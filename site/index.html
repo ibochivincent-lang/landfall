@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Landfall — settlement record for Stellar anchors</title>
+<style>
+  :root {
+    --surface-1: #fcfcfb;
+    --plane: #f9f9f7;
+    --text-primary: #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted: #898781;
+    --gridline: #e1e0d9;
+    --baseline: #c3c2b7;
+    --border: rgba(11,11,11,0.10);
+    --good: #0ca30c;
+    --warning: #fab219;
+    --critical: #d03b3b;
+    --neutral: #b8b7b0;
+    --accent: #2a78d6;
+    color-scheme: light;
+  }
+  :root[data-theme="dark"] {
+    --surface-1: #1a1a19;
+    --plane: #0d0d0d;
+    --text-primary: #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted: #898781;
+    --gridline: #2c2c2a;
+    --baseline: #383835;
+    --border: rgba(255,255,255,0.10);
+    --good: #0ca30c;
+    --warning: #fab219;
+    --critical: #d03b3b;
+    --neutral: #4a4a46;
+    --accent: #3987e5;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--plane);
+    color: var(--text-primary);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  /* ---- header ---- */
+  header { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 44px; }
+  .brand { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+  .logo { font-size: 26px; font-weight: 640; letter-spacing: -0.02em; }
+  .tagline { color: var(--text-secondary); font-size: 15px; }
+  .sub { color: var(--text-muted); font-size: 13.5px; margin-top: 6px; max-width: 62ch; }
+
+  button.theme {
+    background: var(--surface-1); color: var(--text-secondary);
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: 7px 13px; font: inherit; font-size: 13px; cursor: pointer;
+    white-space: nowrap;
+  }
+  button.theme:hover { color: var(--text-primary); }
+
+  /* ---- hero ---- */
+  .hero {
+    background: var(--surface-1); border: 1px solid var(--border);
+    border-radius: 14px; padding: 30px 32px; margin-bottom: 18px;
+  }
+  .hero-label { color: var(--text-secondary); font-size: 13.5px; text-transform: uppercase; letter-spacing: 0.07em; }
+  .hero-figure { font-size: 62px; font-weight: 620; letter-spacing: -0.035em; line-height: 1.08; margin: 10px 0 2px; }
+  .hero-figure .of { color: var(--text-muted); font-weight: 400; font-size: 34px; letter-spacing: -0.02em; }
+  .hero-say { font-size: 17px; color: var(--text-primary); max-width: 58ch; }
+  .hero-note { color: var(--text-secondary); font-size: 14px; margin-top: 12px; max-width: 66ch; }
+  .hero-note strong { color: var(--text-primary); font-weight: 600; }
+
+  /* ---- stat tiles ---- */
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(168px,1fr)); gap: 12px; margin-bottom: 34px; }
+  .tile { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 17px 19px; }
+  .tile .k { color: var(--text-secondary); font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .tile .v { font-size: 27px; font-weight: 600; letter-spacing: -0.02em; margin-top: 5px; }
+  .tile .n { color: var(--text-muted); font-size: 12.5px; margin-top: 2px; }
+
+  /* ---- sections ---- */
+  section { margin-bottom: 40px; }
+  h2 { font-size: 17.5px; font-weight: 620; margin: 0 0 4px; letter-spacing: -0.01em; }
+  .lede { color: var(--text-secondary); font-size: 14px; margin: 0 0 22px; max-width: 70ch; }
+
+  .panel { background: var(--surface-1); border: 1px solid var(--border); border-radius: 14px; padding: 26px 28px; }
+
+  /* ---- legend ---- */
+  .legend { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 22px; }
+  .lg { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--text-secondary); }
+  .sw { width: 11px; height: 11px; border-radius: 3px; flex: none; }
+  .sw-hatch { background-image: repeating-linear-gradient(45deg, rgba(0,0,0,.34) 0 2px, transparent 2px 5px); }
+  .lg svg { flex: none; }
+
+  /* ---- bar chart ---- */
+  .chart { position: relative; }
+  .row { display: grid; grid-template-columns: 190px 1fr 96px; align-items: center; gap: 14px; padding: 5px 0; }
+  .row-label { font-size: 13px; color: var(--text-secondary); text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .row-label .acct { color: var(--text-muted); font-variant-numeric: tabular-nums; }
+  .track { position: relative; height: 20px; }
+  .bar {
+    position: absolute; left: 0; top: 2px; height: 16px;
+    border-radius: 0 4px 4px 0; min-width: 3px;
+    transition: opacity .12s ease;
+  }
+  /* Texture is the accessibility channel, not decoration. Status green and red
+     sit at CVD ΔE 4.1 under deuteranopia — far below the separation floor — so
+     colour alone cannot carry the live/dark distinction. Dark bars are hatched,
+     live bars solid, and every row also carries an icon and a text label. */
+  .bar.is-dark {
+    background-image: repeating-linear-gradient(
+      45deg,
+      rgba(0,0,0,.34) 0 3px,
+      transparent 3px 7px
+    );
+  }
+  :root[data-theme="dark"] .bar.is-dark {
+    background-image: repeating-linear-gradient(
+      45deg,
+      rgba(0,0,0,.42) 0 3px,
+      transparent 3px 7px
+    );
+  }
+  .bar.is-none { background-image: none; opacity: .7; }
+  .row:hover .bar { opacity: .82; }
+  .row-val { font-size: 13px; font-variant-numeric: tabular-nums; color: var(--text-primary); }
+  .row-state { font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-muted); }
+
+  .threshold { position: absolute; top: 0; bottom: 26px; width: 1px; background: var(--baseline); }
+  .threshold::after {
+    content: "30 days"; position: absolute; top: -18px; left: 6px;
+    font-size: 11.5px; color: var(--text-muted); white-space: nowrap;
+  }
+  .axis { display: grid; grid-template-columns: 190px 1fr 96px; gap: 14px; margin-top: 8px; }
+  .axis-inner { position: relative; height: 18px; border-top: 1px solid var(--gridline); }
+  .tick { position: absolute; top: 4px; font-size: 11.5px; color: var(--text-muted); transform: translateX(-50%); font-variant-numeric: tabular-nums; }
+
+  /* ---- tooltip ---- */
+  .tip {
+    position: fixed; pointer-events: none; opacity: 0; z-index: 40;
+    background: var(--surface-1); border: 1px solid var(--border);
+    border-radius: 9px; padding: 10px 13px; font-size: 12.5px;
+    box-shadow: 0 6px 24px rgba(0,0,0,.16); transition: opacity .1s ease;
+    max-width: 260px;
+  }
+  .tip .t { font-weight: 620; margin-bottom: 5px; }
+  .tip .l { color: var(--text-secondary); display: flex; justify-content: space-between; gap: 18px; }
+  .tip .l b { color: var(--text-primary); font-weight: 560; font-variant-numeric: tabular-nums; }
+
+  /* ---- table ---- */
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th, td { text-align: right; padding: 9px 10px; border-bottom: 1px solid var(--gridline); }
+  th:first-child, td:first-child { text-align: left; }
+  th { color: var(--text-muted); font-weight: 560; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.06em; }
+  td { font-variant-numeric: tabular-nums; color: var(--text-secondary); }
+  td:first-child { color: var(--text-primary); font-variant-numeric: normal; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: color-mix(in srgb, var(--text-primary) 3.5%, transparent); }
+  .chip { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; letter-spacing: .04em; text-transform: uppercase; }
+  .chip .sw { width: 9px; height: 9px; }
+  .mono { font-variant-numeric: tabular-nums; color: var(--text-muted); font-size: 12.5px; }
+
+  details.tablewrap { margin-top: 20px; }
+  details.tablewrap summary { cursor: pointer; font-size: 13.5px; color: var(--text-secondary); padding: 6px 0; }
+  details.tablewrap summary:hover { color: var(--text-primary); }
+
+  /* ---- caveat ---- */
+  .caveat { border-left: 2px solid var(--warning); padding: 2px 0 2px 16px; margin: 20px 0 0; }
+  .caveat p { margin: 0 0 8px; font-size: 13.5px; color: var(--text-secondary); max-width: 74ch; }
+  .caveat p:last-child { margin-bottom: 0; }
+  .caveat strong { color: var(--text-primary); font-weight: 600; }
+
+  footer { border-top: 1px solid var(--gridline); padding-top: 22px; color: var(--text-muted); font-size: 12.5px; }
+  footer a { color: var(--text-secondary); }
+  code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: .92em; }
+
+  @media (max-width: 700px) {
+    .row, .axis { grid-template-columns: 118px 1fr 74px; gap: 9px; }
+    .hero-figure { font-size: 46px; }
+    .row-label { font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <div class="brand">
+        <span class="logo">Landfall</span>
+        <span class="tagline">Did the money land?</span>
+      </div>
+      <div class="sub">
+        Settlement record for Stellar anchors, derived entirely from public ledger data.
+        We don't ask anchors how they're doing — we read what they actually did.
+      </div>
+    </div>
+    <button class="theme" id="themeBtn" type="button">Light</button>
+  </header>
+
+  <div class="hero">
+    <div class="hero-label">Anchor accounts dormant over 30 days</div>
+    <div class="hero-figure"><span id="heroN">6</span><span class="of"> of 13</span></div>
+    <div class="hero-say">Nearly half the anchor accounts we can discover have processed no on-chain settlement in over a month.</div>
+    <div class="hero-note">
+      <strong>Every account with payment history at ntokens.com is dark.</strong>
+      An anchor can keep a status page green indefinitely. It cannot fake a month of on-chain silence.
+    </div>
+  </div>
+
+  <div class="tiles">
+    <div class="tile"><div class="k">Accounts tracked</div><div class="v">13</div><div class="n">across 5 domains</div></div>
+    <div class="tile"><div class="k">Payments indexed</div><div class="v">3,974</div><div class="n">inbound, dust excluded</div></div>
+    <div class="tile"><div class="k">Returned to sender</div><div class="v">0.13%</div><div class="n">5 payments</div></div>
+    <div class="tile"><div class="k">Median return time</div><div class="v">0.3h</div><div class="n">n=5 — observation only</div></div>
+  </div>
+
+  <section>
+    <h2>Time since last settlement</h2>
+    <p class="lede">
+      Every declared anchor account, sorted by dormancy. Read straight off the ledger —
+      no heuristic, no self-report, nothing an anchor can edit.
+    </p>
+
+    <div class="panel">
+      <div class="legend">
+        <span class="lg"><span class="sw" style="background:var(--good)"></span> ● Live — under 48h</span>
+        <span class="lg"><span class="sw" style="background:var(--warning)"></span> ◐ Slow — 2 to 30 days</span>
+        <span class="lg"><span class="sw sw-hatch" style="background:var(--critical)"></span> ▲ Dark — over 30 days</span>
+        <span class="lg"><span class="sw" style="background:var(--neutral)"></span> ○ No payment history</span>
+      </div>
+
+      <div class="chart" id="chart"></div>
+
+      <details class="tablewrap">
+        <summary>View as table</summary>
+        <table>
+          <thead>
+            <tr>
+              <th>Domain</th><th>Account</th><th>In</th><th>Out</th>
+              <th>Returns</th><th>Last settlement</th><th>State</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <h2>What a low return rate does not mean</h2>
+    <div class="panel">
+      <div class="caveat">
+        <p>
+          <strong>A return is the honest failure mode.</strong> When an anchor can't complete the
+          off-chain leg of a withdrawal, sending the asset back is what a good actor does — and
+          that return is visible on the ledger.
+        </p>
+        <p>
+          An anchor that accepts value, fails to settle, and simply keeps it produces
+          <strong>no return event at all</strong>. It scores a clean 0.00% — identical to an anchor
+          that never fails. The worst conduct we could hope to detect is exactly the conduct that
+          leaves no trace in this metric.
+        </p>
+        <p>
+          So 0.13% is not a clean bill of health. It is the absence of one specific kind of evidence.
+          Closing that gap needs the fiat leg, which means signed settlement attestations — the next
+          thing we're building.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    Scan of 12 August 2026 · 13 accounts resolved from SEP-1 declarations across 5 home domains ·
+    Liveness read directly from the ledger; return matching is a documented heuristic ·
+    Every figure ships with its transaction hashes so any claim here can be checked against the ledger ·
+    <a href="https://github.com/ibochivincent-lang/landfall">Source and methodology</a>
+  </footer>
+</div>
+
+<div class="tip" id="tip" role="status" aria-live="polite"></div>
+
+<script>
+// Real figures from the 12 Aug 2026 scan. In production this renders from
+// out/scan-*.json rather than being inlined.
+const ACCOUNTS = [
+  { domain:"cowrie.exchange",       acct:"GDI5…TMNN", days:73.2, inn:10,   out:0,   ret:0, state:"dark" },
+  { domain:"anclap.com",            acct:"GA4T…BPEN", days:58.1, inn:5,    out:0,   ret:0, state:"dark" },
+  { domain:"ntokens.com",           acct:"GDKL…LMT6", days:34.6, inn:0,    out:0,   ret:0, state:"dark", approx:true },
+  { domain:"ntokens.com",           acct:"GCVV…KX6P", days:34.4, inn:15,   out:0,   ret:0, state:"dark" },
+  { domain:"cowrie.exchange",       acct:"GBQZ…V3GT", days:34.3, inn:56,   out:3,   ret:0, state:"dark" },
+  { domain:"ntokens.com",           acct:"GDVK…VVSP", days:34.2, inn:62,   out:45,  ret:0, state:"dark" },
+  { domain:"anclap.com",            acct:"GARD…3HOT", days:1.87, inn:1490, out:755, ret:2, state:"live" },
+  { domain:"mykobo.co",             acct:"GAQR…Z7NM", days:1.28, inn:19,   out:4,   ret:0, state:"live" },
+  { domain:"mykobo.co",             acct:"GCY3…TKBD", days:1.27, inn:745,  out:580, ret:3, state:"live" },
+  { domain:"cowrie.exchange",       acct:"GAWO…CCPD", days:1.14, inn:54,   out:0,   ret:0, state:"live" },
+  { domain:"anclap.com",            acct:"GCYE…DARS", days:0.004,inn:18,   out:0,   ret:0, state:"live" },
+  { domain:"stellar.moneygram.com", acct:"GA5Z…KZVN", days:0.004,inn:2157, out:0,   ret:0, state:"live" },
+  { domain:"cowrie.exchange",       acct:"GBSK…RE3W", days:null, inn:0,    out:0,   ret:0, state:"none" },
+];
+
+const COLORS = { live:"var(--good)", slow:"var(--warning)", dark:"var(--critical)", none:"var(--neutral)" };
+const LABEL  = { live:"live", slow:"slow", dark:"DARK", none:"no payments" };
+// Icon is the third channel, after texture and text — status never rides on hue alone.
+const ICON   = { live:"\u25CF", slow:"\u25D0", dark:"\u25B2", none:"\u25CB" };
+
+const MAX = 80;              // days, chart domain
+const TICKS = [0,20,40,60,80];
+
+function fmtAge(d) {
+  if (d === null) return "—";
+  if (d < 2) { const h = d*24; return h < 1 ? (h*60).toFixed(0)+"m" : h.toFixed(1)+"h"; }
+  return d.toFixed(1)+"d";
+}
+
+const chart = document.getElementById("chart");
+const tip = document.getElementById("tip");
+
+// threshold marker at 30 days, positioned over the track column
+const thr = document.createElement("div");
+thr.className = "threshold";
+chart.appendChild(thr);
+
+ACCOUNTS.forEach(a => {
+  const row = document.createElement("div");
+  row.className = "row";
+
+  const label = document.createElement("div");
+  label.className = "row-label";
+  label.innerHTML = a.domain.replace("stellar.moneygram.com","moneygram") +
+                    ' <span class="acct">' + a.acct.slice(0,5) + '</span>';
+  row.appendChild(label);
+
+  const track = document.createElement("div");
+  track.className = "track";
+  const bar = document.createElement("div");
+  bar.className = "bar";
+  const pct = a.days === null ? 0 : Math.min(a.days / MAX, 1) * 100;
+  bar.style.width = a.days === null ? "3px" : "max(3px, " + pct.toFixed(2) + "%)";
+  bar.style.backgroundColor = COLORS[a.state];
+  if (a.state === "dark") bar.classList.add("is-dark");
+  if (a.state === "none") bar.classList.add("is-none");
+  track.appendChild(bar);
+  row.appendChild(track);
+
+  const val = document.createElement("div");
+  val.innerHTML = '<div class="row-val">' + (a.approx ? "≈" : "") + fmtAge(a.days) +
+                  '</div><div class="row-state">' + ICON[a.state] + " " + LABEL[a.state] + '</div>';
+  row.appendChild(val);
+
+  row.addEventListener("mousemove", e => {
+    tip.innerHTML =
+      '<div class="t">' + a.domain + '</div>' +
+      '<div class="l"><span>Account</span><b>' + a.acct + '</b></div>' +
+      '<div class="l"><span>State</span><b>' + ICON[a.state] + " " + LABEL[a.state] + '</b></div>' +
+      '<div class="l"><span>Last settlement</span><b>' + (a.approx ? "≈" : "") + fmtAge(a.days) + ' ago</b></div>' +
+      '<div class="l"><span>Inbound</span><b>' + a.inn.toLocaleString() + '</b></div>' +
+      '<div class="l"><span>Outbound</span><b>' + a.out.toLocaleString() + '</b></div>' +
+      '<div class="l"><span>Returned</span><b>' + a.ret + '</b></div>';
+    tip.style.opacity = 1;
+    const w = 250, pad = 14;
+    tip.style.left = Math.min(e.clientX + pad, window.innerWidth - w - pad) + "px";
+    tip.style.top = (e.clientY + pad) + "px";
+  });
+  row.addEventListener("mouseleave", () => { tip.style.opacity = 0; });
+
+  chart.appendChild(row);
+});
+
+// axis
+const axis = document.createElement("div");
+axis.className = "axis";
+axis.innerHTML = '<div></div><div class="axis-inner" id="ai"></div><div></div>';
+chart.appendChild(axis);
+const ai = axis.querySelector("#ai");
+TICKS.forEach(t => {
+  const el = document.createElement("span");
+  el.className = "tick";
+  el.style.left = (t / MAX * 100) + "%";
+  el.textContent = t === 0 ? "0" : t + "d";
+  ai.appendChild(el);
+});
+
+// place the 30-day threshold line over the track column
+function placeThreshold() {
+  const track = chart.querySelector(".track");
+  if (!track) return;
+  const cr = chart.getBoundingClientRect(), tr = track.getBoundingClientRect();
+  thr.style.left = (tr.left - cr.left + tr.width * 30 / MAX) + "px";
+}
+placeThreshold();
+window.addEventListener("resize", placeThreshold);
+
+// table
+const tbody = document.getElementById("tbody");
+ACCOUNTS.forEach(a => {
+  const tr = document.createElement("tr");
+  tr.innerHTML =
+    "<td>" + a.domain + "</td>" +
+    '<td class="mono">' + a.acct + "</td>" +
+    "<td>" + a.inn.toLocaleString() + "</td>" +
+    "<td>" + a.out.toLocaleString() + "</td>" +
+    "<td>" + a.ret + "</td>" +
+    "<td>" + (a.approx ? "≈" : "") + fmtAge(a.days) + "</td>" +
+    '<td><span class="chip"><span class="sw' + (a.state==="dark"?" sw-hatch":"") + '" style="background:' + COLORS[a.state] + '"></span>' + ICON[a.state] + " " + LABEL[a.state] + "</span></td>";
+  tbody.appendChild(tr);
+});
+
+// theme toggle
+const btn = document.getElementById("themeBtn");
+function sync() {
+  btn.textContent = document.documentElement.dataset.theme === "dark" ? "Light" : "Dark";
+}
+btn.addEventListener("click", () => {
+  document.documentElement.dataset.theme =
+    document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+  sync(); placeThreshold();
+});
+sync();
+</script>
+</body>
+</html>

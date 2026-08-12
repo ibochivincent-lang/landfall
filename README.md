@@ -4,6 +4,25 @@
 
 Ledger-derived settlement record for Stellar anchors.
 
+**Live: [landfall.vercel.app](https://landfall.vercel.app)** · [Methodology](docs/methodology.md) · [Contributing](CONTRIBUTING.md)
+
+> **Submitted to the Drips Stellar Wave Program.** Issues are labelled by
+> complexity — `trivial-100`, `medium-150`, `high-200` — and tagged
+> `Stellar Wave`. New contributors should start with `good-first-issue`.
+> **Wait to be assigned before you start coding**; an unassigned issue is not
+> yours. See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+---
+
+## Current finding
+
+From the scan of 12 August 2026, across 13 anchor accounts on 5 home domains:
+
+> **6 of 13 anchor accounts have processed no on-chain settlement in over 30 days.**
+> Every account with payment history at one anchor is dark.
+
+Verified against stellar.expert. Every figure ships with its transaction hashes.
+
 ---
 
 ## The difference
