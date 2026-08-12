@@ -1,5 +1,5 @@
 <#
-    Landfall — bring the GitHub repo up to the standard the approved
+    Landfall - bring the GitHub repo up to the standard the approved
     Stellar Wave repos hold.
 
     Observed on every approved repo: a description, a homepage link, topics
@@ -11,7 +11,7 @@
         gh auth status                  # confirm the right account
         .\scripts\setup-repo.ps1
 
-    Safe to re-run. Sets metadata and labels only — it files no issues.
+    Safe to re-run. Sets metadata and labels only - it files no issues.
     Use scripts\setup-issues.ps1 for those.
 #>
 
@@ -38,7 +38,7 @@ Write-Host ""
 
 # ---- description and homepage ---------------------------------------------
 
-$description = "Ledger-derived settlement record for Stellar anchors. We don't ask anchors how they're doing — we read what they actually did."
+$description = "Ledger-derived settlement record for Stellar anchors. We don't ask anchors how they're doing - we read what they actually did."
 
 if ($PSCmdlet.ShouldProcess($Repo, "set description and homepage")) {
     gh repo edit $Repo --description $description --homepage $Homepage | Out-Null
@@ -55,9 +55,11 @@ $topics = @(
 )
 
 if ($PSCmdlet.ShouldProcess($Repo, "set topics")) {
-    $args = @()
-    foreach ($t in $topics) { $args += "--add-topic"; $args += $t }
-    gh repo edit $Repo @args | Out-Null
+    # NOT $args - that is an automatic variable and assigning to it
+    # misbehaves under Windows PowerShell 5.1.
+    $topicArgs = @()
+    foreach ($t in $topics) { $topicArgs += "--add-topic"; $topicArgs += $t }
+    gh repo edit $Repo @topicArgs | Out-Null
     Write-Host "Topics set: $($topics -join ', ')"
 }
 

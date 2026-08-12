@@ -1,12 +1,12 @@
 <#
-    Landfall — create Wave labels and file the backlog as GitHub issues.
+    Landfall - create Wave labels and file the backlog as GitHub issues.
 
     Run once, from the repo root, after pushing:
 
         gh auth status              # confirm you are ibochivincent-lang
         .\scripts\setup-issues.ps1
 
-    Idempotent for labels (uses --force). NOT idempotent for issues — running
+    Idempotent for labels (uses --force). NOT idempotent for issues - running
     it twice files 16 duplicates. Use -WhatIf first if unsure.
 #>
 
@@ -105,7 +105,7 @@ $issues = @(
         body   = Body `
             "Some accounts have many tiny payments that clear the dust threshold but still carry no real volume. Add a per-asset volume floor." `
             "Accounts below the floor are excluded from the headline but still listed in the table with their true figures." `
-            "Follow the existing suppression pattern — never silently drop a row, mark it."
+            "Follow the existing suppression pattern - never silently drop a row, mark it."
     },
     @{
         title  = "Emit a CSV alongside the JSON scan output"
@@ -120,7 +120,7 @@ $issues = @(
         title  = "Read SEP-24 memos to correlate transaction legs"
         labels = "Stellar Wave,medium-150,module/metrics"
         body   = Body `
-            "The highest-value item in the repo. Refund detection currently matches on counterparty, asset, amount tolerance and time window, which both over- and under-counts (see docs/methodology.md section 5). SEP-24 uses memos to correlate legs — read them and correlate directly." `
+            "The highest-value item in the repo. Refund detection currently matches on counterparty, asset, amount tolerance and time window, which both over- and under-counts (see docs/methodology.md section 5). SEP-24 uses memos to correlate legs - read them and correlate directly." `
             "Memo-matched pairs are marked ``confidence: ""memo""`` versus ``""heuristic""`` in the JSON, and the report distinguishes the two counts." `
             "This converts the project's core metric from an inference into a measurement. Update docs/methodology.md in the same PR."
     },
@@ -183,7 +183,7 @@ $issues = @(
         body   = Body `
             "A publishable package exposing ``pickAnchor({from, to, amount})`` returning a ranked list with confidence." `
             "Package builds, ships types, and returns rankings against the public API." `
-            "This is the distribution strategy — wallets embed it and the end user never sees the brand. Do not build a consumer dashboard instead."
+            "This is the distribution strategy - wallets embed it and the end user never sees the brand. Do not build a consumer dashboard instead."
     },
     @{
         title  = "MCP server exposing anchor quality to payment agents"
@@ -199,7 +199,7 @@ $issues = @(
         body   = Body `
             "An on-chain contract publishing periodic signed digests so other Soroban contracts can route programmatically." `
             "Contract deployed to testnet, digests verifiable against the published dataset, contract tests included, MIT licensed." `
-            "Must be open source — this is a commitment in the grant application."
+            "Must be open source - this is a commitment in the grant application."
     }
 )
 
