@@ -1,429 +1,414 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Landfall — settlement record for Stellar anchors</title>
-<style>
-  :root {
-    --surface-1: #fcfcfb;
-    --plane: #f9f9f7;
-    --text-primary: #0b0b0b;
-    --text-secondary: #52514e;
-    --text-muted: #898781;
-    --gridline: #e1e0d9;
-    --baseline: #c3c2b7;
-    --border: rgba(11,11,11,0.10);
-    --good: #0ca30c;
-    --warning: #fab219;
-    --critical: #d03b3b;
-    --neutral: #b8b7b0;
-    --accent: #2a78d6;
-    color-scheme: light;
-  }
-  :root[data-theme="dark"] {
-    --surface-1: #1a1a19;
-    --plane: #0d0d0d;
-    --text-primary: #ffffff;
-    --text-secondary: #c3c2b7;
-    --text-muted: #898781;
-    --gridline: #2c2c2a;
-    --baseline: #383835;
-    --border: rgba(255,255,255,0.10);
-    --good: #0ca30c;
-    --warning: #fab219;
-    --critical: #d03b3b;
-    --neutral: #4a4a46;
-    --accent: #3987e5;
-    color-scheme: dark;
-  }
-
-  * { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; }
-  body {
-    background: var(--plane);
-    color: var(--text-primary);
-    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-    font-size: 15px;
-    line-height: 1.55;
-    -webkit-font-smoothing: antialiased;
-  }
-  .wrap { max-width: 1080px; margin: 0 auto; padding: 40px 24px 80px; }
-
-  /* ---- header ---- */
-  header { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 44px; }
-  .brand { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
-  .logo { font-size: 26px; font-weight: 640; letter-spacing: -0.02em; }
-  .tagline { color: var(--text-secondary); font-size: 15px; }
-  .sub { color: var(--text-muted); font-size: 13.5px; margin-top: 6px; max-width: 62ch; }
-
-  button.theme {
-    background: var(--surface-1); color: var(--text-secondary);
-    border: 1px solid var(--border); border-radius: 8px;
-    padding: 7px 13px; font: inherit; font-size: 13px; cursor: pointer;
-    white-space: nowrap;
-  }
-  button.theme:hover { color: var(--text-primary); }
-
-  /* ---- hero ---- */
-  .hero {
-    background: var(--surface-1); border: 1px solid var(--border);
-    border-radius: 14px; padding: 30px 32px; margin-bottom: 18px;
-  }
-  .hero-label { color: var(--text-secondary); font-size: 13.5px; text-transform: uppercase; letter-spacing: 0.07em; }
-  .hero-figure { font-size: 62px; font-weight: 620; letter-spacing: -0.035em; line-height: 1.08; margin: 10px 0 2px; }
-  .hero-figure .of { color: var(--text-muted); font-weight: 400; font-size: 34px; letter-spacing: -0.02em; }
-  .hero-say { font-size: 17px; color: var(--text-primary); max-width: 58ch; }
-  .hero-note { color: var(--text-secondary); font-size: 14px; margin-top: 12px; max-width: 66ch; }
-  .hero-note strong { color: var(--text-primary); font-weight: 600; }
-
-  /* ---- stat tiles ---- */
-  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(168px,1fr)); gap: 12px; margin-bottom: 34px; }
-  .tile { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 17px 19px; }
-  .tile .k { color: var(--text-secondary); font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.06em; }
-  .tile .v { font-size: 27px; font-weight: 600; letter-spacing: -0.02em; margin-top: 5px; }
-  .tile .n { color: var(--text-muted); font-size: 12.5px; margin-top: 2px; }
-
-  /* ---- sections ---- */
-  section { margin-bottom: 40px; }
-  h2 { font-size: 17.5px; font-weight: 620; margin: 0 0 4px; letter-spacing: -0.01em; }
-  .lede { color: var(--text-secondary); font-size: 14px; margin: 0 0 22px; max-width: 70ch; }
-
-  .panel { background: var(--surface-1); border: 1px solid var(--border); border-radius: 14px; padding: 26px 28px; }
-
-  /* ---- legend ---- */
-  .legend { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 22px; }
-  .lg { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--text-secondary); }
-  .sw { width: 11px; height: 11px; border-radius: 3px; flex: none; }
-  .sw-hatch { background-image: repeating-linear-gradient(45deg, rgba(0,0,0,.34) 0 2px, transparent 2px 5px); }
-  .lg svg { flex: none; }
-
-  /* ---- bar chart ---- */
-  .chart { position: relative; }
-  .row { display: grid; grid-template-columns: 190px 1fr 96px; align-items: center; gap: 14px; padding: 5px 0; }
-  .row-label { font-size: 13px; color: var(--text-secondary); text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .row-label .acct { color: var(--text-muted); font-variant-numeric: tabular-nums; }
-  .track { position: relative; height: 20px; }
-  .bar {
-    position: absolute; left: 0; top: 2px; height: 16px;
-    border-radius: 0 4px 4px 0; min-width: 3px;
-    transition: opacity .12s ease;
-  }
-  /* Texture is the accessibility channel, not decoration. Status green and red
-     sit at CVD ΔE 4.1 under deuteranopia — far below the separation floor — so
-     colour alone cannot carry the live/dark distinction. Dark bars are hatched,
-     live bars solid, and every row also carries an icon and a text label. */
-  .bar.is-dark {
-    background-image: repeating-linear-gradient(
-      45deg,
-      rgba(0,0,0,.34) 0 3px,
-      transparent 3px 7px
-    );
-  }
-  :root[data-theme="dark"] .bar.is-dark {
-    background-image: repeating-linear-gradient(
-      45deg,
-      rgba(0,0,0,.42) 0 3px,
-      transparent 3px 7px
-    );
-  }
-  .bar.is-none { background-image: none; opacity: .7; }
-  .row:hover .bar { opacity: .82; }
-  .row-val { font-size: 13px; font-variant-numeric: tabular-nums; color: var(--text-primary); }
-  .row-state { font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-muted); }
-
-  .threshold { position: absolute; top: 0; bottom: 26px; width: 1px; background: var(--baseline); }
-  .threshold::after {
-    content: "30 days"; position: absolute; top: -18px; left: 6px;
-    font-size: 11.5px; color: var(--text-muted); white-space: nowrap;
-  }
-  .axis { display: grid; grid-template-columns: 190px 1fr 96px; gap: 14px; margin-top: 8px; }
-  .axis-inner { position: relative; height: 18px; border-top: 1px solid var(--gridline); }
-  .tick { position: absolute; top: 4px; font-size: 11.5px; color: var(--text-muted); transform: translateX(-50%); font-variant-numeric: tabular-nums; }
-
-  /* ---- tooltip ---- */
-  .tip {
-    position: fixed; pointer-events: none; opacity: 0; z-index: 40;
-    background: var(--surface-1); border: 1px solid var(--border);
-    border-radius: 9px; padding: 10px 13px; font-size: 12.5px;
-    box-shadow: 0 6px 24px rgba(0,0,0,.16); transition: opacity .1s ease;
-    max-width: 260px;
-  }
-  .tip .t { font-weight: 620; margin-bottom: 5px; }
-  .tip .l { color: var(--text-secondary); display: flex; justify-content: space-between; gap: 18px; }
-  .tip .l b { color: var(--text-primary); font-weight: 560; font-variant-numeric: tabular-nums; }
-
-  /* ---- table ---- */
-  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
-  th, td { text-align: right; padding: 9px 10px; border-bottom: 1px solid var(--gridline); }
-  th:first-child, td:first-child { text-align: left; }
-  th { color: var(--text-muted); font-weight: 560; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.06em; }
-  td { font-variant-numeric: tabular-nums; color: var(--text-secondary); }
-  td:first-child { color: var(--text-primary); font-variant-numeric: normal; }
-  tbody tr:last-child td { border-bottom: none; }
-  tbody tr:hover td { background: color-mix(in srgb, var(--text-primary) 3.5%, transparent); }
-  .chip { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; letter-spacing: .04em; text-transform: uppercase; }
-  .chip .sw { width: 9px; height: 9px; }
-  .mono { font-variant-numeric: tabular-nums; color: var(--text-muted); font-size: 12.5px; }
-
-  details.tablewrap { margin-top: 20px; }
-  details.tablewrap summary { cursor: pointer; font-size: 13.5px; color: var(--text-secondary); padding: 6px 0; }
-  details.tablewrap summary:hover { color: var(--text-primary); }
-
-  /* ---- caveat ---- */
-  .caveat { border-left: 2px solid var(--warning); padding: 2px 0 2px 16px; margin: 20px 0 0; }
-  .caveat p { margin: 0 0 8px; font-size: 13.5px; color: var(--text-secondary); max-width: 74ch; }
-  .caveat p:last-child { margin-bottom: 0; }
-  .caveat strong { color: var(--text-primary); font-weight: 600; }
-
-  footer { border-top: 1px solid var(--gridline); padding-top: 22px; color: var(--text-muted); font-size: 12.5px; }
-  footer a { color: var(--text-secondary); }
-  code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: .92em; }
-
-  @media (max-width: 700px) {
-    .row, .axis { grid-template-columns: 118px 1fr 74px; gap: 9px; }
-    .hero-figure { font-size: 46px; }
-    .row-label { font-size: 12px; }
-  }
-</style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Landfall — did the money land?</title>
+<meta name="description" content="Settlement quality for Stellar anchors, read straight off the public ledger. 6 of 13 anchor accounts have settled nothing in over 30 days.">
+<meta property="og:title" content="Landfall — did the money land?">
+<meta property="og:description" content="We don't ask anchors how they're doing. We read what they actually did.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='16' fill='%23ffcf3d'/><circle cx='12' cy='18' r='7' fill='%23f64b2c'/><circle cx='22' cy='13' r='5' fill='%233b4fe8'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<div class="wrap">
 
-  <header>
-    <div>
-      <div class="brand">
-        <span class="logo">Landfall</span>
-        <span class="tagline">Did the money land?</span>
-      </div>
-      <div class="sub">
-        Settlement record for Stellar anchors, derived entirely from public ledger data.
-        We don't ask anchors how they're doing — we read what they actually did.
-      </div>
-    </div>
-    <button class="theme" id="themeBtn" type="button">Light</button>
-  </header>
-
-  <div class="hero">
-    <div class="hero-label">Anchor accounts dormant over 30 days</div>
-    <div class="hero-figure"><span id="heroN">6</span><span class="of"> of 13</span></div>
-    <div class="hero-say">Nearly half the anchor accounts we can discover have processed no on-chain settlement in over a month.</div>
-    <div class="hero-note">
-      <strong>Every account with payment history at ntokens.com is dark.</strong>
-      An anchor can keep a status page green indefinitely. It cannot fake a month of on-chain silence.
-    </div>
+<!-- ============ LOADER ============ -->
+<div class="loader" id="loader">
+  <div class="loader__blocks">
+    <div class="loader__block loader__block--1"></div>
+    <div class="loader__block loader__block--2"></div>
+    <div class="loader__block loader__block--3"></div>
+    <div class="loader__block loader__block--4"></div>
   </div>
-
-  <div class="tiles">
-    <div class="tile"><div class="k">Accounts tracked</div><div class="v">13</div><div class="n">across 5 domains</div></div>
-    <div class="tile"><div class="k">Payments indexed</div><div class="v">3,974</div><div class="n">inbound, dust excluded</div></div>
-    <div class="tile"><div class="k">Returned to sender</div><div class="v">0.13%</div><div class="n">5 payments</div></div>
-    <div class="tile"><div class="k">Median return time</div><div class="v">0.3h</div><div class="n">n=5 — observation only</div></div>
+  <div class="loader__meta">
+    <span id="loader-label">READING LEDGER</span>
+    <span class="loader__counter" id="loader-counter">0%</span>
   </div>
-
-  <section>
-    <h2>Time since last settlement</h2>
-    <p class="lede">
-      Every declared anchor account, sorted by dormancy. Read straight off the ledger —
-      no heuristic, no self-report, nothing an anchor can edit.
-    </p>
-
-    <div class="panel">
-      <div class="legend">
-        <span class="lg"><span class="sw" style="background:var(--good)"></span> ● Live — under 48h</span>
-        <span class="lg"><span class="sw" style="background:var(--warning)"></span> ◐ Slow — 2 to 30 days</span>
-        <span class="lg"><span class="sw sw-hatch" style="background:var(--critical)"></span> ▲ Dark — over 30 days</span>
-        <span class="lg"><span class="sw" style="background:var(--neutral)"></span> ○ No payment history</span>
-      </div>
-
-      <div class="chart" id="chart"></div>
-
-      <details class="tablewrap">
-        <summary>View as table</summary>
-        <table>
-          <thead>
-            <tr>
-              <th>Domain</th><th>Account</th><th>In</th><th>Out</th>
-              <th>Returns</th><th>Last settlement</th><th>State</th>
-            </tr>
-          </thead>
-          <tbody id="tbody"></tbody>
-        </table>
-      </details>
-    </div>
-  </section>
-
-  <section>
-    <h2>What a low return rate does not mean</h2>
-    <div class="panel">
-      <div class="caveat">
-        <p>
-          <strong>A return is the honest failure mode.</strong> When an anchor can't complete the
-          off-chain leg of a withdrawal, sending the asset back is what a good actor does — and
-          that return is visible on the ledger.
-        </p>
-        <p>
-          An anchor that accepts value, fails to settle, and simply keeps it produces
-          <strong>no return event at all</strong>. It scores a clean 0.00% — identical to an anchor
-          that never fails. The worst conduct we could hope to detect is exactly the conduct that
-          leaves no trace in this metric.
-        </p>
-        <p>
-          So 0.13% is not a clean bill of health. It is the absence of one specific kind of evidence.
-          Closing that gap needs the fiat leg, which means signed settlement attestations — the next
-          thing we're building.
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <footer>
-    Scan of 12 August 2026 · 13 accounts resolved from SEP-1 declarations across 5 home domains ·
-    Liveness read directly from the ledger; return matching is a documented heuristic ·
-    Every figure ships with its transaction hashes so any claim here can be checked against the ledger ·
-    <a href="https://github.com/ibochivincent-lang/landfall">Source and methodology</a>
-  </footer>
+  <div class="loader__cover" id="loader-cover"></div>
 </div>
 
-<div class="tip" id="tip" role="status" aria-live="polite"></div>
+<!-- ============ NAV ============ -->
+<header class="topnav" id="topnav"><div class="wrap topnav__in">
+  <a href="#" class="topnav__logo" data-nav-el>
+    <svg viewBox="0 0 32 32" class="topnav__logo-mark" aria-hidden="true">
+      <circle cx="12" cy="18" r="9" fill="#f64b2c"/>
+      <circle cx="23" cy="12" r="6" fill="#3b4fe8"/>
+    </svg>
+    <span>landfall<em>.</em></span>
+  </a>
 
-<script>
-// Real figures from the 12 Aug 2026 scan. In production this renders from
-// out/scan-*.json rather than being inlined.
-const ACCOUNTS = [
-  { domain:"cowrie.exchange",       acct:"GDI5…TMNN", days:73.2, inn:10,   out:0,   ret:0, state:"dark" },
-  { domain:"anclap.com",            acct:"GA4T…BPEN", days:58.1, inn:5,    out:0,   ret:0, state:"dark" },
-  { domain:"ntokens.com",           acct:"GDKL…LMT6", days:34.6, inn:0,    out:0,   ret:0, state:"dark", approx:true },
-  { domain:"ntokens.com",           acct:"GCVV…KX6P", days:34.4, inn:15,   out:0,   ret:0, state:"dark" },
-  { domain:"cowrie.exchange",       acct:"GBQZ…V3GT", days:34.3, inn:56,   out:3,   ret:0, state:"dark" },
-  { domain:"ntokens.com",           acct:"GDVK…VVSP", days:34.2, inn:62,   out:45,  ret:0, state:"dark" },
-  { domain:"anclap.com",            acct:"GARD…3HOT", days:1.87, inn:1490, out:755, ret:2, state:"live" },
-  { domain:"mykobo.co",             acct:"GAQR…Z7NM", days:1.28, inn:19,   out:4,   ret:0, state:"live" },
-  { domain:"mykobo.co",             acct:"GCY3…TKBD", days:1.27, inn:745,  out:580, ret:3, state:"live" },
-  { domain:"cowrie.exchange",       acct:"GAWO…CCPD", days:1.14, inn:54,   out:0,   ret:0, state:"live" },
-  { domain:"anclap.com",            acct:"GCYE…DARS", days:0.004,inn:18,   out:0,   ret:0, state:"live" },
-  { domain:"stellar.moneygram.com", acct:"GA5Z…KZVN", days:0.004,inn:2157, out:0,   ret:0, state:"live" },
-  { domain:"cowrie.exchange",       acct:"GBSK…RE3W", days:null, inn:0,    out:0,   ret:0, state:"none" },
-];
+  <nav class="topnav__pill" data-nav-el>
+    <div class="topnav__item" data-dd>
+      <button class="topnav__link">Product <span class="topnav__caret">&#9662;</span></button>
+      <div class="dropdown">
+        <a href="#data"><span class="ico" style="background:#ffe9b8">📊</span><span><b>Live anchor data</b><span>Every declared account, ranked by silence</span></span></a>
+        <a href="#how"><span class="ico" style="background:#d9f2f5">⚓</span><span><b>How it works</b><span>Ledger truth, attestation, routing</span></span></a>
+        <a href="#developers"><span class="ico" style="background:#ffd9d0">⚡</span><span><b>SDK &amp; API</b><span>pickAnchor() for wallets and agents</span></span></a>
+      </div>
+    </div>
+    <div class="topnav__item"><a class="topnav__link" href="#pricing">Pricing</a></div>
+    <div class="topnav__item" data-dd>
+      <button class="topnav__link">Company <span class="topnav__caret">&#9662;</span></button>
+      <div class="dropdown">
+        <a href="https://github.com/ibochivincent-lang/landfall/blob/main/docs/methodology.md"><span class="ico" style="background:#e2e0ff">📐</span><span><b>Methodology</b><span>Exactly how every number is derived</span></span></a>
+        <a href="https://github.com/ibochivincent-lang/landfall"><span class="ico" style="background:#e8e8ee">🐙</span><span><b>Open source</b><span>MIT, and every claim is checkable</span></span></a>
+        <a href="#contact"><span class="ico" style="background:#d7f5dd">✉️</span><span><b>Contact us</b><span>Wallets, anchors, disputes</span></span></a>
+      </div>
+    </div>
+  </nav>
 
-const COLORS = { live:"var(--good)", slow:"var(--warning)", dark:"var(--critical)", none:"var(--neutral)" };
-const LABEL  = { live:"live", slow:"slow", dark:"DARK", none:"no payments" };
-// Icon is the third channel, after texture and text — status never rides on hue alone.
-const ICON   = { live:"\u25CF", slow:"\u25D0", dark:"\u25B2", none:"\u25CB" };
+  <div class="topnav__actions">
+    <button class="btn btn--ghost" data-nav-el id="loginBtn">Log in</button>
+    <a class="btn btn--primary" href="#contact" data-nav-el>Get API access</a>
+    <button class="burger" id="burger" aria-label="Menu" data-nav-el><span></span><span></span><span></span></button>
+  </div>
+</div></header>
 
-const MAX = 80;              // days, chart domain
-const TICKS = [0,20,40,60,80];
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#data">Live data</a>
+  <a href="#how">How it works</a>
+  <a href="#developers">Developers</a>
+  <a href="#pricing">Pricing</a>
+  <a href="#faq">FAQ</a>
+  <a href="#contact">Contact us</a>
+  <button class="btn btn--ghost btn--block" id="loginBtnM">Log in</button>
+  <a class="btn btn--primary btn--block" href="#contact">Get API access</a>
+</div>
 
-function fmtAge(d) {
-  if (d === null) return "—";
-  if (d < 2) { const h = d*24; return h < 1 ? (h*60).toFixed(0)+"m" : h.toFixed(1)+"h"; }
-  return d.toFixed(1)+"d";
-}
+<!-- ============ HERO ============ -->
+<section class="hero" id="hero">
+  <div class="bg">
+    <div class="bg__base"></div>
+    <div class="bg__tri bg__tri--left"  data-el="tri-left"></div>
+    <div class="bg__tri bg__tri--right" data-el="tri-right"></div>
+  </div>
 
-const chart = document.getElementById("chart");
-const tip = document.getElementById("tip");
+  <div class="scene" id="scene">
+    <div class="scene__sun" data-el="sun">
+      <svg viewBox="0 0 140 140"><circle cx="70" cy="70" r="46" fill="#fff3b0"/><circle cx="70" cy="70" r="34" fill="#fff8d6"/></svg>
+    </div>
 
-// threshold marker at 30 days, positioned over the track column
-const thr = document.createElement("div");
-thr.className = "threshold";
-chart.appendChild(thr);
+    <div class="scene__cloud-a" data-el="cloud-a">
+      <svg viewBox="0 0 300 170">
+        <ellipse cx="80"  cy="115" rx="74" ry="50" fill="#fff"/>
+        <ellipse cx="155" cy="92"  rx="60" ry="54" fill="#fff"/>
+        <ellipse cx="214" cy="120" rx="50" ry="41" fill="#fff"/>
+        <ellipse cx="135" cy="136" rx="70" ry="36" fill="#fff"/>
+      </svg>
+    </div>
+    <div class="scene__cloud-b" data-el="cloud-b">
+      <svg viewBox="0 0 240 140">
+        <ellipse cx="70"  cy="94" rx="60" ry="40" fill="#fffdf2"/>
+        <ellipse cx="132" cy="76" rx="50" ry="44" fill="#fffdf2"/>
+        <ellipse cx="180" cy="98" rx="42" ry="34" fill="#fffdf2"/>
+      </svg>
+    </div>
 
-ACCOUNTS.forEach(a => {
-  const row = document.createElement("div");
-  row.className = "row";
+    <div class="scene__birds" data-el="birds">
+      <svg viewBox="0 0 180 120">
+        <path d="M 20 30 Q 32 18 45 30 Q 58 18 70 30" stroke="#3b4fe8" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <path d="M 92 68 Q 106 54 120 68 Q 134 54 148 68" stroke="#3b4fe8" stroke-width="5" fill="none" stroke-linecap="round"/>
+      </svg>
+    </div>
 
-  const label = document.createElement("div");
-  label.className = "row-label";
-  label.innerHTML = a.domain.replace("stellar.moneygram.com","moneygram") +
-                    ' <span class="acct">' + a.acct.slice(0,5) + '</span>';
-  row.appendChild(label);
+    <!-- The beacon. Landfall = reaching shore; the lamp is the signal. -->
+    <div class="scene__lighthouse" data-el="lighthouse">
+      <svg viewBox="0 0 220 400">
+        <g id="beam" style="transform-origin:110px 92px">
+          <polygon points="110,92 220,30 220,154" fill="#fff3b0" opacity=".55"/>
+        </g>
+        <rect x="72" y="130" width="76" height="180" rx="8" fill="#fef5d3"/>
+        <rect x="72" y="168" width="76" height="30" fill="#f64b2c"/>
+        <rect x="72" y="234" width="76" height="30" fill="#f64b2c"/>
+        <rect x="60" y="300" width="100" height="26" rx="10" fill="#3b4fe8"/>
+        <rect x="64" y="112" width="92" height="22" rx="8" fill="#3b4fe8"/>
+        <rect x="84" y="66" width="52" height="48" rx="8" fill="#1b2560"/>
+        <circle cx="110" cy="90" r="15" fill="#ffcf3d" id="lamp"/>
+        <polygon points="84,66 136,66 110,34" fill="#f64b2c"/>
+        <rect x="30" y="322" width="160" height="20" rx="10" fill="#f8a9b3"/>
+      </svg>
+    </div>
 
-  const track = document.createElement("div");
-  track.className = "track";
-  const bar = document.createElement("div");
-  bar.className = "bar";
-  const pct = a.days === null ? 0 : Math.min(a.days / MAX, 1) * 100;
-  bar.style.width = a.days === null ? "3px" : "max(3px, " + pct.toFixed(2) + "%)";
-  bar.style.backgroundColor = COLORS[a.state];
-  if (a.state === "dark") bar.classList.add("is-dark");
-  if (a.state === "none") bar.classList.add("is-none");
-  track.appendChild(bar);
-  row.appendChild(track);
+    <!-- Anchors: upright ones are settling, the tilted one is dark. -->
+    <div class="scene__anchors" data-el="anchors">
+      <svg viewBox="0 0 300 220">
+        <g id="anchor-a" fill="none" stroke="#3b4fe8" stroke-width="11" stroke-linecap="round">
+          <circle cx="60" cy="34" r="15"/>
+          <path d="M60 50 V150"/><path d="M30 76 H90"/>
+          <path d="M22 118 a38 38 0 0 0 76 0"/>
+        </g>
+        <g id="anchor-b" fill="none" stroke="#2fb5c4" stroke-width="11" stroke-linecap="round">
+          <circle cx="165" cy="60" r="13"/>
+          <path d="M165 74 V158"/><path d="M139 96 H191"/>
+          <path d="M132 132 a33 33 0 0 0 66 0"/>
+        </g>
+        <g id="anchor-c" fill="none" stroke="#d03b3b" stroke-width="11" stroke-linecap="round" style="transform-origin:255px 120px">
+          <circle cx="255" cy="72" r="12"/>
+          <path d="M255 85 V160"/><path d="M232 104 H278"/>
+          <path d="M226 136 a29 29 0 0 0 58 0"/>
+        </g>
+      </svg>
+    </div>
 
-  const val = document.createElement("div");
-  val.innerHTML = '<div class="row-val">' + (a.approx ? "≈" : "") + fmtAge(a.days) +
-                  '</div><div class="row-state">' + ICON[a.state] + " " + LABEL[a.state] + '</div>';
-  row.appendChild(val);
+    <!-- Coins arcing in and landing. -->
+    <div class="scene__coins" data-el="coins">
+      <svg viewBox="0 0 300 200">
+        <g class="coin" id="coin1"><circle cx="40"  cy="150" r="21" fill="#ffcf3d" stroke="#e8940c" stroke-width="4"/><text x="40"  y="158" font-size="20" font-weight="700" text-anchor="middle" fill="#e8940c" font-family="Nunito, sans-serif">$</text></g>
+        <g class="coin" id="coin2"><circle cx="140" cy="60"  r="25" fill="#ffcf3d" stroke="#e8940c" stroke-width="4"/><text x="140" y="69"  font-size="23" font-weight="700" text-anchor="middle" fill="#e8940c" font-family="Nunito, sans-serif">$</text></g>
+        <g class="coin" id="coin3"><circle cx="245" cy="130" r="19" fill="#ffcf3d" stroke="#e8940c" stroke-width="4"/><text x="245" y="137" font-size="18" font-weight="700" text-anchor="middle" fill="#e8940c" font-family="Nunito, sans-serif">$</text></g>
+      </svg>
+    </div>
 
-  row.addEventListener("mousemove", e => {
-    tip.innerHTML =
-      '<div class="t">' + a.domain + '</div>' +
-      '<div class="l"><span>Account</span><b>' + a.acct + '</b></div>' +
-      '<div class="l"><span>State</span><b>' + ICON[a.state] + " " + LABEL[a.state] + '</b></div>' +
-      '<div class="l"><span>Last settlement</span><b>' + (a.approx ? "≈" : "") + fmtAge(a.days) + ' ago</b></div>' +
-      '<div class="l"><span>Inbound</span><b>' + a.inn.toLocaleString() + '</b></div>' +
-      '<div class="l"><span>Outbound</span><b>' + a.out.toLocaleString() + '</b></div>' +
-      '<div class="l"><span>Returned</span><b>' + a.ret + '</b></div>';
-    tip.style.opacity = 1;
-    const w = 250, pad = 14;
-    tip.style.left = Math.min(e.clientX + pad, window.innerWidth - w - pad) + "px";
-    tip.style.top = (e.clientY + pad) + "px";
-  });
-  row.addEventListener("mouseleave", () => { tip.style.opacity = 0; });
+    <div class="scene__sea" data-el="sea">
+      <svg viewBox="0 0 1440 220" preserveAspectRatio="none">
+        <path id="wave1" d="M0,110 C220,54 420,158 720,110 C1020,62 1240,150 1440,104 L1440,220 L0,220 Z" fill="#3b4fe8" opacity=".92"/>
+        <path id="wave2" d="M0,148 C260,96 470,190 760,146 C1050,102 1260,182 1440,142 L1440,220 L0,220 Z" fill="#2a38b8"/>
+      </svg>
+    </div>
 
-  chart.appendChild(row);
-});
+    <span class="scene__dot scene__dot--1" data-el="dots"></span>
+    <span class="scene__dot scene__dot--2" data-el="dots"></span>
+    <span class="scene__dot scene__dot--3" data-el="dots"></span>
+  </div>
 
-// axis
-const axis = document.createElement("div");
-axis.className = "axis";
-axis.innerHTML = '<div></div><div class="axis-inner" id="ai"></div><div></div>';
-chart.appendChild(axis);
-const ai = axis.querySelector("#ai");
-TICKS.forEach(t => {
-  const el = document.createElement("span");
-  el.className = "tick";
-  el.style.left = (t / MAX * 100) + "%";
-  el.textContent = t === 0 ? "0" : t + "d";
-  ai.appendChild(el);
-});
+  <button class="arrow arrow--left" id="prev" aria-label="Previous" data-nav-el>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 6l-6 6 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <button class="arrow arrow--right" id="next" aria-label="Next" data-nav-el>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
 
-// place the 30-day threshold line over the track column
-function placeThreshold() {
-  const track = chart.querySelector(".track");
-  if (!track) return;
-  const cr = chart.getBoundingClientRect(), tr = track.getBoundingClientRect();
-  thr.style.left = (tr.left - cr.left + tr.width * 30 / MAX) + "px";
-}
-placeThreshold();
-window.addEventListener("resize", placeThreshold);
+  <div class="card" id="card" data-card>
+    <div class="card__eyebrow" id="cardEyebrow">SETTLEMENT RECORD FOR STELLAR ANCHORS</div>
+    <h1 class="card__title">
+      <span class="card__line">DID THE MONEY</span>
+      <span class="card__line">LAND?</span>
+    </h1>
+    <span class="card__tag" id="cardTag">6 OF 13 ANCHORS ARE DARK</span>
+    <div class="card__dots" id="cardDots">
+      <button class="card__dot is-active" aria-label="Slide 1"></button>
+      <button class="card__dot" aria-label="Slide 2"></button>
+      <button class="card__dot" aria-label="Slide 3"></button>
+    </div>
+  </div>
+</section>
 
-// table
-const tbody = document.getElementById("tbody");
-ACCOUNTS.forEach(a => {
-  const tr = document.createElement("tr");
-  tr.innerHTML =
-    "<td>" + a.domain + "</td>" +
-    '<td class="mono">' + a.acct + "</td>" +
-    "<td>" + a.inn.toLocaleString() + "</td>" +
-    "<td>" + a.out.toLocaleString() + "</td>" +
-    "<td>" + a.ret + "</td>" +
-    "<td>" + (a.approx ? "≈" : "") + fmtAge(a.days) + "</td>" +
-    '<td><span class="chip"><span class="sw' + (a.state==="dark"?" sw-hatch":"") + '" style="background:' + COLORS[a.state] + '"></span>' + ICON[a.state] + " " + LABEL[a.state] + "</span></td>";
-  tbody.appendChild(tr);
-});
+<!-- ============ STATS ============ -->
+<section class="section section--cream"><div class="wrap">
+  <div class="stats">
+    <div class="stat rv"><div class="stat__v pop"><span id="c1">0</span> / 13</div><div class="stat__k">Dark over 30 days</div><div class="stat__n">nearly half of every account</div></div>
+    <div class="stat rv"><div class="stat__v"><span id="c2">0</span></div><div class="stat__k">Payments indexed</div><div class="stat__n">inbound, dust excluded</div></div>
+    <div class="stat rv"><div class="stat__v">0.13%</div><div class="stat__k">Returned to sender</div><div class="stat__n">5 payments</div></div>
+    <div class="stat rv"><div class="stat__v">0.3h</div><div class="stat__k">Median return</div><div class="stat__n">n=5 — observation only</div></div>
+  </div>
+</div></section>
 
-// theme toggle
-const btn = document.getElementById("themeBtn");
-function sync() {
-  btn.textContent = document.documentElement.dataset.theme === "dark" ? "Light" : "Dark";
-}
-btn.addEventListener("click", () => {
-  document.documentElement.dataset.theme =
-    document.documentElement.dataset.theme === "dark" ? "light" : "dark";
-  sync(); placeThreshold();
-});
-sync();
-</script>
+<!-- ============ DATA ============ -->
+<section class="section section--white" id="data"><div class="wrap">
+  <div class="rv">
+    <span class="eyebrow">Live from the ledger</span>
+    <h2 class="big">Every declared anchor account, sorted by silence.</h2>
+    <p class="lede">No heuristic, no self-report, nothing an anchor can edit. An anchor can keep a status page green indefinitely — <b>it cannot fake a month of on-chain silence.</b></p>
+  </div>
+
+  <div class="panel rv">
+    <div class="legend">
+      <span class="lg"><span class="sw" style="background:#2f9e44"></span>● Live · under 48h</span>
+      <span class="lg"><span class="sw" style="background:#e8940c"></span>◐ Slow · 2–30 days</span>
+      <span class="lg"><span class="sw sw-hatch" style="background:#d03b3b"></span>▲ Dark · over 30 days</span>
+      <span class="lg"><span class="sw" style="background:#c9c9d4"></span>○ No payment history</span>
+    </div>
+    <div class="chart" id="chart"></div>
+    <details class="tbl">
+      <summary>Table view</summary>
+      <table>
+        <thead><tr><th>Domain</th><th>Account</th><th>In</th><th>Out</th><th>Returns</th><th>Last settlement</th><th>State</th></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </details>
+  </div>
+</div></section>
+
+<!-- ============ HOW ============ -->
+<section class="section section--cream" id="how"><div class="wrap">
+  <div class="rv">
+    <span class="eyebrow">How it works</span>
+    <h2 class="big">Stop interrogating. Start observing.</h2>
+    <p class="lede">Under SEP-24, one leg of every deposit and withdrawal is written to a public ledger. That record already exists, for every anchor, going back years — and <b>nobody needs to give permission to read it.</b></p>
+  </div>
+  <div class="steps">
+    <div class="step rv"><div class="step__n" style="background:#f64b2c">01</div><h3>Discover</h3><p>Resolve every anchor's home domain to the on-chain accounts it declares under SEP-1. A domain that won't resolve is reported, never quietly skipped.</p></div>
+    <div class="step rv"><div class="step__n" style="background:#3b4fe8">02</div><h3>Index</h3><p>Page the full payment history for each account, with resumable cursors. Interrupted work resumes — the failure mode is stale, never wrong.</p></div>
+    <div class="step rv"><div class="step__n" style="background:#2fb5c4">03</div><h3>Publish</h3><p>Liveness, volume, returns and concentration, each with the transaction hashes behind it. Anyone can recompute every figure from the same ledger.</p></div>
+  </div>
+</div></section>
+
+<!-- ============ DEVELOPERS ============ -->
+<section class="section section--navy" id="developers"><div class="wrap">
+  <div class="split">
+    <div class="rv">
+      <span class="eyebrow">For wallets &amp; agents</span>
+      <h2 class="big">One call. The right anchor.</h2>
+      <p class="lede">Nobody sending money home comparison-shops on a dashboard. So the product isn't a dashboard — it's a function your wallet calls before it routes, and an MCP surface a payment agent can query directly.</p>
+      <a class="btn btn--primary btn--lg" href="#contact">Get API access</a>
+    </div>
+    <div class="code rv">
+<pre><span class="c">// rank anchors by expected landed value</span>
+<span class="k">import</span> { <span class="f">pickAnchor</span> } <span class="k">from</span> <span class="s">'@landfall/sdk'</span>
+
+<span class="k">const</span> ranked = <span class="k">await</span> <span class="f">pickAnchor</span>({
+  from:   <span class="s">'USDC'</span>,
+  to:     <span class="s">'NGN'</span>,
+  amount: <span class="s">100</span>
+})
+
+<span class="c">// [{ domain: 'mykobo.co',</span>
+<span class="c">//    liveness: 'live',</span>
+<span class="c">//    lastSettlement: '1.3h',</span>
+<span class="c">//    confidence: 0.94 }, ...]</span></pre>
+    </div>
+  </div>
+</div></section>
+
+<!-- ============ PRICING ============ -->
+<section class="section section--cream" id="pricing"><div class="wrap">
+  <div class="rv">
+    <span class="eyebrow">Pricing</span>
+    <h2 class="big">The data is free. The volume isn't.</h2>
+    <p class="lede">Public dashboards and the raw dataset stay open forever — a reputation record nobody can read is worthless. Paid tiers cover teams querying it in production.</p>
+  </div>
+  <div class="tiers">
+    <div class="tier rv">
+      <div class="tier__name">Open</div>
+      <div class="tier__price">Free</div>
+      <div class="tier__per">forever, no account</div>
+      <ul><li>Full public dataset</li><li>Every transaction hash</li><li>Published methodology</li><li>1,000 API calls / month</li></ul>
+      <a class="btn btn--ghost btn--block" href="#data">Browse the data</a>
+    </div>
+    <div class="tier featured rv">
+      <div class="tier__name">Wallet</div>
+      <div class="tier__price">$99</div>
+      <div class="tier__per">per month</div>
+      <ul><li>Everything in Open</li><li>250k API calls / month</li><li><code>@landfall/sdk</code> with pickAnchor()</li><li>MCP server for agents</li><li>Webhooks when an anchor goes dark</li></ul>
+      <a class="btn btn--primary btn--block" href="#contact">Start a trial</a>
+    </div>
+    <div class="tier rv">
+      <div class="tier__name">Anchor</div>
+      <div class="tier__price">Talk</div>
+      <div class="tier__per">to us</div>
+      <ul><li>Verified data feed</li><li>Dispute portal access</li><li>Pre-publication alerts</li><li>Scores are never for sale</li></ul>
+      <a class="btn btn--ghost btn--block" href="#contact">Contact us</a>
+    </div>
+  </div>
+</div></section>
+
+<!-- ============ CAVEAT ============ -->
+<section class="section section--white"><div class="wrap">
+  <div class="rv">
+    <span class="eyebrow">What we can't see</span>
+    <h2 class="big">A low return rate is not a clean bill of health.</h2>
+  </div>
+  <div class="caveat rv">
+    <p><b>A return is the honest failure mode.</b> When an anchor can't complete the off-chain leg of a withdrawal, sending the asset back is what a good actor does — and that return is visible on the ledger.</p>
+    <p>An anchor that accepts value, fails to settle, and simply keeps it produces <b>no return event at all</b>. It scores a clean 0.00% — identical to an anchor that never fails.</p>
+    <p>So 0.13% isn't reassurance. It's the absence of one specific kind of evidence, and we'd rather say so than let a number flatter us. Closing that gap needs the fiat leg, which means signed settlement attestations. That's what we're building next.</p>
+  </div>
+</div></section>
+
+<!-- ============ FAQ ============ -->
+<section class="section section--cream" id="faq"><div class="wrap">
+  <div class="rv"><span class="eyebrow">FAQ</span><h2 class="big">Questions people actually ask.</h2></div>
+  <div class="faq">
+    <details class="qa rv"><summary>Where does the data come from?</summary><p>Public Stellar ledger records, via Horizon. Anchor accounts are resolved from each domain's SEP-1 declaration. No anchor supplies us with anything, and none can opt out.</p></details>
+    <details class="qa rv"><summary>What if you get a figure wrong?</summary><p>Every number ships with its transaction hashes, so a disagreement is settled by checking the ledger rather than by argument. We've already published two defects we found in our own tool during verification, including what the numbers were before and after.</p></details>
+    <details class="qa rv"><summary>Is "dark" the same as "fraudulent"?</summary><p>No, and we're careful never to imply it. Dark means the account has processed no on-chain settlement in over 30 days. That's a fact about the ledger. Why an anchor is quiet is not something we claim to know.</p></details>
+    <details class="qa rv"><summary>I run an anchor and I think you're wrong.</summary><p>Get in touch. Bring the account and the scan date; we'll check it against the ledger together. If our method is at fault we fix it publicly and say so. Scores are not for sale, in either direction.</p></details>
+    <details class="qa rv"><summary>Is it open source?</summary><p>MIT, entirely. Indexer, metrics, methodology and this site. A reputation system that can't be audited has no claim on anyone's trust.</p></details>
+  </div>
+</div></section>
+
+<!-- ============ CONTACT ============ -->
+<section class="section section--white" id="contact"><div class="wrap">
+  <div class="split">
+    <div class="rv">
+      <span class="eyebrow">Contact us</span>
+      <h2 class="big">Wallets, anchors, and awkward questions.</h2>
+      <p class="lede">Building a wallet and want anchor quality in your routing? Running an anchor and think a figure is wrong? Researching corridors? All of that lands in the same inbox and gets a real reply.</p>
+      <p class="lede" style="margin-bottom:0"><b>Lagos, Nigeria</b><br>In the corridor we measure.</p>
+    </div>
+    <form class="form rv" id="contactForm" novalidate>
+      <div class="field"><label for="cname">Name</label><input id="cname" name="name" type="text" required placeholder="Your name"></div>
+      <div class="field"><label for="cmail">Email</label><input id="cmail" name="email" type="email" required placeholder="you@company.com"></div>
+      <div class="field"><label for="ctopic">I'm here about</label>
+        <select id="ctopic" name="topic">
+          <option>API access for a wallet</option>
+          <option>Disputing a figure about my anchor</option>
+          <option>Research or press</option>
+          <option>Contributing to the project</option>
+          <option>Something else</option>
+        </select>
+      </div>
+      <div class="field"><label for="cmsg">Message</label><textarea id="cmsg" name="message" required placeholder="What would you like to know?"></textarea></div>
+      <button class="btn btn--primary btn--lg btn--block" type="submit">Send message</button>
+      <div class="form__ok" id="formOk">Thanks — that's noted. This demo form doesn't send anywhere yet; wire it to your inbox before launch.</div>
+      <p class="form__note">We reply to everything. Anchor disputes get priority.</p>
+    </form>
+  </div>
+</div></section>
+
+<!-- ============ FOOTER ============ -->
+<footer><div class="wrap">
+  <div class="foot-grid">
+    <div>
+      <div class="foot-brand">landfall<em>.</em></div>
+      <p style="max-width:34ch;font-size:.92rem">Settlement quality for Stellar anchors, read straight off the public ledger. Open source, MIT.</p>
+    </div>
+    <div class="foot-col"><h4>Product</h4>
+      <a href="#data">Live data</a><a href="#how">How it works</a><a href="#developers">SDK &amp; API</a><a href="#pricing">Pricing</a>
+    </div>
+    <div class="foot-col"><h4>Resources</h4>
+      <a href="https://github.com/ibochivincent-lang/landfall/blob/main/docs/methodology.md">Methodology</a>
+      <a href="https://github.com/ibochivincent-lang/landfall/blob/main/docs/roadmap.md">Roadmap</a>
+      <a href="https://github.com/ibochivincent-lang/landfall/blob/main/CONTRIBUTING.md">Contributing</a>
+      <a href="#faq">FAQ</a>
+    </div>
+    <div class="foot-col"><h4>Company</h4>
+      <a href="#contact">Contact us</a>
+      <a href="https://github.com/ibochivincent-lang/landfall">GitHub</a>
+      <a href="https://github.com/ibochivincent-lang/landfall/blob/main/SECURITY.md">Security</a>
+      <a href="https://github.com/ibochivincent-lang/landfall/blob/main/CODE_OF_CONDUCT.md">Code of conduct</a>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    <span>Scan of 12 August 2026 · 13 accounts across 5 home domains · verified against stellar.expert</span>
+    <span>© 2026 Landfall · MIT</span>
+  </div>
+</div></footer>
+
+<!-- ============ LOGIN MODAL ============ -->
+<div class="modal" id="loginModal" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+  <div class="modal__scrim" data-close></div>
+  <div class="modal__box">
+    <button class="modal__x" data-close aria-label="Close">✕</button>
+    <h3 id="loginTitle">Welcome back</h3>
+    <p class="sub">Log in to manage API keys and dark-anchor alerts.</p>
+    <form class="form" id="loginForm" novalidate>
+      <div class="field"><label for="lmail">Email</label><input id="lmail" type="email" required placeholder="you@company.com" autocomplete="username"></div>
+      <div class="field"><label for="lpass">Password</label><input id="lpass" type="password" required placeholder="••••••••" autocomplete="current-password"></div>
+      <button class="btn btn--primary btn--block btn--lg" type="submit">Log in</button>
+      <div class="form__ok" id="loginOk">Demo only — no account system is wired up yet.</div>
+    </form>
+    <p class="alt">No account? <a href="#contact" data-close>Request API access</a></p>
+  </div>
+</div>
+
+<div class="tip" id="tip"></div>
+
+<script src="vendor/gsap.min.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
