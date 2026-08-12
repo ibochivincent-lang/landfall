@@ -30,7 +30,7 @@ Repo: https://github.com/ibochivincent-lang/landfall (public)
 
 **The writing**
 
-- [x] README, methodology, roadmap, CONTRIBUTING, CLAUDE.md
+- [x] README, methodology, roadmap, CONTRIBUTING, DEVELOPMENT.md
 - [x] 16 backlog items scoped and point-tagged
 - [x] SCF submission pack — interest form copy plus full Build Award draft
 - [x] `scripts/setup-issues.ps1` written and dry-run tested

@@ -19,7 +19,7 @@ before you start coding.** An unassigned issue is not yours.
 
 ## Ground rules
 
-The project has six invariants, listed in [CLAUDE.md](CLAUDE.md). The two that
+The project has six invariants, listed in [DEVELOPMENT.md](DEVELOPMENT.md). The two that
 catch people most often:
 
 - **Money arithmetic is BigInt stroops.** Never `parseFloat` an amount. Use

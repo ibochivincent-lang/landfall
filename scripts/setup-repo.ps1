@@ -18,7 +18,7 @@
 [CmdletBinding(SupportsShouldProcess = $true)]
 param(
     [string]$Repo = "",
-    [string]$Homepage = "https://landfall.vercel.app"
+    [string]$Homepage = "https://landfall-ib.vercel.app"
 )
 
 $ErrorActionPreference = "Stop"
@@ -99,6 +99,7 @@ $files = @{
     "README.md"           = "readme"
     "LICENSE"             = "licence"
     "CONTRIBUTING.md"     = "contributing guide"
+    "DEVELOPMENT.md"      = "development guide"
     "CODE_OF_CONDUCT.md"  = "code of conduct"
     "SECURITY.md"         = "security policy"
     "vercel.json"         = "deploy config"

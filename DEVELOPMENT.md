@@ -1,6 +1,7 @@
-# CLAUDE.md
+# Development guide
 
-Guidance for Claude Code when working in this repository.
+Orientation for anyone working in this repository - the architecture, the
+commands, and the constraints that are not up for negotiation.
 
 ## What this project is
 

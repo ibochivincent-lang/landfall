@@ -4,7 +4,7 @@
 
 Ledger-derived settlement record for Stellar anchors.
 
-**Live: [landfall.vercel.app](https://landfall.vercel.app)** · [Methodology](docs/methodology.md) · [Contributing](CONTRIBUTING.md)
+**Live: [landfall-ib.vercel.app](https://landfall-ib.vercel.app)** · [Methodology](docs/methodology.md) · [Contributing](CONTRIBUTING.md)
 
 > **Submitted to the Drips Stellar Wave Program.** Issues are labelled by
 > complexity — `trivial-100`, `medium-150`, `high-200` — and tagged
@@ -130,12 +130,13 @@ See [docs/roadmap.md](docs/roadmap.md).
 ## Contributing
 
 Issues are scoped and labelled by complexity. Start with `good-first-issue`.
-See [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/backlog.md](docs/backlog.md).
+See [CONTRIBUTING.md](CONTRIBUTING.md), [DEVELOPMENT.md](DEVELOPMENT.md) and
+[docs/backlog.md](docs/backlog.md).
 
 ## Tests
 
 ```bash
-npm test         # 19 tests, no network required
+npm test         # 35 tests, no network required
 npm run typecheck
 ```
 
