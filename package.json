@@ -1,0 +1,21 @@
+{
+  "name": "landfall",
+  "version": "0.1.0",
+  "description": "Ledger-derived settlement record for Stellar anchors. Observe what anchors did, don't ask them how they're doing.",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "scan": "tsx src/cli.ts scan",
+    "discover": "tsx src/cli.ts discover",
+    "test": "tsx --test test/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

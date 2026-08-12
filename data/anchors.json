@@ -1,0 +1,13 @@
+{
+  "note": "Seed list of candidate anchor home domains. Landfall does NOT trust this file — it fetches each domain's /.well-known/stellar.toml and reports which resolved and which did not. A domain that fails to resolve is printed as a finding, never silently dropped. Add or remove domains freely; verify before citing any result publicly.",
+  "domains": [
+    "cowrie.exchange",
+    "mykobo.co",
+    "anclap.com",
+    "vibrantapp.com",
+    "stellar.moneygram.com",
+    "clickpesa.com",
+    "ntokens.com",
+    "settle.network"
+  ]
+}
