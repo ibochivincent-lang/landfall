@@ -76,6 +76,33 @@ async function getJson(
   return (await res.json()) as Record<string, unknown>;
 }
 
+/**
+ * Fetch the single newest payment for an account, ignoring any `since` window.
+ *
+ * Liveness must be measured against the whole ledger, not the analysis window.
+ * An account whose last payment was two years ago returns zero records under a
+ * `--since 2026-01-01` scan; reading that as "no history" would silently drop
+ * the most dormant accounts from the dark count. This call exists so dormancy
+ * and volume are measured independently.
+ *
+ * Returns null when the account genuinely has no payment history.
+ */
+export async function fetchLastActivity(
+  horizon: string,
+  account: string,
+  fetchImpl: typeof fetch = fetch,
+): Promise<{ createdAt: string; totalKnown: number } | null> {
+  const url = `${horizon.replace(/\/$/, "")}/accounts/${account}/payments?limit=1&order=desc`;
+  const body = await getJson(url, fetchImpl);
+  const embedded = body["_embedded"] as { records?: unknown[] } | undefined;
+  const records = embedded?.records ?? [];
+  const first = records[0] as Record<string, unknown> | undefined;
+  if (!first) return null;
+  const createdAt = String(first["created_at"] ?? "");
+  if (!createdAt) return null;
+  return { createdAt, totalKnown: records.length };
+}
+
 export interface FetchPaymentsArgs {
   horizon: string;
   account: string;

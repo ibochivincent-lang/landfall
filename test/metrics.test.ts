@@ -38,6 +38,7 @@ const OPTS: ScanOptions = {
   maxRecords: 1000,
   refundWindowHours: 24 * 30,
   refundTolerance: 0.02,
+  dustThreshold: "0.01",
 };
 
 const ANCHOR_META: AnchorAccount = { domain: "example.com", account: ANCHOR, role: "declared" };
@@ -212,4 +213,68 @@ test("computeMetrics excludes self-payments from both directions", () => {
   assert.equal(m.inbound.count, 0);
   assert.equal(m.outbound.count, 0);
   assert.equal(m.sampled, 1);
+});
+
+/* -------------------------------------------------------------- *
+ * Regression: bugs found by verifying against stellar.expert
+ * -------------------------------------------------------------- */
+
+test("REGRESSION: an account dormant before the --since window keeps its real last-activity date", () => {
+  // GDKL5TOW…LMT6 had 1221 lifetime payments but none since 2026-01-01.
+  // The scan returned zero records and the account was classified as having
+  // no payment history — dropping the single most dormant account in the set
+  // out of the dark count. Liveness must come from outside the window.
+  const m = computeMetrics(
+    ANCHOR_META,
+    [], // nothing inside the window
+    OPTS,
+    new Date("2026-08-12T00:00:00Z"),
+    "2025-09-01T00:00:00Z", // but the ledger knows it last moved a year ago
+  );
+  assert.equal(m.sampled, 0);
+  assert.equal(m.hasLifetimeActivity, true);
+  assert.equal(m.lastActivityAt, "2025-09-01T00:00:00.000Z");
+  assert.ok((m.hoursSinceLastActivity ?? 0) > 24 * 300, "should read as long dormant");
+});
+
+test("an account with genuinely no history anywhere reports hasLifetimeActivity false", () => {
+  const m = computeMetrics(ANCHOR_META, [], OPTS, new Date("2026-08-12T00:00:00Z"), undefined);
+  assert.equal(m.hasLifetimeActivity, false);
+  assert.equal(m.lastActivityAt, undefined);
+});
+
+test("REGRESSION: dust payments are excluded from activity counts", () => {
+  // GCVVC4SL…KX6P reported 86 inbound while the explorer showed 15 payments.
+  // The gap is unsolicited micro-payments in assorted assets. Counting them
+  // makes an abandoned account look busy.
+  const records = [
+    payment(USER_A, ANCHOR, "500", "2026-02-01T00:00:00Z"),
+    payment(USER_B, ANCHOR, "0.0000013", "2026-02-02T00:00:00Z", "XCHF:GI"),
+    payment(USER_B, ANCHOR, "0.0000076", "2026-02-03T00:00:00Z", "IDRT:GI"),
+    payment(USER_B, ANCHOR, "0.0000069", "2026-02-04T00:00:00Z", "CLPX:GI"),
+  ];
+  const m = computeMetrics(ANCHOR_META, records, OPTS, new Date("2026-03-01T00:00:00Z"));
+  assert.equal(m.inbound.count, 1, "only the real payment counts");
+  assert.equal(m.dustExcluded, 3);
+});
+
+test("dust filtering can be disabled with a zero threshold", () => {
+  const records = [payment(USER_B, ANCHOR, "0.0000013", "2026-02-02T00:00:00Z")];
+  const m = computeMetrics(
+    ANCHOR_META,
+    records,
+    { ...OPTS, dustThreshold: "0" },
+    new Date("2026-03-01T00:00:00Z"),
+  );
+  assert.equal(m.inbound.count, 1);
+  assert.equal(m.dustExcluded, 0);
+});
+
+test("dust does not create phantom refund pairs", () => {
+  const records = [
+    payment(USER_A, ANCHOR, "0.000001", "2026-02-01T00:00:00Z"),
+    payment(ANCHOR, USER_A, "0.000001", "2026-02-01T01:00:00Z"),
+  ];
+  const m = computeMetrics(ANCHOR_META, records, OPTS, new Date("2026-03-01T00:00:00Z"));
+  assert.equal(m.refundCount, 0);
 });

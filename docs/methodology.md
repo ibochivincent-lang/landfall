@@ -57,6 +57,34 @@ where drift is immaterial. This is tested — `0.1 + 0.2` sums to exactly `0.3`.
 
 ---
 
+## 3a. Liveness — the census signal
+
+For each account, `hoursSinceLastActivity` is the gap between now and the
+newest payment record in the sample. Accounts are classified:
+
+| Bucket | Definition |
+|---|---|
+| `live` | activity within 48 hours |
+| `slow` | 2 to 30 days |
+| `dark` | no activity for over 30 days |
+| `no-activity` | no payment records at all |
+
+**`no-activity` is not `dark`.** An issuer account moves value through
+trustlines rather than payments, so it can be perfectly healthy with an empty
+payment history. Collapsing the two would manufacture a finding out of normal
+account structure. This distinction is enforced by test.
+
+Liveness is the project's strongest claim because it is a **census, not a
+sample** — every discovered account is classified, so there is no sample-size
+caveat. It is also the least contestable: an anchor can keep a status page
+green indefinitely, but it cannot fake a month of on-chain silence.
+
+A domain is described as fully dark only when it has at least one account with
+payment history and *every* such account is dark. One stale account at a
+multi-account anchor is not the same finding.
+
+---
+
 ## 4. Direction
 
 Relative to the anchor account `A`:
@@ -99,6 +127,30 @@ most once.
 The refund rate is therefore an **indicator, not a measurement**. It is
 published with both transaction hashes for every pair so that any specific
 claim can be checked against the ledger by anyone.
+
+### The limitation that matters most
+
+**A return is the honest failure mode.**
+
+An anchor that accepts value, fails to settle the fiat leg, and simply keeps
+the asset produces *no return event at all*. It scores a clean 0.00% — the
+same as an anchor that never fails. The worst conduct this project could
+hope to detect is precisely the conduct that leaves no trace in this metric.
+
+So a low return rate is **not evidence of good conduct**. It is the absence of
+one specific kind of evidence. Landfall states this wherever a return rate is
+displayed, and any write-up using these figures must carry the same caveat.
+
+Detecting the dishonest failure mode requires the fiat leg, which means
+attestation (Layer 2). Until that ships, liveness is the only signal here that
+supports a strong claim.
+
+### Sample size
+
+Where fewer than 30 matched pairs exist, the report prints `n=` and labels the
+median as an observation about specific transactions rather than a property of
+the anchor. A median over five pairs is not a rate estimate and must not be
+presented as one.
 
 ---
 

@@ -63,12 +63,31 @@ export interface AccountMetrics {
   windowStart?: string;
   windowEnd?: string;
 
-  /** Liveness — cannot be faked, the ledger either has activity or it doesn't. */
+  /**
+   * Liveness — cannot be faked, the ledger either has activity or it doesn't.
+   *
+   * This is deliberately measured OUTSIDE the `--since` window. An account
+   * whose last payment predates the window has zero sampled records, and
+   * treating that as "no history" would hide the most dormant accounts in the
+   * set — the exact opposite of the truth. Liveness answers "when did this
+   * account last do anything, ever", not "within the analysis window".
+   */
   lastActivityAt?: string;
   hoursSinceLastActivity?: number;
+  /** Whether the account has any payment history at all, ignoring the window. */
+  hasLifetimeActivity: boolean;
 
   inbound: { count: number; uniqueCounterparties: number; byAsset: AssetTotals[] };
   outbound: { count: number; uniqueCounterparties: number; byAsset: AssetTotals[] };
+
+  /**
+   * Payments below the dust threshold, excluded from all counts above.
+   *
+   * Abandoned Stellar accounts accumulate unsolicited dust — tiny amounts of
+   * assorted assets sent by spammers. Counting it makes a dead account look
+   * busy, so it is excluded and reported separately.
+   */
+  dustExcluded: number;
 
   /** Refund signal. */
   refundCount: number;
@@ -93,6 +112,11 @@ export interface ScanOptions {
   refundWindowHours: number;
   /** Refund matching: allowed relative difference in amount, e.g. 0.02 = 2%. */
   refundTolerance: number;
+  /**
+   * Payments strictly below this amount are treated as dust and excluded.
+   * Set to "0" to disable filtering.
+   */
+  dustThreshold: string;
 }
 
 export const DEFAULT_SCAN_OPTIONS: ScanOptions = {
@@ -100,4 +124,5 @@ export const DEFAULT_SCAN_OPTIONS: ScanOptions = {
   maxRecords: 2000,
   refundWindowHours: 24 * 30,
   refundTolerance: 0.02,
+  dustThreshold: "0.01",
 };

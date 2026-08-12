@@ -166,13 +166,42 @@ export function detectRefunds(
  * Top-level metrics
  * ------------------------------------------------------------------ */
 
+/**
+ * Split dust off a record set.
+ *
+ * Abandoned accounts accumulate unsolicited micro-payments. Left in, they make
+ * a dead account look busy and inflate every count derived from it.
+ */
+export function partitionDust(
+  records: PaymentRecord[],
+  threshold: string,
+): { kept: PaymentRecord[]; dust: PaymentRecord[] } {
+  const limit = toStroops(threshold);
+  if (limit <= 0n) return { kept: records, dust: [] };
+  const kept: PaymentRecord[] = [];
+  const dust: PaymentRecord[] = [];
+  for (const r of records) {
+    if (toStroops(r.amount) < limit) dust.push(r);
+    else kept.push(r);
+  }
+  return { kept, dust };
+}
+
 export function computeMetrics(
   anchor: AnchorAccount,
-  records: PaymentRecord[],
+  allRecords: PaymentRecord[],
   opts: ScanOptions,
   now: Date = new Date(),
+  /**
+   * Last activity read outside the `--since` window. Pass this whenever it is
+   * available — without it, a fully dormant account reports as having no
+   * history and vanishes from the dark count.
+   */
+  lifetimeLastActivityAt?: string,
 ): AccountMetrics {
   const account = anchor.account;
+  const { kept: records, dust } = partitionDust(allRecords, opts.dustThreshold);
+
   const inbound = records.filter((r) => r.to === account && r.from !== account);
   const outbound = records.filter((r) => r.from === account && r.to !== account);
 
@@ -182,11 +211,22 @@ export function computeMetrics(
     .sort((a, b) => a - b);
 
   const windowStart = times[0] !== undefined ? new Date(times[0]).toISOString() : undefined;
-  const newest = times[times.length - 1];
-  const windowEnd = newest !== undefined ? new Date(newest).toISOString() : undefined;
+  const newestInWindow = times[times.length - 1];
+  const windowEnd =
+    newestInWindow !== undefined ? new Date(newestInWindow).toISOString() : undefined;
+
+  // Prefer the unfiltered lifetime reading; fall back to the window only when
+  // no lifetime value was supplied.
+  const lifetimeMs = lifetimeLastActivityAt ? Date.parse(lifetimeLastActivityAt) : NaN;
+  const newest = Number.isFinite(lifetimeMs) ? lifetimeMs : newestInWindow;
+
+  const lastActivityAt =
+    newest !== undefined && Number.isFinite(newest)
+      ? new Date(newest).toISOString()
+      : undefined;
 
   const hoursSinceLastActivity =
-    newest !== undefined
+    newest !== undefined && Number.isFinite(newest)
       ? Math.round(((now.getTime() - newest) / HOUR_MS) * 100) / 100
       : undefined;
 
@@ -213,8 +253,10 @@ export function computeMetrics(
     sampled: records.length,
     windowStart,
     windowEnd,
-    lastActivityAt: windowEnd,
+    lastActivityAt,
     hoursSinceLastActivity,
+    hasLifetimeActivity: lastActivityAt !== undefined,
+    dustExcluded: dust.length,
     inbound: {
       count: inbound.length,
       uniqueCounterparties: new Set(inbound.map((r) => r.from)).size,
