@@ -106,9 +106,7 @@
   function stampFreshness(body, isSnapshot) {
     const f = $('#freshness');
     if (isSnapshot) {
-      const h = Number(body.staleHours ?? 29);
-      const age = h < 48 ? Math.round(h) + 'h' : Math.round(h / 24) + 'd';
-      f.textContent = 'Snapshot · ' + age + ' old · no live API';
+      f.textContent = 'Scan · 12 Aug 2026';
       f.className = 'freshness';
       return;
     }
@@ -236,18 +234,16 @@
     if (!state.domain) return;
     const btn = $('#moreBtn');
 
-    // Snapshot mode: no payments endpoint available — show a clear message.
+    // Snapshot mode: no payments endpoint available.
     if (state.isSnapshot) {
       if (reset) { $('#txBody').innerHTML = ''; state.rows = 0; }
       if (state.rows === 0) {
         $('#txBody').appendChild(el('tr', '',
           '<td colspan="7" class="tx-none">' +
-          'Transaction-level data requires a live API connection. ' +
-          'The anchor summary above is from the snapshot scan of 12 August 2026. ' +
-          '<a href="https://github.com/ibochivincent-lang/landfall/blob/main/docs/deployment.md" ' +
-          'target="_blank" rel="noopener" style="color:var(--teal);font-weight:700">Deploy the API</a> to see live rows.' +
+          'Row-level transactions are available when the live API is connected. ' +
+          'Anchor summaries above reflect the 12 August 2026 ledger scan.' +
           '</td>'));
-        $('#txCount').textContent = 'Snapshot — no row-level data';
+        $('#txCount').textContent = '';
       }
       btn.hidden = true;
       return;
