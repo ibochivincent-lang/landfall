@@ -118,6 +118,13 @@ a { color: inherit; }
 .dropdown span { display: block; font-size: .78rem; color: var(--ink-3); }
 
 .topnav__actions { display: flex; align-items: center; gap: .6rem; }
+/* Any author `display` rule outranks the user-agent stylesheet's
+   `[hidden] { display: none }`, so `.btn` below silently defeats the hidden
+   attribute. That is how a "Load more" button stayed on screen under a table
+   with nothing more to load. One rule, applied once, rather than remembering
+   it at every call site. */
+[hidden] { display: none !important; }
+
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: .45rem;
   font-family: inherit; font-weight: 800; font-size: .93rem; text-decoration: none;
@@ -403,3 +410,129 @@ footer { background: var(--ink); color: rgba(255,255,255,.62); padding: 4.5rem 0
 .freshness.is-snapshot { background: rgba(232,148,12,.12); color: #b8720a; }
 .freshness.is-snapshot::before { background: #e8940c; }
 .tier li em { font-style: normal; opacity: .6; font-size: .85em; }
+
+/* ===========================================================
+   TRANSACTION DASHBOARD
+   =========================================================== */
+.dash-body { background: var(--cream); }
+.dash { padding: 110px 0 80px; min-height: 70vh; }
+
+.dash-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 2rem; flex-wrap: wrap; margin-bottom: 2rem; }
+.dash-title { font-size: clamp(2rem, 4.5vw, 3rem); letter-spacing: -.02em; margin-bottom: .5rem; }
+.dash-sub { color: var(--ink-2); max-width: 58ch; }
+.dash-note { color: var(--ink-3); font-size: .88rem; max-width: 78ch; margin-top: 1.4rem; }
+.dash-note code, .mono { font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+.muted { color: var(--ink-3); }
+
+.dash-empty { background: #fff; border-radius: 26px; padding: 3rem; box-shadow: var(--shadow-sm); max-width: 62ch; }
+.dash-empty h2 { font-size: 1.5rem; margin-bottom: .8rem; }
+.dash-empty p { color: var(--ink-2); margin-bottom: 1rem; }
+.dash-empty .mono { font-size: .82rem; color: var(--red); word-break: break-all; }
+
+/* ---- anchor picker ---- */
+.anchor-strip { display: flex; gap: .8rem; overflow-x: auto; padding-bottom: .8rem; margin-bottom: 1.6rem; }
+.anchor-card {
+  flex: none; text-align: left; cursor: pointer; font-family: inherit;
+  background: #fff; border: 2px solid transparent; border-radius: 18px;
+  padding: 1rem 1.3rem; box-shadow: var(--shadow-sm);
+  transition: transform .2s var(--pop), border-color .2s, box-shadow .2s;
+}
+.anchor-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+.anchor-card.is-on { border-color: var(--orange); }
+.anchor-card.is-dark .anchor-card__name::before { content: "▲ "; color: var(--red); }
+.anchor-card__name { display: block; font-weight: 800; font-size: .98rem; }
+.anchor-card__meta { display: block; font-size: .78rem; color: var(--ink-3); margin-top: .2rem; }
+.anchor-card__meta b { color: var(--red); }
+
+.dash-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px,1fr)); gap: 1rem; margin-bottom: 1.6rem; }
+
+/* ---- filters ---- */
+.filters { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.2rem; }
+.filter-group { display: flex; background: #fff; border-radius: 999px; padding: .3rem; box-shadow: var(--shadow-sm); }
+.chip {
+  border: none; background: none; font-family: inherit; font-weight: 800; font-size: .85rem;
+  padding: .5rem 1.1rem; border-radius: 999px; cursor: pointer; color: var(--ink-2);
+  transition: background .2s, color .2s;
+}
+.chip:hover { color: var(--ink); }
+.chip.is-on { background: var(--ink); color: #fff; }
+.filter-select { display: flex; align-items: center; gap: .5rem; font-size: .8rem; font-weight: 800; color: var(--ink-3); text-transform: uppercase; letter-spacing: .08em; }
+.filter-select select {
+  font-family: inherit; font-size: .9rem; font-weight: 700; text-transform: none; letter-spacing: 0;
+  color: var(--ink); padding: .55rem .9rem; border-radius: 12px;
+  border: 2px solid rgba(10,10,30,.1); background: #fff;
+}
+.filter-select select:focus { outline: none; border-color: var(--orange); }
+.filter-spacer { flex: 1; }
+
+/* ---- transaction table ---- */
+.tx-panel { padding: 0; overflow: hidden; }
+.tx-scroll { overflow-x: auto; }
+table.tx { width: 100%; border-collapse: collapse; font-size: .88rem; }
+table.tx th {
+  text-align: left; font-size: .68rem; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--ink-3); padding: 1rem 1.1rem; border-bottom: 2px solid rgba(10,10,30,.07);
+  position: sticky; top: 0; background: #fff; z-index: 1;
+}
+table.tx td { padding: .8rem 1.1rem; border-bottom: 1px solid rgba(10,10,30,.05); vertical-align: middle; }
+table.tx th.num, table.tx td.num { text-align: right; font-variant-numeric: tabular-nums; }
+table.tx tbody tr:hover td { background: var(--cream); }
+table.tx tbody tr.is-dust td { opacity: .5; }
+table.tx tbody tr:last-child td { border-bottom: none; }
+
+.tx-when { display: block; font-weight: 700; }
+.tx-abs { display: block; font-size: .72rem; color: var(--ink-3); }
+.tx-domain { display: block; font-size: .72rem; color: var(--ink-3); font-family: var(--sans); }
+.tx-memo { max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .8rem; }
+.tx-dust { display: inline-block; margin-left: .4rem; font-size: .62rem; font-weight: 800; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--ink-3); background: rgba(10,10,30,.06); padding: .12rem .4rem; border-radius: 5px; }
+.tx-link { color: var(--blue); text-decoration: none; font-weight: 700; font-size: .82rem; }
+.tx-link:hover { text-decoration: underline; }
+.tx-none { text-align: center; color: var(--ink-3); padding: 3rem 1rem !important; }
+
+.dir { display: inline-block; font-size: .72rem; font-weight: 800; letter-spacing: .05em;
+  padding: .25rem .6rem; border-radius: 8px; white-space: nowrap; }
+.dir--in  { background: rgba(47,158,68,.12);  color: #2f9e44; }
+.dir--out { background: rgba(59,79,232,.10);  color: var(--blue); }
+
+.tx-foot { display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+  padding: 1.1rem 1.4rem; border-top: 2px solid rgba(10,10,30,.06); flex-wrap: wrap; }
+#txCount { font-size: .82rem; color: var(--ink-3); }
+
+@media (max-width: 700px) {
+  .dash { padding: 90px 0 50px; }
+  .tx-abs, .tx-domain { display: none; }
+  table.tx th, table.tx td { padding: .7rem .6rem; font-size: .8rem; }
+}
+
+/* ============================================================ 404 =========
+   Styled rather than left to the browser, because a bare Chrome error page on
+   a site that argues for verifiability reads as a site that stopped being
+   maintained. */
+
+.notfound { min-height: 100vh; display: grid; place-items: center; padding: 60px 0; }
+.notfound__in {
+  display: flex; align-items: center; gap: 4rem;
+  flex-wrap: wrap; justify-content: center; text-align: left;
+}
+.notfound__lighthouse { width: 150px; flex: 0 0 auto; }
+.notfound__code {
+  font-family: var(--font-display, "Fredoka", sans-serif);
+  font-size: 4.5rem; line-height: 1; margin: 0 0 .2rem;
+  color: #f64b2c; letter-spacing: -.03em;
+}
+.notfound__title { font-size: 1.9rem; margin: 0 0 .8rem; max-width: 20ch; }
+.notfound__body  { max-width: 42ch; margin: 0 0 1.6rem; opacity: .82; }
+.notfound__actions { display: flex; gap: .8rem; flex-wrap: wrap; }
+.notfound__note {
+  margin-top: 1.8rem; max-width: 46ch;
+  font-size: .85rem; opacity: .6; border-left: 3px solid rgba(0,0,0,.1);
+  padding-left: .9rem;
+}
+
+@media (max-width: 700px) {
+  .notfound__in { gap: 2rem; }
+  .notfound__lighthouse { width: 100px; }
+  .notfound__code { font-size: 3.2rem; }
+  .notfound__title { font-size: 1.45rem; }
+}

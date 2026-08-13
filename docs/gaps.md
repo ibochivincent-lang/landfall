@@ -1,24 +1,52 @@
 # What Landfall doesn't have yet
 
-An honest inventory as of 12 August 2026. Ordered by how much each gap could
-hurt, not by how hard it is to fix.
+An honest inventory as of 12 August 2026, amended 13 August. Ordered by how
+much each gap could hurt, not by how hard it is to fix.
+
+Closed items are struck through rather than deleted. A gap list that only ever
+shrinks silently is a changelog wearing a disguise, and the point of this page
+is that it can be checked against the repository.
 
 ---
 
-## 0. The one that matters most: the site now promises things that don't exist
+## Closed since this list was written — 13 August 2026
 
-The landing page currently advertises:
-
-| Claim on the site | Reality |
+| Was | Now |
 |---|---|
-| "Get API access" | There is no API |
-| Pricing: $99/mo, 250k calls | Nothing to bill for, no billing |
-| `@landfall/sdk` with `pickAnchor()` | Not written, not published to npm |
-| "Log in" | No accounts, no auth, no database |
-| "Webhooks when an anchor goes dark" | No webhooks |
-| "MCP server for agents" | Not built |
-| "1,000 API calls / month" free tier | No calls to make |
-| Contact form | Submits to nothing |
+| No database | Postgres schema, 12 tables, applied and verified. `--persist` writes to it. |
+| No API | Read-only HTTP API, eight endpoints, every response carrying `asOf` and `staleHours`. |
+| Site data frozen, no freshness indicator | Both pages read the API live and stamp the scan age. |
+| No transaction-level view | `/dashboard` — every indexed payment per anchor, each row linked to its hash on a block explorer. |
+| No scheduled scanning | `docker-compose.prod.yml` runs the indexer on a loop; `docs/deployment.md` covers running it as a real cron job instead. |
+| No deployment path | Supabase, production compose, Vercel proxy, and a contract deploy script. `docs/deployment.md`. |
+| Site promised an API, pricing, login, SDK that did not exist | Marked planned. The API now exists; the rest is still labelled. |
+
+Two defects were found and published while doing this, in keeping with the
+rule that we hold ourselves to what we measure in others:
+
+- `docker-compose.yml` passed `--persist` to a flag the indexer did not
+  implement. It ran every fifteen minutes, printed a clean report, and wrote
+  nothing to the database. Silently.
+- `vercel.json` still pointed at the pre-restructure directory. The next
+  deploy would have served a 404.
+
+---
+
+## 0. The one that mattered most: the site promising things that don't exist
+
+The landing page advertised a product that was not there. Most of it is now
+either real or labelled; what remains is listed as **still aspirational**.
+
+| Claim on the site | Reality, 13 August |
+|---|---|
+| "Get API access" | The API exists and is documented. There is no access control, so "get access" still overstates it. |
+| Pricing: $99/mo, 250k calls | **Still invented.** Nothing to bill for, no billing, no buyer has seen the number. |
+| `@landfall/sdk` with `pickAnchor()` | **Still not written**, not on npm. Labelled planned. |
+| "Log in" | **Still no accounts, no auth.** The button opens a waitlist. |
+| "Webhooks when an anchor goes dark" | **Still none.** The contract emits a `dark` event; nothing consumes it. |
+| "MCP server for agents" | **Still not built.** |
+| "1,000 API calls / month" free tier | There are calls to make now, but no metering and no tier. |
+| Contact form | **Still submits to nothing.** |
 
 **This is the exact flaw we identified in stellar-intel** — a landing page
 claiming 70 anchors tracked while the code probed 7. We criticised it, then
@@ -37,16 +65,16 @@ whole problem. The alternative is deleting those sections until they're real.
 
 ## 1. Product — nothing runs on its own
 
-- **No scheduled scanning.** Someone has to open PowerShell and run the CLI.
-  Nothing updates by itself.
-- **The site's data is frozen.** Figures are hardcoded from one scan. A visitor
-  in October sees August data presented as current, with no "as of" freshness
-  indicator anywhere near the numbers.
-- **No database.** Every run writes a JSON file. Nothing accumulates, so there
-  are no trends, no history, no "this anchor has been dark for N consecutive
-  scans", no alerting on state change.
-- **No API, no SDK, no MCP server, no Soroban oracle** — Layers 2 and 3 of the
-  architecture are designed and unbuilt.
+- ~~**No scheduled scanning.**~~ The production compose file loops; a real
+  scheduler is documented and preferred. **Still nothing running anywhere** —
+  the stack is deployable, not deployed.
+- ~~**The site's data is frozen.**~~ Both pages read live and show scan age.
+- ~~**No database.**~~ Postgres, persisted, resumable.
+- **No trend history in the product.** Every scan is stored, so the data for
+  "dark for N consecutive scans" exists — nothing reads it back yet, and there
+  is still no alerting on state change.
+- ~~**No API**~~ — shipped. **No SDK, no MCP server**, and the **Soroban oracle
+  is written and tested but has never been deployed to any network.**
 - **No attestation layer**, so no slippage metric. The most valuable number the
   project could produce does not exist yet.
 - **No dispute portal**, despite the code of conduct and security policy both
@@ -72,8 +100,8 @@ whole problem. The alternative is deleting those sections until they're real.
 
 ## 3. Repo and process
 
-- **The 16 issues are still unfiled** — deliberately, but it's the gate on
-  applying to the Wave.
+- **The 21 issues are still unfiled.** `scripts/setup-issues.ps1` files them
+  in one run. This is the gate on applying to the Wave.
 - **Not under an organisation.** Eight of ten approved Wave repos are.
 - **Not applied to the Stellar Wave.**
 - **No contributors, no PRs, no external commits.**
@@ -112,18 +140,25 @@ whole problem. The alternative is deleting those sections until they're real.
 - **No stated position on the obvious risk**: publishing negative findings about
   named financial businesses. The code of conduct covers tone; nothing covers
   what happens if an anchor's lawyer writes in.
-- **No backup of scan history.** Delete `out/` and the record is gone.
+- **No backup of scan history beyond the host's own.** Supabase keeps seven
+  days on the free tier. Nothing in this repo takes a `pg_dump`.
+- **No alerting.** Nothing tells anyone the indexer stopped; `staleHours` in
+  every API response is the manual substitute.
 
 ---
 
 ## If you only do four things
 
-1. **Mark the aspirational parts of the site as planned** — one hour, removes
-   the credibility problem this list opens with
-2. **Submit the SCF interest form** — Saturday, and it's three answers already
-   written
-3. **File the 16 issues and apply to the Wave** — one script run
-4. **Automate the scan** so the site's numbers stop being a snapshot of one
-   afternoon
+1. **Submit the SCF interest form.** Deadline 16 August. Three answers, all
+   already drafted. Nothing else on this page has a clock on it. (The draft is
+   not in the repository — that is itself a gap.)
+2. **File the 21 issues and apply to the Wave** — one script run:
+   `.\scripts\setup-issues.ps1`
+3. **Actually deploy something.** The stack is deployable and not deployed; a
+   Supabase project and one container turn "designed" into "running", and it is
+   an afternoon. `docs/deployment.md`.
+4. **Deploy the oracle to testnet.** Sixteen passing tests against a simulated
+   environment is not the same claim as a contract that exists.
+   `./scripts/deploy-contract.sh testnet`
 
 Everything else can wait. The first two are the ones with a clock on them.

@@ -8,7 +8,7 @@ Ledger-derived settlement record for Stellar anchors.
 
 > **Submitted to the Drips Stellar Wave Program.** Issues are labelled by
 > complexity — `trivial-100`, `medium-150`, `high-200` — and tagged
-> `Stellar Wave`. New contributors should start with `good-first-issue`.
+> `Stellar Wave`. New contributors should start with `good first issue`.
 > **Wait to be assigned before you start coding**; an unassigned issue is not
 > yours. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
@@ -138,6 +138,8 @@ and faking those topics would pollute the exact stream this project consumes.
 | Horizon indexing, resumable cursors | shipping |
 | Liveness, volume, concentration, returns | shipping |
 | Postgres persistence + read API | shipping |
+| Transactions dashboard | shipping |
+| Hosted deployment (Supabase, prod compose) | shipping |
 | Soroban oracle | written, 16 tests, **not yet deployed** |
 | CAP-67 event ingestion | schema ready, ingestion **not written** |
 | SEP-38 slippage / attestations | **designed, not built** |
@@ -175,10 +177,34 @@ packages/contracts   Rust + Soroban oracle
 packages/db          PostgreSQL schema
 packages/indexer     ledger reader and metrics
 packages/api         read-only HTTP API
-packages/web         the public site
+packages/web         the public site and dashboard
 ```
 
 See [docs/architecture.md](docs/architecture.md).
+
+### Transactions dashboard
+
+`/dashboard` lists every indexed payment, per anchor, with the transaction hash
+linked to a block explorer so any figure on the front page can be traced to the
+rows it came from. Dark anchors sort first, because they are the reason anyone
+opens the page.
+
+It is live-only. Unlike the landing page it ships no offline snapshot: a stale
+list of "every transaction" would mislead in a way a stale headline figure does
+not, so with no API reachable it says so and shows nothing.
+
+### Deploying it
+
+[docs/deployment.md](docs/deployment.md) covers the whole path — Supabase for
+Postgres (including the row-level-security lockdown that stops the public
+`anon` key from deleting the dataset), the production compose file, Vercel with
+a same-origin API proxy, and deploying the oracle.
+
+```bash
+./scripts/migrate.sh                                   # apply the schema
+npm run scan -- --persist --horizon https://horizon.stellar.org
+docker compose -f docker-compose.prod.yml up -d --build
+```
 
 Scan writes full results, including both transaction hashes for every matched
 refund pair, to `out/scan-<timestamp>.json` so any claim can be checked
@@ -243,7 +269,7 @@ See [docs/roadmap.md](docs/roadmap.md).
 
 ## Contributing
 
-Issues are scoped and labelled by complexity. Start with `good-first-issue`.
+Issues are scoped and labelled by complexity. Start with `good first issue`.
 See [CONTRIBUTING.md](CONTRIBUTING.md), [DEVELOPMENT.md](DEVELOPMENT.md) and
 [docs/backlog.md](docs/backlog.md).
 

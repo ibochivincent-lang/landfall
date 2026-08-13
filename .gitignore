@@ -11,3 +11,9 @@ out/
 packages/contracts/target/
 packages/*/node_modules/
 .env
+.env.production
+
+# written by scripts/deploy-contract.sh. Deliberately not committed: the file
+# is what stops a second deploy silently orphaning the first contract, and a
+# committed copy would make every fresh clone refuse to deploy.
+.contract-id

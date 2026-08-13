@@ -25,7 +25,17 @@ if (!DATABASE_URL) {
   process.exit(1);
 }
 
-const pool = new Pool({ connectionString: DATABASE_URL, max: 8, connectionTimeoutMillis: 8_000 });
+// Hosted Postgres (Neon, Supabase, Railway, RDS) requires TLS. Their certs are
+// issued by intermediaries Node does not ship, so verification is relaxed for
+// those hosts only — the connection is still encrypted. A plain local socket
+// gets no TLS at all.
+const needsTls = /sslmode=require|neon\.tech|supabase\.|railway\.app|render\.com|rds\.amazonaws/.test(DATABASE_URL);
+const pool = new Pool({
+  connectionString: DATABASE_URL,
+  max: Number(process.env["PG_POOL_MAX"] ?? 8),
+  connectionTimeoutMillis: 8_000,
+  ...(needsTls ? { ssl: { rejectUnauthorized: false } } : {}),
+});
 
 /** Stated on every response that reports a return rate. */
 const RETURN_RATE_CAVEAT =
@@ -135,6 +145,82 @@ function headlineFrom(accounts: Json[]): Json {
   };
 }
 
+/** Clamp a user-supplied limit so one request cannot ask for the whole table. */
+function pageLimit(url: URL, fallback = 50, max = 500): number {
+  const n = Number(url.searchParams.get("limit") ?? fallback);
+  return Number.isFinite(n) ? Math.min(Math.max(Math.trunc(n), 1), max) : fallback;
+}
+
+/**
+ * Payment history, newest first.
+ *
+ * Keyset pagination on the primary key rather than OFFSET: the table grows
+ * continuously, and OFFSET would both slow down and silently skip rows as new
+ * payments arrive between pages.
+ */
+async function paymentsPage(opts: {
+  accounts?: string[];
+  direction?: string | null;
+  asset?: string | null;
+  before?: string | null;
+  limit: number;
+}): Promise<{ rows: Json[]; nextCursor: string | null }> {
+  const where: string[] = [];
+  const params: unknown[] = [];
+
+  if (opts.accounts && opts.accounts.length > 0) {
+    params.push(opts.accounts);
+    const i = params.length;
+    if (opts.direction === "in") where.push(`p.to_account = ANY($${i})`);
+    else if (opts.direction === "out") where.push(`p.from_account = ANY($${i})`);
+    else where.push(`(p.to_account = ANY($${i}) OR p.from_account = ANY($${i}))`);
+  }
+  if (opts.asset) { params.push(opts.asset); where.push(`p.asset = $${params.length}`); }
+  if (opts.before) { params.push(opts.before); where.push(`p.id < $${params.length}`); }
+
+  params.push(opts.limit + 1); // one extra row tells us whether another page exists
+  const sql = `
+    SELECT p.id, p.tx_hash, p.op_type, p.from_account, p.to_account,
+           p.amount::text AS amount, p.asset, p.memo, p.created_at, p.is_dust, p.source,
+           ai.domain AS to_domain, af.domain AS from_domain
+      FROM payments p
+      LEFT JOIN anchor_accounts ai ON ai.account_id = p.to_account
+      LEFT JOIN anchor_accounts af ON af.account_id = p.from_account
+     ${where.length ? "WHERE " + where.join(" AND ") : ""}
+     ORDER BY p.id DESC
+     LIMIT $${params.length}`;
+
+  const { rows } = await pool.query(sql, params);
+  const hasMore = rows.length > opts.limit;
+  const page = hasMore ? rows.slice(0, opts.limit) : rows;
+
+  return {
+    rows: page.map((r) => ({
+      id: String(r.id),
+      txHash: r.tx_hash,
+      type: r.op_type,
+      from: r.from_account,
+      to: r.to_account,
+      fromDomain: r.from_domain,
+      toDomain: r.to_domain,
+      amount: r.amount,
+      asset: r.asset,
+      memo: r.memo,
+      createdAt: new Date(r.created_at).toISOString(),
+      isDust: r.is_dust,
+      source: r.source,
+    })),
+    nextCursor: hasMore ? String(page[page.length - 1]!.id) : null,
+  };
+}
+
+async function accountsFor(domain: string): Promise<string[]> {
+  const { rows } = await pool.query<{ account_id: string }>(
+    "SELECT account_id FROM anchor_accounts WHERE domain = $1", [domain],
+  );
+  return rows.map((r) => r.account_id);
+}
+
 const routes: Record<string, (req: IncomingMessage, res: ServerResponse, url: URL) => Promise<void>> = {
   "GET /health": async (_req, res) => {
     try {
@@ -170,6 +256,28 @@ const routes: Record<string, (req: IncomingMessage, res: ServerResponse, url: UR
     });
   },
 
+  "GET /api/v1/payments": async (_req, res, url) => {
+    const account = url.searchParams.get("account");
+    const page = await paymentsPage({
+      accounts: account ? [account] : undefined,
+      direction: url.searchParams.get("direction"),
+      asset: url.searchParams.get("asset"),
+      before: url.searchParams.get("before"),
+      limit: pageLimit(url),
+    });
+    send(res, 200, { count: page.rows.length, nextCursor: page.nextCursor, payments: page.rows }, 30);
+  },
+
+  "GET /api/v1/assets": async (_req, res) => {
+    // Powers the asset filter on the dashboard without the client having to
+    // page the whole table to discover what exists.
+    const { rows } = await pool.query(
+      `SELECT asset, count(*)::int AS count FROM payments
+        GROUP BY asset ORDER BY count DESC LIMIT 50`,
+    );
+    send(res, 200, { assets: rows }, 300);
+  },
+
   "GET /api/v1/dark": async (_req, res) => {
     const scan = await latestScan();
     if (!scan) return send(res, 503, { error: "No completed scan yet." }, 0);
@@ -188,6 +296,31 @@ const server = createServer(async (req, res) => {
       "access-control-allow-headers": "content-type",
     });
     return res.end();
+  }
+
+  // Per-anchor payment history: /api/v1/anchors/<domain>/payments
+  const paymentsMatch = /^\/api\/v1\/anchors\/([a-z0-9.-]+)\/payments$/i.exec(url.pathname);
+  if (req.method === "GET" && paymentsMatch) {
+    try {
+      const domain = paymentsMatch[1]!;
+      const accounts = await accountsFor(domain);
+      if (accounts.length === 0) return send(res, 404, { error: "Unknown anchor domain." }, 0);
+      const page = await paymentsPage({
+        accounts,
+        direction: url.searchParams.get("direction"),
+        asset: url.searchParams.get("asset"),
+        before: url.searchParams.get("before"),
+        limit: pageLimit(url),
+      });
+      return send(res, 200, {
+        domain, accounts,
+        count: page.rows.length,
+        nextCursor: page.nextCursor,
+        payments: page.rows,
+      }, 30);
+    } catch (e) {
+      return send(res, 500, { error: (e as Error).message }, 0);
+    }
   }
 
   // Anchor domain lookup: /api/v1/anchors/<domain>
@@ -209,7 +342,16 @@ const server = createServer(async (req, res) => {
   if (!handler) {
     return send(res, 404, {
       error: "Not found",
-      endpoints: ["/health", "/api/v1/summary", "/api/v1/anchors", "/api/v1/anchors/{domain}", "/api/v1/dark"],
+      endpoints: [
+        "/health",
+        "/api/v1/summary",
+        "/api/v1/anchors",
+        "/api/v1/anchors/{domain}",
+        "/api/v1/anchors/{domain}/payments?limit=&before=&direction=in|out&asset=",
+        "/api/v1/payments?account=&limit=&before=&direction=&asset=",
+        "/api/v1/assets",
+        "/api/v1/dark",
+      ],
     }, 0);
   }
 
@@ -220,8 +362,47 @@ const server = createServer(async (req, res) => {
   }
 });
 
+/**
+ * One startup check, for one specific failure that is otherwise invisible.
+ *
+ * Migration 002 turns row-level security on for every table so that a hosted
+ * Postgres cannot be mutated by whoever holds the project's public API key.
+ * The owner bypasses RLS, so the indexer and this service are unaffected —
+ * *provided they connect as the owner*. Connect as some other role and
+ * Postgres does not error: it returns zero rows. The API comes up healthy, the
+ * dashboard renders, and every anchor has apparently vanished.
+ *
+ * `row_security_active` answers exactly that question for the connected role.
+ * We warn rather than exit, because an operator who has deliberately written
+ * read policies for a restricted role should not be locked out by our guess.
+ */
+async function warnIfInvisible(): Promise<void> {
+  try {
+    const { rows } = await pool.query(
+      `SELECT current_user AS role,
+              row_security_active('payments') AS blocked,
+              (SELECT count(*) FROM pg_policies
+                WHERE schemaname = 'public' AND tablename = 'payments') AS policies`,
+    );
+    const r = rows[0];
+    if (r?.blocked && Number(r.policies) === 0) {
+      console.warn(
+        `\n  WARNING: connected as '${r.role}', which is not the table owner.\n` +
+        `  Row-level security is on and no read policy exists, so every query\n` +
+        `  will return zero rows without raising an error. Connect with the\n` +
+        `  owner role (on Supabase that is 'postgres'), or add read policies.\n` +
+        `  See docs/deployment.md.\n`,
+      );
+    }
+  } catch {
+    // A database that is unreachable at boot is the pool's problem to report,
+    // and /health already surfaces it. Not worth a second, noisier failure.
+  }
+}
+
 server.listen(PORT, () => {
   console.log(`landfall api listening on :${PORT}`);
+  void warnIfInvisible();
 });
 
 const shutdown = async () => {

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Landfall — anchor transactions</title>
+<meta name="description" content="Every indexed transaction, per Stellar anchor, straight off the public ledger.">
+<meta name="robots" content="index,follow">
+<!-- Point at your API. Empty falls back to same-origin /api. -->
+<meta name="landfall-api" content="">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='16' fill='%23ffcf3d'/><circle cx='12' cy='18' r='7' fill='%23f64b2c'/><circle cx='22' cy='13' r='5' fill='%233b4fe8'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body class="dash-body">
+
+<header class="topnav stuck" id="topnav"><div class="wrap topnav__in">
+  <a href="index.html" class="topnav__logo">
+    <svg viewBox="0 0 32 32" class="topnav__logo-mark" aria-hidden="true">
+      <circle cx="12" cy="18" r="9" fill="#f64b2c"/><circle cx="23" cy="12" r="6" fill="#3b4fe8"/>
+    </svg>
+    <span>landfall<em>.</em></span>
+  </a>
+  <nav class="topnav__pill">
+    <div class="topnav__item"><a class="topnav__link" href="index.html">Overview</a></div>
+    <div class="topnav__item"><a class="topnav__link" href="dashboard.html" aria-current="page">Transactions</a></div>
+    <div class="topnav__item"><a class="topnav__link" href="index.html#how">How it works</a></div>
+  </nav>
+  <div class="topnav__actions">
+    <a class="btn btn--ghost" href="https://github.com/ibochivincent-lang/landfall">GitHub</a>
+  </div>
+</div></header>
+
+<main class="dash">
+  <div class="wrap">
+
+    <div class="dash-head">
+      <div>
+        <h1 class="dash-title">Anchor transactions</h1>
+        <p class="dash-sub">
+          Every payment we've indexed, per anchor, straight off the ledger.
+          Each row links to the transaction so you can check it yourself.
+        </p>
+      </div>
+      <div class="freshness is-snapshot" id="freshness">Connecting…</div>
+    </div>
+
+    <!-- shown only when the API can't be reached -->
+    <div class="dash-empty" id="offline" hidden>
+      <h2>No API connected</h2>
+      <p>
+        This page reads live data from the Landfall API. Nothing is hardcoded here —
+        an offline transaction list would be worse than none, so it shows nothing
+        rather than something stale.
+      </p>
+      <p class="mono" id="offlineDetail"></p>
+      <p>
+        Run the stack locally with <code>docker compose up</code>, then set the API
+        URL in this page's <code>&lt;meta name="landfall-api"&gt;</code> tag.
+      </p>
+    </div>
+
+    <div id="live" hidden>
+      <!-- ---------- anchor picker ---------- -->
+      <div class="anchor-strip" id="anchorStrip"></div>
+
+      <!-- ---------- selected anchor summary ---------- -->
+      <div class="dash-stats" id="anchorStats"></div>
+
+      <!-- ---------- filters ---------- -->
+      <div class="filters">
+        <div class="filter-group" role="group" aria-label="Direction">
+          <button class="chip is-on" data-dir="">All</button>
+          <button class="chip" data-dir="in">Inbound</button>
+          <button class="chip" data-dir="out">Outbound</button>
+        </div>
+        <label class="filter-select">
+          <span>Asset</span>
+          <select id="assetFilter"><option value="">All assets</option></select>
+        </label>
+        <label class="filter-select">
+          <span>Per page</span>
+          <select id="limitFilter">
+            <option>25</option><option selected>50</option><option>100</option><option>250</option>
+          </select>
+        </label>
+        <div class="filter-spacer"></div>
+        <button class="btn btn--ghost" id="refreshBtn">Refresh</button>
+      </div>
+
+      <!-- ---------- transactions ---------- -->
+      <div class="panel tx-panel">
+        <div class="tx-scroll">
+          <table class="tx">
+            <thead>
+              <tr>
+                <th>When</th><th>Dir</th><th>Counterparty</th>
+                <th class="num">Amount</th><th>Asset</th><th>Memo</th><th>Tx</th>
+              </tr>
+            </thead>
+            <tbody id="txBody"></tbody>
+          </table>
+        </div>
+        <div class="tx-foot">
+          <span id="txCount" class="mono"></span>
+          <button class="btn btn--primary" id="moreBtn" hidden>Load more</button>
+        </div>
+      </div>
+
+      <p class="dash-note">
+        Amounts are exact to seven decimal places — stored as <code>NUMERIC(30,7)</code>
+        and computed in integer stroops, never floating point. Dust-flagged rows are
+        excluded from published metrics but still shown here, because hiding them
+        would make this list disagree with the ledger.
+      </p>
+    </div>
+
+  </div>
+</main>
+
+<footer><div class="wrap">
+  <div class="foot-bottom">
+    <span>Data read from the public Stellar ledger · every figure traceable to a transaction hash</span>
+    <span>© 2026 Landfall · MIT</span>
+  </div>
+</div></footer>
+
+<script src="dashboard.js"></script>
+</body>
+</html>

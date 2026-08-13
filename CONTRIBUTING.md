@@ -51,7 +51,7 @@ database at all:
 
 ```bash
 npm install
-npm test                # 35 tests, fully offline
+npm test                # 35 tests offline; 40 with TEST_DATABASE_URL set
 npm run scan            # scan mainnet anchors and print the report
 ```
 
@@ -76,6 +76,18 @@ npm run scan -- --horizon http://localhost:8000 --persist
 
 `--persist` needs `DATABASE_URL` set. Without it the scan still runs and writes
 JSON to `out/`.
+
+### Applying migrations by hand
+
+```bash
+./scripts/migrate.sh          # or .\scripts\migrate.ps1 on Windows
+```
+
+Runs every file in `packages/db/migrations` in order and stops on the first
+error. Docker applies them automatically on first boot; this is for a database
+you brought yourself. Deploying to a hosted Postgres is
+[docs/deployment.md](docs/deployment.md) — read the row-level-security section
+before pointing anything at Supabase.
 
 ---
 
