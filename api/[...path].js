@@ -167,17 +167,122 @@ async function domainAccounts(db, domain) {
   return rows.map(r => r.account_id);
 }
 
+import OpenAI from 'openai';
+
+// ── AI Chat handler ──────────────────────────────────────────────────────────
+async function handleChat(req, res, db) {
+  if (!process.env.OPENAI_API_KEY) {
+    return json(res, 503, { error: 'OPENAI_API_KEY not configured' });
+  }
+
+  // Parse body safely (Vercel raw req handling)
+  let body = {};
+  if (req.body) {
+    body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+  } else {
+    const buffers = [];
+    for await (const chunk of req) buffers.push(chunk);
+    body = JSON.parse(Buffer.concat(buffers).toString());
+  }
+
+  const userQuery = body.query;
+  if (!userQuery) return json(res, 400, { error: 'Missing query parameter' });
+
+  const openai = new OpenAI();
+  
+  const schema = `
+    TABLE current_accounts (
+      account_id TEXT PRIMARY KEY,
+      domain TEXT,
+      role TEXT,
+      state TEXT,
+      inbound_count INTEGER,
+      outbound_count INTEGER,
+      refund_count INTEGER
+    );
+    TABLE payments (
+      id BIGINT PRIMARY KEY,
+      tx_hash TEXT,
+      from_account TEXT,
+      to_account TEXT,
+      amount NUMERIC,
+      asset TEXT,
+      memo TEXT,
+      created_at TIMESTAMPTZ,
+      is_dust BOOLEAN
+    );
+  `;
+
+  // Step 1: AI generates SQL
+  const sqlPrompt = `
+You are a PostgreSQL expert. Convert the following natural language request into a secure, read-only SQL query for a Stellar blockchain indexer database.
+Schema: ${schema}
+Rules:
+1. Return ONLY the raw SQL query. No markdown, no explanations.
+2. ALWAYS limit the results to 50 rows maximum.
+3. Only use SELECT statements.
+
+User request: "${userQuery}"
+`;
+
+  try {
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [{ role: 'user', content: sqlPrompt }],
+      temperature: 0,
+    });
+
+    let sql = completion.choices[0].message.content.trim();
+    // Strip markdown if AI included it anyway
+    if (sql.startsWith('\`\`\`')) {
+      sql = sql.replace(/^\`\`\`sql\n/, '').replace(/\n\`\`\`$/, '');
+    }
+
+    // Basic safety check (though DB should be read-only user)
+    if (!sql.toUpperCase().startsWith('SELECT')) {
+      throw new Error("Generated query is not a SELECT statement.");
+    }
+
+    // Step 2: Execute SQL
+    const { rows } = await db.query(sql);
+
+    // Step 3: AI generates explanation
+    const explainPrompt = `
+User asked: "${userQuery}"
+The database returned ${rows.length} rows. Here is the JSON data:
+${JSON.stringify(rows.slice(0, 5))}
+Write a brief, 1-2 sentence human-readable answer summarizing these results.
+`;
+    
+    const explainCompletion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [{ role: 'user', content: explainPrompt }],
+      temperature: 0.5,
+    });
+
+    const explanation = explainCompletion.choices[0].message.content;
+
+    return json(res, 200, {
+      explanation,
+      sql,
+      rows
+    });
+  } catch (error) {
+    console.error('[AI Chat Error]', error);
+    return json(res, 500, { error: 'Failed to process AI query: ' + error.message });
+  }
+}
+
 // ── Main handler ─────────────────────────────────────────────────────────────
 
 export default async function handler(req, res) {
   // Preflight
   if (req.method === 'OPTIONS') {
     res.setHeader('Access-Control-Allow-Origin', ORIGIN);
-    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     return res.status(204).end();
   }
-
-  if (req.method !== 'GET') return json(res, 405, { error: 'Method not allowed' });
 
   const db = pool();
   if (!db) {
@@ -188,6 +293,13 @@ export default async function handler(req, res) {
   const joined = parts.join('/');
 
   try {
+    // POST /api/v1/chat
+    if (req.method === 'POST' && joined === 'v1/chat') {
+      return await handleChat(req, res, db);
+    }
+
+    if (req.method !== 'GET') return json(res, 405, { error: 'Method not allowed' });
+
     // GET /health
     if (joined === 'health' || joined === '') {
       await db.query('SELECT 1');

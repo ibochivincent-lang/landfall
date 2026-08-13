@@ -29,6 +29,7 @@
     "contracts:test": "cd packages/contracts && cargo test"
   },
   "dependencies": {
+    "openai": "^4.55.0",
     "pg": "^8.13.1"
   },
   "devDependencies": {
