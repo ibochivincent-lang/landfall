@@ -1,422 +1,89 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Landfall — did the money land?</title>
-<meta name="description" content="Settlement quality for Stellar anchors, read straight off the public ledger. 6 of 13 anchor accounts have settled nothing in over 30 days.">
-<meta property="og:title" content="Landfall — did the money land?">
-<meta property="og:description" content="We don't ask anchors how they're doing. We read what they actually did.">
-<meta property="og:type" content="website">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='16' fill='%23ffcf3d'/><circle cx='12' cy='18' r='7' fill='%23f64b2c'/><circle cx='22' cy='13' r='5' fill='%233b4fe8'/></svg>">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
-<!-- Point this at your API. Empty means the page uses its built-in snapshot. -->
-<meta name="landfall-api" content="">
-<link rel="stylesheet" href="styles.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#061f2d">
+  <title>Landfall — Settlement intelligence for Stellar</title>
+  <meta name="description" content="Independent, ledger-derived settlement intelligence for Stellar anchors.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
-<!-- ============ LOADER ============ -->
-<div class="loader" id="loader">
-  <div class="loader__blocks">
-    <div class="loader__block loader__block--1"></div>
-    <div class="loader__block loader__block--2"></div>
-    <div class="loader__block loader__block--3"></div>
-    <div class="loader__block loader__block--4"></div>
+  <div class="loader" id="loader" aria-live="polite">
+    <div class="loader__mark"><span></span><span></span><span></span></div>
+    <p id="loaderText">Reading the Stellar ledger</p>
   </div>
-  <div class="loader__meta">
-    <span id="loader-label">READING LEDGER</span>
-    <span class="loader__counter" id="loader-counter">0%</span>
-  </div>
-  <div class="loader__cover" id="loader-cover"></div>
-</div>
 
-<!-- ============ NAV ============ -->
-<header class="topnav" id="topnav"><div class="wrap topnav__in">
-  <a href="#" class="topnav__logo" data-nav-el>
-    <svg viewBox="0 0 32 32" class="topnav__logo-mark" aria-hidden="true">
-      <circle cx="12" cy="18" r="9" fill="#f64b2c"/>
-      <circle cx="23" cy="12" r="6" fill="#3b4fe8"/>
-    </svg>
-    <span>landfall<em>.</em></span>
-  </a>
-
-  <nav class="topnav__pill" data-nav-el>
-    <div class="topnav__item" data-dd>
-      <button class="topnav__link">Product <span class="topnav__caret">&#9662;</span></button>
-      <div class="dropdown">
-        <a href="#data"><span class="ico" style="background:#ffe9b8">📊</span><span><b>Live anchor data</b><span>Every declared account, ranked by silence</span></span></a>
-        <a href="dashboard.html"><span class="ico" style="background:#ffd7e6">🧾</span><span><b>Transactions</b><span>Every indexed payment, per anchor</span></span></a>
-        <a href="#how"><span class="ico" style="background:#d9f2f5">⚓</span><span><b>How it works</b><span>Ledger truth, attestation, routing</span></span></a>
-        <a href="#developers"><span class="ico" style="background:#ffd9d0">⚡</span><span><b>SDK &amp; API</b><span>pickAnchor() — in development</span></span></a>
+  <main class="page">
+    <nav class="nav wrap" aria-label="Primary navigation">
+      <a class="brand" href="#top" aria-label="Landfall home"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 3 35 29H5L20 3Z" fill="currentColor"/><path d="M20 12 28 26H12l8-14Z" fill="#eaf4ef"/><path d="M20 29v7" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg><span>landfall<span class="brand__dot">.</span></span></a>
+      <div class="nav__links" id="navLinks">
+        <a href="#data">Network data</a><a href="#how">How it works</a><a href="#developers">Developers</a>
       </div>
-    </div>
-    <div class="topnav__item"><a class="topnav__link" href="#pricing">Pricing</a></div>
-    <div class="topnav__item" data-dd>
-      <button class="topnav__link">Company <span class="topnav__caret">&#9662;</span></button>
-      <div class="dropdown">
-        <a href="https://github.com/ibochivincent-lang/landfall/blob/main/docs/methodology.md"><span class="ico" style="background:#e2e0ff">📐</span><span><b>Methodology</b><span>Exactly how every number is derived</span></span></a>
-        <a href="https://github.com/ibochivincent-lang/landfall"><span class="ico" style="background:#e8e8ee">🐙</span><span><b>Open source</b><span>MIT, and every claim is checkable</span></span></a>
-        <a href="#contact"><span class="ico" style="background:#d7f5dd">✉️</span><span><b>Contact us</b><span>Wallets, anchors, disputes</span></span></a>
+      <div class="nav__actions"><a class="text-link" href="dashboard.html">Dashboard</a><a class="button button--small" href="#contact">Join the pilot</a></div>
+      <button class="menu" id="menu" aria-label="Open menu" aria-expanded="false"><i></i><i></i></button>
+    </nav>
+
+    <section class="hero wrap" id="top">
+      <div class="hero__copy">
+        <p class="eyebrow"><span class="eyebrow__pulse"></span> Independent Stellar settlement data</p>
+        <h1>Know if the money <em>landed.</em></h1>
+        <p class="hero__lede">Landfall reads public Stellar ledger activity to show which anchors are settling, slowing down, or falling silent — before a wallet routes a payment.</p>
+        <div class="hero__actions"><a class="button" href="#data">Explore the ledger <span>→</span></a><a class="watch-link" href="#how"><b>▶</b> See how it works</a></div>
+        <div class="trust"><span>Built from public records</span><div></div><span>Open methodology</span><div></div><span>Stellar native</span></div>
       </div>
+
+      <div class="visual" aria-label="Illustration of a Stellar settlement record">
+        <div class="orbit orbit--a"></div><div class="orbit orbit--b"></div>
+        <div class="stellar-card">
+          <div class="stellar-card__top"><span class="stellar-card__label">SETTLEMENT RECORD</span><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="16" fill="none" stroke="currentColor" stroke-width="3"/><path d="m13 28 9-12 4 9 9-5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="stellar-card__amount"><small>Observed volume</small><strong id="cardVolume">$1,876,580</strong><span>last 30 days</span></div>
+          <div class="stellar-card__bottom"><span>STELLAR NETWORK</span><b>✦</b><span>LANDFALL</span></div>
+          <div class="stellar-card__shine"></div>
+        </div>
+        <article class="record">
+          <div class="record__head"><div class="avatar">L</div><div><b>Landfall network scan</b><span>Updated from Horizon</span></div><span class="status"><i></i> Live</span></div>
+          <div class="record__metric"><span>Anchors observed</span><b id="anchorCount">13</b><small>declared accounts</small></div>
+          <div class="record__rows"><div><span>Settling under 48h</span><b id="liveCount">—</b></div><div><span>Silent over 30 days</span><b class="danger" id="darkCount">—</b></div></div>
+          <a href="dashboard.html" class="record__button">View settlement details <span>→</span></a>
+        </article>
+        <div class="float-chip float-chip--one"><span>◉</span> Ledger verified</div><div class="float-chip float-chip--two"><b>↗</b> Public data</div>
+      </div>
+    </section>
+  </main>
+
+  <section class="logos"><div class="wrap"><span>Designed for the people moving value on Stellar</span><div class="logos__items"><b>Wallets</b><b>Anchors</b><b>Payment agents</b><b>Researchers</b></div></div></section>
+
+  <section class="section wrap" id="data">
+    <div class="section__intro"><p class="eyebrow">Live from the ledger</p><h2>Not a status page.<br><em>A settlement record.</em></h2><p>Anchors can publish a reassuring message. They cannot edit their public payment history. Landfall turns that history into a clear, independently verifiable signal.</p></div>
+    <div class="data-grid">
+      <article class="data-card data-card--feature"><span class="data-card__icon">⌁</span><p>Network coverage</p><strong id="coverageCount">13</strong><span>declared anchor accounts monitored</span><div class="mini-bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></article>
+      <article class="data-card"><p>Fast settlement</p><strong id="fastPct">—</strong><span>of observed accounts active in 48 hours</span><div class="meter"><i id="fastMeter"></i></div></article>
+      <article class="data-card"><p>What we measure</p><strong class="text-value">Every<br>payment.</strong><span>Activity, silence, volume and returns — with transactions behind every number.</span><a href="dashboard.html">Open dashboard →</a></article>
     </div>
-  </nav>
+  </section>
 
-  <div class="topnav__actions">
-    <button class="btn btn--ghost" data-nav-el id="loginBtn">Sign in</button>
-    <a class="btn btn--primary" href="#contact" data-nav-el>Join the pilot</a>
-    <button class="burger" id="burger" aria-label="Menu" data-nav-el><span></span><span></span><span></span></button>
-  </div>
-</div></header>
+  <section class="section section--tint" id="how"><div class="wrap">
+    <div class="section__intro section__intro--center"><p class="eyebrow">Built for evidence</p><h2>See what the ledger <em>actually says.</em></h2></div>
+    <div class="steps"><article><span>01</span><h3>Discover</h3><p>We resolve the public accounts each Stellar anchor declares in its SEP-1 file.</p></article><article><span>02</span><h3>Read</h3><p>We index payment history directly from the Stellar network, with no self-reporting.</p></article><article><span>03</span><h3>Route smarter</h3><p>Wallets and agents get a clear signal before choosing where to send a payment.</p></article></div>
+  </div></section>
 
-<div class="mobile-menu" id="mobileMenu">
-  <a href="#data">Live data</a>
-  <a href="dashboard.html">Transactions</a>
-  <a href="#how">How it works</a>
-  <a href="#developers">Developers</a>
-  <a href="#pricing">Pricing</a>
-  <a href="#faq">FAQ</a>
-  <a href="#contact">Contact us</a>
-  <button class="btn btn--ghost btn--block" id="loginBtnM">Sign in</button>
-  <a class="btn btn--primary btn--block" href="#contact">Join the pilot</a>
-</div>
-
-<!-- ============ HERO ============ -->
-<section class="hero" id="hero">
-  <div class="bg">
-    <div class="bg__base"></div>
-    <div class="bg__tri bg__tri--left"  data-el="tri-left"></div>
-    <div class="bg__tri bg__tri--right" data-el="tri-right"></div>
-  </div>
-
-  <div class="scene" id="scene">
-    <div class="scene__sun" data-el="sun">
-      <svg viewBox="0 0 140 140"><circle cx="70" cy="70" r="46" fill="#fff3b0"/><circle cx="70" cy="70" r="34" fill="#fff8d6"/></svg>
-    </div>
-
-    <div class="scene__cloud-a" data-el="cloud-a">
-      <svg viewBox="0 0 300 170">
-        <ellipse cx="80"  cy="115" rx="74" ry="50" fill="#fff"/>
-        <ellipse cx="155" cy="92"  rx="60" ry="54" fill="#fff"/>
-        <ellipse cx="214" cy="120" rx="50" ry="41" fill="#fff"/>
-        <ellipse cx="135" cy="136" rx="70" ry="36" fill="#fff"/>
-      </svg>
-    </div>
-    <div class="scene__cloud-b" data-el="cloud-b">
-      <svg viewBox="0 0 240 140">
-        <ellipse cx="70"  cy="94" rx="60" ry="40" fill="#fffdf2"/>
-        <ellipse cx="132" cy="76" rx="50" ry="44" fill="#fffdf2"/>
-        <ellipse cx="180" cy="98" rx="42" ry="34" fill="#fffdf2"/>
-      </svg>
-    </div>
-
-    <div class="scene__birds" data-el="birds">
-      <svg viewBox="0 0 180 120">
-        <path d="M 20 30 Q 32 18 45 30 Q 58 18 70 30" stroke="#3b4fe8" stroke-width="5" fill="none" stroke-linecap="round"/>
-        <path d="M 92 68 Q 106 54 120 68 Q 134 54 148 68" stroke="#3b4fe8" stroke-width="5" fill="none" stroke-linecap="round"/>
-      </svg>
-    </div>
-
-    <!-- The beacon. Landfall = reaching shore; the lamp is the signal. -->
-    <div class="scene__lighthouse" data-el="lighthouse">
-      <svg viewBox="0 0 220 400">
-        <g id="beam" style="transform-origin:110px 92px">
-          <polygon points="110,92 220,30 220,154" fill="#fff3b0" opacity=".55"/>
-        </g>
-        <rect x="72" y="130" width="76" height="180" rx="8" fill="#fef5d3"/>
-        <rect x="72" y="168" width="76" height="30" fill="#f64b2c"/>
-        <rect x="72" y="234" width="76" height="30" fill="#f64b2c"/>
-        <rect x="60" y="300" width="100" height="26" rx="10" fill="#3b4fe8"/>
-        <rect x="64" y="112" width="92" height="22" rx="8" fill="#3b4fe8"/>
-        <rect x="84" y="66" width="52" height="48" rx="8" fill="#1b2560"/>
-        <circle cx="110" cy="90" r="15" fill="#ffcf3d" id="lamp"/>
-        <polygon points="84,66 136,66 110,34" fill="#f64b2c"/>
-        <rect x="30" y="322" width="160" height="20" rx="10" fill="#f8a9b3"/>
-      </svg>
-    </div>
-
-    <!-- Anchors: upright ones are settling, the tilted one is dark. -->
-    <div class="scene__anchors" data-el="anchors">
-      <svg viewBox="0 0 300 220">
-        <g id="anchor-a" fill="none" stroke="#3b4fe8" stroke-width="11" stroke-linecap="round">
-          <circle cx="60" cy="34" r="15"/>
-          <path d="M60 50 V150"/><path d="M30 76 H90"/>
-          <path d="M22 118 a38 38 0 0 0 76 0"/>
-        </g>
-        <g id="anchor-b" fill="none" stroke="#2fb5c4" stroke-width="11" stroke-linecap="round">
-          <circle cx="165" cy="60" r="13"/>
-          <path d="M165 74 V158"/><path d="M139 96 H191"/>
-          <path d="M132 132 a33 33 0 0 0 66 0"/>
-        </g>
-        <g id="anchor-c" fill="none" stroke="#d03b3b" stroke-width="11" stroke-linecap="round" style="transform-origin:255px 120px">
-          <circle cx="255" cy="72" r="12"/>
-          <path d="M255 85 V160"/><path d="M232 104 H278"/>
-          <path d="M226 136 a29 29 0 0 0 58 0"/>
-        </g>
-      </svg>
-    </div>
-
-    <!-- Coins arcing in and landing. -->
-    <div class="scene__coins" data-el="coins">
-      <svg viewBox="0 0 300 200">
-        <g class="coin" id="coin1"><circle cx="40"  cy="150" r="21" fill="#ffcf3d" stroke="#e8940c" stroke-width="4"/><text x="40"  y="158" font-size="20" font-weight="700" text-anchor="middle" fill="#e8940c" font-family="Nunito, sans-serif">$</text></g>
-        <g class="coin" id="coin2"><circle cx="140" cy="60"  r="25" fill="#ffcf3d" stroke="#e8940c" stroke-width="4"/><text x="140" y="69"  font-size="23" font-weight="700" text-anchor="middle" fill="#e8940c" font-family="Nunito, sans-serif">$</text></g>
-        <g class="coin" id="coin3"><circle cx="245" cy="130" r="19" fill="#ffcf3d" stroke="#e8940c" stroke-width="4"/><text x="245" y="137" font-size="18" font-weight="700" text-anchor="middle" fill="#e8940c" font-family="Nunito, sans-serif">$</text></g>
-      </svg>
-    </div>
-
-    <div class="scene__sea" data-el="sea">
-      <svg viewBox="0 0 1440 220" preserveAspectRatio="none">
-        <path id="wave1" d="M0,110 C220,54 420,158 720,110 C1020,62 1240,150 1440,104 L1440,220 L0,220 Z" fill="#3b4fe8" opacity=".92"/>
-        <path id="wave2" d="M0,148 C260,96 470,190 760,146 C1050,102 1260,182 1440,142 L1440,220 L0,220 Z" fill="#2a38b8"/>
-      </svg>
-    </div>
-
-    <span class="scene__dot scene__dot--1" data-el="dots"></span>
-    <span class="scene__dot scene__dot--2" data-el="dots"></span>
-    <span class="scene__dot scene__dot--3" data-el="dots"></span>
-  </div>
-
-  <button class="arrow arrow--left" id="prev" aria-label="Previous" data-nav-el>
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 6l-6 6 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-  </button>
-  <button class="arrow arrow--right" id="next" aria-label="Next" data-nav-el>
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-  </button>
-
-  <div class="card" id="card" data-card>
-    <div class="card__eyebrow" id="cardEyebrow">SETTLEMENT RECORD FOR STELLAR ANCHORS</div>
-    <h1 class="card__title">
-      <span class="card__line">DID THE MONEY</span>
-      <span class="card__line">LAND?</span>
-    </h1>
-    <span class="card__tag" id="cardTag">6 OF 13 ANCHORS ARE DARK</span>
-    <div class="card__dots" id="cardDots">
-      <button class="card__dot is-active" aria-label="Slide 1"></button>
-      <button class="card__dot" aria-label="Slide 2"></button>
-      <button class="card__dot" aria-label="Slide 3"></button>
-    </div>
-  </div>
-</section>
-
-<!-- ============ STATS ============ -->
-<section class="section section--cream"><div class="wrap">
-  <div class="stats">
-    <div class="stat rv"><div class="stat__v pop"><span id="c1">0</span> / 13</div><div class="stat__k">Dark over 30 days</div><div class="stat__n">nearly half of every account</div></div>
-    <div class="stat rv"><div class="stat__v"><span id="c2">0</span></div><div class="stat__k">Payments indexed</div><div class="stat__n">inbound, dust excluded</div></div>
-    <div class="stat rv"><div class="stat__v">0.13%</div><div class="stat__k">Returned to sender</div><div class="stat__n">5 payments</div></div>
-    <div class="stat rv"><div class="stat__v">0.3h</div><div class="stat__k">Median return</div><div class="stat__n">n=5 — observation only</div></div>
-  </div>
-</div></section>
-
-<!-- ============ DATA ============ -->
-<section class="section section--white" id="data"><div class="wrap">
-  <div class="rv">
-    <span class="eyebrow">Live from the ledger</span>
-    <h2 class="big">Every declared anchor account, sorted by silence.</h2>
-    <p class="lede">No heuristic, no self-report, nothing an anchor can edit. An anchor can keep a status page green indefinitely — <b>it cannot fake a month of on-chain silence.</b></p>
-  </div>
-
-  <div class="panel rv">
-    <div class="legend">
-      <span class="lg"><span class="sw" style="background:#2f9e44"></span>● Live · under 48h</span>
-      <span class="lg"><span class="sw" style="background:#e8940c"></span>◐ Slow · 2–30 days</span>
-      <span class="lg"><span class="sw sw-hatch" style="background:#d03b3b"></span>▲ Dark · over 30 days</span>
-      <span class="lg"><span class="sw" style="background:#c9c9d4"></span>○ No payment history</span>
-    </div>
-    <div class="freshness is-snapshot" id="freshness">Snapshot</div>
-    <div class="chart" id="chart"></div>
-    <details class="tbl">
-      <summary>Table view</summary>
-      <table>
-        <thead><tr><th>Domain</th><th>Account</th><th>In</th><th>Out</th><th>Returns</th><th>Last settlement</th><th>State</th></tr></thead>
-        <tbody id="tbody"></tbody>
-      </table>
-    </details>
-  </div>
-</div></section>
-
-<!-- ============ HOW ============ -->
-<section class="section section--cream" id="how"><div class="wrap">
-  <div class="rv">
-    <span class="eyebrow">How it works</span>
-    <h2 class="big">Stop interrogating. Start observing.</h2>
-    <p class="lede">Under SEP-24, one leg of every deposit and withdrawal is written to a public ledger. That record already exists, for every anchor, going back years — and <b>nobody needs to give permission to read it.</b></p>
-  </div>
-  <div class="steps">
-    <div class="step rv"><div class="step__n" style="background:#f64b2c">01</div><h3>Discover</h3><p>Resolve every anchor's home domain to the on-chain accounts it declares under SEP-1. A domain that won't resolve is reported, never quietly skipped.</p></div>
-    <div class="step rv"><div class="step__n" style="background:#3b4fe8">02</div><h3>Index</h3><p>Page the full payment history for each account, with resumable cursors. Interrupted work resumes — the failure mode is stale, never wrong.</p></div>
-    <div class="step rv"><div class="step__n" style="background:#2fb5c4">03</div><h3>Publish</h3><p>Liveness, volume, returns and concentration, each with the transaction hashes behind it. Anyone can recompute every figure from the same ledger.</p></div>
-  </div>
-</div></section>
-
-<!-- ============ DEVELOPERS ============ -->
-<section class="section section--navy" id="developers"><div class="wrap">
-  <div class="split">
-    <div class="rv">
-      <span class="eyebrow">For wallets &amp; agents &middot; in development</span>
-      <h2 class="big">One call. The right anchor.</h2>
-      <p class="lede">Nobody sending money home comparison-shops on a dashboard. So the product isn't a dashboard — it's a function your wallet calls before it routes, and an MCP surface a payment agent can query directly.</p>
-      <a class="btn btn--primary btn--lg" href="#contact">Join the pilot list</a>
-      <p class="form__note" style="margin-top:1rem">The SDK is not published yet. This is the interface we are building to — tell us if it is the wrong shape.</p>
-    </div>
-    <div class="code rv">
-<pre><span class="c">// planned interface - not yet on npm</span>
-<span class="c">// rank anchors by expected landed value</span>
-<span class="k">import</span> { <span class="f">pickAnchor</span> } <span class="k">from</span> <span class="s">'@landfall/sdk'</span>
-
-<span class="k">const</span> ranked = <span class="k">await</span> <span class="f">pickAnchor</span>({
-  from:   <span class="s">'USDC'</span>,
-  to:     <span class="s">'NGN'</span>,
-  amount: <span class="s">100</span>
+  <section class="developer" id="developers"><div class="wrap developer__grid"><div><p class="eyebrow">For builders</p><h2>One signal before every route.</h2><p>Landfall is building a simple interface for wallets and payment agents to factor real settlement quality into their routing decisions.</p><a class="button button--light" href="#contact">Build with us <span>→</span></a></div><pre><code><span class="code__muted">// planned interface</span>
+<span class="code__blue">const</span> anchor = <span class="code__blue">await</span> pickAnchor({
+  from: <span class="code__green">'USDC'</span>,
+  to: <span class="code__green">'NGN'</span>,
+  amount: <span class="code__gold">100</span>
 })
 
-<span class="c">// [{ domain: 'mykobo.co',</span>
-<span class="c">//    liveness: 'live',</span>
-<span class="c">//    lastSettlement: '1.3h',</span>
-<span class="c">//    confidence: 0.94 }, ...]</span></pre>
-    </div>
-  </div>
-</div></section>
+<span class="code__muted">// settlement signal, backed by the ledger</span>
+anchor.confidence <span class="code__muted">// 0.94</span></code></pre></div></section>
 
-<!-- ============ PRICING ============ -->
-<section class="section section--cream" id="pricing"><div class="wrap">
-  <div class="rv">
-    <span class="eyebrow">Pricing &middot; planned</span>
-    <h2 class="big">The data is free. The volume isn't.</h2>
-    <p class="lede"><b>None of this is live yet — there is no API to bill for and no way to sign up.</b> This is the intended shape, published early so wallets can tell us if it is wrong. Public dashboards and the raw dataset stay open forever — a reputation record nobody can read is worthless. Paid tiers cover teams querying it in production.</p>
-  </div>
-  <div class="tiers">
-    <div class="tier rv">
-      <div class="tier__name">Open</div>
-      <div class="tier__price">Free</div>
-      <div class="tier__per">forever, no account</div>
-      <ul><li>Full public dataset</li><li>Every transaction hash</li><li>Published methodology</li><li>1,000 API calls / month</li></ul>
-      <a class="btn btn--ghost btn--block" href="#data">Browse the data</a>
-    </div>
-    <div class="tier featured rv">
-      <div class="tier__name">Wallet</div>
-      <div class="tier__price">$99</div>
-      <div class="tier__per">per month &middot; not yet available</div>
-      <ul><li>Everything in Open</li><li>250k API calls / month</li><li><code>@landfall/sdk</code> with pickAnchor()</li><li>MCP server for agents</li><li>Webhooks when an anchor goes dark <em>(planned)</em></li></ul>
-      <a class="btn btn--primary btn--block" href="#contact">Register interest</a>
-    </div>
-    <div class="tier rv">
-      <div class="tier__name">Anchor</div>
-      <div class="tier__price">Talk</div>
-      <div class="tier__per">to us</div>
-      <ul><li>Verified data feed</li><li>Dispute portal access</li><li>Pre-publication alerts</li><li>Scores are never for sale</li></ul>
-      <a class="btn btn--ghost btn--block" href="#contact">Contact us</a>
-    </div>
-  </div>
-</div></section>
+  <section class="contact wrap" id="contact"><div><p class="eyebrow">Early access</p><h2>Help make settlement more visible.</h2><p>Building on Stellar? We would love to hear what routing information would make your product safer and more useful.</p></div><form id="contactForm"><label>Email address<input type="email" required placeholder="you@company.com" aria-label="Email address"></label><button class="button" type="submit">Join the pilot <span>→</span></button><p id="formMessage" role="status"></p></form></section>
 
-<!-- ============ CAVEAT ============ -->
-<section class="section section--white"><div class="wrap">
-  <div class="rv">
-    <span class="eyebrow">What we can't see</span>
-    <h2 class="big">A low return rate is not a clean bill of health.</h2>
-  </div>
-  <div class="caveat rv">
-    <p><b>A return is the honest failure mode.</b> When an anchor can't complete the off-chain leg of a withdrawal, sending the asset back is what a good actor does — and that return is visible on the ledger.</p>
-    <p>An anchor that accepts value, fails to settle, and simply keeps it produces <b>no return event at all</b>. It scores a clean 0.00% — identical to an anchor that never fails.</p>
-    <p>So 0.13% isn't reassurance. It's the absence of one specific kind of evidence, and we'd rather say so than let a number flatter us. Closing that gap needs the fiat leg, which means signed settlement attestations. That's what we're building next.</p>
-  </div>
-</div></section>
-
-<!-- ============ FAQ ============ -->
-<section class="section section--cream" id="faq"><div class="wrap">
-  <div class="rv"><span class="eyebrow">FAQ</span><h2 class="big">Questions people actually ask.</h2></div>
-  <div class="faq">
-    <details class="qa rv"><summary>Where does the data come from?</summary><p>Public Stellar ledger records, via Horizon. Anchor accounts are resolved from each domain's SEP-1 declaration. No anchor supplies us with anything, and none can opt out.</p></details>
-    <details class="qa rv"><summary>What if you get a figure wrong?</summary><p>Every number ships with its transaction hashes, so a disagreement is settled by checking the ledger rather than by argument. We've already published two defects we found in our own tool during verification, including what the numbers were before and after.</p></details>
-    <details class="qa rv"><summary>Is "dark" the same as "fraudulent"?</summary><p>No, and we're careful never to imply it. Dark means the account has processed no on-chain settlement in over 30 days. That's a fact about the ledger. Why an anchor is quiet is not something we claim to know.</p></details>
-    <details class="qa rv"><summary>I run an anchor and I think you're wrong.</summary><p>Get in touch. Bring the account and the scan date; we'll check it against the ledger together. If our method is at fault we fix it publicly and say so. Scores are not for sale, in either direction.</p></details>
-    <details class="qa rv"><summary>Is it open source?</summary><p>MIT, entirely. Indexer, metrics, methodology and this site. A reputation system that can't be audited has no claim on anyone's trust.</p></details>
-  </div>
-</div></section>
-
-<!-- ============ CONTACT ============ -->
-<section class="section section--white" id="contact"><div class="wrap">
-  <div class="split">
-    <div class="rv">
-      <span class="eyebrow">Contact us</span>
-      <h2 class="big">Wallets, anchors, and awkward questions.</h2>
-      <p class="lede">Building a wallet and want anchor quality in your routing? Running an anchor and think a figure is wrong? Researching corridors? All of that lands in the same inbox and gets a real reply.</p>
-      <p class="lede" style="margin-bottom:0"><b>Lagos, Nigeria</b><br>In the corridor we measure.</p>
-    </div>
-    <form class="form rv" id="contactForm" novalidate>
-      <div class="field"><label for="cname">Name</label><input id="cname" name="name" type="text" required placeholder="Your name"></div>
-      <div class="field"><label for="cmail">Email</label><input id="cmail" name="email" type="email" required placeholder="you@company.com"></div>
-      <div class="field"><label for="ctopic">I'm here about</label>
-        <select id="ctopic" name="topic">
-          <option>API access for a wallet</option>
-          <option>Disputing a figure about my anchor</option>
-          <option>Research or press</option>
-          <option>Contributing to the project</option>
-          <option>Something else</option>
-        </select>
-      </div>
-      <div class="field"><label for="cmsg">Message</label><textarea id="cmsg" name="message" required placeholder="What would you like to know?"></textarea></div>
-      <button class="btn btn--primary btn--lg btn--block" type="submit">Send message</button>
-      <div class="form__ok" id="formOk">Nothing was actually sent — this form has no backend yet. Please email us directly for now.</div>
-      <p class="form__note">We reply to everything. Anchor disputes get priority.</p>
-    </form>
-  </div>
-</div></section>
-
-<!-- ============ FOOTER ============ -->
-<footer><div class="wrap">
-  <div class="foot-grid">
-    <div>
-      <div class="foot-brand">landfall<em>.</em></div>
-      <p style="max-width:34ch;font-size:.92rem">Settlement quality for Stellar anchors, read straight off the public ledger. Open source, MIT.</p>
-    </div>
-    <div class="foot-col"><h4>Product</h4>
-      <a href="#data">Live data</a><a href="dashboard.html">Transactions</a><a href="#how">How it works</a><a href="#developers">SDK &amp; API</a><a href="#pricing">Pricing</a>
-    </div>
-    <div class="foot-col"><h4>Resources</h4>
-      <a href="https://github.com/ibochivincent-lang/landfall/blob/main/docs/methodology.md">Methodology</a>
-      <a href="https://github.com/ibochivincent-lang/landfall/blob/main/docs/roadmap.md">Roadmap</a>
-      <a href="https://github.com/ibochivincent-lang/landfall/blob/main/CONTRIBUTING.md">Contributing</a>
-      <a href="https://github.com/ibochivincent-lang/landfall/blob/main/docs/deployment.md">Self-host</a>
-      <a href="#faq">FAQ</a>
-    </div>
-    <div class="foot-col"><h4>Company</h4>
-      <a href="#contact">Contact us</a>
-      <a href="https://github.com/ibochivincent-lang/landfall">GitHub</a>
-      <a href="https://github.com/ibochivincent-lang/landfall/blob/main/SECURITY.md">Security</a>
-      <a href="https://github.com/ibochivincent-lang/landfall/blob/main/CODE_OF_CONDUCT.md">Code of conduct</a>
-    </div>
-  </div>
-  <div class="foot-bottom">
-    <span>Scan of 12 August 2026 · 13 accounts across 5 home domains · verified against stellar.expert</span>
-    <span>© 2026 Landfall · MIT</span>
-  </div>
-</div></footer>
-
-<!-- ============ LOGIN MODAL ============ -->
-<div class="modal" id="loginModal" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
-  <div class="modal__scrim" data-close></div>
-  <div class="modal__box">
-    <button class="modal__x" data-close aria-label="Close">✕</button>
-    <h3 id="loginTitle">Not open yet</h3>
-    <p class="sub">There are no accounts to sign in to. Accounts arrive with the API — leave an address and we will tell you when it is real.</p>
-    <form class="form" id="loginForm" novalidate>
-      <div class="field"><label for="lmail">Email</label><input id="lmail" type="email" required placeholder="you@company.com" autocomplete="username"></div>
-      
-      <button class="btn btn--primary btn--block btn--lg" type="submit">Notify me</button>
-      <div class="form__ok" id="loginOk">Noted. This form is not wired to a backend yet, so nothing was sent — email us instead.</div>
-    </form>
-    <p class="alt">Prefer to talk? <a href="#contact" data-close>Contact us</a></p>
-  </div>
-</div>
-
-<div class="tip" id="tip"></div>
-
-<script src="vendor/gsap.min.js"></script>
-<script src="app.js"></script>
+  <footer><div class="wrap footer__in"><a class="brand" href="#top"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 3 35 29H5L20 3Z" fill="currentColor"/><path d="M20 12 28 26H12l8-14Z" fill="#eaf4ef"/></svg><span>landfall<span class="brand__dot">.</span></span></a><p>Settlement intelligence for Stellar anchors, read from the public ledger.</p><a href="https://github.com/ibochivincent-lang/landfall">GitHub ↗</a></div></footer>
+  <script src="app.js"></script>
 </body>
 </html>
