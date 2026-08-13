@@ -10,9 +10,11 @@
  */
 
 import { readdir, readFile, writeFile } from 'node:fs/promises';
-import { join, resolve } from 'node:path';
+import { join, resolve, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const ROOT      = resolve(import.meta.dirname, '..');
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const ROOT      = resolve(__dirname, '..');
 const OUT_DIR   = join(ROOT, 'out');
 const API_FILE  = join(ROOT, 'packages', 'web', 'api', 'v1', 'anchors.json');
 const SNAP_FILE = join(ROOT, 'packages', 'web', 'snapshot.json');
