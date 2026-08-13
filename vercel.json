@@ -8,7 +8,6 @@
   "trailingSlash": false,
   "functions": {
     "api/[...path].js": {
-      "runtime": "nodejs20.x",
       "maxDuration": 30
     }
   },
