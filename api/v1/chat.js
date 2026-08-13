@@ -93,15 +93,20 @@ export default async function handler(req, res) {
   `;
 
   try {
-    const openai = new OpenAI();
+    const apiKeys = process.env.OPENAI_API_KEY.split(',').map(k => k.trim()).filter(Boolean);
+    let lastError = null;
 
-    // Step 1: Generate SQL
-    const sqlCompletion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      temperature: 0,
-      messages: [{
-        role: 'user',
-        content: `You are a PostgreSQL expert for a Stellar blockchain indexer.
+    for (const apiKey of apiKeys) {
+      try {
+        const openai = new OpenAI({ apiKey });
+
+        // Step 1: Generate SQL
+        const sqlCompletion = await openai.chat.completions.create({
+          model: 'gpt-4o-mini',
+          temperature: 0,
+          messages: [{
+            role: 'user',
+            content: `You are a PostgreSQL expert for a Stellar blockchain indexer.
 Schema: ${schema}
 Rules:
 1. Return ONLY raw SQL. No markdown fences, no explanations.
@@ -109,39 +114,53 @@ Rules:
 3. Only SELECT statements.
 
 Request: "${userQuery}"`
-      }]
-    });
+          }]
+        });
 
-    let sql = sqlCompletion.choices[0].message.content.trim()
-      .replace(/^```sql\n?/, '').replace(/\n?```$/, '');
+        let sql = sqlCompletion.choices[0].message.content.trim()
+          .replace(/^```sql\n?/, '').replace(/\n?```$/, '');
 
-    if (!sql.toUpperCase().startsWith('SELECT')) {
-      throw new Error('AI generated a non-SELECT query. Refusing to run it.');
-    }
+        if (!sql.toUpperCase().startsWith('SELECT')) {
+          throw new Error('AI generated a non-SELECT query. Refusing to run it.');
+        }
 
-    // Step 2: Execute SQL
-    const { rows } = await db.query(sql);
+        // Step 2: Execute SQL
+        const { rows } = await db.query(sql);
 
-    // Step 3: Explain results
-    const explainCompletion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      temperature: 0.5,
-      messages: [{
-        role: 'user',
-        content: `User asked: "${userQuery}"
+        // Step 3: Explain results
+        const explainCompletion = await openai.chat.completions.create({
+          model: 'gpt-4o-mini',
+          temperature: 0.5,
+          messages: [{
+            role: 'user',
+            content: `User asked: "${userQuery}"
 Database returned ${rows.length} rows. Sample: ${JSON.stringify(rows.slice(0, 3))}
 Write 1-2 sentences summarizing the result in plain English.`
-      }]
-    });
+          }]
+        });
 
-    return json(res, 200, {
-      explanation: explainCompletion.choices[0].message.content,
-      sql,
-      rows,
-    });
+        // If we reach here, this API key worked perfectly! Return and break loop.
+        return json(res, 200, {
+          explanation: explainCompletion.choices[0].message.content,
+          sql,
+          rows,
+        });
+
+      } catch (err) {
+        // Log the failure of this specific key and continue to the next one
+        console.error(`[AI Chat] Key failed: ${err.message}`);
+        lastError = err;
+        
+        // If it's a database error (not OpenAI 401/429), break immediately.
+        if (!err.status) break;
+      }
+    }
+
+    // If we exhaust all keys and none worked, throw the last error
+    throw lastError || new Error('All provided API keys failed.');
 
   } catch (err) {
-    console.error('[AI Chat]', err);
+    console.error('[AI Chat Fatal]', err);
     return json(res, 500, { error: 'AI query failed: ' + err.message });
   }
 }
