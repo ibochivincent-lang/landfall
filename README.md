@@ -56,6 +56,97 @@ This is **retroactive**. A prober starts collecting the day you switch it on. La
 
 ---
 
+## How Landfall uses Stellar
+
+Landfall is not a generic app that happens to settle on Stellar. Its core
+mechanism depends on properties only this network provides, and it would not
+port to another chain without being redesigned.
+
+### SEP-1 — anchor discovery
+
+Anchors publish a `stellar.toml` declaring the accounts they operate. That is
+the entry point: a home domain resolves to on-chain accounts, permissionlessly,
+with no cooperation from the anchor. `packages/indexer/src/toml.ts`.
+
+### SEP-24 — why the ledger is enough
+
+Under SEP-24 one leg of every deposit and withdrawal is written to the ledger:
+
+| Flow | On-chain | Off-chain |
+|---|---|---|
+| Deposit (fiat → asset) | anchor sends the asset to the user | user pays fiat in |
+| Withdrawal (asset → fiat) | user sends the asset to the anchor | anchor pays fiat out |
+
+So settlement behaviour is already public, retroactively, for every anchor.
+No permission needed and no opt-out available.
+
+### CAP-67 — the unified event stream
+
+Protocol 23 makes classic operations emit the same events Soroban contracts do
+— `transfer`, `mint`, `burn`, `clawback` — with standardised topics and an
+`i128` amount, and backfills them for past ledgers.
+
+For this project that is not a convenience:
+
+- **One stream instead of N cursors.** Follow the ledger once rather than
+  paging every anchor account separately.
+- **Mint and burn are distinguishable from transfer.** A payment involving the
+  issuer is a different event from a user-to-user payment, and the protocol now
+  says so rather than leaving us to infer it.
+
+The `ledger_events` table is shaped directly on CAP-67's topics. The REST path
+remains as a fallback and for pre-Protocol-23 networks; `payments.source`
+records which path each row came from.
+
+### SEP-38 — the slippage baseline
+
+Firm quotes with an expiry give slippage a defined baseline: the gap between
+the amount quoted and the amount that landed. That metric does not exist in the
+ecosystem today. It needs the fiat leg, which is why Layer 2 is attestation.
+
+### Soroban — publishing the record on-chain
+
+`packages/contracts/landfall-oracle` publishes a **digest** of each dataset plus
+a per-account liveness state, so other contracts can route on the same data a
+wallet reads from the API.
+
+It stores a digest rather than the dataset because anyone can re-derive the
+digest from the published data and check the two agree. An oracle that asks you
+to trust it has missed the point of being an oracle.
+
+Events use `#[contractevent]`, so topics and payload shapes are part of the
+contract spec and an indexer generates its decoder instead of guessing:
+
+| Topic | Fires when |
+|---|---|
+| `publish` | a new dataset digest, epoch as a topic |
+| `score` | every score write |
+| `dark` | **only** on the transition into dormancy |
+
+`dark` fires on the transition, not the state — a consumer wants waking when an
+anchor goes quiet, not on every scan confirming it still is.
+
+The contract deliberately emits **no CAP-67 asset events**. CAP-67 standardises
+`transfer`/`mint`/`burn` for value movement; a scoring update moves no value,
+and faking those topics would pollute the exact stream this project consumes.
+
+### What is built, and what is not
+
+| | Status |
+|---|---|
+| SEP-1 discovery | shipping |
+| Horizon indexing, resumable cursors | shipping |
+| Liveness, volume, concentration, returns | shipping |
+| Postgres persistence + read API | shipping |
+| Soroban oracle | written, 16 tests, **not yet deployed** |
+| CAP-67 event ingestion | schema ready, ingestion **not written** |
+| SEP-38 slippage / attestations | **designed, not built** |
+| `@landfall/sdk`, MCP server | **designed, not built** |
+
+We would rather list this honestly than let a roadmap read as a changelog.
+
+---
+
 ## Quick start
 
 **Whole stack, one command.** Requires Docker.

@@ -3,6 +3,8 @@ import { discoverDomain } from "./toml.js";
 import { fetchPayments, fetchLastActivity } from "./horizon.js";
 import { computeMetrics } from "./metrics.js";
 import { renderTable, renderHeadline, renderDiscovery } from "./report.js";
+import { classifyLiveness } from "./report.js";
+import { Store, connectionStringFromEnv } from "./db.js";
 import { DEFAULT_SCAN_OPTIONS, type AccountMetrics, type AnchorAccount } from "./types.js";
 
 interface Args {
@@ -15,6 +17,8 @@ interface Args {
   minInbound: number;
   concurrency: number;
   dustThreshold: string;
+  /** Write results to Postgres as well as to disk. */
+  persist: boolean;
 }
 
 function parseArgs(argv: string[]): Args {
@@ -37,6 +41,7 @@ function parseArgs(argv: string[]): Args {
     minInbound: Number(get("--min-inbound") ?? 25),
     concurrency: Number(get("--concurrency") ?? 4),
     dustThreshold: get("--dust") ?? DEFAULT_SCAN_OPTIONS.dustThreshold,
+    persist: argv.includes("--persist"),
   };
 }
 
@@ -107,6 +112,8 @@ async function scan(args: Args): Promise<void> {
   };
   process.stderr.write(`Scanning ${accounts.length} account(s) against ${args.horizon}...\n`);
 
+  const rawByAccount = new Map<string, Awaited<ReturnType<typeof fetchPayments>>["records"]>();
+
   const metrics = await mapLimit(accounts, args.concurrency, async (anchor) => {
     try {
       // Liveness first, and deliberately outside the --since window: an account
@@ -119,6 +126,7 @@ async function scan(args: Args): Promise<void> {
         maxRecords: args.maxRecords,
         since: args.since,
       });
+      rawByAccount.set(anchor.account, records);
       const dormant = lifetime && records.length === 0 ? "  [dormant before window]" : "";
       process.stderr.write(
         `  ${anchor.domain} ${anchor.account.slice(0, 8)} — ${records.length} records${dormant}\n`,
@@ -144,6 +152,73 @@ async function scan(args: Args): Promise<void> {
   process.stdout.write("\n" + renderTable(ok) + "\n\n");
   process.stdout.write(renderHeadline(ok, args.minInbound) + "\n\n");
   process.stdout.write(`Full results with transaction hashes: ${jsonPath}\n`);
+
+  if (args.persist) await persist(args, accounts, ok, rawByAccount, opts);
+}
+
+/**
+ * Write the scan to Postgres.
+ *
+ * Deliberately runs after the JSON and the report, and never throws into the
+ * caller: a database problem must not lose a scan that already succeeded. The
+ * JSON on disk is the durable record; Postgres is the queryable copy.
+ */
+async function persist(
+  args: Args,
+  accounts: AnchorAccount[],
+  metrics: AccountMetrics[],
+  raw: Map<string, { cursor: string }[]>,
+  opts: typeof DEFAULT_SCAN_OPTIONS,
+): Promise<void> {
+  const connectionString = connectionStringFromEnv();
+  if (!connectionString) {
+    process.stderr.write(
+      "\n--persist was requested but DATABASE_URL is not set. Nothing written.\n" +
+      "Set it, or drop --persist. See .env.example.\n",
+    );
+    process.exitCode = 1;
+    return;
+  }
+
+  const store = new Store({ connectionString });
+  try {
+    await store.assertReady();
+
+    const domains = new Map<string, string>();
+    for (const a of accounts) domains.set(a.account, a.domain);
+    for (const domain of new Set(accounts.map((a) => a.domain))) {
+      await store.upsertAnchor(domain);
+    }
+    await store.upsertAccounts(accounts);
+
+    const scanId = await store.startScan(args.horizon, opts);
+    process.stderr.write(`\nPersisting scan #${scanId}...\n`);
+
+    let payments = 0;
+    for (const m of metrics) {
+      await store.setLiveness(m.account, m.lastActivityAt);
+      await store.writeMetrics(scanId, m, classifyLiveness(m).replace("-", "_"));
+
+      const records = raw.get(m.account) ?? [];
+      if (records.length > 0) {
+        // Dust is stored, not discarded — flagged so a future change of
+        // threshold can be applied without re-fetching the ledger.
+        const dust = new Set<string>();
+        payments += await store.insertPayments(records as never, dust);
+      }
+    }
+
+    await store.finishScan(scanId, metrics.length);
+    process.stderr.write(`Wrote ${metrics.length} accounts and ${payments} payments.\n`);
+  } catch (err) {
+    process.stderr.write(
+      `\nPersist failed: ${err instanceof Error ? err.message : String(err)}\n` +
+      `The scan itself succeeded and the JSON above is intact.\n`,
+    );
+    process.exitCode = 1;
+  } finally {
+    await store.close();
+  }
 }
 
 const args = parseArgs(process.argv.slice(2));
@@ -172,6 +247,7 @@ switch (args.command) {
         "  --min-inbound <n>                minimum inbound payments to be ranked (default 25)",
         "  --concurrency <n>                parallel requests (default 4)",
         "  --dust <amount>                  ignore payments below this (default 0.01, 0 disables)",
+        "  --persist                        also write to Postgres via $DATABASE_URL",
         "  --out <dir>                      output directory (default ./out)",
         "",
       ].join("\n"),

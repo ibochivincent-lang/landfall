@@ -1,0 +1,33 @@
+name: Data dispute
+description: A published figure about an anchor looks wrong
+title: "[DATA] "
+labels: ["type:data-dispute"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Every figure ships with its transaction hashes, so this is settled by
+        checking the ledger rather than by argument. Anchor operators: these
+        get priority.
+  - type: input
+    id: account
+    attributes:
+      label: Account ID
+      placeholder: "G..."
+    validations: { required: true }
+  - type: input
+    id: scan
+    attributes:
+      label: Scan timestamp
+      description: From the report footer or the JSON filename.
+    validations: { required: true }
+  - type: textarea
+    id: disagreement
+    attributes:
+      label: What we published, and what you believe is correct
+    validations: { required: true }
+  - type: textarea
+    id: hashes
+    attributes:
+      label: Transaction hashes
+      description: From the JSON output, or from the ledger.

@@ -72,8 +72,8 @@ $labels = @(
     @{ name = "trivial-100";      color = "0E8A16"; desc = "Drips Wave: 100 points" }
     @{ name = "medium-150";       color = "FBCA04"; desc = "Drips Wave: 150 points" }
     @{ name = "high-200";         color = "D93F0B"; desc = "Drips Wave: 200 points" }
-    @{ name = "good-first-issue"; color = "7057FF"; desc = "Scoped, unblocked, reviewer-ready" }
-    @{ name = "help-wanted";      color = "008672"; desc = "Larger ticket actively looking for an owner" }
+    @{ name = "good first issue"; color = "7057FF"; desc = "Scoped, unblocked and reviewer-ready" }
+    @{ name = "help wanted";      color = "008672"; desc = "Larger ticket actively looking for an owner" }
     @{ name = "module/indexer";   color = "1D76DB"; desc = "Horizon indexing and data collection" }
     @{ name = "module/metrics";   color = "1D76DB"; desc = "Metric computation and correctness" }
     @{ name = "module/sdk";       color = "1D76DB"; desc = "SDK, API and integrations" }
@@ -106,6 +106,8 @@ $files = @{
     "vercel.json"         = "deploy config"
     ".github/workflows/ci.yml" = "CI workflow"
     "packages/web/index.html" = "site"
+    ".github/pull_request_template.md" = "PR template"
+    ".github/ISSUE_TEMPLATE/bug_report.yml" = "issue templates"
 }
 foreach ($f in $files.Keys | Sort-Object) {
     $mark = if (Test-Path $f) { "  ok  " } else { "  MISSING " }

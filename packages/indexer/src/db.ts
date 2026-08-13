@@ -93,9 +93,11 @@ export class Store {
   /** Liveness is written from the unfiltered lifetime reading, never the window. */
   async setLiveness(account: string, lastActivityAt?: string): Promise<void> {
     await this.pool.query(
+      // $2 is cast explicitly: it appears only inside IS NOT NULL, which gives
+      // Postgres no type context to infer from (SQLSTATE 42P08).
       `UPDATE anchor_accounts
-          SET last_activity_at = $2,
-              has_lifetime_activity = ($2 IS NOT NULL)
+          SET last_activity_at = $2::timestamptz,
+              has_lifetime_activity = ($2::timestamptz IS NOT NULL)
         WHERE account_id = $1`,
       [account, lastActivityAt ?? null],
     );
