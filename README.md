@@ -106,6 +106,17 @@ ecosystem today. It needs the fiat leg, which is why Layer 2 is attestation.
 
 ### Soroban — publishing the record on-chain
 
+**Live on testnet:**
+[`CA2IYHFKTKSJWR5IICY6HFD55BJEGE7OMKISWMLMPFSHLESZYO3VICAG`](https://stellar.expert/explorer/testnet/contract/CA2IYHFKTKSJWR5IICY6HFD55BJEGE7OMKISWMLMPFSHLESZYO3VICAG)
+— initialised in
+[this transaction](https://stellar.expert/explorer/testnet/tx/705435b9a826d2258b4a7f1fc73ff15c1865df13fd5bf89cdcffa15abdb9cc53),
+admin `GA7YI536V4BC7CL43DRMZ2UU7N4T3VZZSY7FVOY6Q4JUPBVZYHN43QMT`.
+Deployed with `scripts/deploy-contract.ps1`; 15,641 bytes optimised.
+
+Not on mainnet, and the indexer does not publish to it yet. It is a deployed
+contract you can call, not a running oracle.
+
+
 `packages/contracts/landfall-oracle` publishes a **digest** of each dataset plus
 a per-account liveness state, so other contracts can route on the same data a
 wallet reads from the API.
@@ -140,7 +151,7 @@ and faking those topics would pollute the exact stream this project consumes.
 | Postgres persistence + read API | shipping |
 | Transactions dashboard | shipping |
 | Hosted deployment (Supabase, prod compose) | shipping |
-| Soroban oracle | written, 16 tests, **not yet deployed** |
+| Soroban oracle | **deployed to testnet**, 16 tests, not on mainnet |
 | CAP-67 event ingestion | schema ready, ingestion **not written** |
 | SEP-38 slippage / attestations | **designed, not built** |
 | `@landfall/sdk`, MCP server | **designed, not built** |
@@ -204,7 +215,11 @@ a same-origin API proxy, and deploying the oracle.
 ./scripts/migrate.sh                                   # apply the schema
 npm run scan -- --persist --horizon https://horizon.stellar.org
 docker compose -f docker-compose.prod.yml up -d --build
+./scripts/deploy-contract.sh testnet                   # oracle; -Preflight on Windows
 ```
+
+Windows equivalents are `.\scripts\migrate.ps1` and
+`.\scripts\deploy-contract.ps1 -Network testnet`.
 
 Scan writes full results, including both transaction hashes for every matched
 refund pair, to `out/scan-<timestamp>.json` so any claim can be checked

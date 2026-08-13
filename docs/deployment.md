@@ -274,18 +274,99 @@ Still the honest gap in this list: **written, tested, and never deployed.**
 Sixteen tests pass against the SDK's test environment. It has not touched a
 network.
 
-```bash
-rustup target add wasm32-unknown-unknown
-cargo install --locked stellar-cli
+### Toolchain first
 
+Two installs, roughly fifteen minutes between them. Check before you build,
+not after:
+
+```powershell
+.\scripts\deploy-contract.ps1 -Network testnet -Preflight
+```
+
+```bash
+./scripts/deploy-contract.sh testnet    # checks the same things, then proceeds
+```
+
+It reports exactly what is missing and the command that fixes it:
+
+| Missing | Fix |
+|---|---|
+| Rust | `winget install Rustlang.Rustup`, then reopen the terminal |
+| wasm target | `rustup target add wasm32v1-none` |
+| stellar CLI | `winget install --id Stellar.StellarCLI` — check `stellar --version` reports 23+; if not, `cargo install --locked stellar-cli` |
+| C linker (Windows) | see below |
+
+Two of these catch almost everyone.
+
+**The wasm target, and which one.** It is `wasm32v1-none`, not
+`wasm32-unknown-unknown`. The second is the one every older tutorial names,
+and `soroban-sdk` 27 rejects it outright:
+
+```
+Rust compiler 1.82+ with target 'wasm32-unknown-unknown' is unsupported by the
+Soroban Environment, use 'wasm32v1-none' available with Rust 1.84+.
+```
+
+Rust 1.82 turned on reference-types and multi-value for that target. The
+Soroban environment does not support either, and they are not easily disabled,
+so the SDK's build script panics rather than emit a wasm the network would
+refuse. With the right target absent you instead get ``can't find crate for
+`core` ``, which reads like a broken Rust install and is not.
+
+**A C linker, on Windows.** This one is genuinely counter-intuitive. The
+output is WebAssembly, so it looks like no native toolchain should be
+involved — but cargo compiles proc-macro crates and build scripts *for the
+host*, because they execute on your machine during the build. On an
+`x86_64-pc-windows-msvc` toolchain that needs `link.exe`, which only arrives
+with Visual Studio's C++ tools. Without it you get 194 crates downloaded, a
+minute of compiling, and then:
+
+```
+error: linker `link.exe` not found
+```
+
+Two ways out. Microsoft's build tools are the well-trodden path:
+
+```powershell
+winget install --id Microsoft.VisualStudio.2022.BuildTools --override "--wait --quiet --add Microsoft.VisualStudio.Workload.VCTools --includeRecommended"
+```
+
+That is roughly 3 GB and 15–20 minutes. The GNU toolchain is about a tenth of
+the size and brings its own linker:
+
+```powershell
+rustup toolchain install stable-x86_64-pc-windows-gnu
+rustup default stable-x86_64-pc-windows-gnu
+rustup target add wasm32v1-none
+```
+
+Re-adding the wasm target is not redundant. Targets are installed per
+toolchain, so the one you added under msvc does not carry over — miss this and
+you land straight back on ``can't find crate for `core` ``.
+
+On Linux and macOS the equivalent is `build-essential` or the Xcode command
+line tools, and it is usually already there.
+
+### Then deploy
+
+```powershell
+.\scripts\deploy-contract.ps1 -Network testnet
+```
+
+```bash
 ./scripts/deploy-contract.sh testnet
 ```
 
-The script builds, optimises, generates and funds an identity, deploys, calls
-`initialise`, reads `epoch` back to confirm the call took, writes
-`.contract-id`, and appends `ORACLE_CONTRACT_ID` to `.env`. It refuses to run
-twice without `--force`, because a second deploy orphans the first contract
-along with every consumer still pointing at it.
+Both scripts do the same nine things: check the toolchain, build, optimise,
+generate and fund an identity, deploy, call `initialise`, read `epoch` back to
+confirm the call took, write `.contract-id`, and append `ORACLE_CONTRACT_ID` to
+`.env`. They refuse to run twice without `-Force` / `--force`, because a second
+deploy orphans the first contract along with every consumer still pointing at
+it.
+
+Reading `epoch` back is not ceremony. `initialise` is guarded against a second
+call, so a silent no-op there is the signal that the deploy reused an existing
+instance rather than creating one.
 
 `mainnet` prompts you to fund the deployer yourself and waits.
 

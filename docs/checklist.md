@@ -100,8 +100,15 @@ The stack is deployable and not deployed. Until one of these is ticked, every
 - [ ] Set `LANDFALL_API_URL` in the Vercel project and redeploy, so
       `/dashboard` stops showing its "no API connected" panel
 - [ ] Schedule the indexer — a real cron job on the host, not the compose loop
-- [ ] `./scripts/deploy-contract.sh testnet`, then put the contract id in the
-      README. Sixteen passing tests is not the same claim as a deployed contract
+- [x] `.\scripts\deploy-contract.ps1 -Network testnet` - **done 13 August 2026**
+      `CA2IYHFKTKSJWR5IICY6HFD55BJEGE7OMKISWMLMPFSHLESZYO3VICAG`
+      Four of my own bugs surfaced on the way: the wrong wasm target, a missing
+      host C linker, PowerShell treating stderr as failure, and three CLI flags
+      that do not exist. All fixed in the scripts, so the next person runs it
+      once.
+- [ ] Wire the indexer to publish digests to it. Deployed is not the same as
+      used - nothing writes to this contract yet
+- [ ] Mainnet, once there is something worth publishing
 - [ ] Take one `pg_dump` and put it somewhere that is not Supabase
 
 ---

@@ -24,7 +24,8 @@
     "prod:down": "docker compose -f docker-compose.prod.yml down",
     "prod:logs": "docker compose -f docker-compose.prod.yml logs -f",
     "contracts:deploy": "bash scripts/deploy-contract.sh",
-    "contracts:build": "cd packages/contracts && cargo build --target wasm32-unknown-unknown --release",
+    "contracts:deploy:testnet": "bash scripts/deploy-contract.sh testnet",
+    "contracts:build": "cd packages/contracts && cargo build --target wasm32v1-none --release",
     "contracts:test": "cd packages/contracts && cargo test"
   },
   "devDependencies": {

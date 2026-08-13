@@ -18,7 +18,12 @@ FORCE="${2:-}"
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-WASM="packages/contracts/target/wasm32-unknown-unknown/release/landfall_oracle.wasm"
+# soroban-sdk 27 refuses wasm32-unknown-unknown: Rust 1.82+ turns on
+# reference-types and multi-value for that target, which the Soroban
+# environment does not accept, and the SDK's build script panics rather than
+# emit a wasm the network will reject. wasm32v1-none is the supported target.
+TARGET="wasm32v1-none"
+WASM="packages/contracts/target/$TARGET/release/landfall_oracle.wasm"
 ID_FILE=".contract-id"
 IDENTITY="landfall-deployer"
 
@@ -37,10 +42,29 @@ which is the one that speaks Protocol 23.)"
 
 command -v cargo >/dev/null 2>&1 || fail "Rust is not installed. See https://rustup.rs"
 
-rustup target list --installed 2>/dev/null | grep -q wasm32-unknown-unknown || fail \
-"The wasm32-unknown-unknown target is missing.
+rustup target list --installed 2>/dev/null | grep -qx "$TARGET" || fail \
+"The $TARGET target is missing.
 
-  rustup target add wasm32-unknown-unknown"
+  rustup target add $TARGET
+
+If you have wasm32-unknown-unknown, that is the wrong one: soroban-sdk 27
+rejects it because Rust 1.82+ enables reference-types and multi-value there,
+which the Soroban environment does not support. Needs Rust 1.84+."
+
+# A host C linker. Counter-intuitive but required: the output is wasm, yet
+# cargo compiles proc-macro crates and build scripts for the HOST, and those
+# need a native linker. Usually present here; the check costs nothing and the
+# failure it prevents ("linker `cc` not found", 194 crates in) looks like a
+# Rust problem and is not.
+command -v cc >/dev/null 2>&1 || command -v gcc >/dev/null 2>&1 || fail \
+"No C compiler on PATH (cc or gcc).
+
+Proc-macros and build scripts compile for this machine even though the
+contract targets wasm, and they need a native linker.
+
+  Debian/Ubuntu   sudo apt-get install build-essential
+  Fedora          sudo dnf install gcc
+  macOS           xcode-select --install"
 
 case "$NETWORK" in
   local)   RPC="${SOROBAN_RPC_URL:-http://localhost:8001}"
@@ -67,7 +91,7 @@ fi
 # ------------------------------------------------------------------ build
 
 say "1/5  Building wasm"
-(cd packages/contracts && cargo build --target wasm32-unknown-unknown --release)
+(cd packages/contracts && cargo build --target "$TARGET" --release)
 [ -f "$WASM" ] || fail "Build reported success but $WASM is not there."
 
 # The oracle is a few hundred lines; anything over ~64 KiB means an accidental
@@ -90,7 +114,10 @@ say "3/5  Identity"
 if stellar keys address "$IDENTITY" >/dev/null 2>&1; then
   printf '     reusing %s\n' "$IDENTITY"
 else
-  stellar keys generate --global "$IDENTITY" --network-passphrase "$PASSPHRASE" --rpc-url "$RPC"
+  # No --global (that is --config-dir) and no --no-fund: funding is opt-in via
+  # --fund and off by default. Friendbot below does the funding, so a friendbot
+  # outage cannot leave you without a key and no explanation.
+  stellar keys generate "$IDENTITY"
   printf '     generated %s\n' "$IDENTITY"
 fi
 ADDRESS="$(stellar keys address "$IDENTITY")"
@@ -111,7 +138,7 @@ fi
 say "4/5  Deploying to $NETWORK"
 CONTRACT_ID="$(stellar contract deploy \
   --wasm "$WASM" \
-  --source "$IDENTITY" \
+  --source-account "$IDENTITY" \
   --rpc-url "$RPC" \
   --network-passphrase "$PASSPHRASE")"
 
@@ -124,7 +151,7 @@ printf '%s\n' "$CONTRACT_ID" > "$ID_FILE"
 say "5/5  Initialising (admin = $ADDRESS)"
 stellar contract invoke \
   --id "$CONTRACT_ID" \
-  --source "$IDENTITY" \
+  --source-account "$IDENTITY" \
   --rpc-url "$RPC" \
   --network-passphrase "$PASSPHRASE" \
   -- initialise --admin "$ADDRESS"
@@ -132,11 +159,17 @@ stellar contract invoke \
 # `initialise` is guarded against a second call, so verifying it took is a real
 # check rather than a formality: a silent no-op here means the deploy reused an
 # existing instance.
-EPOCH="$(stellar contract invoke \
-  --id "$CONTRACT_ID" --source "$IDENTITY" \
+if EPOCH="$(stellar contract invoke \
+  --id "$CONTRACT_ID" --source-account "$IDENTITY" \
   --rpc-url "$RPC" --network-passphrase "$PASSPHRASE" \
-  -- epoch 2>/dev/null || echo '?')"
-printf '     epoch reads back as %s\n' "$EPOCH"
+  -- epoch 2>/dev/null)"; then
+  printf '     epoch reads back as %s\n' "$EPOCH"
+else
+  # Say the check did not run rather than printing a placeholder. The
+  # Initialised event in the transaction above is on the ledger; this is a
+  # local read that can fail for network reasons alone.
+  printf '     could not read epoch back; rely on the Initialised event above\n'
+fi
 
 # ------------------------------------------------------------------ record it
 

@@ -21,7 +21,11 @@ param(
     [string]$Homepage = "https://landfall-ib.vercel.app"
 )
 
-$ErrorActionPreference = "Stop"
+# NOT 'Stop'. With 'Stop', PowerShell turns anything a native command writes
+# to stderr into a TERMINATING error, even when the command succeeded and
+# exited 0. `gh` writes progress and warnings there routinely.
+# stderr is not an error signal; the exit code is, and it is checked below.
+$ErrorActionPreference = 'Continue'
 
 if (-not (Get-Command gh -ErrorAction SilentlyContinue)) {
     throw "GitHub CLI not found. Install it, or set these by hand in repo Settings."

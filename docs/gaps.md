@@ -73,8 +73,12 @@ whole problem. The alternative is deleting those sections until they're real.
 - **No trend history in the product.** Every scan is stored, so the data for
   "dark for N consecutive scans" exists — nothing reads it back yet, and there
   is still no alerting on state change.
-- ~~**No API**~~ — shipped. **No SDK, no MCP server**, and the **Soroban oracle
-  is written and tested but has never been deployed to any network.**
+- ~~**No API**~~ — shipped. **No SDK, no MCP server.**
+- ~~**The Soroban oracle has never been deployed.**~~ Live on **testnet** at
+  `CA2IYHFKTKSJWR5IICY6HFD55BJEGE7OMKISWMLMPFSHLESZYO3VICAG` as of
+  13 August 2026. Still **not on mainnet**, and **the indexer does not publish
+  to it** — so it is a deployed contract, not a working oracle. The gap moved;
+  it did not close.
 - **No attestation layer**, so no slippage metric. The most valuable number the
   project could produce does not exist yet.
 - **No dispute portal**, despite the code of conduct and security policy both

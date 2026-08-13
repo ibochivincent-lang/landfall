@@ -17,7 +17,13 @@ param(
   [switch]$DryRun
 )
 
-$ErrorActionPreference = 'Stop'
+# NOT 'Stop'. With 'Stop', PowerShell turns anything a native command writes
+# to stderr into a TERMINATING error, even when the command succeeded and
+# exited 0. `psql` writes every NOTICE there - including the
+# "already exists, skipping" lines our re-runnable migrations emit by design,
+# which would abort a perfectly correct second run.
+# stderr is not an error signal; the exit code is, and it is checked below.
+$ErrorActionPreference = 'Continue'
 $root = Split-Path -Parent $PSScriptRoot
 $dir  = Join-Path $root 'packages\db\migrations'
 

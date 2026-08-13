@@ -62,11 +62,16 @@ npm run contracts:test  # 16 tests
 npm run contracts:build # wasm
 ```
 
-Requires Rust with the `wasm32-unknown-unknown` target:
+Requires Rust 1.84+ with the `wasm32v1-none` target:
 
 ```bash
-rustup target add wasm32-unknown-unknown
+rustup target add wasm32v1-none
 ```
+
+Not `wasm32-unknown-unknown`. `soroban-sdk` 27 rejects that target outright —
+Rust 1.82+ enables reference-types and multi-value on it, which the Soroban
+environment does not support, so the SDK's build script panics rather than
+emit a wasm the network would refuse.
 
 ### Running against the local network
 

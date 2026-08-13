@@ -14,7 +14,13 @@
 [CmdletBinding(SupportsShouldProcess = $true)]
 param([string]$Repo = "")
 
-$ErrorActionPreference = "Stop"
+# NOT 'Stop'. With 'Stop', PowerShell turns anything a native command writes
+# to stderr into a TERMINATING error, even when the command succeeded and
+# exited 0. `gh` writes progress and rate-limit
+# warnings there routinely, and dying midway through would leave the tracker
+# half-populated - the worst possible state to resume from.
+# stderr is not an error signal; the exit code is, and it is checked below.
+$ErrorActionPreference = 'Continue'
 
 if (-not (Get-Command gh -ErrorAction SilentlyContinue)) {
     throw "GitHub CLI not found. Install it, or file the issues by hand from docs/backlog.md."
@@ -86,7 +92,7 @@ $issues = @(
     @{
         title  = "[DOCS] Write a local testnet deployment guide"
         labels = "type:docs,good first issue,trivial-100,module/docs"
-        body   = Body "There is no single page that walks a new contributor from ``git clone`` to a deployed contract on the local Quickstart node. CONTRIBUTING.md covers running the stack; nothing covers deploying." "A new contributor can follow ``docs/local-deployment.md`` start to finish and end up with the oracle deployed to the local network and its contract id in their .env, without asking a question." "Cover: starting the stack, funding an account with friendbot, ``cargo build --target wasm32-unknown-unknown --release``, ``stellar contract deploy``, calling ``initialise``, and how to verify it worked."
+        body   = Body "There is no single page that walks a new contributor from ``git clone`` to a deployed contract on the local Quickstart node. CONTRIBUTING.md covers running the stack; nothing covers deploying." "A new contributor can follow ``docs/local-deployment.md`` start to finish and end up with the oracle deployed to the local network and its contract id in their .env, without asking a question." "Cover: starting the stack, funding an account with friendbot, ``cargo build --target wasm32v1-none --release``, ``stellar contract deploy``, calling ``initialise``, and how to verify it worked."
     },
     @{
         title  = "[FEAT] Add --format json|table to the CLI"
@@ -195,8 +201,15 @@ $n = 0
 foreach ($i in $issues) {
     if ($PSCmdlet.ShouldProcess($i.title, "create issue")) {
         $url = gh issue create --repo $Repo --title $i.title --body $i.body --label $i.labels
-        Write-Host "  $url"
-        $n++
+        if ($LASTEXITCODE -ne 0 -or -not $url) {
+            # Report and carry on. A partial tracker is recoverable - the script
+            # skips issues whose titles already exist - but only if you can see
+            # which ones did not land.
+            Write-Host ("  FAILED: " + $i.title) -ForegroundColor Red
+        } else {
+            Write-Host "  $url"
+            $n++
+        }
         Start-Sleep -Milliseconds 400
     }
 }
