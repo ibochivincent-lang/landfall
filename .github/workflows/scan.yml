@@ -47,6 +47,7 @@ jobs:
       # Without it the scan still runs and writes JSON to ./out — that's enough
       # for the static API update step below.
       - name: Run ledger scan
+        continue-on-error: true   # persist failure must not skip the JSON update
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
