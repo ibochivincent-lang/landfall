@@ -28,6 +28,9 @@
     "contracts:build": "cd packages/contracts && cargo build --target wasm32v1-none --release",
     "contracts:test": "cd packages/contracts && cargo test"
   },
+  "dependencies": {
+    "pg": "^8.13.1"
+  },
   "devDependencies": {
     "@types/node": "^22.10.0",
     "tsx": "^4.19.2",
