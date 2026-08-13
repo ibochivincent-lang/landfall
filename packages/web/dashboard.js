@@ -69,32 +69,50 @@
   /* ------------------------------------------------------------------ boot */
 
   async function boot() {
+    // Try live API first, fall back to bundled snapshot.
+    let body = null;
+    let isSnapshot = false;
+
     try {
-      const body = await api('/api/v1/anchors');
-      if (!body.accounts?.length) throw new Error('API returned no accounts');
-
-      $('#live').hidden = false;
-      $('#offline').hidden = true;
-      stampFreshness(body);
-      renderAnchors(body.accounts);
-      loadAssets();
-
-      selectDomain(defaultDomain(body.accounts));
-    } catch (err) {
-      $('#live').hidden = true;
-      $('#offline').hidden = false;
-      $('#offlineDetail').textContent = String(err.message || err);
-      const f = $('#freshness');
-      f.textContent = 'API unreachable';
-      f.className = 'freshness is-snapshot';
+      body = await api('/api/v1/anchors');
+      if (!body.accounts?.length) throw new Error('No accounts in response');
+    } catch (_liveErr) {
+      try {
+        const res = await fetch('snapshot.json');
+        if (!res.ok) throw new Error('snapshot.json not found');
+        body = await res.json();
+        isSnapshot = true;
+      } catch (snapErr) {
+        $('#live').hidden = true;
+        $('#offline').hidden = false;
+        $('#offlineDetail').textContent = String(snapErr.message || snapErr);
+        const f = $('#freshness');
+        f.textContent = 'Data unavailable';
+        f.className = 'freshness';
+        return;
+      }
     }
+
+    $('#live').hidden = false;
+    $('#offline').hidden = true;
+    stampFreshness(body, isSnapshot);
+    renderAnchors(body.accounts);
+    if (!isSnapshot) loadAssets();
+    state.isSnapshot = isSnapshot;
+
+    selectDomain(defaultDomain(body.accounts));
   }
 
-  function stampFreshness(body) {
+  function stampFreshness(body, isSnapshot) {
     const f = $('#freshness');
+    if (isSnapshot) {
+      const h = Number(body.staleHours ?? 29);
+      const age = h < 48 ? Math.round(h) + 'h' : Math.round(h / 24) + 'd';
+      f.textContent = 'Snapshot · ' + age + ' old · no live API';
+      f.className = 'freshness';
+      return;
+    }
     const h = Number(body.staleHours ?? 0);
-    // Rounding 0.5 up to "1h old" overstates the age of a scan that just
-    // finished. Below the hour, say so rather than inventing a number.
     const age = h < 1 ? 'under an hour'
               : h < 48 ? Math.round(h) + 'h'
               : Math.round(h / 24) + 'd';
@@ -217,6 +235,24 @@
   async function loadPage(reset) {
     if (!state.domain) return;
     const btn = $('#moreBtn');
+
+    // Snapshot mode: no payments endpoint available — show a clear message.
+    if (state.isSnapshot) {
+      if (reset) { $('#txBody').innerHTML = ''; state.rows = 0; }
+      if (state.rows === 0) {
+        $('#txBody').appendChild(el('tr', '',
+          '<td colspan="7" class="tx-none">' +
+          'Transaction-level data requires a live API connection. ' +
+          'The anchor summary above is from the snapshot scan of 12 August 2026. ' +
+          '<a href="https://github.com/ibochivincent-lang/landfall/blob/main/docs/deployment.md" ' +
+          'target="_blank" rel="noopener" style="color:var(--teal);font-weight:700">Deploy the API</a> to see live rows.' +
+          '</td>'));
+        $('#txCount').textContent = 'Snapshot — no row-level data';
+      }
+      btn.hidden = true;
+      return;
+    }
+
     btn.disabled = true;
     btn.textContent = 'Loading…';
 
