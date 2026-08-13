@@ -37,38 +37,147 @@ h1, h2, h3, p { margin-top: 0; }
 }
 
 /* ============================================================
-   LOADER
+   LOADER — GSAP Stellar ledger scan
    ============================================================ */
 .loader {
   position: fixed;
   inset: 0;
   z-index: 10;
-  display: grid;
-  place-content: center;
-  gap: 20px;
-  text-align: center;
   background: var(--mint);
-  transition: opacity .5s, visibility .5s;
-}
-.loader.is-done { opacity: 0; visibility: hidden; }
-.loader__mark {
   display: flex;
-  gap: 5px;
+  align-items: center;
   justify-content: center;
-  align-items: end;
-  height: 45px;
 }
-.loader__mark span {
-  background: var(--teal);
-  width: 10px;
-  border-radius: 3px;
-  animation: load .7s ease-in-out infinite alternate;
+.loader.is-done { opacity: 0; visibility: hidden; pointer-events: none; }
+
+.loader__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
 }
-.loader__mark span:nth-child(1) { height: 20px; }
-.loader__mark span:nth-child(2) { height: 42px; animation-delay: .15s; }
-.loader__mark span:nth-child(3) { height: 29px; animation-delay: .3s; }
-.loader p { font: 11px 'DM Mono'; text-transform: uppercase; letter-spacing: 1.2px; }
-@keyframes load { to { transform: scaleY(.35); } }
+
+/* Stellar settlement card */
+.loader__card {
+  position: relative;
+  width: 340px;
+  height: 200px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, var(--teal) 0%, #08766f 100%);
+  padding: 24px 26px;
+  color: #fff;
+  overflow: hidden;
+  box-shadow: 0 24px 50px rgba(11,156,145,.4), 0 10px 20px rgba(6,31,45,.18);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.loader__card::before {
+  content: '';
+  position: absolute;
+  top: -60%; right: -30%;
+  width: 200%; height: 220%;
+  background: radial-gradient(ellipse at center, rgba(255,255,255,.14) 0%, transparent 60%);
+  pointer-events: none;
+}
+.loader__card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+.loader__card-icon svg {
+  width: 36px; height: 36px;
+  display: block;
+}
+.loader__card-badge {
+  font: 600 9px 'DM Mono';
+  letter-spacing: 1.8px;
+  background: rgba(255,255,255,.15);
+  border-radius: 4px;
+  padding: 4px 8px;
+  color: rgba(255,255,255,.9);
+}
+.loader__card-number {
+  display: flex;
+  gap: 10px;
+  font: 500 14px 'DM Mono';
+  letter-spacing: .12em;
+  position: relative;
+  z-index: 2;
+}
+.loader__card-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 9px;
+  letter-spacing: .22em;
+  font-weight: 700;
+  position: relative;
+  z-index: 2;
+}
+.loader__card-brand {
+  font: 800 20px Manrope;
+  letter-spacing: -.02em;
+  color: rgba(255,255,255,.95);
+}
+/* scan sweep line */
+.loader__card-scan {
+  position: absolute;
+  top: 0; left: -25%;
+  width: 45%; height: 100%;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,.45) 50%, transparent 100%);
+  transform: skewX(-12deg);
+  pointer-events: none;
+  z-index: 3;
+}
+/* checkmark overlay */
+.loader__card-check {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(7,135,126,.88);
+  color: #fff;
+  opacity: 0;
+  backdrop-filter: blur(4px);
+  z-index: 4;
+  border-radius: inherit;
+}
+.loader__card-check svg { width: 72px; height: 72px; }
+
+/* meta row */
+.loader__meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 340px;
+  font: 500 11px 'DM Mono';
+  color: var(--muted);
+}
+.loader__counter {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--teal);
+}
+
+/* progress bar */
+.loader__bar {
+  width: 340px;
+  height: 4px;
+  background: var(--line);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.loader__bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--teal) 0%, #07877e 100%);
+  border-radius: inherit;
+  transition: none;
+}
 
 /* ============================================================
    NAVIGATION
@@ -171,6 +280,26 @@ h1, h2, h3, p { margin-top: 0; }
   margin-right: 8px;
   box-shadow: 0 0 0 5px rgba(11,156,145,.14);
 }
+
+/* Hero title — GSAP line-mask reveal */
+.hero__title {
+  font-size: clamp(48px, 5.4vw, 76px);
+  line-height: 1.02;
+  letter-spacing: -4px;
+  margin: 0 0 24px;
+  max-width: 650px;
+}
+.hero__line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: .06em;
+}
+.hero__line-inner {
+  display: inline-block;
+  transform: translateY(110%);
+  will-change: transform;
+}
+.hero__line-inner--em { color: var(--teal); }
 
 h1 {
   font-size: clamp(48px, 5.4vw, 76px);

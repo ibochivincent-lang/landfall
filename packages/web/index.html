@@ -14,9 +14,41 @@
 </head>
 <body>
 
+  <!-- ====== GSAP LOADER — Stellar ledger scan ====== -->
   <div class="loader" id="loader" aria-live="polite">
-    <div class="loader__mark"><span></span><span></span><span></span></div>
-    <p id="loaderText">Reading the Stellar ledger</p>
+    <div class="loader__content">
+      <!-- Stellar settlement panel (replaces bank card) -->
+      <div class="loader__card" id="loaderCard">
+        <div class="loader__card-top">
+          <div class="loader__card-icon">
+            <svg viewBox="0 0 40 40" aria-hidden="true">
+              <path d="M20 3 35 29H5L20 3Z" fill="rgba(255,255,255,0.9)"/>
+              <path d="M20 12 28 26H12l8-14Z" fill="rgba(255,255,255,0.3)"/>
+              <path d="M20 29v7" stroke="rgba(255,255,255,0.7)" stroke-width="3" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <span class="loader__card-badge">SEP-24 · LEDGER</span>
+        </div>
+        <div class="loader__card-number">
+          <span>GABC</span><span>••••</span><span>••••</span><span id="loaderDigits">WXYZ</span>
+        </div>
+        <div class="loader__card-foot">
+          <span>READING LEDGER</span>
+          <span class="loader__card-brand">STELLAR</span>
+        </div>
+        <div class="loader__card-scan" id="loaderScan"></div>
+        <div class="loader__card-check" id="loaderCheck">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <path d="M5 12l5 5 9-11" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+      <div class="loader__meta">
+        <span id="loaderLabel">Reading the Stellar ledger</span>
+        <span class="loader__counter" id="loaderCounter">$0</span>
+      </div>
+      <div class="loader__bar"><div class="loader__bar-fill" id="loaderBarFill"></div></div>
+    </div>
   </div>
 
   <main class="page">
@@ -44,14 +76,14 @@
 
     <section class="hero wrap" id="top">
       <div class="hero__copy">
-        <p class="eyebrow"><span class="eyebrow__pulse"></span> Independent Stellar settlement data</p>
-        <h1>Know if the money <em>landed.</em></h1>
-        <p class="hero__lede">Landfall reads public Stellar ledger activity to show which anchors are settling, slowing down, or falling silent — before a wallet routes a payment.</p>
-        <div class="hero__actions">
-          <a class="button" href="#data">Explore the ledger <span>→</span></a>
-          <a class="watch-link" href="#how"><b>▶</b> See how it works</a>
-        </div>
-        <div class="trust">
+        <p class="eyebrow" data-fade><span class="eyebrow__pulse"></span> Independent Stellar settlement data</p>
+        <h1 class="hero__title">
+          <span class="hero__line"><span class="hero__line-inner">Know if the money</span></span>
+          <span class="hero__line"><span class="hero__line-inner hero__line-inner--em">landed.</span></span>
+        </h1>
+        <p class="hero__lede" data-fade>Landfall reads public Stellar ledger activity to show which anchors are settling, slowing down, or falling silent — before a wallet routes a payment.</p>
+        <div class="hero__actions" data-fade><a class="button" href="#data">Explore the ledger <span>→</span></a><a class="watch-link" href="#how"><b>▶</b> See how it works</a></div>
+        <div class="trust" data-fade>
           <span>Built from public records</span>
           <div></div>
           <span>Open methodology</span>
@@ -376,6 +408,7 @@ anchor.darkRisk   <span class="code__muted">// false</span></code></pre>
     </div>
   </footer>
 
+  <script src="vendor/gsap.min.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
