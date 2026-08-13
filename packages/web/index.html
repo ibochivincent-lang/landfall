@@ -12,6 +12,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<!-- Point this at your API. Empty means the page uses its built-in snapshot. -->
+<meta name="landfall-api" content="">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -47,7 +49,7 @@
       <div class="dropdown">
         <a href="#data"><span class="ico" style="background:#ffe9b8">📊</span><span><b>Live anchor data</b><span>Every declared account, ranked by silence</span></span></a>
         <a href="#how"><span class="ico" style="background:#d9f2f5">⚓</span><span><b>How it works</b><span>Ledger truth, attestation, routing</span></span></a>
-        <a href="#developers"><span class="ico" style="background:#ffd9d0">⚡</span><span><b>SDK &amp; API</b><span>pickAnchor() for wallets and agents</span></span></a>
+        <a href="#developers"><span class="ico" style="background:#ffd9d0">⚡</span><span><b>SDK &amp; API</b><span>pickAnchor() — in development</span></span></a>
       </div>
     </div>
     <div class="topnav__item"><a class="topnav__link" href="#pricing">Pricing</a></div>
@@ -62,8 +64,8 @@
   </nav>
 
   <div class="topnav__actions">
-    <button class="btn btn--ghost" data-nav-el id="loginBtn">Log in</button>
-    <a class="btn btn--primary" href="#contact" data-nav-el>Get API access</a>
+    <button class="btn btn--ghost" data-nav-el id="loginBtn">Sign in</button>
+    <a class="btn btn--primary" href="#contact" data-nav-el>Join the pilot</a>
     <button class="burger" id="burger" aria-label="Menu" data-nav-el><span></span><span></span><span></span></button>
   </div>
 </div></header>
@@ -75,8 +77,8 @@
   <a href="#pricing">Pricing</a>
   <a href="#faq">FAQ</a>
   <a href="#contact">Contact us</a>
-  <button class="btn btn--ghost btn--block" id="loginBtnM">Log in</button>
-  <a class="btn btn--primary btn--block" href="#contact">Get API access</a>
+  <button class="btn btn--ghost btn--block" id="loginBtnM">Sign in</button>
+  <a class="btn btn--primary btn--block" href="#contact">Join the pilot</a>
 </div>
 
 <!-- ============ HERO ============ -->
@@ -222,6 +224,7 @@
       <span class="lg"><span class="sw sw-hatch" style="background:#d03b3b"></span>▲ Dark · over 30 days</span>
       <span class="lg"><span class="sw" style="background:#c9c9d4"></span>○ No payment history</span>
     </div>
+    <div class="freshness is-snapshot" id="freshness">Snapshot</div>
     <div class="chart" id="chart"></div>
     <details class="tbl">
       <summary>Table view</summary>
@@ -251,13 +254,15 @@
 <section class="section section--navy" id="developers"><div class="wrap">
   <div class="split">
     <div class="rv">
-      <span class="eyebrow">For wallets &amp; agents</span>
+      <span class="eyebrow">For wallets &amp; agents &middot; in development</span>
       <h2 class="big">One call. The right anchor.</h2>
       <p class="lede">Nobody sending money home comparison-shops on a dashboard. So the product isn't a dashboard — it's a function your wallet calls before it routes, and an MCP surface a payment agent can query directly.</p>
-      <a class="btn btn--primary btn--lg" href="#contact">Get API access</a>
+      <a class="btn btn--primary btn--lg" href="#contact">Join the pilot list</a>
+      <p class="form__note" style="margin-top:1rem">The SDK is not published yet. This is the interface we are building to — tell us if it is the wrong shape.</p>
     </div>
     <div class="code rv">
-<pre><span class="c">// rank anchors by expected landed value</span>
+<pre><span class="c">// planned interface - not yet on npm</span>
+<span class="c">// rank anchors by expected landed value</span>
 <span class="k">import</span> { <span class="f">pickAnchor</span> } <span class="k">from</span> <span class="s">'@landfall/sdk'</span>
 
 <span class="k">const</span> ranked = <span class="k">await</span> <span class="f">pickAnchor</span>({
@@ -277,9 +282,9 @@
 <!-- ============ PRICING ============ -->
 <section class="section section--cream" id="pricing"><div class="wrap">
   <div class="rv">
-    <span class="eyebrow">Pricing</span>
+    <span class="eyebrow">Pricing &middot; planned</span>
     <h2 class="big">The data is free. The volume isn't.</h2>
-    <p class="lede">Public dashboards and the raw dataset stay open forever — a reputation record nobody can read is worthless. Paid tiers cover teams querying it in production.</p>
+    <p class="lede"><b>None of this is live yet — there is no API to bill for and no way to sign up.</b> This is the intended shape, published early so wallets can tell us if it is wrong. Public dashboards and the raw dataset stay open forever — a reputation record nobody can read is worthless. Paid tiers cover teams querying it in production.</p>
   </div>
   <div class="tiers">
     <div class="tier rv">
@@ -292,9 +297,9 @@
     <div class="tier featured rv">
       <div class="tier__name">Wallet</div>
       <div class="tier__price">$99</div>
-      <div class="tier__per">per month</div>
-      <ul><li>Everything in Open</li><li>250k API calls / month</li><li><code>@landfall/sdk</code> with pickAnchor()</li><li>MCP server for agents</li><li>Webhooks when an anchor goes dark</li></ul>
-      <a class="btn btn--primary btn--block" href="#contact">Start a trial</a>
+      <div class="tier__per">per month &middot; not yet available</div>
+      <ul><li>Everything in Open</li><li>250k API calls / month</li><li><code>@landfall/sdk</code> with pickAnchor()</li><li>MCP server for agents</li><li>Webhooks when an anchor goes dark <em>(planned)</em></li></ul>
+      <a class="btn btn--primary btn--block" href="#contact">Register interest</a>
     </div>
     <div class="tier rv">
       <div class="tier__name">Anchor</div>
@@ -354,7 +359,7 @@
       </div>
       <div class="field"><label for="cmsg">Message</label><textarea id="cmsg" name="message" required placeholder="What would you like to know?"></textarea></div>
       <button class="btn btn--primary btn--lg btn--block" type="submit">Send message</button>
-      <div class="form__ok" id="formOk">Thanks — that's noted. This demo form doesn't send anywhere yet; wire it to your inbox before launch.</div>
+      <div class="form__ok" id="formOk">Nothing was actually sent — this form has no backend yet. Please email us directly for now.</div>
       <p class="form__note">We reply to everything. Anchor disputes get priority.</p>
     </form>
   </div>
@@ -394,15 +399,15 @@
   <div class="modal__scrim" data-close></div>
   <div class="modal__box">
     <button class="modal__x" data-close aria-label="Close">✕</button>
-    <h3 id="loginTitle">Welcome back</h3>
-    <p class="sub">Log in to manage API keys and dark-anchor alerts.</p>
+    <h3 id="loginTitle">Not open yet</h3>
+    <p class="sub">There are no accounts to sign in to. Accounts arrive with the API — leave an address and we will tell you when it is real.</p>
     <form class="form" id="loginForm" novalidate>
       <div class="field"><label for="lmail">Email</label><input id="lmail" type="email" required placeholder="you@company.com" autocomplete="username"></div>
-      <div class="field"><label for="lpass">Password</label><input id="lpass" type="password" required placeholder="••••••••" autocomplete="current-password"></div>
-      <button class="btn btn--primary btn--block btn--lg" type="submit">Log in</button>
-      <div class="form__ok" id="loginOk">Demo only — no account system is wired up yet.</div>
+      
+      <button class="btn btn--primary btn--block btn--lg" type="submit">Notify me</button>
+      <div class="form__ok" id="loginOk">Noted. This form is not wired to a backend yet, so nothing was sent — email us instead.</div>
     </form>
-    <p class="alt">No account? <a href="#contact" data-close>Request API access</a></p>
+    <p class="alt">Prefer to talk? <a href="#contact" data-close>Contact us</a></p>
   </div>
 </div>
 

@@ -6,3 +6,8 @@ out/
 .env
 .env.local
 .DS_Store
+
+# monorepo
+packages/contracts/target/
+packages/*/node_modules/
+.env

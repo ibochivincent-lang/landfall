@@ -1,10 +1,13 @@
-﻿name: CI
+name: CI
 
 on:
   push:
     branches: [main]
   pull_request:
 
+# A contributor's first PR should get a green tick without a maintainer
+# doing anything. Everything here runs offline — the test suite uses a mock
+# Horizon server, so CI never depends on the network or on rate limits.
 jobs:
   test:
     name: Node ${{ matrix.node }}
@@ -13,14 +16,19 @@ jobs:
       fail-fast: false
       matrix:
         node: ['20', '22']
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
           cache: npm
+
       - run: npm ci
+
       - name: Typecheck
         run: npm run typecheck
+
       - name: Test
         run: npm test

@@ -58,13 +58,36 @@ This is **retroactive**. A prober starts collecting the day you switch it on. La
 
 ## Quick start
 
-Requires Node 20+.
+**Whole stack, one command.** Requires Docker.
+
+```bash
+cp .env.example .env
+docker compose up
+```
+
+Brings up a local Stellar Quickstart node, Postgres with the schema applied,
+the indexer, and the API — no account anywhere, no mainnet, no credentials.
+Site on :8080, API on :8787, Horizon on :8000.
+
+**Just the indexer.** Requires Node 20+, no Docker, no database.
 
 ```bash
 npm install
 npm run discover     # resolve anchor domains to on-chain accounts
 npm run scan         # index payment history and print the finding
 ```
+
+Layout:
+
+```
+packages/contracts   Rust + Soroban oracle
+packages/db          PostgreSQL schema
+packages/indexer     ledger reader and metrics
+packages/api         read-only HTTP API
+packages/web         the public site
+```
+
+See [docs/architecture.md](docs/architecture.md).
 
 Scan writes full results, including both transaction hashes for every matched
 refund pair, to `out/scan-<timestamp>.json` so any claim can be checked
@@ -136,7 +159,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md), [DEVELOPMENT.md](DEVELOPMENT.md) and
 ## Tests
 
 ```bash
-npm test         # 35 tests, no network required
+npm test                # indexer: 35 tests, no network required
+npm run contracts:test  # oracle: 16 tests
 npm run typecheck
 ```
 

@@ -1,0 +1,126 @@
+# ===========================================================
+# Landfall — the whole stack, locally, in one command.
+#
+#   docker compose up
+#
+# Brings up a Stellar Quickstart node (core + Horizon + RPC + friendbot),
+# Postgres with the schema already applied, the indexer, and the API.
+#
+# The point of this file is that a contributor can clone the repo and have a
+# working environment without an account anywhere, without touching mainnet,
+# and without asking anyone for a credential.
+# ===========================================================
+
+name: landfall
+
+services:
+  # ---------------------------------------------------------------- stellar
+  # Quickstart runs core, Horizon, Soroban RPC and friendbot together.
+  # --local gives a private network with an instantly-funded root account,
+  # so contract deploys and test payments cost nothing and wait for nobody.
+  stellar:
+    image: stellar/quickstart:latest
+    container_name: landfall-stellar
+    command: ["--local", "--enable-soroban-rpc", "--protocol-version", "23"]
+    ports:
+      - "8000:8000"   # Horizon
+      - "8001:8001"   # Soroban RPC
+      - "11626:11626" # core admin
+    healthcheck:
+      # Horizon reporting a ledger is the real readiness signal; the container
+      # being up is not the same thing as the network being usable.
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8000/ | grep -q core_latest_ledger"]
+      interval: 10s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    volumes:
+      - stellar-data:/opt/stellar
+
+  # ---------------------------------------------------------------- database
+  postgres:
+    image: postgres:16-alpine
+    container_name: landfall-postgres
+    environment:
+      POSTGRES_USER: landfall
+      POSTGRES_PASSWORD: landfall
+      POSTGRES_DB: landfall
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U landfall -d landfall"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+      # Everything in this directory runs on first boot, in filename order.
+      - ./packages/db/migrations:/docker-entrypoint-initdb.d:ro
+
+  # ---------------------------------------------------------------- indexer
+  indexer:
+    image: node:22-alpine
+    container_name: landfall-indexer
+    working_dir: /app
+    environment:
+      DATABASE_URL: postgres://landfall:landfall@postgres:5432/landfall
+      HORIZON_URL: ${HORIZON_URL:-http://stellar:8000}
+      SCAN_INTERVAL_SECONDS: ${SCAN_INTERVAL_SECONDS:-900}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      stellar:
+        condition: service_healthy
+    volumes:
+      - ./:/app
+    # Scan, sleep, repeat. Crude on purpose — a cron container is one more
+    # thing to debug, and the loop makes the cadence obvious in the logs.
+    command: >
+      sh -c "npm ci --silent &&
+             while true; do
+               npm run scan -w @landfall/indexer -- --persist --horizon \"$$HORIZON_URL\" || echo 'scan failed, retrying next cycle';
+               sleep $$SCAN_INTERVAL_SECONDS;
+             done"
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------- api
+  api:
+    image: node:22-alpine
+    container_name: landfall-api
+    working_dir: /app
+    environment:
+      DATABASE_URL: postgres://landfall:landfall@postgres:5432/landfall
+      PORT: 8787
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
+    ports:
+      - "8787:8787"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./:/app
+    command: sh -c "npm ci --silent && npm run start -w @landfall/api"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8787/health | grep -q '\"ok\": true'"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 40s
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------- web
+  # Static only. The site fetches from the API at runtime and falls back to
+  # its built-in snapshot when the API is unreachable, so this container has
+  # no build step and no dependency on the others being healthy.
+  web:
+    image: nginx:alpine
+    container_name: landfall-web
+    ports:
+      - "8080:80"
+    volumes:
+      - ./packages/web:/usr/share/nginx/html:ro
+    restart: unless-stopped
+
+volumes:
+  pg-data:
+  stellar-data:

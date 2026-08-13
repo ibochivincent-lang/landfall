@@ -1,0 +1,21 @@
+{
+  "name": "@landfall/indexer",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "Reads anchor settlement history off the Stellar ledger and persists it.",
+  "scripts": {
+    "discover": "tsx src/cli.ts discover",
+    "scan": "tsx src/cli.ts scan",
+    "serve-once": "tsx src/cli.ts scan --persist",
+    "test": "tsx --test test/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "pg": "^8.13.1"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.11.10"
+  }
+}

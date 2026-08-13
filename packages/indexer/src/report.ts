@@ -1,5 +1,4 @@
 import type { AccountMetrics } from "./types.js";
-import { median } from "./metrics.js";
 
 function pct(value: number | null): string {
   return value === null ? "n/a" : `${(value * 100).toFixed(2)}%`;
@@ -182,7 +181,7 @@ export function renderHeadline(metrics: AccountMetrics[], minInbound = 25): stri
       .sort((a, b) => a - b);
 
     if (latencies.length > 0) {
-      const med = median(latencies) as number;
+      const med = latencies[Math.floor(latencies.length / 2)] as number;
       out.push(`  Those returns took a median of ${hours(med)} to arrive.`);
       if (latencies.length < 30) {
         out.push(

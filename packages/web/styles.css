@@ -389,3 +389,17 @@ footer { background: var(--ink); color: rgba(255,255,255,.62); padding: 4.5rem 0
   [data-nav-el], [data-card], [data-el] { opacity: 1; }
   .loader { display: none; }
 }
+
+/* Data freshness. A page that serves month-old numbers as current is the
+   exact failure this project exists to detect, so provenance is always shown. */
+.freshness {
+  display: inline-flex; align-items: center; gap: .5rem;
+  font-size: .74rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase;
+  padding: .4rem .9rem; border-radius: 999px; margin-bottom: 1.2rem;
+}
+.freshness::before { content: ""; width: 7px; height: 7px; border-radius: 50%; }
+.freshness.is-live     { background: rgba(47,158,68,.12);  color: #2f9e44; }
+.freshness.is-live::before     { background: #2f9e44; }
+.freshness.is-snapshot { background: rgba(232,148,12,.12); color: #b8720a; }
+.freshness.is-snapshot::before { background: #e8940c; }
+.tier li em { font-style: normal; opacity: .6; font-size: .85em; }

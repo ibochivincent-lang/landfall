@@ -99,12 +99,13 @@ $files = @{
     "README.md"           = "readme"
     "LICENSE"             = "licence"
     "CONTRIBUTING.md"     = "contributing guide"
+    "docker-compose.yml"  = "local stack"
     "DEVELOPMENT.md"      = "development guide"
     "CODE_OF_CONDUCT.md"  = "code of conduct"
     "SECURITY.md"         = "security policy"
     "vercel.json"         = "deploy config"
     ".github/workflows/ci.yml" = "CI workflow"
-    "site/index.html"     = "site"
+    "packages/web/index.html" = "site"
 }
 foreach ($f in $files.Keys | Sort-Object) {
     $mark = if (Test-Path $f) { "  ok  " } else { "  MISSING " }

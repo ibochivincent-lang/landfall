@@ -14,10 +14,17 @@
   const hasGsap = typeof window.gsap !== 'undefined';
 
   /* =========================================================
-     1. DATA — figures from the 12 Aug 2026 scan.
-     In production this renders from out/scan-*.json.
+     1. DATA
+     The array below is a snapshot, used only when the API is
+     unreachable. When the API answers, it wins and the page
+     shows an "as of" stamp with real staleness. A page that
+     silently serves month-old numbers as current would be the
+     exact failure this project exists to detect.
      ========================================================= */
-  const ACCOUNTS = [
+  const API_BASE =
+    document.querySelector('meta[name="landfall-api"]')?.content?.replace(/\/$/, '') || '';
+
+  let ACCOUNTS = [
     { d:'cowrie.exchange',       a:'GDI5…TMNN', days:73.2,  i:10,   o:0,   r:0, s:'dark' },
     { d:'anclap.com',            a:'GA4T…BPEN', days:58.1,  i:5,    o:0,   r:0, s:'dark' },
     { d:'ntokens.com',           a:'GDKL…LMT6', days:34.6,  i:0,    o:0,   r:0, s:'dark', approx:true },
@@ -32,6 +39,10 @@
     { d:'stellar.moneygram.com', a:'GA5Z…KZVN', days:0.004, i:2157, o:0,   r:0, s:'live' },
     { d:'cowrie.exchange',       a:'GBSK…RE3W', days:null,  i:0,    o:0,   r:0, s:'none' },
   ];
+  // Snapshot provenance. Overwritten if the API responds.
+  let DATA_AS_OF = '2026-08-12';
+  let DATA_LIVE = false;
+
   const COLOR = { live:'#2f9e44', slow:'#e8940c', dark:'#d03b3b', none:'#c9c9d4' };
   const LABEL = { live:'live', slow:'slow', dark:'dark', none:'no payments' };
   // Icon + hatch are the non-colour channels: green and red sit at CVD ΔE 4.1
@@ -47,6 +58,10 @@
      2. CHART
      ========================================================= */
   const chart = $('#chart'), tbody = $('#tbody'), tip = $('#tip');
+
+  function buildChart() {
+  chart.innerHTML = '';
+  tbody.innerHTML = '';
   const thr = document.createElement('div');
   thr.className = 'threshold';
   chart.appendChild(thr);
@@ -108,14 +123,64 @@
     s.textContent = t === 0 ? '0' : t + 'd';
     axisIn.appendChild(s);
   });
+  placeThreshold();
+  }
 
   function placeThreshold() {
-    const t = $('.track', chart); if (!t) return;
+    const thr = $('.threshold', chart), t = $('.track', chart);
+    if (!t || !thr) return;
     const c = chart.getBoundingClientRect(), r = t.getBoundingClientRect();
     thr.style.left = (r.left - c.left + r.width * 30 / MAX_D) + 'px';
   }
-  placeThreshold();
+  buildChart();
   addEventListener('resize', placeThreshold);
+
+  /* ---- live data ---------------------------------------------------------
+     Best effort. A failed fetch leaves the snapshot in place and says so,
+     rather than showing an empty page or pretending the numbers are fresh. */
+  async function loadLive() {
+    if (!API_BASE) return;
+    try {
+      const res = await fetch(API_BASE + '/api/v1/anchors', { headers: { accept: 'application/json' } });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const body = await res.json();
+      if (!Array.isArray(body.accounts) || body.accounts.length === 0) throw new Error('empty payload');
+
+      ACCOUNTS = body.accounts.map(a => ({
+        d: a.domain,
+        a: a.account ? a.account.slice(0, 4) + '\u2026' + a.account.slice(-4) : '',
+        days: a.hoursSinceActivity === null ? null : a.hoursSinceActivity / 24,
+        i: a.inbound ?? 0,
+        o: a.outbound ?? 0,
+        r: a.returns ?? 0,
+        s: a.state === 'no_activity' ? 'none' : a.state,
+      }));
+      DATA_AS_OF = body.asOf;
+      DATA_LIVE = true;
+      buildChart();
+      chart.querySelectorAll('.bar').forEach((b, n) =>
+        setTimeout(() => { b.style.width = b.dataset.w; }, reduce ? 0 : n * 40));
+      stampFreshness(body);
+    } catch {
+      stampFreshness(null);
+    }
+  }
+
+  function stampFreshness(body) {
+    const el = $('#freshness');
+    if (!el) return;
+    if (DATA_LIVE && body) {
+      const stale = Math.round(body.staleHours ?? 0);
+      const age = stale < 48 ? stale + 'h old' : Math.round(stale / 24) + 'd old';
+      el.textContent = 'Live from the API \u00b7 scan ' + age;
+      el.className = 'freshness is-live';
+    } else {
+      el.textContent = 'Snapshot of 12 Aug 2026 \u00b7 API not connected';
+      el.className = 'freshness is-snapshot';
+    }
+  }
+  stampFreshness(null);
+  loadLive();
 
   /* =========================================================
      3. SCROLL REVEALS + counters + bar growth

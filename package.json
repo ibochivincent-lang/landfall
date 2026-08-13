@@ -1,24 +1,31 @@
 {
   "name": "landfall",
-  "version": "0.1.0",
-  "description": "Ledger-derived settlement record for Stellar anchors. Observe what anchors did, don't ask them how they're doing.",
-  "type": "module",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Ledger-derived settlement record for Stellar anchors.",
   "license": "MIT",
-  "engines": {
-    "node": ">=20"
-  },
+  "type": "module",
+  "workspaces": [
+    "packages/indexer",
+    "packages/api"
+  ],
+  "engines": { "node": ">=20" },
   "scripts": {
-    "scan": "tsx src/cli.ts scan",
-    "discover": "tsx src/cli.ts discover",
-    "test": "tsx --test test/*.test.ts",
-    "typecheck": "tsc --noEmit"
+    "discover": "npm run discover -w @landfall/indexer",
+    "scan": "npm run scan -w @landfall/indexer",
+    "api": "npm run dev -w @landfall/api",
+    "test": "npm run test -w @landfall/indexer",
+    "typecheck": "npm run typecheck -w @landfall/indexer && npm run typecheck -w @landfall/api",
+    "db:migrate": "psql \"$DATABASE_URL\" -f packages/db/migrations/001_init.sql",
+    "stack:up": "docker compose up -d",
+    "stack:down": "docker compose down",
+    "stack:logs": "docker compose logs -f",
+    "contracts:build": "cd packages/contracts && cargo build --target wasm32-unknown-unknown --release",
+    "contracts:test": "cd packages/contracts && cargo test"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2"
-  },
-  "allowScripts": {
-    "esbuild@0.28.2": true
   }
 }

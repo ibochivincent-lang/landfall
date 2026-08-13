@@ -13,6 +13,13 @@ export interface PaymentRecord {
   /** Canonical asset id: "native" or "CODE:ISSUER". */
   asset: string;
   createdAt: string;
+  /**
+   * SEP-24 uses a memo to correlate the two legs of a transfer. Reading it is
+   * what turns refund matching from an inference into a measurement, so it is
+   * carried on the record even before the matcher uses it.
+   */
+  memo?: string;
+  memoType?: string;
 }
 
 /** An anchor account discovered from a SEP-1 stellar.toml. */
@@ -50,6 +57,11 @@ export interface RefundPair {
   latencyHours: number;
   inTxHash: string;
   outTxHash: string;
+  /**
+   * How the two legs were tied together. "memo" means SEP-24 said so;
+   * "heuristic" means we inferred it and could be wrong in both directions.
+   */
+  confidence?: "memo" | "heuristic";
 }
 
 export interface AccountMetrics {
