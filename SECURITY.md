@@ -47,7 +47,7 @@ We will credit reporters by name unless you ask otherwise, and we publish a
 short note describing any defect that affected a published figure — including
 what the numbers were before and after. We have done this before: two bugs
 found on 12 August 2026 during verification against stellar.expert are
-described in the methodology document and in the commit history.
+described in `docs/checklist.md` and `docs/gaps.md` and in the commit history.
 
 A project that scores other people's reliability has no standing to hide its
 own defects.

@@ -132,3 +132,51 @@ test("fetchPayments honours the maxRecords cap", async () => {
     server.close();
   }
 });
+
+test("fetchPayments sends a stored cursor to Horizon when resuming", async () => {
+  // The resume path is what makes honesty rule 6 true - "degradation is stale,
+  // not broken". It was documented in the methodology for weeks while cli.ts
+  // quietly discarded newestCursor and re-paged from the beginning every run.
+  // This asserts the wire format, which is the part a mock can actually prove:
+  // that the cursor reaches Horizon as a query parameter.
+  const seen: string[] = [];
+  const server = createServer((req, res) => {
+    seen.push(req.url ?? "");
+    res.writeHead(200, { "content-type": "application/json" });
+    res.end(JSON.stringify({ _links: {}, _embedded: { records: [] } }));
+  });
+  await new Promise<void>((r) => server.listen(0, r));
+  const base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
+
+  try {
+    await fetchPayments({ horizon: base, account: ANCHOR, maxRecords: 10, cursor: "999" });
+    assert.ok(seen[0]?.includes("cursor=999"), `expected cursor in ${seen[0]}`);
+
+    seen.length = 0;
+    await fetchPayments({ horizon: base, account: ANCHOR, maxRecords: 10 });
+    assert.ok(!seen[0]?.includes("cursor="), `expected no cursor in ${seen[0]}`);
+  } finally {
+    server.close();
+  }
+});
+
+test("fetchPayments reports no newest cursor when there is nothing to record", async () => {
+  // An empty resumed page must not return a cursor, or the caller would
+  // persist `undefined` over a good one and lose its place.
+  const server = createServer((_req, res) => {
+    res.writeHead(200, { "content-type": "application/json" });
+    res.end(JSON.stringify({ _links: {}, _embedded: { records: [] } }));
+  });
+  await new Promise<void>((r) => server.listen(0, r));
+  const base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
+
+  try {
+    const { records, newestCursor } = await fetchPayments({
+      horizon: base, account: ANCHOR, maxRecords: 10, cursor: "999",
+    });
+    assert.equal(records.length, 0);
+    assert.equal(newestCursor, undefined);
+  } finally {
+    server.close();
+  }
+});

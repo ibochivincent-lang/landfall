@@ -9,9 +9,6 @@
   "functions": {
     "api/[...path].js": {
       "maxDuration": 30
-    },
-    "api/v1/chat.js": {
-      "maxDuration": 30
     }
   },
   "headers": [

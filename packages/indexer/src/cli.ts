@@ -114,18 +114,42 @@ async function scan(args: Args): Promise<void> {
 
   const rawByAccount = new Map<string, Awaited<ReturnType<typeof fetchPayments>>["records"]>();
 
+  // Resume cursors. `horizon.ts` has always accepted one and returned the
+  // newest; `db.ts` has always been able to store one. Nothing wired the two
+  // together, so every scan re-paged from the beginning and honesty rule 6
+  // ("interrupted work resumes from a cursor") was documented rather than
+  // implemented. This is that wiring.
+  //
+  // Cursors live in Postgres, not on disk, so they are only available with
+  // --persist. Without a database the scan is stateless and re-pages, which is
+  // correct: there is nowhere to have remembered.
+  const cursorStore = args.persist ? storeFromEnv() : null;
+  const resumeFrom = new Map<string, string>();
+  const newestSeen = new Map<string, string>();
+  if (cursorStore) {
+    for (const a of accounts) {
+      const c = await cursorStore.getCursor("payments", a.account).catch(() => undefined);
+      if (c) resumeFrom.set(a.account, c);
+    }
+    if (resumeFrom.size > 0) {
+      process.stderr.write(`Resuming ${resumeFrom.size} of ${accounts.length} account(s) from a stored cursor.\n`);
+    }
+  }
+
   const metrics = await mapLimit(accounts, args.concurrency, async (anchor) => {
     try {
       // Liveness first, and deliberately outside the --since window: an account
       // dormant since before the window still has a real last-activity date.
       const lifetime = await fetchLastActivity(args.horizon, anchor.account);
 
-      const { records } = await fetchPayments({
+      const { records, newestCursor } = await fetchPayments({
         horizon: args.horizon,
         account: anchor.account,
         maxRecords: args.maxRecords,
         since: args.since,
+        cursor: resumeFrom.get(anchor.account),
       });
+      if (newestCursor) newestSeen.set(anchor.account, newestCursor);
       rawByAccount.set(anchor.account, records);
       const dormant = lifetime && records.length === 0 ? "  [dormant before window]" : "";
       process.stderr.write(
@@ -153,7 +177,34 @@ async function scan(args: Args): Promise<void> {
   process.stdout.write(renderHeadline(ok, args.minInbound) + "\n\n");
   process.stdout.write(`Full results with transaction hashes: ${jsonPath}\n`);
 
-  if (args.persist) await persist(args, accounts, ok, rawByAccount, opts);
+  if (args.persist) await persist(args, accounts, ok, rawByAccount, opts, newestSeen);
+
+  // Cursors advance only after the scan has been written. Advancing earlier
+  // would mean a crash between fetch and persist skips those records forever:
+  // degradation has to be stale, never wrong.
+  if (cursorStore) {
+    for (const [account, cursor] of newestSeen) {
+      await cursorStore.setCursor("payments", account, cursor).catch(() => {});
+    }
+    await cursorStore.close().catch(() => {});
+  }
+}
+
+/**
+ * A Store, or null when there is no database configured.
+ *
+ * Cursors are the only thing that needs the database before the scan runs, and
+ * a missing DATABASE_URL there must not be fatal - `--persist` already reports
+ * that loudly at the end. Returning null degrades to a stateless full re-page.
+ */
+function storeFromEnv(): Store | null {
+  const connectionString = connectionStringFromEnv();
+  if (!connectionString) return null;
+  try {
+    return new Store({ connectionString });
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -169,6 +220,7 @@ async function persist(
   metrics: AccountMetrics[],
   raw: Map<string, { cursor: string }[]>,
   opts: typeof DEFAULT_SCAN_OPTIONS,
+  _newestSeen?: Map<string, string>,
 ): Promise<void> {
   const connectionString = connectionStringFromEnv();
   if (!connectionString) {

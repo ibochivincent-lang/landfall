@@ -51,7 +51,7 @@ database at all:
 
 ```bash
 npm install
-npm test                # 35 tests offline; 40 with TEST_DATABASE_URL set
+npm test                # 37 tests offline; 42 with TEST_DATABASE_URL set
 npm run scan            # scan mainnet anchors and print the report
 ```
 

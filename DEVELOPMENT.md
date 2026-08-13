@@ -17,7 +17,7 @@ design questions resolve by asking: *are we observing, or are we asking?*
 
 ```bash
 npm install
-npm test            # 19 tests, no network required
+npm test            # 37 tests, no network required
 npm run typecheck   # tsc --noEmit, must stay clean
 npm run discover    # resolve domains → accounts
 npm run scan        # index and report
@@ -26,13 +26,19 @@ npm run scan        # index and report
 ## Architecture
 
 ```
-src/
-  types.ts     shared types + DEFAULT_SCAN_OPTIONS
-  toml.ts      SEP-1 discovery: domain → declared accounts (zero-dep parser)
-  horizon.ts   paginated payment fetch, normalisation, retry/backoff
-  metrics.ts   PURE functions — BigInt arithmetic, refund detection
-  report.ts    PURE rendering — table + headline
-  cli.ts       the only place doing I/O orchestration
+packages/
+  contracts/         Rust + Soroban oracle (deployed to testnet)
+  db/migrations/     PostgreSQL schema
+  api/src/           read-only HTTP API
+  web/               the public site and transaction dashboard
+  indexer/src/
+    types.ts         shared types + DEFAULT_SCAN_OPTIONS
+    toml.ts          SEP-1 discovery: domain → declared accounts (zero-dep parser)
+    horizon.ts       paginated payment fetch, normalisation, retry/backoff
+    metrics.ts       PURE functions — BigInt arithmetic, refund detection
+    report.ts        PURE rendering — table + headline
+    db.ts            Postgres persistence and resume cursors
+    cli.ts           the only place doing I/O orchestration
 ```
 
 `metrics.ts` and `report.ts` are pure and must stay that way. Every metric is

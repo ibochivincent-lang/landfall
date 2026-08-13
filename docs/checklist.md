@@ -17,14 +17,14 @@ Repo: https://github.com/ibochivincent-lang/landfall (public)
 - [x] Refund detection heuristic with documented limits
 - [x] Liveness classification (live / slow / dark / no-activity)
 - [x] Dust filtering
-- [x] 35 tests passing offline, including a mock Horizon server
+- [x] 37 tests passing offline, including a mock Horizon server
 - [x] Postgres schema — 12 tables, verified on real Postgres 16
 - [x] `--persist`, cursors and scan bookkeeping wired end to end
 - [x] Read-only HTTP API, eight endpoints, caveats in every payload
 - [x] Transactions dashboard at `/dashboard`, keyset-paginated
-- [x] Soroban oracle written, 16 tests — **never deployed to any network**
+- [x] Soroban oracle, 16 tests, **deployed to testnet**
 - [x] Deployment path: Supabase, production compose, Vercel API proxy
-- [x] 40 tests passing (35 offline + 5 integration against real Postgres)
+- [x] 42 tests passing (37 offline + 5 integration against real Postgres)
 
 **The evidence**
 
@@ -39,7 +39,7 @@ Repo: https://github.com/ibochivincent-lang/landfall (public)
 
 - [x] README, methodology, roadmap, CONTRIBUTING, DEVELOPMENT.md
 - [x] 20 backlog items scoped and point-tagged
-- [x] SCF submission pack drafted — **not currently in the repository**
+- [x] SCF submission pack — `docs/scf-submission.md`, interest form ready to paste
 - [x] `docs/deployment.md` — Supabase, hosting, the RLS trap, and what is
       still not automated
 - [x] `docs/gaps.md` kept as a struck-through record rather than edited clean

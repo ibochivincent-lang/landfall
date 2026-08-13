@@ -104,8 +104,8 @@ whole problem. The alternative is deleting those sections until they're real.
 
 ## 3. Repo and process
 
-- **The 20 issues are still unfiled.** `scripts/setup-issues.ps1` files them
-  in one run. This is the gate on applying to the Wave.
+- ~~**The 20 issues are unfiled.**~~ Filed 13 August 2026, issues #4-#23.
+  **Not yet applied to the Wave** - that is now the open step.
 - **Not under an organisation.** Eight of ten approved Wave repos are.
 - **Not applied to the Stellar Wave.**
 - **No contributors, no PRs, no external commits.**
@@ -134,7 +134,6 @@ whole problem. The alternative is deleting those sections until they're real.
   data itself won't render for a crawler or a no-JS reader.
 - **No accessibility audit.** Keyboard nav, focus traps in the modal, and
   contrast on the yellow background have not been checked properly.
-- **No 404 page.**
 - **Fonts come from Google**, which is a third-party request on every load and
   a privacy consideration worth a thought.
 
@@ -153,11 +152,10 @@ whole problem. The alternative is deleting those sections until they're real.
 
 ## If you only do four things
 
-1. **Submit the SCF interest form.** Deadline 16 August. Three answers, all
-   already drafted. Nothing else on this page has a clock on it. (The draft is
-   not in the repository — that is itself a gap.)
-2. **File the 20 issues and apply to the Wave** — one script run:
-   `.\scripts\setup-issues.ps1`
+1. **Submit the SCF interest form.** Deadline 16 August. Part 1 of
+   `docs/scf-submission.md` is ready to paste. Nothing else here has a clock.
+2. **Apply the repo to the Stellar Wave in Drips.** The 20 issues are filed;
+   the application is not made.
 3. **Actually deploy something.** The stack is deployable and not deployed; a
    Supabase project and one container turn "designed" into "running", and it is
    an afternoon. `docs/deployment.md`.

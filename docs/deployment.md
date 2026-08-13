@@ -270,9 +270,10 @@ for the same same-origin reason.
 
 ## 5. Oracle contract
 
-Still the honest gap in this list: **written, tested, and never deployed.**
-Sixteen tests pass against the SDK's test environment. It has not touched a
-network.
+**Deployed to testnet** on 13 August 2026:
+`CA2IYHFKTKSJWR5IICY6HFD55BJEGE7OMKISWMLMPFSHLESZYO3VICAG`.
+Sixteen tests pass against the SDK's test environment, and the contract now
+exists on a network. It is **not on mainnet**, and nothing publishes to it.
 
 ### Toolchain first
 
@@ -434,4 +435,5 @@ is the same defect this project measures in other people:
   field in every API response is the manual version of that alarm.
 - **No migration rollback.** Forward-only. Both migrations are re-runnable;
   neither is reversible.
-- **The oracle is not deployed and the indexer does not publish to it.**
+- **The indexer does not publish to the oracle.** The contract is on testnet;
+  nothing writes to it, so it holds no data.
