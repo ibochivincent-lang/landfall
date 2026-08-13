@@ -38,7 +38,7 @@ Repo: https://github.com/ibochivincent-lang/landfall (public)
 **The writing**
 
 - [x] README, methodology, roadmap, CONTRIBUTING, DEVELOPMENT.md
-- [x] 21 backlog items scoped and point-tagged
+- [x] 20 backlog items scoped and point-tagged
 - [x] SCF submission pack drafted — **not currently in the repository**
 - [x] `docs/deployment.md` — Supabase, hosting, the RLS trap, and what is
       still not automated
@@ -74,7 +74,7 @@ Then only if invited to the full Build Award submission:
 
 ## Drips Wave — no deadline
 
-- [ ] Read the 21 backlog items and cut or reword anything you don't want
+- [ ] Read the 20 backlog items and cut or reword anything you don't want
       contributors touching. Easier to edit a markdown file than to close
       issues someone has already claimed.
 - [ ] Run `.\scripts\setup-issues.ps1 -WhatIf`, then without `-WhatIf`

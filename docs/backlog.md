@@ -24,7 +24,7 @@ contributors actually look.
 progress counter, CSV output, API docs, local Horizon support.
 
 **Medium** - SEP-24 memo correlation (the highest-value item in the repo),
-Freighter wallet integration, CAP-67 event ingestion, an oracle deploy script,
+Freighter wallet integration, CAP-67 event ingestion,
 resume cursors, partial refunds, confidence intervals, domain rollup, account
 merges, an end-to-end test against the local node.
 

@@ -104,7 +104,7 @@ whole problem. The alternative is deleting those sections until they're real.
 
 ## 3. Repo and process
 
-- **The 21 issues are still unfiled.** `scripts/setup-issues.ps1` files them
+- **The 20 issues are still unfiled.** `scripts/setup-issues.ps1` files them
   in one run. This is the gate on applying to the Wave.
 - **Not under an organisation.** Eight of ten approved Wave repos are.
 - **Not applied to the Stellar Wave.**
@@ -156,7 +156,7 @@ whole problem. The alternative is deleting those sections until they're real.
 1. **Submit the SCF interest form.** Deadline 16 August. Three answers, all
    already drafted. Nothing else on this page has a clock on it. (The draft is
    not in the repository — that is itself a gap.)
-2. **File the 21 issues and apply to the Wave** — one script run:
+2. **File the 20 issues and apply to the Wave** — one script run:
    `.\scripts\setup-issues.ps1`
 3. **Actually deploy something.** The stack is deployable and not deployed; a
    Supabase project and one container turn "designed" into "running", and it is

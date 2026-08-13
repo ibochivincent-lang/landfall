@@ -135,11 +135,6 @@ $issues = @(
         body   = Body "Protocol 23 makes classic payments emit transfer/mint/burn events with standardised topics. The ``ledger_events`` table and the ``cap67_topic`` enum exist; nothing populates them. Today the indexer pages the REST endpoint per account." "The indexer follows the event stream, writes rows to ``ledger_events``, and marks payments sourced that way as ``cap67_event`` in ``payments.source``. REST remains the fallback for pre-Protocol-23 networks." "One stream replaces N per-account cursors. Mint and burn become distinguishable from transfer instead of being inferred."
     },
     @{
-        title  = "[CHORE] Add a deploy script for the oracle contract"
-        labels = "type:chore,help wanted,medium-150,module/soroban"
-        body   = Body "The contract has 16 passing tests and has never been deployed. There is no script, no contract id, and nothing in the repo invokes it." "``npm run contracts:deploy`` builds the wasm, deploys to the network in ```$SOROBAN_RPC_URL``, calls ``initialise``, and writes the contract id somewhere the indexer can read it. Works against the local Quickstart node with no manual steps." ""
-    },
-    @{
         title  = "[FEAT] Persist the resume cursor between runs"
         labels = "type:feat,medium-150,module/indexer"
         body   = Body "``fetchPayments`` returns ``newestCursor`` and the ``cursors`` table exists, but the scan never reads or writes it, so every run re-fetches history it already has." "A second run against an unchanged account fetches zero pages." ""
