@@ -17,6 +17,9 @@ concurrency:
   group: scan
   cancel-in-progress: false   # never cancel a running scan — let it finish
 
+permissions:
+  contents: write
+
 jobs:
   scan:
     name: Scan → Persist → Update API JSON
