@@ -5,17 +5,18 @@ on:
     branches: [main]
   pull_request:
 
-# A contributor's first PR should get a green tick without a maintainer
-# doing anything. Everything here runs offline — the test suite uses a mock
-# Horizon server, so CI never depends on the network or on rate limits.
 jobs:
   test:
     name: Node ${{ matrix.node }}
     runs-on: ubuntu-latest
+
     strategy:
       fail-fast: false
       matrix:
         node: ['20', '22']
+
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
     steps:
       - uses: actions/checkout@v4
@@ -26,6 +27,25 @@ jobs:
           cache: npm
 
       - run: npm ci
+
+      - name: Install PostgreSQL client
+        if: github.event_name == 'push' && matrix.node == '20'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Test database connection
+        if: github.event_name == 'push' && matrix.node == '20'
+        run: |
+          psql "$DATABASE_URL" \
+            -v ON_ERROR_STOP=1 \
+            -c "SELECT 1 AS database_ok;"
+
+      - name: Run database migrations
+        if: github.event_name == 'push' && matrix.node == '20'
+        run: |
+          chmod +x scripts/migrate.sh
+          ./scripts/migrate.sh
 
       - name: Typecheck
         run: npm run typecheck
