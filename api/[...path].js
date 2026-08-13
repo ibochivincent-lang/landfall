@@ -289,7 +289,10 @@ export default async function handler(req, res) {
     return json(res, 503, { error: 'DATABASE_URL not configured' }, 0);
   }
 
-  const parts  = Array.isArray(req.query.path) ? req.query.path : (req.query.path || '').split('/').filter(Boolean);
+  // Parse path from the actual URL — works with both native routing and rewrites
+  const urlPath = (req.url || '').split('?')[0];                    // e.g. /api/v1/anchors
+  const stripped = urlPath.replace(/^\/api\//, '');                  // e.g. v1/anchors
+  const parts  = stripped.split('/').filter(Boolean);
   const joined = parts.join('/');
 
   try {
