@@ -1,8 +1,7 @@
 {
   "asOf": "2026-08-12T13:23:00.436Z",
-  "staleHours": 29,
-  "source": "snapshot",
-  "caveat": "This is a static snapshot from the last scan. A live database connection is needed for real-time data.",
+  "staleHours": 29.28,
+  "returnRateCaveat": "A return is the honest failure mode. An anchor that accepts value, fails to settle and keeps it produces no return event and scores 0. A low rate is the absence of one kind of evidence, not evidence of good conduct.",
   "accounts": [
     {
       "account": "GAWODAROMJ33V5YDFY3NPYTHVYQG7MJXVJ2ND3AOGIHYRWINES6ACCPD",
@@ -128,7 +127,7 @@
       "account": "GDKL5TOWWAVLJ2WRAUQS2QJEAGHEDJFXFEPQFB6LKW2WRB257BVLLMT6",
       "domain": "ntokens.com",
       "name": "nTokens Serviços Digitais Ltda",
-      "state": "dark",
+      "state": "no_activity",
       "inbound": 0,
       "outbound": 0,
       "returns": 0,

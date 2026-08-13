@@ -1,6 +1,6 @@
 {
   "asOf": "2026-08-12T13:23:00.436Z",
-  "staleHours": 29,
+  "staleHours": 29.28,
   "returnRateCaveat": "A return is the honest failure mode. An anchor that accepts value, fails to settle and keeps it produces no return event and scores 0. A low rate is the absence of one kind of evidence, not evidence of good conduct.",
   "accounts": [
     {
@@ -127,7 +127,7 @@
       "account": "GDKL5TOWWAVLJ2WRAUQS2QJEAGHEDJFXFEPQFB6LKW2WRB257BVLLMT6",
       "domain": "ntokens.com",
       "name": "nTokens Serviços Digitais Ltda",
-      "state": "dark",
+      "state": "no_activity",
       "inbound": 0,
       "outbound": 0,
       "returns": 0,

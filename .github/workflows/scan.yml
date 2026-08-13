@@ -1,0 +1,80 @@
+name: Daily Ledger Scan
+
+on:
+  # Run every day at 02:00 UTC (quiet time, Horizon not at peak load)
+  schedule:
+    - cron: '0 2 * * *'
+
+  # Also allow a manual trigger from the GitHub Actions UI
+  workflow_dispatch:
+    inputs:
+      since:
+        description: 'Scan from date (ISO 8601, e.g. 2026-01-01). Leave blank for default.'
+        required: false
+        default: ''
+
+concurrency:
+  group: scan
+  cancel-in-progress: false   # never cancel a running scan — let it finish
+
+jobs:
+  scan:
+    name: Scan → Persist → Update API JSON
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      # ── 1. Checkout ───────────────────────────────────────────────────────────
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          # Need push access, so use the built-in token
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # ── 2. Node setup ─────────────────────────────────────────────────────────
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # ── 3. Install dependencies ───────────────────────────────────────────────
+      - name: Install dependencies
+        run: npm ci
+
+      # ── 4. Run the scan ───────────────────────────────────────────────────────
+      # --persist writes to Supabase (DATABASE_URL secret).
+      # If DATABASE_URL is not set the scan still runs and writes to ./out —
+      # the JSON update step below handles both cases.
+      - name: Run ledger scan
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          SINCE_FLAG=""
+          if [ -n "${{ github.event.inputs.since }}" ]; then
+            SINCE_FLAG="--since ${{ github.event.inputs.since }}"
+          fi
+          npx tsx packages/indexer/src/cli.ts scan \
+            --horizon https://horizon.stellar.org \
+            --max-records 2000 \
+            --concurrency 4 \
+            --dust 0.01 \
+            --persist \
+            --out out \
+            $SINCE_FLAG
+
+      # ── 5. Convert scan output → static API JSON ──────────────────────────────
+      # This runs regardless of whether --persist succeeded, so the static JSON
+      # is always updated from the latest scan file on disk.
+      - name: Convert scan → API JSON
+        run: node scripts/scan-to-api.mjs
+
+      # ── 6. Commit updated JSON back to main ───────────────────────────────────
+      - name: Commit and push updated API snapshot
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add packages/web/api/v1/anchors.json packages/web/snapshot.json
+          # Only commit if there are actual changes
+          git diff --staged --quiet || git commit -m "chore: daily ledger scan $(date -u +%Y-%m-%d)"
+          git push
