@@ -372,7 +372,81 @@
   $('#moreBtn').addEventListener('click', () => loadPage(false));
   $('#refreshBtn').addEventListener('click', () => { state.cursor = null; loadPage(true); });
 
+  /* ----------------------------------------------------------- CSV export */
 
+  $('#exportBtn').addEventListener('click', async () => {
+    const btn = $('#exportBtn');
+    if (!state.domain) return;
+    btn.disabled = true;
+    btn.textContent = 'Exporting…';
+    try {
+      // Fetch up to 2000 rows for the CSV
+      const q = new URLSearchParams({ limit: '2000' });
+      if (state.direction) q.set('direction', state.direction);
+      if (state.asset) q.set('asset', state.asset);
+      const body = await api('/api/v1/anchors/' + encodeURIComponent(state.domain) + '/payments?' + q);
 
-  boot();
+      const headers = ['when','direction','counterparty','counterparty_domain','amount','source_amount','asset','source_asset','memo','tx_hash'];
+      const rows = body.payments.map(p => {
+        const inbound = state.accounts.includes(p.to);
+        return [
+          p.createdAt,
+          inbound ? 'in' : 'out',
+          inbound ? p.from : p.to,
+          (inbound ? p.fromDomain : p.toDomain) || '',
+          p.amount,
+          p.sourceAmount || '',
+          assetName(p.asset),
+          p.sourceAsset ? assetName(p.sourceAsset) : '',
+          p.memo || '',
+          p.txHash,
+        ].map(v => '"' + String(v).replace(/"/g, '""') + '"').join(',');
+      });
+
+      const csv = [headers.join(','), ...rows].join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'landfall-' + state.domain + '-' + new Date().toISOString().slice(0, 10) + '.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      alert('Export failed: ' + err.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Export CSV ↓';
+    }
+  });
+
+  /* ----------------------------------------------------------- corridors */
+
+  async function loadCorridors() {
+    try {
+      const { corridors } = await api('/api/v1/corridors');
+      if (!corridors || corridors.length === 0) return;
+
+      const tbody = $('#corridorBody');
+      tbody.innerHTML = '';
+      for (const c of corridors) {
+        const tr = el('tr');
+        tr.innerHTML =
+          '<td><code class="mono">' + esc(assetName(c.fromAsset)) + '</code></td>' +
+          '<td class="muted">→</td>' +
+          '<td><code class="mono">' + esc(assetName(c.toAsset)) + '</code></td>' +
+          '<td class="num mono">' + Number(c.count).toLocaleString() + '</td>' +
+          '<td class="num mono">' + esc(amount(c.volume)) + ' ' + esc(assetName(c.toAsset)) + '</td>' +
+          '<td class="muted">' + esc(ago(c.lastSeen)) + '</td>';
+        tbody.appendChild(tr);
+      }
+      $('#corridorPanel').hidden = false;
+    } catch {
+      // corridors panel stays hidden if no data or API error
+    }
+  }
+
+  boot().then(() => {
+    if (!state.isSnapshot) loadCorridors();
+  });
 })();
+

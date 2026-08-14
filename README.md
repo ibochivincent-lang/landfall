@@ -49,12 +49,16 @@ Move any of this to a chain without those primitives and there is nothing left �
 
 | | Status |
 |---|---|
-| SEP-1 discovery | shipping |
-| Horizon indexing, resumable cursors | shipping |
-| Liveness, volume, concentration, returns | shipping |
-| Postgres persistence + read API | shipping |
-| Transactions dashboard | shipping |
-| Hosted deployment (Supabase, prod compose, Vercel) | shipping |
+| SEP-1 discovery | ✅ shipping |
+| Horizon indexing, resumable cursors | ✅ shipping |
+| Liveness, volume, concentration, returns | ✅ shipping |
+| **Path payments (cross-asset trades)** | ✅ **shipping** |
+| **Settlement corridors API + dashboard** | ✅ **shipping** |
+| **CSV export for compliance reporting** | ✅ **shipping** |
+| Postgres persistence + read API | ✅ shipping |
+| Transactions dashboard | ✅ shipping |
+| **Hourly ledger scan (GitHub Actions)** | ✅ **shipping** |
+| Hosted deployment (Supabase, prod compose, Vercel) | ✅ shipping |
 | Soroban oracle | **deployed to testnet**, 16 tests, not on mainnet |
 | CAP-67 event ingestion | schema ready, ingestion **not written** |
 | SEP-38 slippage / attestations | **designed, not built** |

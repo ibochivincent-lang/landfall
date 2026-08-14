@@ -89,6 +89,7 @@
           </select>
         </label>
         <div class="filter-spacer"></div>
+        <button class="dash-btn dash-btn--ghost" id="exportBtn" title="Download transactions as CSV">Export CSV ↓</button>
         <button class="dash-btn dash-btn--ghost" id="refreshBtn">Refresh</button>
       </div>
 
@@ -122,6 +123,29 @@
         excluded from published metrics but still shown here, because hiding them
         would make this list disagree with the ledger.
       </p>
+
+      <!-- corridor flow matrix -->
+      <div class="panel corridor-panel" id="corridorPanel" hidden>
+        <div class="corridor-head">
+          <h2 class="corridor-title">Settlement corridors</h2>
+          <p class="corridor-sub">Cross-asset path payments indexed across all anchors — showing what value entered and what was delivered.</p>
+        </div>
+        <div class="tx-scroll">
+          <table class="tx" id="corridorTable">
+            <thead>
+              <tr>
+                <th>From asset</th>
+                <th>→</th>
+                <th>To asset</th>
+                <th class="num">Transactions</th>
+                <th class="num">Total delivered</th>
+                <th>Last seen</th>
+              </tr>
+            </thead>
+            <tbody id="corridorBody"></tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
   </div>

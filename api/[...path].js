@@ -9,6 +9,7 @@
  *   GET  /api/v1/anchors
  *   GET  /api/v1/anchors/:domain/payments
  *   GET  /api/v1/assets
+ *   GET  /api/v1/corridors           -- cross-asset flow matrix (path payments)
  *   GET  /health
  *
  * Admin routes (session-cookie gated, see requireSession()):
@@ -281,6 +282,38 @@ async function assetRows(db) {
   return rows.map(r => ({ asset: r.asset, count: Number(r.count) }));
 }
 
+/**
+ * Aggregate cross-asset payment corridors.
+ * Groups path payments by source_asset → destination asset, summing count
+ * and total delivered volume. Only rows where source_asset differs from
+ * the delivered asset are true cross-asset trades.
+ */
+async function corridorRows(db) {
+  const { rows } = await db.query(`
+    SELECT
+      source_asset                         AS from_asset,
+      asset                                AS to_asset,
+      COUNT(*)::int                        AS count,
+      SUM(amount)::text                    AS volume,
+      MIN(created_at)                      AS first_seen,
+      MAX(created_at)                      AS last_seen
+    FROM payments
+    WHERE source_asset IS NOT NULL
+      AND source_asset <> asset
+    GROUP BY source_asset, asset
+    ORDER BY count DESC
+    LIMIT 100
+  `);
+  return rows.map(r => ({
+    fromAsset:  r.from_asset,
+    toAsset:    r.to_asset,
+    count:      r.count,
+    volume:     r.volume,
+    firstSeen:  new Date(r.first_seen).toISOString(),
+    lastSeen:   new Date(r.last_seen).toISOString(),
+  }));
+}
+
 async function domainAccounts(db, domain) {
   const { rows } = await db.query(
     'SELECT account_id FROM anchor_accounts WHERE domain = $1',
@@ -514,6 +547,12 @@ export default async function handler(req, res) {
     // GET /api/v1/assets
     if (joined === 'v1/assets') {
       return json(res, 200, { assets: await assetRows(db) });
+    }
+
+    // GET /api/v1/corridors
+    if (joined === 'v1/corridors') {
+      const corridors = await corridorRows(db);
+      return json(res, 200, { corridors }, 300);
     }
 
     // GET /api/v1/anchors/:domain/payments

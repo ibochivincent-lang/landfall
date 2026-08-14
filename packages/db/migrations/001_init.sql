@@ -33,7 +33,12 @@ CREATE TABLE IF NOT EXISTS anchors (
   resolve_error   TEXT
 );
 
-CREATE TYPE account_role AS ENUM ('declared', 'issuer');
+-- Postgres has no "CREATE TYPE IF NOT EXISTS" - this is the standard
+-- idempotent idiom, needed so this migration can be safely re-run.
+DO $$ BEGIN
+  CREATE TYPE account_role AS ENUM ('declared', 'issuer');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 CREATE TABLE IF NOT EXISTS anchor_accounts (
   account_id     TEXT PRIMARY KEY CHECK (account_id ~ '^G[A-Z2-7]{55}$'),
@@ -54,7 +59,10 @@ CREATE INDEX IF NOT EXISTS anchor_accounts_activity_idx ON anchor_accounts(last_
 -- Where a row came from. REST is the Horizon /payments endpoint; CAP-67 is
 -- the unified event stream, where classic payments now emit transfer / mint /
 -- burn alongside contract events.
-CREATE TYPE record_source AS ENUM ('horizon_rest', 'cap67_event');
+DO $$ BEGIN
+  CREATE TYPE record_source AS ENUM ('horizon_rest', 'cap67_event');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 CREATE TABLE IF NOT EXISTS payments (
   id             BIGSERIAL PRIMARY KEY,
@@ -82,7 +90,10 @@ CREATE INDEX IF NOT EXISTS payments_asset_idx   ON payments(asset);
 
 -- CAP-67 unified asset events. Topics are standardised across classic
 -- operations and Soroban contracts, which is what lets one stream cover both.
-CREATE TYPE cap67_topic AS ENUM ('transfer', 'mint', 'burn', 'clawback', 'fee', 'set_authorized');
+DO $$ BEGIN
+  CREATE TYPE cap67_topic AS ENUM ('transfer', 'mint', 'burn', 'clawback', 'fee', 'set_authorized');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 CREATE TABLE IF NOT EXISTS ledger_events (
   id            BIGSERIAL PRIMARY KEY,
@@ -127,7 +138,10 @@ CREATE TABLE IF NOT EXISTS scans (
   notes         TEXT
 );
 
-CREATE TYPE liveness AS ENUM ('live', 'slow', 'dark', 'no_activity');
+DO $$ BEGIN
+  CREATE TYPE liveness AS ENUM ('live', 'slow', 'dark', 'no_activity');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 CREATE TABLE IF NOT EXISTS account_metrics (
   scan_id           BIGINT NOT NULL REFERENCES scans(id) ON DELETE CASCADE,
@@ -167,7 +181,10 @@ CREATE TABLE IF NOT EXISTS asset_totals (
 -- specific inbound one. 'memo' means the SEP-24 memo tied the two legs
 -- together; 'heuristic' means we inferred it from counterparty, asset,
 -- amount tolerance and time window, and could be wrong in both directions.
-CREATE TYPE match_confidence AS ENUM ('memo', 'heuristic');
+DO $$ BEGIN
+  CREATE TYPE match_confidence AS ENUM ('memo', 'heuristic');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 CREATE TABLE IF NOT EXISTS refund_pairs (
   id            BIGSERIAL PRIMARY KEY,

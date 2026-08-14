@@ -402,3 +402,32 @@
   .topnav, .dash-head, .dash-empty, #live { animation: none; }
 }
 
+/* ============================================================
+   CORRIDOR PANEL
+   ============================================================ */
+.corridor-panel {
+  margin-top: 40px;
+  border-top: 2px solid var(--line);
+  padding-top: 32px;
+}
+
+.corridor-head {
+  margin-bottom: 20px;
+}
+
+.corridor-title {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+
+.corridor-sub {
+  font-size: 14px;
+  color: var(--muted);
+  margin: 0;
+}
+
+/* Muted arrow cell in corridor table */
+.corridor-panel td.muted { color: var(--muted); font-size: 18px; padding: 0 4px; }

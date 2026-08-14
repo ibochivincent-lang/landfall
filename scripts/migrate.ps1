@@ -78,7 +78,14 @@ foreach ($f in $files) {
   # ON_ERROR_STOP makes psql exit non-zero on the first failure. Without it a
   # broken migration prints an error and psql still reports success, which is
   # how a half-applied schema reaches production.
-  & psql $ConnectionString -v ON_ERROR_STOP=1 -q -f $f.FullName
+  #
+  # Options come BEFORE the connection string, followed by "--" to mark the
+  # end of options. psql's argument parser on some builds (notably the
+  # Windows EDB installer) does not permute a leading positional dbname/conninfo
+  # argument past later flags the way GNU getopt does on Linux/Mac - put the
+  # conninfo first and psql silently drops -v/-q/-f and everything after them,
+  # falling through to an interactive prompt instead of running the migration.
+  & psql -v ON_ERROR_STOP=1 -q -f $f.FullName -- $ConnectionString
   if ($LASTEXITCODE -ne 0) {
     Write-Host ""
     Write-Host ("FAILED on " + $f.Name) -ForegroundColor Red
@@ -89,7 +96,7 @@ foreach ($f in $files) {
 if ($DryRun) { Write-Host ""; Write-Host "Dry run: nothing applied."; exit 0 }
 
 Write-Host ""
-& psql $ConnectionString -c "SELECT version, applied_at FROM schema_version ORDER BY version;"
+& psql -c "SELECT version, applied_at FROM schema_version ORDER BY version;" -- $ConnectionString
 Write-Host ""
 Write-Host "Done." -ForegroundColor Green
 Write-Host ""
