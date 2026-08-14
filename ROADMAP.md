@@ -42,6 +42,9 @@ than becoming a second changelog.
 - [x] Stellar-branded site redesign, merged (PR #24), live at [landfall-ib.vercel.app](https://landfall-ib.vercel.app)
 - [x] Automated daily scan via GitHub Actions, feeding a static JSON API
 - [x] Repository public at `ibochivincent-lang/landfall`
+- [x] Admin developer board — session auth, backend health, raw payment browser, tracked-anchor management (`/admin`, `docs/deployment.md#admin-board`)
+- [x] GraphQL API at `/api/v1/graphql` — reuses the REST resolvers directly, no duplicated query logic (`docs/GRAPHQL_API.md`)
+- [x] MCP server (`scripts/mcp/server.mjs`) — six read-only tools over the same shared query functions, verified end-to-end against a real database via the MCP SDK's own client (`docs/MCP.md`)
 
 ---
 
@@ -62,7 +65,7 @@ than becoming a second changelog.
 
 ### Reconciling the site with reality
 
-- [ ] Label or remove every claim still ahead of what's built: invented $99/mo pricing, "Get API access" implying access control that doesn't exist, "Log in" with no accounts behind it, an advertised SDK/MCP server/webhooks that aren't built yet
+- [ ] Label or remove every claim still ahead of what's built: invented $99/mo pricing, "Get API access" implying access control that doesn't exist, "Log in" with no accounts behind it, an advertised SDK/webhooks that aren't built yet
 - [ ] Make a deliberate call on the AI chat explorer feature that shipped outside this backlog — decide whether it belongs in the grant pitch or gets held back, since it cuts against the "infrastructure, not application" positioning the whole submission argues for
 
 ---
@@ -85,7 +88,7 @@ than becoming a second changelog.
 
 - [ ] **Wire the indexer to publish digests to the oracle after every persisted scan** (issue #21) — the gap between "deployed contract" and "running oracle"
 - [ ] Oracle to **mainnet**, once there is a real dataset worth publishing
-- [ ] **MCP server** exposing anchor quality to payment agents (issue #23)
+- [x] ~~MCP server exposing anchor quality to payment agents~~ (issue #23) — shipped in Horizon 0, ahead of schedule; what's still open is a real external agent actually calling it
 - [ ] Anchor dispute portal — promised by the code of conduct and security policy today; doesn't exist yet
 - [ ] Paid API tier — sustainability without grant dependence
 - [ ] Move the repository to an organisation

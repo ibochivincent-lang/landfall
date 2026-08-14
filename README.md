@@ -67,7 +67,9 @@ Move any of this to a chain without those primitives and there is nothing left �
 | Soroban oracle | **deployed to testnet**, 16 tests, not on mainnet |
 | CAP-67 event ingestion | schema ready, ingestion **not written** |
 | SEP-38 slippage / attestations | **designed, not built** |
-| `@landfall/sdk`, MCP server | **designed, not built** |
+| **GraphQL API (`/api/v1/graphql`)** | ✅ **shipping** |
+| **MCP server (`scripts/mcp/server.mjs`)** | ✅ **shipping** |
+| `@landfall/sdk` | **designed, not built** |
 
 We would rather list this honestly than let a roadmap read as a changelog. Full detail in [docs/gaps.md](docs/gaps.md) and [ROADMAP.md](ROADMAP.md).
 
@@ -173,6 +175,8 @@ Copy `.env.example` to `.env` and adjust. Nothing in the example file is a secre
 | [docs/gaps.md](docs/gaps.md) | Honest inventory of what isn't built yet, ordered by how much each gap could hurt. |
 | [ROADMAP.md](ROADMAP.md) | Milestones mapped to the Stellar Community Fund Build Award's three tranches. |
 | [docs/deployment.md](docs/deployment.md) | Full deploy path: Supabase, production compose, Vercel, the oracle. |
+| [docs/GRAPHQL_API.md](docs/GRAPHQL_API.md) | The `/api/v1/graphql` schema, examples, and how it reuses the REST resolvers. |
+| [docs/MCP.md](docs/MCP.md) | Running the MCP server, its tools, and how to connect an agent to it. |
 | [docs/backlog.md](docs/backlog.md) | Summary of the scoped, complexity-tagged issues filed on the tracker. |
 | [docs/checklist.md](docs/checklist.md) | Current status snapshot against the Stellar Wave / SCF checklist. |
 | [docs/scf-submission.md](docs/scf-submission.md) | Interest-form answers and the full Build Award draft. |

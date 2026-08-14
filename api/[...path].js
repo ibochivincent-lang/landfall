@@ -36,6 +36,7 @@
 import pg from 'pg';
 import { scrypt as scryptCb, randomBytes, timingSafeEqual, createHash } from 'node:crypto';
 import { promisify } from 'node:util';
+import { graphql, buildSchema } from 'graphql';
 
 const { Pool } = pg;
 const scrypt = promisify(scryptCb);
@@ -43,7 +44,7 @@ const scrypt = promisify(scryptCb);
 // ── Connection pool — created once, reused across warm invocations ────────────
 let _pool = null;
 
-function pool() {
+export function pool() {
   if (_pool) return _pool;
   const url = process.env.DATABASE_URL;
   if (!url) return null;
@@ -197,7 +198,7 @@ async function requireSession(req, db) {
 
 // ── SQL helpers (mirrors packages/api/src/server.ts exactly) ─────────────────
 
-async function latestScan(db) {
+export async function latestScan(db) {
   const { rows } = await db.query(`
     SELECT id, finished_at,
            EXTRACT(EPOCH FROM (now() - finished_at)) / 3600 AS stale_hours
@@ -215,7 +216,7 @@ async function latestScan(db) {
   };
 }
 
-async function accountRows(db) {
+export async function accountRows(db) {
   const { rows } = await db.query(`
     SELECT account_id, domain, role, org_name, state,
            last_activity_at, hours_since_activity,
@@ -248,7 +249,7 @@ async function accountRows(db) {
   }));
 }
 
-async function paymentsPage(db, { accounts, direction, asset, before, limit, includeRaw = false }) {
+export async function paymentsPage(db, { accounts, direction, asset, before, limit, includeRaw = false }) {
   const where  = [];
   const params = [];
 
@@ -299,7 +300,7 @@ async function paymentsPage(db, { accounts, direction, asset, before, limit, inc
   };
 }
 
-async function assetRows(db) {
+export async function assetRows(db) {
   const { rows } = await db.query(`
     SELECT at.asset, SUM(at.count)::int AS count
       FROM asset_totals at
@@ -311,7 +312,7 @@ async function assetRows(db) {
   return rows.map(r => ({ asset: r.asset, count: Number(r.count) }));
 }
 
-async function domainAccounts(db, domain) {
+export async function domainAccounts(db, domain) {
   const { rows } = await db.query(
     'SELECT account_id FROM anchor_accounts WHERE domain = $1',
     [domain]
@@ -319,7 +320,7 @@ async function domainAccounts(db, domain) {
   return rows.map(r => r.account_id);
 }
 
-async function corridorRows(db) {
+export async function corridorRows(db) {
   const { rows } = await db.query(`
     SELECT from_asset, to_asset, count, volume, first_seen, last_seen
       FROM corridors ORDER BY volume DESC
@@ -338,7 +339,7 @@ async function corridorRows(db) {
  * Deterministic Anchor Reliability Score (0-100).
  * Derived purely from ledger evidence across an anchor's accounts.
  */
-function computeDomainReliability(accounts) {
+export function computeDomainReliability(accounts) {
   if (!accounts || accounts.length === 0) {
     return { score: 0, grade: 'F', status: 'unknown', liveness: 0, settlement: 0, volume: 0, recommendation: 'No accounts indexed.' };
   }
@@ -547,6 +548,172 @@ async function listTrackedAnchors(db) {
     createdAt: new Date(r.created_at).toISOString(),
     updatedAt: new Date(r.updated_at).toISOString(),
   }));
+}
+
+// ── GraphQL — additive surface over the same read queries as the REST routes
+// above. Every resolver calls the exact same exported functions the REST
+// handlers use (accountRows, paymentsPage, computeDomainReliability, …) —
+// this is a second way to ask for the same data, not a second source of
+// truth for it. Read-only: the schema has no mutations, on purpose, same
+// as the rest of this API. ───────────────────────────────────────────────────
+
+export const graphqlSchema = buildSchema(`
+  type Account {
+    account: String!
+    domain: String!
+    name: String!
+    state: String!
+    inbound: Int!
+    outbound: Int!
+    returns: Int!
+    returnRate: Float
+    hoursSinceActivity: Float
+    topCounterpartyShare: Float
+  }
+
+  type ReliabilityFactors {
+    liveness: Int!
+    settlement: Int!
+    volume: Int!
+    freshestHours: Float
+    totalPayments: Int!
+    returnRatePercent: Float!
+  }
+
+  type DomainReliability {
+    domain: String!
+    score: Int!
+    grade: String!
+    status: String!
+    recommendation: String!
+    factors: ReliabilityFactors!
+  }
+
+  type AnchorDetail {
+    domain: String!
+    healthy: Boolean!
+    score: Int!
+    grade: String!
+    status: String!
+    recommendation: String!
+    factors: ReliabilityFactors!
+    accounts: [Account!]!
+  }
+
+  type AnchorsResult {
+    asOf: String!
+    staleHours: Float!
+    accounts: [Account!]!
+    reliability: [DomainReliability!]!
+  }
+
+  type Payment {
+    txHash: String!
+    from: String!
+    to: String!
+    fromDomain: String
+    toDomain: String
+    amount: String!
+    asset: String!
+    memo: String
+    createdAt: String!
+    isDust: Boolean!
+  }
+
+  type PaymentsPage {
+    payments: [Payment!]!
+    nextCursor: String
+  }
+
+  type AssetTotal {
+    asset: String!
+    count: Int!
+  }
+
+  type Corridor {
+    fromAsset: String!
+    toAsset: String!
+    count: Int!
+    volume: Float!
+    firstSeen: String!
+    lastSeen: String!
+  }
+
+  type Health {
+    ok: Boolean!
+    asOf: String
+    staleHours: Float
+  }
+
+  type Query {
+    "Every indexed account, grouped and scored by anchor domain — same data as GET /api/v1/anchors."
+    anchors: AnchorsResult!
+
+    "One anchor's accounts and reliability score. Null if the domain has no indexed accounts."
+    anchor(domain: String!): AnchorDetail
+
+    "Payment stream, optionally scoped to one anchor domain and filtered. Keyset-paginated via nextCursor / before."
+    payments(domain: String, direction: String, asset: String, before: String, limit: Int): PaymentsPage!
+
+    "Total payment count per asset across every indexed anchor."
+    assets: [AssetTotal!]!
+
+    "Cross-asset flow matrix from path payments."
+    corridors: [Corridor!]!
+
+    "Liveness check plus the age of the most recent completed scan."
+    health: Health!
+  }
+`);
+
+export function graphqlRootValue(db) {
+  return {
+    anchors: async () => {
+      const scan = await latestScan(db);
+      if (!scan) throw new Error('No completed scan yet.');
+      const accounts = await accountRows(db);
+      const byDomain = new Map();
+      for (const a of accounts) {
+        if (!byDomain.has(a.domain)) byDomain.set(a.domain, []);
+        byDomain.get(a.domain).push(a);
+      }
+      const reliability = [...byDomain.entries()].map(([domain, dAccounts]) => ({
+        domain,
+        ...computeDomainReliability(dAccounts),
+      }));
+      return { asOf: scan.finishedAt, staleHours: scan.staleHours, accounts, reliability };
+    },
+
+    anchor: async ({ domain }) => {
+      const accounts = (await accountRows(db)).filter(a => a.domain.toLowerCase() === domain.toLowerCase());
+      if (!accounts.length) return null;
+      const rel = computeDomainReliability(accounts);
+      return { domain, healthy: rel.score >= 55, ...rel, accounts };
+    },
+
+    payments: async ({ domain, direction, asset, before, limit }) => {
+      let accounts;
+      if (domain) {
+        accounts = await domainAccounts(db, domain);
+        if (!accounts.length) throw new Error(`No accounts for ${domain}`);
+      }
+      return paymentsPage(db, {
+        accounts,
+        direction: direction || null,
+        asset: asset || null,
+        before: before || null,
+        limit: Math.min(Math.max(Number(limit) || 50, 1), 500),
+      });
+    },
+
+    assets: async () => assetRows(db),
+    corridors: async () => corridorRows(db),
+
+    health: async () => {
+      const scan = await latestScan(db);
+      return { ok: true, asOf: scan?.finishedAt ?? null, staleHours: scan?.staleHours ?? null };
+    },
+  };
 }
 
 // ── Main handler ─────────────────────────────────────────────────────────────
@@ -923,6 +1090,41 @@ export default async function handler(req, res) {
       }
 
       return adminJson(res, 404, { error: `Unknown admin route: /${joined}` });
+    }
+
+    // ── GraphQL — POST { query, variables }, or GET ?query=... for quick
+    // testing in a browser address bar. Read-only, no auth: same public
+    // data as the REST routes below, just askable in one shape instead of
+    // several endpoints.
+    if (parts[0] === 'v1' && parts[1] === 'graphql') {
+      if (req.method !== 'POST' && req.method !== 'GET') {
+        return json(res, 405, { error: 'Method not allowed' });
+      }
+
+      let query, variables;
+      if (req.method === 'POST') {
+        const body = await readJsonBody(req);
+        query = body.query;
+        variables = body.variables;
+      } else {
+        const url = new URL(req.url, `https://${req.headers.host}`);
+        query = url.searchParams.get('query');
+        const rawVars = url.searchParams.get('variables');
+        variables = rawVars ? JSON.parse(rawVars) : undefined;
+      }
+      if (!query) return json(res, 400, { error: 'A `query` field is required.' }, 0);
+
+      const result = await graphql({
+        schema: graphqlSchema,
+        source: query,
+        variableValues: variables,
+        rootValue: graphqlRootValue(db),
+      });
+      // A GraphQL error is still a 200 in the spec's strict reading, but a
+      // request that produced no data at all reads better as a 400 to
+      // anything not already speaking GraphQL fluently.
+      const status = result.errors && !result.data ? 400 : 200;
+      return json(res, status, result, 0);
     }
 
     if (req.method !== 'GET') return json(res, 405, { error: 'Method not allowed' });

@@ -198,7 +198,14 @@ npm run scan -- --persist # scan and write to Postgres
 
 npm run db:migrate        # apply the schema to $DATABASE_URL
 npm run api               # API in watch mode
+npm run mcp               # MCP server over stdio, needs $DATABASE_URL — docs/MCP.md
 ```
 
 The indexer works with no database at all — `--persist` opts in. A contributor
 who only wants to fix a metric never has to start Docker.
+
+`npm run api` starts `packages/api/src/server.ts`, the local dev API. It is
+currently behind the deployed API (`api/[...path].js`, the Vercel serverless
+function) — the Developer Portal, reliability scoring, corridors, and the new
+GraphQL/MCP layer all live only in the deployed function today. See
+`docs/gaps.md` for why, and treat local dev as stale until that's reconciled.

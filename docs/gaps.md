@@ -1,7 +1,8 @@
 # What Landfall doesn't have yet
 
-An honest inventory as of 12 August 2026, amended 13 August. Ordered by how
-much each gap could hurt, not by how hard it is to fix.
+An honest inventory as of 12 August 2026, amended 13 August, amended again
+14 August. Ordered by how much each gap could hurt, not by how hard it is to
+fix.
 
 Closed items are struck through rather than deleted. A gap list that only ever
 shrinks silently is a changelog wearing a disguise, and the point of this page
@@ -32,6 +33,63 @@ rule that we hold ourselves to what we measure in others:
 
 ---
 
+## Closed since this list was written — 14 August 2026
+
+| Was | Now |
+|---|---|
+| No GraphQL API | `/api/v1/graphql`, reusing the REST resolvers directly — `docs/GRAPHQL_API.md` |
+| "MCP server for agents" advertised, not built | `scripts/mcp/server.mjs`, six tools, verified against a real database with the MCP SDK's own client — `docs/MCP.md` |
+
+Two more things were found while doing this, in the same spirit as the two
+listed above:
+
+- **`corridors` was a shipped, broken feature.** `GET /api/v1/corridors` and
+  the new GraphQL `corridors` field both query a `corridors` table that no
+  migration ever created and no indexer code ever wrote — the README claimed
+  "Settlement corridors API + dashboard: shipping" while the endpoint threw
+  `relation "corridors" does not exist` on any correctly migrated database.
+  Fixed with `006_corridors_view.sql`, a view derived from the
+  `source_asset`/`asset` columns `003_path_payments.sql` already added —
+  verified against a real database both before the fix (error) and after
+  (correct aggregated rows from seeded path-payment data).
+- **`packages/api/src/server.ts` (local dev API) is now meaningfully behind
+  `api/[...path].js` (the deployed API).** A teammate shipped the Developer
+  Portal, reliability scoring, health-check, badges, and corridors straight
+  to the deployed function without updating local dev. Rather than rush a
+  backport of someone else's large feature set under the SCF deadline, the
+  new GraphQL layer and MCP server both import directly from
+  `api/[...path].js` — the file actually running in production — so they're
+  correct today, but `npm run api` (local dev) does not yet reflect any of
+  this. Whoever picks this up next should treat it as a real backport task,
+  not a quick sync.
+
+---
+
+## Undisclosed until now: a real account-takeover path in the Developer Portal
+
+`POST /api/v1/auth/forgot-password` (added with the Developer Portal,
+`005_developer_portal.sql`) returns the password-reset token directly in the
+JSON response body instead of emailing it:
+
+```js
+return adminJson(res, 200, {
+  ok: true,
+  resetToken, // Returned for instant in-portal reset demonstration
+  message: 'Password reset code generated. Use it below to set your new password.'
+});
+```
+
+Anyone who submits an email address — their own, a guessed one, or one
+scraped from anywhere — gets back a valid token to reset that account's
+password on the spot. There is no verification that the requester controls
+the email. This is a full account-takeover route for every `portal_users`
+account, found while reading `api/[...path].js` to build the GraphQL/MCP
+layer on top of it, not something introduced by this work. It needs fixing
+before the portal is treated as real auth for anything that matters — either
+actually email the token, or don't return it in the response at all.
+
+---
+
 ## 0. The one that mattered most: the site promising things that don't exist
 
 The landing page advertised a product that was not there. Most of it is now
@@ -44,7 +102,7 @@ either real or labelled; what remains is listed as **still aspirational**.
 | `@landfall/sdk` with `pickAnchor()` | **Still not written**, not on npm. Labelled planned. |
 | "Log in" | **Still no accounts, no auth.** The button opens a waitlist. |
 | "Webhooks when an anchor goes dark" | **Still none.** The contract emits a `dark` event; nothing consumes it. |
-| "MCP server for agents" | **Still not built.** |
+| "MCP server for agents" | Built — `scripts/mcp/server.mjs`, `docs/MCP.md`. Not linked from the site, and no external agent has connected to it yet. |
 | "1,000 API calls / month" free tier | There are calls to make now, but no metering and no tier. |
 | Contact form | **Still submits to nothing.** |
 
@@ -73,7 +131,8 @@ whole problem. The alternative is deleting those sections until they're real.
 - **No trend history in the product.** Every scan is stored, so the data for
   "dark for N consecutive scans" exists — nothing reads it back yet, and there
   is still no alerting on state change.
-- ~~**No API**~~ — shipped. **No SDK, no MCP server.**
+- ~~**No API**~~ — shipped. ~~**No MCP server.**~~ — shipped, unlinked from
+  the site, no external consumer yet. **Still no SDK.**
 - ~~**The Soroban oracle has never been deployed.**~~ Live on **testnet** at
   `CA2IYHFKTKSJWR5IICY6HFD55BJEGE7OMKISWMLMPFSHLESZYO3VICAG` as of
   13 August 2026. Still **not on mainnet**, and **the indexer does not publish

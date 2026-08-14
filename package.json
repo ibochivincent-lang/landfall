@@ -9,7 +9,9 @@
     "packages/indexer",
     "packages/api"
   ],
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "discover": "npm run discover -w @landfall/indexer",
     "scan": "npm run scan -w @landfall/indexer",
@@ -17,6 +19,7 @@
     "test": "npm run test -w @landfall/indexer",
     "typecheck": "npm run typecheck -w @landfall/indexer && npm run typecheck -w @landfall/api",
     "db:migrate": "bash scripts/migrate.sh",
+    "mcp": "node scripts/mcp/server.mjs",
     "stack:up": "docker compose up -d",
     "stack:down": "docker compose down",
     "stack:logs": "docker compose logs -f",
@@ -29,8 +32,11 @@
     "contracts:test": "cd packages/contracts && cargo test"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "graphql": "^17.0.2",
     "openai": "^4.55.0",
-    "pg": "^8.13.1"
+    "pg": "^8.13.1",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
