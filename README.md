@@ -54,9 +54,13 @@ Move any of this to a chain without those primitives and there is nothing left �
 | Liveness, volume, concentration, returns | ✅ shipping |
 | **Path payments (cross-asset trades)** | ✅ **shipping** |
 | **Settlement corridors API + dashboard** | ✅ **shipping** |
+| **Anchor Reliability Score (0–100 & Grades A–F)** | ✅ **shipping** |
+| **Pre-Flight Wallet Health Check API (`/health-check`)** | ✅ **shipping** |
+| **Dynamic SVG Status Badges (`/badges/:domain.svg`)** | ✅ **shipping** |
 | **CSV export for compliance reporting** | ✅ **shipping** |
 | Postgres persistence + read API | ✅ shipping |
 | Transactions dashboard | ✅ shipping |
+| Public API Documentation (`/docs.html`) | ✅ shipping |
 | **Hourly ledger scan (GitHub Actions)** | ✅ **shipping** |
 | **Admin developer board (session auth, backend health, payment browser, anchor management)** | ✅ **shipping** |
 | Hosted deployment (Supabase, prod compose, Vercel) | ✅ shipping |

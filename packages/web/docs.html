@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Landfall · Stellar — Public API Documentation</title>
+  <meta name="description" content="Official documentation for Landfall's zero-trust Stellar anchor settlement and reliability API.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="dashboard.css">
+  <style>
+    .docs-wrap { max-width: 960px; margin: 48px auto; padding: 0 24px; }
+    .docs-section { background: var(--paper); border: 1px solid var(--line); border-radius: 16px; padding: 32px; margin-bottom: 32px; }
+    .docs-section h2 { font-size: 22px; font-weight: 800; margin-bottom: 12px; }
+    .docs-section p { color: var(--muted); line-height: 1.6; }
+    .endpoint-card { border: 1px solid var(--line); border-radius: 12px; padding: 20px; margin: 20px 0; background: #fff; }
+    .endpoint-title { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+    .badge-get { background: #0b9c91; color: #fff; font-size: 12px; font-weight: 800; padding: 4px 8px; border-radius: 6px; }
+    .endpoint-path { font-family: 'DM Mono', monospace; font-size: 15px; font-weight: 700; color: var(--ink); }
+  </style>
+</head>
+<body class="dash-body">
+
+<header class="topnav" id="topnav">
+  <div class="wrap topnav__in">
+    <a href="index.html" class="topnav__logo" aria-label="Landfall home">
+      <svg viewBox="0 0 40 40" class="topnav__logo-mark" aria-hidden="true">
+        <path d="M20 3 35 29H5L20 3Z" fill="currentColor"/>
+        <path d="M20 12 28 26H12l8-14Z" fill="#eaf4ef"/>
+        <path d="M20 29v7" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <span>landfall<em>.stellar</em></span>
+    </a>
+    <nav class="topnav__pill" aria-label="Documentation navigation">
+      <a class="topnav__link" href="index.html">Overview</a>
+      <a class="topnav__link" href="dashboard.html">Transactions</a>
+      <a class="topnav__link is-active" href="docs.html" aria-current="page">API Docs</a>
+    </nav>
+    <div class="topnav__actions">
+      <a class="dash-btn dash-btn--ghost" href="https://github.com/ibochivincent-lang/landfall" target="_blank" rel="noopener">GitHub ↗</a>
+    </div>
+  </div>
+</header>
+
+<main class="docs-wrap">
+  <div class="dash-head">
+    <div>
+      <h1 class="dash-title">Developer & Wallet API</h1>
+      <p class="dash-sub">Zero-trust, on-chain anchor settlement oracle endpoints for Stellar wallets, routers, and DeFi protocols.</p>
+    </div>
+  </div>
+
+  <section class="docs-section">
+    <h2>1. Pre-Flight Anchor Health Check</h2>
+    <p>
+      Stellar wallets (Vibrant, LOBSTR, Freighter) can call this endpoint prior to initiating SEP-24 deposits or SEP-31 cross-border remittances.
+      If <code>healthy</code> is false, wallets should warn users or route to an alternate anchor rail.
+    </p>
+
+    <div class="endpoint-card">
+      <div class="endpoint-title">
+        <span class="badge-get">GET</span>
+        <span class="endpoint-path">/api/v1/anchors/{domain}/health-check</span>
+      </div>
+      <p>Returns the real-time reliability score (0–100), operational grade (A–F), and routing recommendation.</p>
+
+      <pre class="code-block mono">{
+  "domain": "cowrie.exchange",
+  "healthy": true,
+  "score": 94,
+  "grade": "A",
+  "status": "optimal",
+  "factors": {
+    "liveness": 40,
+    "settlement": 40,
+    "volume": 14,
+    "freshestHours": 2.1,
+    "totalPayments": 489,
+    "returnRatePercent": 0.4
+  },
+  "recommendation": "Excellent on-chain settlement health. Safe to route."
+}</pre>
+    </div>
+  </section>
+
+  <section class="docs-section">
+    <h2>2. Dynamic SVG Status Badges</h2>
+    <p>Embed auto-updating status badges on anchor documentation, GitHub repositories, or ecosystem directories.</p>
+
+    <div class="endpoint-card">
+      <div class="endpoint-title">
+        <span class="badge-get">GET</span>
+        <span class="endpoint-path">/api/v1/badges/{domain}.svg</span>
+      </div>
+      <p><strong>Example Markdown:</strong></p>
+      <pre class="code-block mono">[![Landfall Status](https://landfall-ib.vercel.app/api/v1/badges/cowrie.exchange.svg)](https://landfall-ib.vercel.app/dashboard.html)</pre>
+    </div>
+  </section>
+
+  <section class="docs-section">
+    <h2>3. Cross-Asset Corridors Matrix</h2>
+    <p>Query aggregated cross-border path payment flows across the network.</p>
+
+    <div class="endpoint-card">
+      <div class="endpoint-title">
+        <span class="badge-get">GET</span>
+        <span class="endpoint-path">/api/v1/corridors</span>
+      </div>
+      <pre class="code-block mono">{
+  "corridors": [
+    {
+      "fromAsset": "USDC:GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN",
+      "toAsset": "NGN:GCC4ESRTCVOUM5MQWUG7FUCTBMBQY7FNRQUR554Z7JNTZ2A2K667K2NQ",
+      "count": 1420,
+      "volume": "48291040.50",
+      "lastSeen": "2026-08-14T07:15:00.000Z"
+    }
+  ]
+}</pre>
+    </div>
+  </section>
+</main>
+
+<footer class="dash-footer">
+  <div class="wrap dash-foot-in">
+    <span>Data read directly from public Stellar ledger</span>
+    <span>© 2026 Landfall · MIT</span>
+  </div>
+</footer>
+
+</body>
+</html>
