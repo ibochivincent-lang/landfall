@@ -40,9 +40,56 @@ rule that we hold ourselves to what we measure in others:
 | No GraphQL API | `/api/v1/graphql`, reusing the REST resolvers directly — `docs/GRAPHQL_API.md` |
 | "MCP server for agents" advertised, not built | `scripts/mcp/server.mjs`, six tools, verified against a real database with the MCP SDK's own client — `docs/MCP.md` |
 | `forgot-password` returned the reset token to anyone who asked — account takeover | Token never leaves the server now; response no longer leaks whether an account exists either. Self-serve delivery is still unbuilt (no email sender exists), so resets are manual via an admin until that's wired up — full detail below. |
+| An incremental scan published one hour's payments as the anchor's whole record, and graded named anchors on it | Metrics computed over persisted history plus the new fetch. Fetch stays incremental, arithmetic is cumulative again — full detail below. |
 
-Two more things were found while doing this, in the same spirit as the two
-listed above:
+### The scan published an hour as though it were a history — 14 August 2026
+
+Between the 07:00 and 08:00 hourly scans, every published figure quietly
+changed meaning. The numbers, straight from the scan commits:
+
+| Scan | Total inbound | Total outbound |
+|---|---|---|
+| 07:00 UTC | 4,039 | 2,099 |
+| 08:00 UTC | 4 | 0 |
+| 09:00 UTC | 1 | 0 |
+
+Nothing about the ledger changed. `d90d6a8` made a cursor-resumed scan fetch
+only what was new since the last run — correct, and the reason an hourly scan
+can finish in seconds — but metrics were still computed from whatever that run
+happened to fetch. So `inbound`, which had always meant "payments this account
+has ever received", started meaning "payments in the last hour" while keeping
+the same name, the same field, and the same place on the site.
+
+The damage was not the empty dashboard. It was that the Anchor Reliability
+Score kept computing, and published **ntokens.com at 10/100, mykobo.co at
+30/100, cowrie.exchange at 40/100** — real, named financial businesses graded
+near-zero on evidence that was never gathered. A project whose entire pitch is
+"we don't overstate, and the ledger is the proof" spent roughly two hours
+publicly rating companies on a dataset containing one payment.
+
+**Fixed** by computing metrics over persisted history plus the new fetch rather
+than the fetch alone (`packages/indexer/src/history.ts`). The fetch stays
+incremental, so the speed win is kept; the arithmetic goes back to being
+cumulative. Verified against a real Postgres database: an account with 300
+persisted payments receiving one new one now reports 301, not 1.
+
+Three further things surfaced while fixing it:
+
+- **A failed Horizon page was silently swallowed.** The paging loop caught
+  errors and `break`ed, returning a short record set indistinguishable from a
+  complete one. SECURITY.md names that exact behaviour — "causing the indexer
+  to silently drop records rather than report a gap" — as the worst class of
+  bug this project can have. Errors now propagate; the account is dropped from
+  the run with a loud log line instead of publishing an undercount.
+- **The resume cursor was tracked by position, not by time.** It took the last
+  record of the last page, which is the *oldest* record under the `order=desc`
+  used by a first full scan. Now chosen by timestamp, which is correct under
+  both orderings.
+- **Two tests were already failing on `main`** and had been pushed anyway.
+  Both are green again. CI runs `npm test`, so this was visible and went
+  unread — worth a look at why.
+
+### Found while building the GraphQL API and MCP server
 
 - **`corridors` was a shipped, broken feature.** `GET /api/v1/corridors` and
   the new GraphQL `corridors` field both query a `corridors` table that no

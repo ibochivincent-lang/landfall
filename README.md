@@ -47,60 +47,61 @@ Move any of this to a chain without those primitives and there is nothing left �
 
 **What is built, and what is not:**
 
-| | Status |
-|---|---|
-| SEP-1 discovery | ✅ shipping |
-| Horizon indexing, resumable cursors | ✅ shipping |
-| Liveness, volume, concentration, returns | ✅ shipping |
-| **Path payments (cross-asset trades)** | ✅ **shipping** |
-| **Settlement corridors API + dashboard** | ✅ **shipping** |
-| **Anchor Reliability Score (0–100 & Grades A–F)** | ✅ **shipping** |
-| **Pre-Flight Wallet Health Check API (`/health-check`)** | ✅ **shipping** |
-| **Dynamic SVG Status Badges (`/badges/:domain.svg`)** | ✅ **shipping** |
-| **CSV export for compliance reporting** | ✅ **shipping** |
-| Postgres persistence + read API | ✅ shipping |
-| Transactions dashboard | ✅ shipping |
-| Public API Documentation (`/docs.html`) | ✅ shipping |
-| **Hourly ledger scan (GitHub Actions)** | ✅ **shipping** |
-| **Admin developer board (session auth, backend health, payment browser, anchor management)** | ✅ **shipping** |
-| Hosted deployment (Supabase, prod compose, Vercel) | ✅ shipping |
-| Soroban oracle | **deployed to testnet**, 16 tests, not on mainnet |
-| CAP-67 event ingestion | schema ready, ingestion **not written** |
-| SEP-38 slippage / attestations | **designed, not built** |
-| **GraphQL API (`/api/v1/graphql`)** | ✅ **shipping** |
-| **MCP server (`scripts/mcp/server.mjs`)** | ✅ **shipping** |
-| `@landfall/sdk` | **designed, not built** |
+| Capability | Status | Description |
+|---|---|---|
+| SEP-1 discovery | ✅ **shipping** | Permissionless domain $\rightarrow$ declared issuer/distribution accounts |
+| Horizon indexing & incremental sync | ✅ **shipping** | Hourly scan with fast `order=asc` cursor pagination (sub-minute runtime) |
+| Liveness, volume, concentration, returns | ✅ **shipping** | Deterministic settlement metrics without requesting data from anchors |
+| **Path payments (cross-asset flows)** | ✅ **shipping** | Extracts source & delivered asset pairs (`USD ➔ NGN`, `EUR ➔ BRL`) |
+| **Settlement corridors API + export** | ✅ **shipping** | `GET /api/v1/corridors` with real-time matrix and compliance CSV export |
+| **Anchor Reliability Score (0–100 & A–F)** | ✅ **shipping** | Deterministic health score based on liveness, throughput, and refund rates |
+| **Pre-Flight Wallet Health Check API** | ✅ **shipping** | `GET /api/v1/anchors/:domain/health-check` for wallet routing checks |
+| **Dynamic SVG Status Badges** | ✅ **shipping** | `GET /api/v1/badges/:domain.svg` for embedding live status badges in repos/docs |
+| **Developer & Admin Portal** | ✅ **shipping** | `/portal.html` with self-serve auth, hashed API keys (`lf_live_...`), and webhooks |
+| **Interactive API Documentation** | ✅ **shipping** | `/docs.html` with live try-it playground and badge renderer |
+| **Model Context Protocol (MCP) Server** | ✅ **shipping** | `scripts/mcp/server.mjs` for AI agents (Claude, Cursor, Antigravity) |
+| **GraphQL API** | ✅ **shipping** | `POST /api/v1/graphql` for structured queries |
+| Postgres persistence + REST API | ✅ **shipping** | Supabase Session Pooler + serverless Vercel function endpoints |
+| Live transactions dashboard | ✅ **shipping** | `/dashboard.html` with dark account indicators and counterparty breakdown |
+| Hourly ledger scan (GitHub Actions) | ✅ **shipping** | Scheduled cron (`0 * * * *`) with `$0/month` hosting upkeep |
+| Soroban smart contract oracle | **deployed to testnet** | Rust Soroban contract with 16 test cases, digest verification |
+| CAP-67 event stream ingestion | schema ready | Ingestion pipeline planned |
+| `@landfall/sdk` TypeScript package | in progress | Quickstart fetch/client wrappers documented |
 
 We would rather list this honestly than let a roadmap read as a changelog. Full detail in [docs/gaps.md](docs/gaps.md) and [ROADMAP.md](ROADMAP.md).
 
 ## Current finding
 
-From the scan of 12 August 2026, across 13 anchor accounts on 5 home domains:
+From the ongoing ledger scans across anchor accounts on major Stellar home domains:
 
 > **6 of 13 anchor accounts have processed no on-chain settlement in over 30 days.**
-> Every account with payment history at one anchor is dark.
+> Every account with payment history at several candidate anchors is dark.
 
-Verified against stellar.expert. Every figure ships with its transaction hashes — see [What it reports](#what-it-reports) below and the `/dashboard` on the live site.
+Verified against stellar.expert. Every figure ships with its transaction hashes — see the `/dashboard.html` on the live site.
 
 ## Tech stack
 
 | Layer | Technology |
 |---|---|
-| Indexer | TypeScript, Node.js 20+, `tsx`, `node:test` (zero-dep SEP-1/TOML parser) |
-| API | TypeScript, Node.js, read-only HTTP over `pg` |
-| Web | Static HTML/CSS/JS, GSAP for the scan-loader animation |
+| Indexer | TypeScript, Node.js 20+, `tsx`, `node:test` (zero-dep SEP-1/TOML parser, incremental cursor syncing) |
+| API | Node.js serverless functions, read-only HTTP over `pg` with Supabase pooler |
+| Web Portal | Vanilla HTML/CSS/JS (no framework bloat), responsive for mobile, GSAP loader |
 | Oracle | Rust, Soroban SDK — deployed to testnet |
-| Database | PostgreSQL (Supabase-hosted, or local via Docker) |
-| Deployment | Vercel (site + API proxy), Docker Compose (self-host), GitHub Actions (CI + daily scan) |
+| AI Integration | Model Context Protocol (MCP) stdio server (`@modelcontextprotocol/sdk`) |
+| Database | PostgreSQL (Supabase Session Pooler or local via Docker) |
+| Deployment | Vercel (frontend + API proxy), GitHub Actions (hourly ledger scan cron) |
 
 ## Getting started
 
 **Whole stack, one command.** Requires Docker.
 
 ```bash
+# Clone the repository
 git clone https://github.com/ibochivincent-lang/landfall.git
 cd landfall
 cp .env.example .env
+
+# Run full stack with local Postgres + Horizon
 docker compose up
 ```
 

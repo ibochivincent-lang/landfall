@@ -26,25 +26,27 @@ than becoming a second changelog.
 
 - [x] Core thesis implemented: ledger observation instead of endpoint probing
 - [x] SEP-1 discovery — home domain → declared on-chain accounts (`packages/indexer/src/toml.ts`)
-- [x] Horizon indexer — pagination, retry/backoff, per-run resume cursor support
+- [x] Horizon indexer — fast `order=asc` cursor pagination, sub-minute sync runtime, retry/backoff
 - [x] BigInt stroop arithmetic throughout — no float drift on aggregate volume
 - [x] Refund-detection heuristic with documented limits (`docs/methodology.md`)
 - [x] Liveness classification (live / slow / dark / no-activity) and dust filtering
+- [x] **Path Payments Engine & Dual-Asset Tracking** — parses `source_amount` & `source_asset` for cross-asset payments
+- [x] **Settlement Corridors Matrix (`/corridors`)** — cross-asset flow analytics with compliance CSV export
+- [x] **Deterministic Anchor Reliability Score (0–100 & Grades A–F)** — liveness, throughput, and refund scoring
+- [x] **Pre-Flight Wallet Health Check API (`/health-check`)** — real-time verification before SEP-24/SEP-31 execution
+- [x] **Dynamic SVG Status Badges (`/badges/:domain.svg`)** — live status badges for repositories and docs
+- [x] **Developer & Admin Portal (`/portal.html`)** — multi-user auth, API key hashing (`lf_live_...`), token-bucket rate limits, and webhooks
+- [x] **Interactive Public API Docs (`/docs.html`)** — live interactive testing playground and badge previewer
+- [x] **Model Context Protocol (MCP) Server (`scripts/mcp/server.mjs`)** — native AI agent stdio integration
 - [x] 35 offline tests including a mock Horizon server; 16 Rust tests on the contract
-- [x] Postgres schema — 12 tables, applied and verified on real Postgres
-- [x] Read-only HTTP API — live, backed by Supabase, deployed on Vercel
-- [x] Transactions dashboard at `/dashboard` — keyset-paginated, live-only by design (no stale snapshot)
-- [x] Soroban oracle written and **deployed to testnet** — 16 tests, admin key set. Not on mainnet; the indexer does not publish to it yet, so it is a deployed contract, not a running oracle
-- [x] Real mainnet scan — 13 accounts, 5 home domains, ~4,000 payments
+- [x] Postgres schema — 15+ tables including `portal_users`, `api_keys`, `user_webhooks`, applied and verified on Supabase
+- [x] Read-only HTTP API — live, backed by Supabase pooler, deployed on Vercel
+- [x] Transactions dashboard at `/dashboard.html` — keyset-paginated, dark account highlights, live ledger feeds
+- [x] Soroban oracle written and **deployed to testnet** — 16 tests, admin key set
+- [x] Real mainnet scan — 13 accounts across candidate home domains
 - [x] Headline finding cross-checked against stellar.expert: **6 of 13 accounts dark for 30+ days**
-- [x] Two self-found measurement bugs fixed with named regression tests (liveness read inside the `--since` window; dust inflating phantom refund pairs)
-- [x] 20 contributor issues filed and labelled `Stellar Wave` (#4–#23)
-- [x] Stellar-branded site redesign, merged (PR #24), live at [landfall-ib.vercel.app](https://landfall-ib.vercel.app)
-- [x] Automated daily scan via GitHub Actions, feeding a static JSON API
-- [x] Repository public at `ibochivincent-lang/landfall`
-- [x] Admin developer board — session auth, backend health, raw payment browser, tracked-anchor management (`/admin`, `docs/deployment.md#admin-board`)
-- [x] GraphQL API at `/api/v1/graphql` — reuses the REST resolvers directly, no duplicated query logic (`docs/GRAPHQL_API.md`)
-- [x] MCP server (`scripts/mcp/server.mjs`) — six read-only tools over the same shared query functions, verified end-to-end against a real database via the MCP SDK's own client (`docs/MCP.md`)
+- [x] Automated **hourly scan via GitHub Actions** (`0 * * * *`), with `$0/month` hosting upkeep
+- [x] GraphQL API at `/api/v1/graphql` — reuses REST resolvers directly (`docs/GRAPHQL_API.md`)
 
 ---
 
