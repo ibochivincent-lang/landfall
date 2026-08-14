@@ -152,6 +152,62 @@ closed.
 
 ---
 
+## 0b. Closed 14 August: the landing page never showed live data
+
+The hero card badged itself `STELLAR LEDGER · LIVE` and displayed
+**"Observed volume $1,876,580"**, animated counting up on load. It was a
+constant in `app.js`:
+
+```js
+const TARGET_VOLUME = 1876580;
+```
+
+Nothing ever replaced it, and no endpoint publishes a volume total, so there
+was no real figure to replace it with. A single dollar number could not be
+honest anyway — the indexed assets are ARS, USDC, EURC, XLM, NGNT, BRL and PEN,
+and summing them into one currency needs FX rates this project does not have
+and will not invent.
+
+Underneath it, the page's live wiring had been broken since it was written, in
+two independent ways:
+
+```js
+.then(b => render(b.anchors || b.data || b))   // b.accounts is the array; this passes the whole object
+const data = accounts.map(a => ({ status: a.status || ... }))   // API sends `state`, never `status`
+```
+
+The first threw `accounts.map is not a function`; the second would have
+classified every account as `none` had the first been fixed alone. Both errors
+landed in `.catch(() => {})`, so the page silently fell back to the hardcoded
+numbers in the HTML and no one saw a failure. Every figure a visitor read —
+including the "6 of 13" headline — was typed, not fetched. It happened to be
+right, because someone updated it by hand.
+
+**Fixed:** the fetch passes `b.accounts`, `render()` reads `state`, and the card
+now reports **inbound settlements indexed** — a number computed from the same
+rows the dashboard shows, which the project can actually prove. The scan date
+is driven from the payload's `asOf` instead of a string typed into the HTML, so
+a page that calls itself live can no longer date itself by hand. The empty
+`.catch` now warns to the console: a silent catch is how both bugs survived.
+
+## 0c. Closed 14 August: the contact form discarded messages
+
+`preventDefault()`, show a green tick, `reset()`. Nothing was sent anywhere.
+The message had already been made honest ("Nothing was actually sent"), but it
+told visitors to "email us directly" and the project publishes no email address
+anywhere.
+
+That matters most for the one visitor this project owes a reply to: an anchor
+disputing a figure published about it. CODE_OF_CONDUCT and SECURITY both
+promise that route.
+
+**Fixed:** the form now opens a pre-filled GitHub issue — the channel
+CONTRIBUTING and SECURITY already name, and one that demonstrably works —
+with security reports pointed at a private advisory instead. Inventing a
+support address would have been the same lie in a different place.
+
+---
+
 ## 0a. Open and live: Route Scout publishes invented rates and fees
 
 Found 14 August, unfixed at time of writing. This is the most serious open item
