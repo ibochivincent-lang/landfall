@@ -69,7 +69,7 @@ export function pool() {
 }
 
 // ── CORS / response helpers ───────────────────────────────────────────────────
-const ORIGIN = process.env.CORS_ORIGIN || 'https://landfall-ib.vercel.app';
+const ORIGIN = process.env.CORS_ORIGIN || '*';
 
 function json(res, status, body, cacheSeconds = 60) {
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
