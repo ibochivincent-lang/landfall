@@ -1,5 +1,5 @@
 {
-  "asOf": "2026-08-14T04:27:34.964Z",
+  "asOf": "2026-08-14T05:49:15.155Z",
   "staleHours": 0,
   "returnRateCaveat": "A return is the honest failure mode. An anchor that accepts value, fails to settle and keeps it produces no return event and scores 0. A low rate is the absence of one kind of evidence, not evidence of good conduct.",
   "accounts": [
@@ -12,7 +12,7 @@
       "outbound": 1,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 66.33,
+      "hoursSinceActivity": 67.69,
       "topCounterpartyShare": 0.9182
     },
     {
@@ -24,7 +24,7 @@
       "outbound": 20,
       "returns": 1,
       "returnRate": 0.1667,
-      "hoursSinceActivity": 862.9,
+      "hoursSinceActivity": 864.26,
       "topCounterpartyShare": 0.8898
     },
     {
@@ -36,7 +36,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1797.49,
+      "hoursSinceActivity": 1798.85,
       "topCounterpartyShare": null
     },
     {
@@ -48,19 +48,19 @@
       "outbound": 2,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1405.83,
+      "hoursSinceActivity": 1407.19,
       "topCounterpartyShare": null
     },
     {
       "account": "GAQRF3UGHBT6JYQZ7YSUYCIYWAF4T2SAA5237Q5LIQYJOHHFAWDXZ7NM",
       "domain": "mykobo.co",
       "name": "MYKOBO",
-      "state": "live",
+      "state": "slow",
       "inbound": 4,
       "outbound": 31,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 70.84,
+      "hoursSinceActivity": 72.2,
       "topCounterpartyShare": 0.9991
     },
     {
@@ -72,7 +72,7 @@
       "outbound": 932,
       "returns": 10,
       "returnRate": 0.0116,
-      "hoursSinceActivity": 70.52,
+      "hoursSinceActivity": 71.88,
       "topCounterpartyShare": 0.5316
     },
     {
@@ -84,7 +84,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 66.33,
+      "hoursSinceActivity": 67.69,
       "topCounterpartyShare": 0.9401
     },
     {
@@ -96,7 +96,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 1434.41,
+      "hoursSinceActivity": 1435.77,
       "topCounterpartyShare": 0.9999
     },
     {
@@ -108,7 +108,7 @@
       "outbound": 668,
       "returns": 1,
       "returnRate": 0.0008,
-      "hoursSinceActivity": 10.36,
+      "hoursSinceActivity": 11.72,
       "topCounterpartyShare": 0.0932
     },
     {
@@ -120,7 +120,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 8.1,
+      "hoursSinceActivity": 9.46,
       "topCounterpartyShare": 0.9268
     },
     {
@@ -144,8 +144,20 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 863.73,
+      "hoursSinceActivity": 865.09,
       "topCounterpartyShare": 1
+    },
+    {
+      "account": "GDVKY2GU2DRXWTBEYJJWSFXIGBZV6AZNBVVSUHEPZI54LIS6BA7DVVSP",
+      "domain": "ntokens.com",
+      "name": "nTokens Serviços Digitais Ltda",
+      "state": "dark",
+      "inbound": 46,
+      "outbound": 444,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 862.2,
+      "topCounterpartyShare": 0.4281
     }
   ]
 }
