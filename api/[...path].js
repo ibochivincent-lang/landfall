@@ -156,23 +156,43 @@ function clearSessionCookie(res) {
   res.setHeader('Set-Cookie', `${SESSION_COOKIE}=; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=0`);
 }
 
-/** Returns { id, username } for a valid, unexpired session, or null. */
+/** Returns { id, username, email, role } for a valid, unexpired session, or null. */
 async function requireSession(req, db) {
   const token = parseCookies(req)[SESSION_COOKIE];
   if (!token) return null;
   const tokenHash = sha256Hex(token);
-  const { rows } = await db.query(
-    `SELECT u.id, u.username
-       FROM admin_sessions s
-       JOIN admin_users u ON u.id = s.user_id
-      WHERE s.token_hash = $1 AND s.expires_at > now()`,
-    [tokenHash],
-  );
-  if (!rows[0]) return null;
-  // Sliding activity marker — not extending expiry, just recording use, so a
-  // stolen-but-unused cookie still dies on schedule.
-  db.query('UPDATE admin_sessions SET last_seen_at = now() WHERE token_hash = $1', [tokenHash]).catch(() => {});
-  return rows[0];
+
+  // Check portal_sessions first
+  try {
+    const { rows } = await db.query(
+      `SELECT u.id, u.username, u.email, u.role
+         FROM portal_sessions s
+         JOIN portal_users u ON u.id = s.user_id
+        WHERE s.token_hash = $1 AND s.expires_at > now()`,
+      [tokenHash],
+    );
+    if (rows[0]) {
+      db.query('UPDATE portal_sessions SET last_seen_at = now() WHERE token_hash = $1', [tokenHash]).catch(() => {});
+      return rows[0];
+    }
+  } catch {}
+
+  // Fallback to admin_sessions
+  try {
+    const { rows } = await db.query(
+      `SELECT u.id, u.username, 'admin@landfall.stellar' as email, 'admin' as role
+         FROM admin_sessions s
+         JOIN admin_users u ON u.id = s.user_id
+        WHERE s.token_hash = $1 AND s.expires_at > now()`,
+      [tokenHash],
+    );
+    if (rows[0]) {
+      db.query('UPDATE admin_sessions SET last_seen_at = now() WHERE token_hash = $1', [tokenHash]).catch(() => {});
+      return rows[0];
+    }
+  } catch {}
+
+  return null;
 }
 
 // ── SQL helpers (mirrors packages/api/src/server.ts exactly) ─────────────────
@@ -551,6 +571,262 @@ export default async function handler(req, res) {
   const joined = parts.join('/');
 
   try {
+    // ── Auth routes (Developer Portal & Admin login/register/reset) ────────
+    if (parts[0] === 'v1' && parts[1] === 'auth') {
+      const action = parts[2];
+
+      if (req.method === 'POST' && action === 'register') {
+        const body = await readJsonBody(req);
+        const email = String(body.email || '').trim().toLowerCase();
+        const username = String(body.username || '').trim().toLowerCase();
+        const password = String(body.password || '');
+
+        if (!email || !username || password.length < 6) {
+          return adminJson(res, 400, { error: 'Valid email, username, and password (min 6 chars) required.' });
+        }
+
+        const pwdHash = await hashPassword(password);
+        try {
+          const { rows } = await db.query(
+            `INSERT INTO portal_users (email, username, password_hash, role)
+             VALUES ($1, $2, $3, 'developer')
+             RETURNING id, email, username, role`,
+            [email, username, pwdHash],
+          );
+          const user = rows[0];
+
+          // Generate initial API key
+          const rawKey = 'lf_live_' + randomBytes(24).toString('hex');
+          const keyPrefix = rawKey.slice(0, 15) + '...';
+          await db.query(
+            `INSERT INTO api_keys (user_id, name, key_prefix, key_hash)
+             VALUES ($1, 'Default Key', $2, $3)`,
+            [user.id, keyPrefix, sha256Hex(rawKey)],
+          );
+
+          const token = randomBytes(32).toString('hex');
+          const expiresAt = new Date(Date.now() + SESSION_TTL_MS);
+          await db.query(
+            `INSERT INTO portal_sessions (token_hash, user_id, expires_at, user_agent)
+             VALUES ($1, $2, $3, $4)`,
+            [sha256Hex(token), user.id, expiresAt.toISOString(), String(req.headers['user-agent'] || '').slice(0, 300)],
+          );
+
+          setSessionCookie(res, token, SESSION_TTL_MS / 1000);
+          return adminJson(res, 200, { ok: true, user, initialKey: rawKey, message: 'Account created successfully!' });
+        } catch (err) {
+          if (err.message?.includes('unique') || err.message?.includes('duplicate')) {
+            return adminJson(res, 400, { error: 'An account with that email or username already exists.' });
+          }
+          throw err;
+        }
+      }
+
+      if (req.method === 'POST' && action === 'login') {
+        const body = await readJsonBody(req);
+        const loginIdent = String(body.username || body.email || '').trim().toLowerCase();
+        const password = String(body.password || '');
+        if (!loginIdent || !password) return adminJson(res, 400, { error: 'Username/email and password are required.' });
+
+        // Try portal_users first
+        let user = null;
+        const portalRes = await db.query(
+          'SELECT id, email, username, role, password_hash FROM portal_users WHERE username = $1 OR email = $1',
+          [loginIdent],
+        );
+        if (portalRes.rows[0]) {
+          user = portalRes.rows[0];
+        } else {
+          // Fallback to admin_users
+          const adminRes = await db.query(
+            'SELECT id, username, password_hash FROM admin_users WHERE username = $1',
+            [loginIdent],
+          );
+          if (adminRes.rows[0]) {
+            user = { ...adminRes.rows[0], email: 'admin@landfall.stellar', role: 'admin' };
+          }
+        }
+
+        const ok = user
+          ? await verifyPassword(password, user.password_hash)
+          : await verifyPassword(password, 'scrypt$00$00').catch(() => false);
+        if (!user || !ok) return adminJson(res, 401, { error: 'Invalid username/email or password.' });
+
+        const token = randomBytes(32).toString('hex');
+        const expiresAt = new Date(Date.now() + SESSION_TTL_MS);
+        
+        if (user.role === 'admin') {
+          await db.query(
+            `INSERT INTO admin_sessions (token_hash, user_id, expires_at, user_agent)
+             VALUES ($1, $2, $3, $4)`,
+            [sha256Hex(token), user.id, expiresAt.toISOString(), String(req.headers['user-agent'] || '').slice(0, 300)],
+          );
+        } else {
+          await db.query(
+            `INSERT INTO portal_sessions (token_hash, user_id, expires_at, user_agent)
+             VALUES ($1, $2, $3, $4)`,
+            [sha256Hex(token), user.id, expiresAt.toISOString(), String(req.headers['user-agent'] || '').slice(0, 300)],
+          );
+        }
+
+        setSessionCookie(res, token, SESSION_TTL_MS / 1000);
+        return adminJson(res, 200, {
+          ok: true,
+          user: { id: user.id, email: user.email, username: user.username, role: user.role },
+          message: `Welcome back, ${user.username}! Login successful.`
+        });
+      }
+
+      if (req.method === 'POST' && action === 'forgot-password') {
+        const body = await readJsonBody(req);
+        const email = String(body.email || '').trim().toLowerCase();
+        if (!email) return adminJson(res, 400, { error: 'Email is required.' });
+
+        const { rows } = await db.query('SELECT id, email FROM portal_users WHERE email = $1', [email]);
+        if (!rows[0]) {
+          // Keep response generic to prevent user enumeration
+          return adminJson(res, 200, { ok: true, message: 'If an account exists with that email, reset instructions have been generated.' });
+        }
+
+        const resetToken = randomBytes(24).toString('hex');
+        const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1h
+        await db.query(
+          `INSERT INTO password_resets (user_id, token_hash, expires_at)
+           VALUES ($1, $2, $3)`,
+          [rows[0].id, sha256Hex(resetToken), expiresAt.toISOString()],
+        );
+
+        return adminJson(res, 200, {
+          ok: true,
+          resetToken, // Returned for instant in-portal reset demonstration
+          message: 'Password reset code generated. Use it below to set your new password.'
+        });
+      }
+
+      if (req.method === 'POST' && action === 'reset-password') {
+        const body = await readJsonBody(req);
+        const resetToken = String(body.token || '').trim();
+        const newPassword = String(body.newPassword || '');
+
+        if (!resetToken || newPassword.length < 6) {
+          return adminJson(res, 400, { error: 'Valid reset token and new password (min 6 chars) required.' });
+        }
+
+        const tokenHash = sha256Hex(resetToken);
+        const { rows } = await db.query(
+          `SELECT id, user_id FROM password_resets WHERE token_hash = $1 AND expires_at > now() AND used_at IS NULL`,
+          [tokenHash],
+        );
+        if (!rows[0]) return adminJson(res, 400, { error: 'Reset token is invalid or expired.' });
+
+        const pwdHash = await hashPassword(newPassword);
+        await db.query('UPDATE portal_users SET password_hash = $1 WHERE id = $2', [pwdHash, rows[0].user_id]);
+        await db.query('UPDATE password_resets SET used_at = now() WHERE id = $1', [rows[0].id]);
+
+        return adminJson(res, 200, { ok: true, message: 'Password updated successfully! You can now log in.' });
+      }
+
+      if (req.method === 'GET' && action === 'me') {
+        const session = await requireSession(req, db);
+        if (!session) return adminJson(res, 401, { error: 'Not authenticated.' });
+        return adminJson(res, 200, { ok: true, user: session });
+      }
+
+      if (req.method === 'POST' && action === 'logout') {
+        const token = parseCookies(req)[SESSION_COOKIE];
+        if (token) {
+          const h = sha256Hex(token);
+          await db.query('DELETE FROM portal_sessions WHERE token_hash = $1', [h]).catch(() => {});
+          await db.query('DELETE FROM admin_sessions WHERE token_hash = $1', [h]).catch(() => {});
+        }
+        clearSessionCookie(res);
+        return adminJson(res, 200, { ok: true, message: 'Logged out successfully.' });
+      }
+    }
+
+    // ── Developer Portal keys & webhooks (session required) ──────────────────
+    if (parts[0] === 'v1' && parts[1] === 'developer') {
+      const session = await requireSession(req, db);
+      if (!session) return adminJson(res, 401, { error: 'Developer authentication required.' });
+      const sub = parts.slice(2);
+
+      // GET /api/v1/developer/keys
+      if (req.method === 'GET' && sub[0] === 'keys') {
+        const { rows } = await db.query(
+          `SELECT id, name, key_prefix, rate_limit_per_min, created_at, last_used_at, revoked_at
+             FROM api_keys
+            WHERE user_id = $1
+            ORDER BY created_at DESC`,
+          [session.id],
+        );
+        return adminJson(res, 200, { keys: rows });
+      }
+
+      // POST /api/v1/developer/keys
+      if (req.method === 'POST' && sub[0] === 'keys') {
+        const body = await readJsonBody(req);
+        const name = String(body.name || 'New API Key').slice(0, 50);
+        const rawKey = 'lf_live_' + randomBytes(24).toString('hex');
+        const keyPrefix = rawKey.slice(0, 15) + '...';
+
+        const { rows } = await db.query(
+          `INSERT INTO api_keys (user_id, name, key_prefix, key_hash)
+           VALUES ($1, $2, $3, $4)
+           RETURNING id, name, key_prefix, rate_limit_per_min, created_at`,
+          [session.id, name, keyPrefix, sha256Hex(rawKey)],
+        );
+
+        return adminJson(res, 200, {
+          ok: true,
+          key: rows[0],
+          secretKey: rawKey,
+          message: 'API Key generated. Copy it now; you will not be able to see it again.'
+        });
+      }
+
+      // DELETE /api/v1/developer/keys/:id
+      if (req.method === 'DELETE' && sub[0] === 'keys' && sub[1]) {
+        const keyId = Number(sub[1]);
+        await db.query(
+          `UPDATE api_keys SET revoked_at = now() WHERE id = $1 AND user_id = $2`,
+          [keyId, session.id],
+        );
+        return adminJson(res, 200, { ok: true, message: 'API key revoked.' });
+      }
+
+      // GET /api/v1/developer/webhooks
+      if (req.method === 'GET' && sub[0] === 'webhooks') {
+        const { rows } = await db.query(
+          `SELECT id, target_url, events, active, created_at FROM user_webhooks WHERE user_id = $1 ORDER BY created_at DESC`,
+          [session.id],
+        );
+        return adminJson(res, 200, { webhooks: rows });
+      }
+
+      // POST /api/v1/developer/webhooks
+      if (req.method === 'POST' && sub[0] === 'webhooks') {
+        const body = await readJsonBody(req);
+        const targetUrl = String(body.url || '').trim();
+        if (!targetUrl.startsWith('https://')) {
+          return adminJson(res, 400, { error: 'Webhooks must use HTTPS URLs.' });
+        }
+        const secret = 'whsec_' + randomBytes(20).toString('hex');
+        const { rows } = await db.query(
+          `INSERT INTO user_webhooks (user_id, target_url, secret)
+           VALUES ($1, $2, $3)
+           RETURNING id, target_url, events, active, created_at`,
+          [session.id, targetUrl, secret],
+        );
+        return adminJson(res, 200, { ok: true, webhook: rows[0], secret, message: 'Webhook endpoint registered.' });
+      }
+
+      // DELETE /api/v1/developer/webhooks/:id
+      if (req.method === 'DELETE' && sub[0] === 'webhooks' && sub[1]) {
+        await db.query(`DELETE FROM user_webhooks WHERE id = $1 AND user_id = $2`, [Number(sub[1]), session.id]);
+        return adminJson(res, 200, { ok: true, message: 'Webhook deleted.' });
+      }
+    }
+
     // ── Admin routes ──────────────────────────────────────────────────────
     if (parts[0] === 'v1' && parts[1] === 'admin') {
       const sub = parts.slice(2);
@@ -563,9 +839,6 @@ export default async function handler(req, res) {
 
         const { rows } = await db.query('SELECT id, password_hash FROM admin_users WHERE username = $1', [username]);
         const user = rows[0];
-        // Run verifyPassword against a dummy hash even when the user does not
-        // exist, so a login attempt for an unknown username takes the same
-        // time as a wrong password for a real one.
         const ok = user
           ? await verifyPassword(password, user.password_hash)
           : await verifyPassword(password, 'scrypt$00$00').catch(() => false);

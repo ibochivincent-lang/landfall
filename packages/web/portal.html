@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Landfall · Stellar — Developer & Admin Portal</title>
+  <meta name="description" content="Manage your API keys, inspect live settlement data, and configure webhooks.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="portal.css">
+</head>
+<body class="portal-body">
+
+<div class="toast" id="toast" role="alert" aria-live="polite" hidden></div>
+
+<header class="topnav">
+  <div class="wrap topnav__in">
+    <a href="index.html" class="topnav__logo" aria-label="Landfall home">
+      <svg viewBox="0 0 40 40" class="topnav__logo-mark" aria-hidden="true">
+        <path d="M20 3 35 29H5L20 3Z" fill="currentColor"/>
+        <path d="M20 12 28 26H12l8-14Z" fill="#eaf4ef"/>
+        <path d="M20 29v7" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <span>landfall<em>.portal</em></span>
+    </a>
+    <nav class="topnav__pill">
+      <a class="topnav__link" href="index.html">Overview</a>
+      <a class="topnav__link" href="dashboard.html">Dashboard</a>
+      <a class="topnav__link" href="docs.html">API Docs</a>
+      <a class="topnav__link is-active" href="portal.html">Developer Portal</a>
+    </nav>
+    <div class="topnav__actions">
+      <div id="userMenu" hidden>
+        <span class="user-badge" id="userBadge">developer</span>
+        <button class="dash-btn dash-btn--ghost" id="logoutBtn">Log out</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="portal-main wrap">
+
+  <!-- ================= AUTH VIEW (Login / Register / Forgot) ================= -->
+  <div class="auth-card" id="authView">
+    <div class="auth-tabs">
+      <button class="auth-tab is-active" data-tab="login">Sign In</button>
+      <button class="auth-tab" data-tab="register">Create Account</button>
+      <button class="auth-tab" data-tab="forgot">Forgot Password</button>
+    </div>
+
+    <!-- Login Form -->
+    <form id="loginForm" class="auth-form">
+      <h2>Welcome back</h2>
+      <p class="auth-sub">Access your API keys, webhooks, and developer analytics.</p>
+      
+      <label class="field">
+        <span>Username or Email</span>
+        <input type="text" id="loginIdent" required placeholder="name@domain.com or username" autocomplete="username">
+      </label>
+      
+      <label class="field">
+        <span>Password</span>
+        <input type="password" id="loginPassword" required placeholder="••••••••" autocomplete="current-password">
+      </label>
+      
+      <button type="submit" class="dash-btn dash-btn--primary auth-btn">Sign In →</button>
+    </form>
+
+    <!-- Register Form -->
+    <form id="registerForm" class="auth-form" hidden>
+      <h2>Create Developer Account</h2>
+      <p class="auth-sub">Get instant access to live Stellar settlement oracle endpoints and API keys.</p>
+      
+      <label class="field">
+        <span>Email Address</span>
+        <input type="email" id="regEmail" required placeholder="developer@wallet.io" autocomplete="email">
+      </label>
+      
+      <label class="field">
+        <span>Username</span>
+        <input type="text" id="regUsername" required placeholder="stellar_dev" autocomplete="username">
+      </label>
+      
+      <label class="field">
+        <span>Password (min 6 chars)</span>
+        <input type="password" id="regPassword" required minlength="6" placeholder="••••••••" autocomplete="new-password">
+      </label>
+      
+      <button type="submit" class="dash-btn dash-btn--primary auth-btn">Register & Get API Key →</button>
+    </form>
+
+    <!-- Forgot Password Form -->
+    <form id="forgotForm" class="auth-form" hidden>
+      <h2>Reset Password</h2>
+      <p class="auth-sub">Enter your email address to receive a secure password reset token.</p>
+      
+      <label class="field">
+        <span>Account Email</span>
+        <input type="email" id="forgotEmail" required placeholder="name@domain.com">
+      </label>
+      
+      <button type="submit" class="dash-btn dash-btn--primary auth-btn">Generate Reset Token →</button>
+
+      <div id="resetStep2" class="reset-step2" hidden>
+        <hr class="divider">
+        <label class="field">
+          <span>Reset Token</span>
+          <input type="text" id="resetToken" required placeholder="Paste reset code">
+        </label>
+        <label class="field">
+          <span>New Password</span>
+          <input type="password" id="newPassword" required minlength="6" placeholder="••••••••">
+        </label>
+        <button type="button" class="dash-btn dash-btn--primary auth-btn" id="confirmResetBtn">Update Password</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ================= LOGGED-IN PORTAL VIEW ================= -->
+  <div id="portalView" hidden>
+    
+    <div class="portal-header">
+      <div>
+        <h1 class="portal-title">Developer & Admin Portal</h1>
+        <p class="portal-sub">Manage your Stellar settlement oracle credentials, webhooks, and live queries.</p>
+      </div>
+      <div class="portal-meta">
+        <div class="meta-pill" id="tierPill">Free Tier · 60 req/min</div>
+      </div>
+    </div>
+
+    <!-- Portal Navigation Tabs -->
+    <div class="portal-nav">
+      <button class="portal-nav-btn is-active" data-view="keys">API Keys</button>
+      <button class="portal-nav-btn" data-view="quickstart">Quickstart & SDKs</button>
+      <button class="portal-nav-btn" data-view="explorer">Interactive API</button>
+      <button class="portal-nav-btn" data-view="webhooks">Webhooks</button>
+      <button class="portal-nav-btn" data-view="mcp">AI Agents (MCP)</button>
+      <button class="portal-nav-btn is-admin-only" data-view="admin" id="adminTabBtn" hidden>Super Admin ⚡</button>
+    </div>
+
+    <!-- View: API Keys -->
+    <section class="portal-section" id="view-keys">
+      <div class="section-head">
+        <div>
+          <h2>Your Secret API Keys</h2>
+          <p>Authenticate requests by passing <code>x-api-key: lf_live_...</code> or <code>Authorization: Bearer lf_live_...</code></p>
+        </div>
+        <button class="dash-btn dash-btn--primary" id="newKeyBtn">+ Create New Key</button>
+      </div>
+
+      <div id="keyRevealBox" class="key-reveal-box" hidden>
+        <p><strong>Copy your new secret key now.</strong> For security, it will never be displayed again:</p>
+        <div class="key-copy-row">
+          <code class="mono" id="revealedKey">lf_live_...</code>
+          <button class="dash-btn dash-btn--ghost btn-sm" id="copyKeyBtn">Copy Key</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <table class="portal-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Prefix</th>
+              <th>Rate Limit</th>
+              <th>Created</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="keysTableBody">
+            <tr><td colspan="6" class="muted">Loading API keys…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- View: Quickstart & SDKs -->
+    <section class="portal-section" id="view-quickstart" hidden>
+      <h2>Quickstart: Make your first call in 2 minutes</h2>
+      <p>Integrate Landfall's zero-trust anchor settlement verification into any wallet or backend.</p>
+
+      <div class="code-tabs">
+        <div class="code-tab is-active" data-lang="curl">cURL</div>
+        <div class="code-tab" data-lang="js">JavaScript / TypeScript</div>
+        <div class="code-tab" data-lang="python">Python</div>
+      </div>
+
+      <pre class="code-block mono" id="quickstartCode">curl -X GET "https://landfall-ib.vercel.app/api/v1/anchors/cowrie.exchange/health-check" \
+  -H "x-api-key: YOUR_API_KEY"</pre>
+    </section>
+
+    <!-- View: Interactive API Explorer -->
+    <section class="portal-section" id="view-explorer" hidden>
+      <h2>Interactive API Explorer</h2>
+      <p>Test live queries and inspect raw response payloads directly from your browser.</p>
+
+      <div class="explorer-grid">
+        <div class="explorer-form">
+          <label class="field">
+            <span>Select Endpoint</span>
+            <select id="explorerEndpoint">
+              <option value="/api/v1/anchors">GET /api/v1/anchors (All Anchors & Reliability)</option>
+              <option value="/api/v1/anchors/cowrie.exchange/health-check">GET /api/v1/anchors/cowrie.exchange/health-check</option>
+              <option value="/api/v1/corridors">GET /api/v1/corridors (Cross-Asset Corridors)</option>
+              <option value="/api/v1/assets">GET /api/v1/assets (Asset Totals)</option>
+            </select>
+          </label>
+          <button class="dash-btn dash-btn--primary" id="runExplorerBtn">Execute Request 🚀</button>
+        </div>
+        <div class="explorer-result">
+          <pre class="code-block mono" id="explorerResult">// Click "Execute Request" to test endpoint live</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- View: Webhooks -->
+    <section class="portal-section" id="view-webhooks" hidden>
+      <div class="section-head">
+        <div>
+          <h2>Real-Time Event Webhooks</h2>
+          <p>Receive HTTP POST payloads when an anchor goes dark or when refund rates spike.</p>
+        </div>
+        <button class="dash-btn dash-btn--primary" id="newWebhookBtn">+ Add Webhook Endpoint</button>
+      </div>
+
+      <div id="webhookFormBox" class="key-reveal-box" hidden>
+        <h3>Register HTTPS Webhook</h3>
+        <label class="field">
+          <span>Target HTTPS URL</span>
+          <input type="url" id="webhookUrlInput" placeholder="https://api.mywallet.com/webhooks/landfall" required>
+        </label>
+        <button class="dash-btn dash-btn--primary" id="saveWebhookBtn">Save Endpoint</button>
+      </div>
+
+      <div class="panel">
+        <table class="portal-table">
+          <thead>
+            <tr>
+              <th>Target URL</th>
+              <th>Events</th>
+              <th>Status</th>
+              <th>Created</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="webhooksTableBody">
+            <tr><td colspan="5" class="muted">No webhooks configured yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- View: AI Agents & MCP Server -->
+    <section class="portal-section" id="view-mcp" hidden>
+      <h2>Model Context Protocol (MCP) Tools for AI Agents</h2>
+      <p>Connect Landfall to Claude Desktop, Cursor, or AI Copilots to query Stellar settlement data via natural language.</p>
+
+      <div class="dev-card">
+        <h3>claude_desktop_config.json</h3>
+        <pre class="code-block mono">{
+  "mcpServers": {
+    "landfall": {
+      "command": "npx",
+      "args": ["-y", "@landfall/mcp-server"],
+      "env": {
+        "LANDFALL_API_KEY": "YOUR_API_KEY"
+      }
+    }
+  }
+}</pre>
+      </div>
+    </section>
+
+    <!-- View: Super Admin Tools (Admin Only) -->
+    <section class="portal-section" id="view-admin" hidden>
+      <div class="section-head">
+        <div>
+          <h2>Super Admin Ops Center</h2>
+          <p>Manage tracked domains, database health, and inspect raw ledger events.</p>
+        </div>
+      </div>
+
+      <div class="admin-grid">
+        <div class="admin-card">
+          <h3>Add Tracked Anchor Domain</h3>
+          <div class="admin-form-row">
+            <input type="text" id="adminDomainInput" placeholder="example.com" class="admin-input">
+            <button class="dash-btn dash-btn--primary" id="addDomainBtn">Add Domain</button>
+          </div>
+          <div id="trackedDomainsList" class="domain-list">Loading tracked domains…</div>
+        </div>
+
+        <div class="admin-card">
+          <h3>Database Health</h3>
+          <div id="adminHealthStats" class="health-stats">Loading database stats…</div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+</main>
+
+<footer class="portal-footer">
+  <div class="wrap dash-foot-in">
+    <span>Data read directly from public Stellar ledger</span>
+    <span>© 2026 Landfall · Developer Portal</span>
+  </div>
+</footer>
+
+<script src="portal.js"></script>
+</body>
+</html>
