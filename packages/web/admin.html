@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Landfall · Admin</title>
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="dashboard.css">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body class="dash-body">
+
+<header class="topnav" id="topnav">
+  <div class="wrap topnav__in">
+    <a href="index.html" class="topnav__logo" aria-label="Landfall home">
+      <svg viewBox="0 0 40 40" class="topnav__logo-mark" aria-hidden="true">
+        <path d="M20 3 35 29H5L20 3Z" fill="currentColor"/>
+        <path d="M20 12 28 26H12l8-14Z" fill="#eaf4ef"/>
+        <path d="M20 29v7" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <span>landfall<em>.stellar</em></span>
+    </a>
+    <nav class="topnav__pill" aria-label="Dashboard navigation">
+      <a class="topnav__link" href="index.html">Overview</a>
+      <a class="topnav__link" href="dashboard.html">Transactions</a>
+      <a class="topnav__link is-active" href="admin.html" aria-current="page">Admin</a>
+    </nav>
+    <div class="topnav__actions" id="topActions"></div>
+  </div>
+</header>
+
+<main class="dash">
+  <div class="wrap">
+
+    <!-- ── Login ─────────────────────────────────────────────────────────── -->
+    <div id="loginPanel" class="admin-login" hidden>
+      <div class="panel admin-login__card">
+        <h1 class="dash-title">Admin sign-in</h1>
+        <p class="dash-sub">
+          Accounts are created with <code>scripts/create-admin.mjs</code> — there is
+          no public sign-up route. Sessions are server-side and expire after 24h.
+        </p>
+        <form id="loginForm" class="admin-login__form">
+          <label>
+            <span>Username</span>
+            <input type="text" id="loginUsername" autocomplete="username" required>
+          </label>
+          <label>
+            <span>Password</span>
+            <input type="password" id="loginPassword" autocomplete="current-password" required>
+          </label>
+          <button type="submit" class="dash-btn dash-btn--primary">Sign in</button>
+          <p class="admin-error" id="loginError" hidden></p>
+        </form>
+      </div>
+    </div>
+
+    <!-- ── Admin board ───────────────────────────────────────────────────── -->
+    <div id="board" hidden>
+      <div class="dash-head">
+        <div>
+          <h1 class="dash-title">Developer board</h1>
+          <p class="dash-sub">Backend health, the full raw payment stream, and the scanned-domain list — signed in as <strong id="whoami"></strong>.</p>
+        </div>
+      </div>
+
+      <div class="admin-tabs" role="tablist">
+        <button class="admin-tab is-on" data-tab="health" role="tab">Backend health</button>
+        <button class="admin-tab" data-tab="payments" role="tab">Payment browser</button>
+        <button class="admin-tab" data-tab="anchors" role="tab">Anchor management</button>
+      </div>
+
+      <!-- Backend health -->
+      <section class="admin-panel" id="tab-health">
+        <div class="admin-grid" id="healthStats"></div>
+
+        <div class="panel">
+          <h2 class="admin-h2">Recent scans</h2>
+          <div class="tx-scroll">
+            <table class="tx" id="scansTable">
+              <thead><tr><th>ID</th><th>Started</th><th>Finished</th><th>Status</th><th>Accounts</th><th>Horizon</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2 class="admin-h2">Table sizes (approximate)</h2>
+          <div class="tx-scroll">
+            <table class="tx" id="tableSizes">
+              <thead><tr><th>Table</th><th class="num">Rows</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2 class="admin-h2">Resume cursors</h2>
+          <p class="dash-sub">Where each per-account scan left off. A cursor far behind <code>now</code> on an account still in the anchor list usually means that account is stuck, not just quiet.</p>
+          <div class="tx-scroll">
+            <table class="tx" id="cursorsTable">
+              <thead><tr><th>Stream</th><th>Key</th><th>Cursor</th><th>Updated</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Payment browser -->
+      <section class="admin-panel" id="tab-payments" hidden>
+        <div class="filters">
+          <div class="filter-group" role="group" aria-label="Direction filter">
+            <button class="chip is-on" data-dir="">All</button>
+            <button class="chip" data-dir="in">Inbound</button>
+            <button class="chip" data-dir="out">Outbound</button>
+          </div>
+          <label class="filter-select">
+            <span>Per page</span>
+            <select id="paymentsLimit">
+              <option>50</option><option selected>100</option><option>250</option><option>500</option>
+            </select>
+          </label>
+          <div class="filter-spacer"></div>
+          <button class="dash-btn dash-btn--ghost" id="paymentsRefresh">Refresh</button>
+        </div>
+        <div class="panel tx-panel">
+          <div class="tx-scroll">
+            <table class="tx">
+              <thead>
+                <tr><th>ID</th><th>When</th><th>Source</th><th>Op</th><th>From</th><th>To</th><th class="num">Amount</th><th>Asset</th><th>Memo</th><th>Dust</th><th>Tx</th></tr>
+              </thead>
+              <tbody id="paymentsBody"></tbody>
+            </table>
+          </div>
+          <div class="tx-foot">
+            <span id="paymentsCount" class="mono"></span>
+            <button class="dash-btn dash-btn--primary" id="paymentsMore" hidden>Load more</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Anchor management -->
+      <section class="admin-panel" id="tab-anchors" hidden>
+        <div class="panel">
+          <h2 class="admin-h2">Add a tracked domain</h2>
+          <p class="dash-sub">
+            Added here without a redeploy. Merged with the seed list in
+            <code>packages/indexer/data/anchors.json</code> on every scan that has
+            <code>DATABASE_URL</code> set — see <code>loadDomains()</code> in
+            <code>packages/indexer/src/cli.ts</code>.
+          </p>
+          <form id="addAnchorForm" class="admin-inline-form">
+            <input type="text" id="newDomain" placeholder="example-anchor.com" required>
+            <input type="text" id="newNotes" placeholder="notes (optional)">
+            <button type="submit" class="dash-btn dash-btn--primary">Add</button>
+          </form>
+          <p class="admin-error" id="addAnchorError" hidden></p>
+        </div>
+
+        <div class="panel">
+          <h2 class="admin-h2">Tracked anchors</h2>
+          <div class="tx-scroll">
+            <table class="tx" id="anchorsTable">
+              <thead><tr><th>Domain</th><th>Active</th><th>Added by</th><th>Notes</th><th>Updated</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  </div>
+</main>
+
+<footer class="dash-footer">
+  <div class="wrap dash-foot-in">
+    <span>Session-gated · not indexed · scripts/create-admin.mjs creates accounts</span>
+    <span>© 2026 Landfall · MIT</span>
+  </div>
+</footer>
+
+<script src="admin.js"></script>
+</body>
+</html>

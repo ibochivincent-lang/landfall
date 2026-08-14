@@ -12,6 +12,10 @@ export interface PaymentRecord {
   amount: string;
   /** Canonical asset id: "native" or "CODE:ISSUER". */
   asset: string;
+  /** Original amount sent in a path payment. */
+  sourceAmount?: string;
+  /** Original asset sent in a path payment. */
+  sourceAsset?: string;
   createdAt: string;
   /**
    * SEP-24 uses a memo to correlate the two legs of a transfer. Reading it is

@@ -131,12 +131,12 @@ export class Store {
         const res = await c.query(
           `INSERT INTO payments
              (paging_token, tx_hash, op_type, from_account, to_account,
-              amount, asset, memo, memo_type, created_at, source, is_dust)
-           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,'horizon_rest',$11)
+              amount, asset, source_amount, source_asset, memo, memo_type, created_at, source, is_dust)
+           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,'horizon_rest',$13)
            ON CONFLICT (paging_token, source) DO NOTHING`,
           [
             r.cursor, r.txHash, r.type, r.from, r.to,
-            r.amount, r.asset, r.memo ?? null, r.memoType ?? null,
+            r.amount, r.asset, r.sourceAmount ?? null, r.sourceAsset ?? null, r.memo ?? null, r.memoType ?? null,
             r.createdAt, dustCursors.has(r.cursor),
           ],
         );
@@ -217,6 +217,21 @@ export class Store {
         );
       }
     });
+  }
+
+  /* --------------------------------------------------------- tracked anchors */
+
+  /**
+   * Active domains added through the admin board. Additive to the seed list
+   * in packages/indexer/data/anchors.json — see loadDomains() in cli.ts.
+   * Failure here must never fail a scan, so callers should catch and fall
+   * back to the seed list alone.
+   */
+  async trackedDomains(): Promise<string[]> {
+    const { rows } = await this.pool.query<{ domain: string }>(
+      "SELECT domain FROM tracked_anchors WHERE active = true ORDER BY domain",
+    );
+    return rows.map((r) => r.domain);
   }
 }
 

@@ -1,9 +1,9 @@
-name: Daily Ledger Scan
+name: Hourly Ledger Scan
 
 on:
-  # Run every day at 02:00 UTC (quiet time, Horizon not at peak load)
+  # Run every hour
   schedule:
-    - cron: '0 2 * * *'
+    - cron: '0 * * * *'
 
   # Also allow a manual trigger from the GitHub Actions UI
   workflow_dispatch:
@@ -84,5 +84,5 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add packages/web/api/v1/anchors.json packages/web/snapshot.json
           # Only commit if there are actual changes
-          git diff --staged --quiet || git commit -m "chore: daily ledger scan $(date -u +%Y-%m-%d)"
+          git diff --staged --quiet || git commit -m "chore: hourly ledger scan $(date -u +%Y-%m-%d-%H00)"
           git push

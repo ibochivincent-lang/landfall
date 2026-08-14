@@ -10,6 +10,15 @@ export function assetId(rec: Record<string, unknown>): string {
   return typeof code === "string" ? code : "unknown";
 }
 
+export function sourceAssetId(rec: Record<string, unknown>): string {
+  const type = rec["source_asset_type"];
+  if (type === "native") return "native";
+  const code = rec["source_asset_code"];
+  const issuer = rec["source_asset_issuer"];
+  if (typeof code === "string" && typeof issuer === "string") return `${code}:${issuer}`;
+  return typeof code === "string" ? code : "unknown";
+}
+
 /**
  * Normalise a Horizon operation into a PaymentRecord.
  * Returns null for operation types that carry no transfer we can attribute
@@ -43,6 +52,8 @@ export function normalise(rec: Record<string, unknown>): PaymentRecord | null {
   const to = rec["to"];
   if (typeof from !== "string" || typeof to !== "string") return null;
 
+  const isPath = type.startsWith("path_payment");
+
   return {
     cursor,
     type,
@@ -52,6 +63,8 @@ export function normalise(rec: Record<string, unknown>): PaymentRecord | null {
     // path payments report the delivered amount in `amount`
     amount: String(rec["amount"] ?? "0"),
     asset: assetId(rec),
+    sourceAmount: isPath ? String(rec["source_amount"] ?? "0") : undefined,
+    sourceAsset: isPath ? sourceAssetId(rec) : undefined,
     createdAt,
   };
 }

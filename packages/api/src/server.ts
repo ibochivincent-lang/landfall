@@ -1,5 +1,6 @@
 /**
- * Landfall API — read-only HTTP over the indexed dataset.
+ * Landfall API — read-only HTTP over the indexed dataset, plus a session-gated
+ * admin surface for the developer board at packages/web/admin.html.
  *
  * Design rules carried over from the rest of the project:
  *
@@ -11,10 +12,20 @@
  *     to see that the data is from last month without reading our blog.
  *   * The limitation ships in the payload, not just the docs. A machine
  *     consuming `returnRate` should receive the caveat alongside it.
+ *
+ * Admin auth mirrors api/[...path].js (the Vercel deployment) exactly:
+ * scrypt password hashes, server-side sessions keyed by a SHA-256 of a random
+ * token, httpOnly/Secure/SameSite=Strict cookie. See that file's header for
+ * why — including the SQL-execution endpoint it used to expose and no longer
+ * does.
  */
 
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { Pool } from "pg";
+import { scrypt as scryptCb, randomBytes, timingSafeEqual, createHash } from "node:crypto";
+import { promisify } from "node:util";
+
+const scrypt = promisify(scryptCb) as (password: string, salt: string, keylen: number) => Promise<Buffer>;
 
 const PORT = Number(process.env["PORT"] ?? 8787);
 const DATABASE_URL = process.env["DATABASE_URL"];
@@ -56,8 +67,86 @@ function send(res: ServerResponse, status: number, body: Json, cache = 60): void
   res.end(payload);
 }
 
+/** Admin responses skip access-control-allow-origin entirely — same-origin only, cookie never leaves this host. */
+function sendAdmin(res: ServerResponse, status: number, body: Json): void {
+  res.writeHead(status, {
+    "content-type": "application/json; charset=utf-8",
+    "cache-control": "no-store",
+    "x-content-type-options": "nosniff",
+  });
+  res.end(JSON.stringify(body, null, 2));
+}
+
+async function readJsonBody(req: IncomingMessage): Promise<Json> {
+  const chunks: Buffer[] = [];
+  for await (const chunk of req) chunks.push(chunk as Buffer);
+  const raw = Buffer.concat(chunks).toString("utf8");
+  return raw ? (JSON.parse(raw) as Json) : {};
+}
+
 /** Postgres NUMERIC arrives as a string; keep precision, drop the nulls. */
 const num = (v: unknown): number | null => (v === null || v === undefined ? null : Number(v));
+
+// ── Auth: password hashing, sessions, cookies (mirrors api/[...path].js) ────
+
+const SESSION_COOKIE = "landfall_admin";
+const SESSION_TTL_MS = 24 * 60 * 60 * 1000; // 24h
+
+async function hashPassword(password: string): Promise<string> {
+  const salt = randomBytes(16).toString("hex");
+  const hash = (await scrypt(password, salt, 64)).toString("hex");
+  return `scrypt$${salt}$${hash}`;
+}
+
+async function verifyPassword(password: string, stored: string): Promise<boolean> {
+  const parts = String(stored || "").split("$");
+  if (parts.length !== 3 || parts[0] !== "scrypt") return false;
+  const [, salt, hashHex] = parts as [string, string, string];
+  const computed = await scrypt(password, salt, 64);
+  const expected = Buffer.from(hashHex, "hex");
+  if (computed.length !== expected.length) return false;
+  return timingSafeEqual(computed, expected);
+}
+
+function sha256Hex(value: string): string {
+  return createHash("sha256").update(value).digest("hex");
+}
+
+function parseCookies(req: IncomingMessage): Record<string, string> {
+  const header = req.headers.cookie ?? "";
+  const out: Record<string, string> = {};
+  for (const part of header.split(";")) {
+    const eq = part.indexOf("=");
+    if (eq === -1) continue;
+    out[part.slice(0, eq).trim()] = decodeURIComponent(part.slice(eq + 1).trim());
+  }
+  return out;
+}
+
+function setSessionCookie(res: ServerResponse, token: string, maxAgeSeconds: number): void {
+  res.setHeader(
+    "set-cookie",
+    `${SESSION_COOKIE}=${token}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${maxAgeSeconds}`,
+  );
+}
+function clearSessionCookie(res: ServerResponse): void {
+  res.setHeader("set-cookie", `${SESSION_COOKIE}=; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=0`);
+}
+
+async function requireSession(req: IncomingMessage): Promise<{ id: number; username: string } | null> {
+  const token = parseCookies(req)[SESSION_COOKIE];
+  if (!token) return null;
+  const tokenHash = sha256Hex(token);
+  const { rows } = await pool.query(
+    `SELECT u.id, u.username
+       FROM admin_sessions s JOIN admin_users u ON u.id = s.user_id
+      WHERE s.token_hash = $1 AND s.expires_at > now()`,
+    [tokenHash],
+  );
+  if (!rows[0]) return null;
+  void pool.query("UPDATE admin_sessions SET last_seen_at = now() WHERE token_hash = $1", [tokenHash]).catch(() => {});
+  return { id: Number(rows[0].id), username: rows[0].username };
+}
 
 async function latestScan(): Promise<{
   id: number; finishedAt: string; horizon: string; options: Json; staleHours: number;
@@ -164,6 +253,7 @@ async function paymentsPage(opts: {
   asset?: string | null;
   before?: string | null;
   limit: number;
+  includeRaw?: boolean;
 }): Promise<{ rows: Json[]; nextCursor: string | null }> {
   const where: string[] = [];
   const params: unknown[] = [];
@@ -196,6 +286,7 @@ async function paymentsPage(opts: {
 
   return {
     rows: page.map((r) => ({
+      ...(opts.includeRaw ? { id: String(r.id), source: r.source, opType: r.op_type } : {}),
       id: String(r.id),
       txHash: r.tx_hash,
       type: r.op_type,
@@ -219,6 +310,65 @@ async function accountsFor(domain: string): Promise<string[]> {
     "SELECT account_id FROM anchor_accounts WHERE domain = $1", [domain],
   );
   return rows.map((r) => r.account_id);
+}
+
+// ── Admin: ops/backend health ────────────────────────────────────────────────
+
+const HEALTH_TABLES = [
+  "anchors", "anchor_accounts", "payments", "ledger_events", "cursors",
+  "scans", "account_metrics", "refund_pairs", "attestations",
+  "oracle_publications", "tracked_anchors", "admin_users",
+];
+
+async function adminHealth(): Promise<Json> {
+  const started = Date.now();
+  const [scanRows, tableCounts, cursorRows, latest, oracleRow] = await Promise.all([
+    pool.query(`SELECT id, started_at, finished_at, horizon_url, accounts_seen, notes FROM scans ORDER BY id DESC LIMIT 10`),
+    pool.query(`SELECT relname AS table_name, n_live_tup AS approx_rows FROM pg_stat_user_tables WHERE schemaname = 'public' ORDER BY relname`),
+    pool.query(`SELECT stream, key, cursor, updated_at FROM cursors ORDER BY updated_at DESC LIMIT 50`),
+    latestScan(),
+    pool.query(`SELECT digest, ledger_seq, tx_hash, contract_id, published_at FROM oracle_publications ORDER BY published_at DESC LIMIT 1`),
+  ]);
+  const dbLatencyMs = Date.now() - started;
+
+  const countsByTable: Record<string, number> = {};
+  for (const name of HEALTH_TABLES) countsByTable[name] = 0;
+  for (const r of tableCounts.rows) countsByTable[r.table_name] = Number(r.approx_rows);
+
+  return {
+    dbLatencyMs,
+    latestScan: latest,
+    recentScans: scanRows.rows.map((r) => ({
+      id: Number(r.id),
+      startedAt: new Date(r.started_at).toISOString(),
+      finishedAt: r.finished_at ? new Date(r.finished_at).toISOString() : null,
+      horizon: r.horizon_url,
+      accountsSeen: r.accounts_seen,
+      notes: r.notes,
+      status: r.finished_at ? "finished" : "running-or-crashed",
+    })),
+    approxRowCounts: countsByTable,
+    resumeCursors: cursorRows.rows.map((r) => ({
+      stream: r.stream, key: r.key, cursor: r.cursor, updatedAt: new Date(r.updated_at).toISOString(),
+    })),
+    oracle: oracleRow.rows[0] ? {
+      lastDigest: oracleRow.rows[0].digest,
+      ledgerSeq: oracleRow.rows[0].ledger_seq ? Number(oracleRow.rows[0].ledger_seq) : null,
+      txHash: oracleRow.rows[0].tx_hash,
+      contractId: oracleRow.rows[0].contract_id,
+      publishedAt: new Date(oracleRow.rows[0].published_at).toISOString(),
+    } : null,
+  };
+}
+
+async function listTrackedAnchors(): Promise<Json[]> {
+  const { rows } = await pool.query(
+    `SELECT domain, active, added_by, notes, created_at, updated_at FROM tracked_anchors ORDER BY domain`,
+  );
+  return rows.map((r) => ({
+    domain: r.domain, active: r.active, addedBy: r.added_by, notes: r.notes,
+    createdAt: new Date(r.created_at).toISOString(), updatedAt: new Date(r.updated_at).toISOString(),
+  }));
 }
 
 const routes: Record<string, (req: IncomingMessage, res: ServerResponse, url: URL) => Promise<void>> = {
@@ -269,8 +419,6 @@ const routes: Record<string, (req: IncomingMessage, res: ServerResponse, url: UR
   },
 
   "GET /api/v1/assets": async (_req, res) => {
-    // Powers the asset filter on the dashboard without the client having to
-    // page the whole table to discover what exists.
     const { rows } = await pool.query(
       `SELECT asset, count(*)::int AS count FROM payments
         GROUP BY asset ORDER BY count DESC LIMIT 50`,
@@ -284,18 +432,124 @@ const routes: Record<string, (req: IncomingMessage, res: ServerResponse, url: UR
     const accounts = (await accountRows()).filter((a) => a["state"] === "dark");
     send(res, 200, { asOf: scan.finishedAt, staleHours: scan.staleHours, count: accounts.length, accounts });
   },
+
+  // ── Admin: auth ────────────────────────────────────────────────────────
+  "POST /api/v1/admin/login": async (req, res) => {
+    const body = await readJsonBody(req);
+    const username = String(body["username"] ?? "").trim().toLowerCase();
+    const password = String(body["password"] ?? "");
+    if (!username || !password) return sendAdmin(res, 400, { error: "Username and password are required." });
+
+    const { rows } = await pool.query("SELECT id, password_hash FROM admin_users WHERE username = $1", [username]);
+    const user = rows[0];
+    const ok = user
+      ? await verifyPassword(password, user.password_hash)
+      : await verifyPassword(password, "scrypt$00$00").catch(() => false);
+    if (!user || !ok) return sendAdmin(res, 401, { error: "Invalid username or password." });
+
+    const token = randomBytes(32).toString("hex");
+    const expiresAt = new Date(Date.now() + SESSION_TTL_MS);
+    await pool.query(
+      `INSERT INTO admin_sessions (token_hash, user_id, expires_at, user_agent) VALUES ($1, $2, $3, $4)`,
+      [sha256Hex(token), user.id, expiresAt.toISOString(), String(req.headers["user-agent"] ?? "").slice(0, 300)],
+    );
+    await pool.query("UPDATE admin_users SET last_login_at = now() WHERE id = $1", [user.id]);
+    setSessionCookie(res, token, SESSION_TTL_MS / 1000);
+    sendAdmin(res, 200, { ok: true, username });
+  },
+
+  "POST /api/v1/admin/logout": async (req, res) => {
+    const token = parseCookies(req)[SESSION_COOKIE];
+    if (token) await pool.query("DELETE FROM admin_sessions WHERE token_hash = $1", [sha256Hex(token)]);
+    clearSessionCookie(res);
+    sendAdmin(res, 200, { ok: true });
+  },
+
+  "GET /api/v1/admin/me": async (req, res) => {
+    const session = await requireSession(req);
+    if (!session) return sendAdmin(res, 401, { error: "Not authenticated." });
+    sendAdmin(res, 200, { ok: true, username: session.username });
+  },
+
+  "GET /api/v1/admin/health": async (req, res) => {
+    const session = await requireSession(req);
+    if (!session) return sendAdmin(res, 401, { error: "Not authenticated." });
+    sendAdmin(res, 200, await adminHealth());
+  },
+
+  "GET /api/v1/admin/payments": async (req, res, url) => {
+    const session = await requireSession(req);
+    if (!session) return sendAdmin(res, 401, { error: "Not authenticated." });
+    const page = await paymentsPage({
+      direction: url.searchParams.get("direction"),
+      asset: url.searchParams.get("asset"),
+      before: url.searchParams.get("before"),
+      limit: pageLimit(url, 100, 1000),
+      includeRaw: true,
+    });
+    sendAdmin(res, 200, { payments: page.rows, nextCursor: page.nextCursor });
+  },
+
+  "GET /api/v1/admin/anchors": async (req, res) => {
+    const session = await requireSession(req);
+    if (!session) return sendAdmin(res, 401, { error: "Not authenticated." });
+    sendAdmin(res, 200, { anchors: await listTrackedAnchors() });
+  },
+
+  "POST /api/v1/admin/anchors": async (req, res) => {
+    const session = await requireSession(req);
+    if (!session) return sendAdmin(res, 401, { error: "Not authenticated." });
+    const body = await readJsonBody(req);
+    const domain = String(body["domain"] ?? "").trim().toLowerCase();
+    if (!domain || !/^[a-z0-9.-]+\.[a-z]{2,}$/.test(domain)) {
+      return sendAdmin(res, 400, { error: "A valid domain is required, e.g. example.com." });
+    }
+    await pool.query(
+      `INSERT INTO tracked_anchors (domain, active, added_by, notes)
+       VALUES ($1, true, $2, $3)
+       ON CONFLICT (domain) DO UPDATE
+         SET active = true, updated_at = now(), notes = COALESCE(EXCLUDED.notes, tracked_anchors.notes)`,
+      [domain, session.username, body["notes"] ? String(body["notes"]).slice(0, 500) : null],
+    );
+    sendAdmin(res, 200, { ok: true, anchors: await listTrackedAnchors() });
+  },
 };
+
+/** PATCH/DELETE /api/v1/admin/anchors/:domain — dynamic segment, handled outside the static route table. */
+async function handleAnchorMutation(req: IncomingMessage, res: ServerResponse, domain: string): Promise<void> {
+  const session = await requireSession(req);
+  if (!session) return sendAdmin(res, 401, { error: "Not authenticated." });
+  if (req.method === "DELETE") {
+    await pool.query("DELETE FROM tracked_anchors WHERE domain = $1", [domain]);
+  } else {
+    const body = await readJsonBody(req);
+    await pool.query("UPDATE tracked_anchors SET active = $2, updated_at = now() WHERE domain = $1", [domain, Boolean(body["active"])]);
+  }
+  sendAdmin(res, 200, { ok: true, anchors: await listTrackedAnchors() });
+}
 
 const server = createServer(async (req, res) => {
   const url = new URL(req.url ?? "/", `http://${req.headers.host ?? "localhost"}`);
 
   if (req.method === "OPTIONS") {
+    const isAdmin = url.pathname.startsWith("/api/v1/admin/");
     res.writeHead(204, {
-      "access-control-allow-origin": ORIGIN,
-      "access-control-allow-methods": "GET, OPTIONS",
+      "access-control-allow-origin": isAdmin ? "" : ORIGIN,
+      "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
       "access-control-allow-headers": "content-type",
     });
     return res.end();
+  }
+
+  // PATCH/DELETE /api/v1/admin/anchors/<domain>
+  const anchorMutationMatch = /^\/api\/v1\/admin\/anchors\/([a-z0-9.-]+)$/i.exec(url.pathname);
+  if ((req.method === "PATCH" || req.method === "DELETE") && anchorMutationMatch) {
+    try {
+      await handleAnchorMutation(req, res, decodeURIComponent(anchorMutationMatch[1]!).toLowerCase());
+    } catch (e) {
+      sendAdmin(res, 500, { error: (e as Error).message });
+    }
+    return;
   }
 
   // Per-anchor payment history: /api/v1/anchors/<domain>/payments
@@ -351,6 +605,13 @@ const server = createServer(async (req, res) => {
         "/api/v1/payments?account=&limit=&before=&direction=&asset=",
         "/api/v1/assets",
         "/api/v1/dark",
+        "/api/v1/admin/login (POST)",
+        "/api/v1/admin/logout (POST)",
+        "/api/v1/admin/me",
+        "/api/v1/admin/health",
+        "/api/v1/admin/payments",
+        "/api/v1/admin/anchors (GET, POST)",
+        "/api/v1/admin/anchors/{domain} (PATCH, DELETE)",
       ],
     }, 0);
   }
@@ -400,9 +661,26 @@ async function warnIfInvisible(): Promise<void> {
   }
 }
 
+async function warnIfNoAdmin(): Promise<void> {
+  try {
+    const { rows } = await pool.query("SELECT count(*)::int AS n FROM admin_users");
+    if (Number(rows[0]?.n ?? 0) === 0) {
+      console.warn(
+        "\n  No admin account exists yet. The developer board at /admin has\n" +
+        "  nothing to log in with. Create one:\n" +
+        "    DATABASE_URL=... node scripts/create-admin.mjs <username>\n",
+      );
+    }
+  } catch {
+    // Table may not exist yet on an unmigrated database; migrate first, that
+    // failure is already loud elsewhere.
+  }
+}
+
 server.listen(PORT, () => {
   console.log(`landfall api listening on :${PORT}`);
   void warnIfInvisible();
+  void warnIfNoAdmin();
 });
 
 const shutdown = async () => {

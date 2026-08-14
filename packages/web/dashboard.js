@@ -320,6 +320,14 @@
     const counterparty = inbound ? p.from : p.to;
     const counterDomain = inbound ? p.fromDomain : p.toDomain;
 
+    let amountHtml = esc(amount(p.amount));
+    let assetHtml = esc(assetName(p.asset));
+
+    if (p.sourceAmount && p.sourceAsset && p.sourceAsset !== p.asset) {
+      amountHtml = '<span class="muted">' + esc(amount(p.sourceAmount)) + ' ➔</span> ' + amountHtml;
+      assetHtml = '<span class="muted">' + esc(assetName(p.sourceAsset)) + ' ➔</span> ' + assetHtml;
+    }
+
     const tr = el('tr', p.isDust ? 'is-dust' : '');
     tr.innerHTML =
       '<td><span class="tx-when">' + esc(ago(p.createdAt)) + '</span>' +
@@ -328,10 +336,10 @@
         (inbound ? '↓ in' : '↑ out') + '</span></td>' +
       '<td class="mono">' + esc(short(counterparty)) +
         (counterDomain ? '<span class="tx-domain">' + esc(counterDomain) + '</span>' : '') + '</td>' +
-      '<td class="num mono">' + esc(amount(p.amount)) +
+      '<td class="num mono">' + amountHtml +
         (p.isDust ? '<span class="tx-dust" title="Below the dust threshold; excluded from metrics">dust</span>' : '') +
       '</td>' +
-      '<td>' + esc(assetName(p.asset)) + '</td>' +
+      '<td>' + assetHtml + '</td>' +
       '<td class="mono tx-memo">' + (p.memo ? esc(p.memo) : '<span class="muted">—</span>') + '</td>' +
       '<td><a class="tx-link mono" target="_blank" rel="noopener"' +
         ' href="https://stellar.expert/explorer/public/tx/' + encodeURIComponent(p.txHash) + '">' +

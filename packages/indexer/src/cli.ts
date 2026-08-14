@@ -49,7 +49,26 @@ async function loadDomains(explicit?: string[]): Promise<string[]> {
   if (explicit?.length) return explicit;
   const raw = await readFile(new URL("../data/anchors.json", import.meta.url), "utf8");
   const parsed = JSON.parse(raw) as { domains?: string[] };
-  return parsed.domains ?? [];
+  const seed = parsed.domains ?? [];
+
+  // Domains added through the admin board live in `tracked_anchors`, not this
+  // file — a Vercel deployment cannot rewrite a file that ships in the git
+  // tree. Merge them in so the admin panel's anchor list feeds real scans
+  // rather than a table nobody reads. Any failure here (no DATABASE_URL, DB
+  // unreachable) falls back to the seed list alone; a scan must never fail
+  // because the admin-additions lookup did.
+  const connectionString = connectionStringFromEnv();
+  if (!connectionString) return seed;
+  let store: Store | undefined;
+  try {
+    store = new Store({ connectionString, connectionTimeoutMillis: 3_000 });
+    const extra = await store.trackedDomains();
+    return Array.from(new Set([...seed, ...extra]));
+  } catch {
+    return seed;
+  } finally {
+    await store?.close().catch(() => {});
+  }
 }
 
 /** Run tasks with a bounded number in flight. */
