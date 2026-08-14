@@ -3,21 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Landfall · Stellar — Public API Documentation</title>
+  <title>Landfall · Stellar — Developer & Wallet API Documentation</title>
   <meta name="description" content="Official documentation for Landfall's zero-trust Stellar anchor settlement and reliability API.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="dashboard.css">
   <style>
-    .docs-wrap { max-width: 960px; margin: 48px auto; padding: 0 24px; }
-    .docs-section { background: var(--paper); border: 1px solid var(--line); border-radius: 16px; padding: 32px; margin-bottom: 32px; }
-    .docs-section h2 { font-size: 22px; font-weight: 800; margin-bottom: 12px; }
-    .docs-section p { color: var(--muted); line-height: 1.6; }
-    .endpoint-card { border: 1px solid var(--line); border-radius: 12px; padding: 20px; margin: 20px 0; background: #fff; }
-    .endpoint-title { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+    .docs-wrap { max-width: 980px; margin: 40px auto; padding: 0 20px; }
+    .docs-section { background: var(--paper); border: 1px solid var(--line); border-radius: 16px; padding: 28px; margin-bottom: 28px; }
+    .docs-section h2 { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+    .docs-section p { color: var(--muted); line-height: 1.6; font-size: 14px; }
+    .endpoint-card { border: 1px solid var(--line); border-radius: 12px; padding: 20px; margin: 18px 0; background: #fff; }
+    .endpoint-title { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; flex-wrap: wrap; }
     .badge-get { background: #0b9c91; color: #fff; font-size: 12px; font-weight: 800; padding: 4px 8px; border-radius: 6px; }
-    .endpoint-path { font-family: 'DM Mono', monospace; font-size: 15px; font-weight: 700; color: var(--ink); }
+    .endpoint-path { font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 700; color: var(--ink); word-break: break-all; }
+    .try-bar { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+    .try-input { flex: 1; min-width: 200px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 6px; font-family: 'DM Mono', monospace; font-size: 13px; }
+    .try-btn { background: #0b9c91; color: #fff; border: none; border-radius: 6px; padding: 8px 16px; font-weight: 700; cursor: pointer; font-size: 13px; }
+    .try-btn:hover { background: #087d74; }
+    .response-preview { background: #04121b; color: #eaf4ef; border-radius: 8px; padding: 14px; margin-top: 12px; font-size: 12px; max-height: 240px; overflow-y: auto; white-space: pre-wrap; word-break: break-all; }
+    .badge-preview-box { margin-top: 14px; padding: 16px; background: #f8fafc; border-radius: 8px; border: 1px dashed var(--line); text-align: center; }
   </style>
 </head>
 <body class="dash-body">
@@ -36,8 +42,10 @@
       <a class="topnav__link" href="index.html">Overview</a>
       <a class="topnav__link" href="dashboard.html">Transactions</a>
       <a class="topnav__link is-active" href="docs.html" aria-current="page">API Docs</a>
+      <a class="topnav__link" href="portal.html">Developer Portal</a>
     </nav>
     <div class="topnav__actions">
+      <a class="dash-btn dash-btn--primary" href="portal.html">Portal / API Keys →</a>
       <a class="dash-btn dash-btn--ghost" href="https://github.com/ibochivincent-lang/landfall" target="_blank" rel="noopener">GitHub ↗</a>
     </div>
   </div>
@@ -47,15 +55,16 @@
   <div class="dash-head">
     <div>
       <h1 class="dash-title">Developer & Wallet API</h1>
-      <p class="dash-sub">Zero-trust, on-chain anchor settlement oracle endpoints for Stellar wallets, routers, and DeFi protocols.</p>
+      <p class="dash-sub">Zero-trust, on-chain settlement oracle endpoints for Stellar wallets, routers, aggregators, and DeFi protocols.</p>
     </div>
   </div>
 
+  <!-- Section 1 -->
   <section class="docs-section">
     <h2>1. Pre-Flight Anchor Health Check</h2>
     <p>
-      Stellar wallets (Vibrant, LOBSTR, Freighter) can call this endpoint prior to initiating SEP-24 deposits or SEP-31 cross-border remittances.
-      If <code>healthy</code> is false, wallets should warn users or route to an alternate anchor rail.
+      Stellar wallets (Vibrant, LOBSTR, Freighter) query this endpoint prior to executing SEP-24 deposits or SEP-31 cross-border remittances.
+      If <code>healthy</code> is false or grade is below C, wallets should warn users or route to an alternate anchor rail.
     </p>
 
     <div class="endpoint-card">
@@ -63,60 +72,71 @@
         <span class="badge-get">GET</span>
         <span class="endpoint-path">/api/v1/anchors/{domain}/health-check</span>
       </div>
-      <p>Returns the real-time reliability score (0–100), operational grade (A–F), and routing recommendation.</p>
+      
+      <div class="try-bar">
+        <input type="text" id="healthDomainInput" class="try-input" value="cowrie.exchange" placeholder="Enter anchor domain (e.g. cowrie.exchange)">
+        <button class="try-btn" onclick="testHealthCheck()">Run Live Check ⚡</button>
+      </div>
 
-      <pre class="code-block mono">{
-  "domain": "cowrie.exchange",
-  "healthy": true,
-  "score": 94,
-  "grade": "A",
-  "status": "optimal",
-  "factors": {
-    "liveness": 40,
-    "settlement": 40,
-    "volume": 14,
-    "freshestHours": 2.1,
-    "totalPayments": 489,
-    "returnRatePercent": 0.4
-  },
-  "recommendation": "Excellent on-chain settlement health. Safe to route."
-}</pre>
+      <pre class="response-preview mono" id="healthCheckOut">// Click "Run Live Check" above to test against the live ledger</pre>
     </div>
   </section>
 
+  <!-- Section 2 -->
   <section class="docs-section">
     <h2>2. Dynamic SVG Status Badges</h2>
-    <p>Embed auto-updating status badges on anchor documentation, GitHub repositories, or ecosystem directories.</p>
+    <p>Embed auto-updating reliability badges on anchor documentation, GitHub repositories, status pages, or ecosystem directories.</p>
 
     <div class="endpoint-card">
       <div class="endpoint-title">
         <span class="badge-get">GET</span>
         <span class="endpoint-path">/api/v1/badges/{domain}.svg</span>
       </div>
-      <p><strong>Example Markdown:</strong></p>
-      <pre class="code-block mono">[![Landfall Status](https://landfall-ib.vercel.app/api/v1/badges/cowrie.exchange.svg)](https://landfall-ib.vercel.app/dashboard.html)</pre>
+      
+      <div class="try-bar">
+        <input type="text" id="badgeDomainInput" class="try-input" value="cowrie.exchange" placeholder="Enter anchor domain">
+        <button class="try-btn" onclick="updateBadgePreview()">Render Badge 🏷️</button>
+      </div>
+
+      <div class="badge-preview-box">
+        <p style="font-size:12px; color:var(--muted); margin-bottom:8px;">Live Rendered SVG Badge:</p>
+        <img id="badgePreviewImg" src="/api/v1/badges/cowrie.exchange.svg" alt="Live Badge" style="height:28px;">
+      </div>
     </div>
   </section>
 
+  <!-- Section 3 -->
   <section class="docs-section">
-    <h2>3. Cross-Asset Corridors Matrix</h2>
-    <p>Query aggregated cross-border path payment flows across the network.</p>
+    <h2>3. Cross-Asset Corridors Matrix (SEP-38 & Path Payments)</h2>
+    <p>Query aggregated cross-border path payment flows, volume metrics, and source-to-destination asset liquidity pairs.</p>
 
     <div class="endpoint-card">
       <div class="endpoint-title">
         <span class="badge-get">GET</span>
         <span class="endpoint-path">/api/v1/corridors</span>
       </div>
-      <pre class="code-block mono">{
-  "corridors": [
-    {
-      "fromAsset": "USDC:GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN",
-      "toAsset": "NGN:GCC4ESRTCVOUM5MQWUG7FUCTBMBQY7FNRQUR554Z7JNTZ2A2K667K2NQ",
-      "count": 1420,
-      "volume": "48291040.50",
-      "lastSeen": "2026-08-14T07:15:00.000Z"
+      <button class="try-btn" style="margin-top:8px;" onclick="testCorridors()">Fetch Corridors Matrix ⚡</button>
+      <pre class="response-preview mono" id="corridorsOut">// Click above to fetch cross-asset corridors</pre>
+    </div>
+  </section>
+
+  <!-- Section 4: MCP Tool -->
+  <section class="docs-section">
+    <h2>4. AI Agent Integration (Model Context Protocol / MCP)</h2>
+    <p>Empower AI agents (Claude, Cursor, Antigravity) to reason about live Stellar settlement health using the official MCP server.</p>
+
+    <div class="endpoint-card">
+      <p><strong>Add Landfall to your Claude Desktop or Cursor configuration:</strong></p>
+      <pre class="response-preview mono">{
+  "mcpServers": {
+    "landfall": {
+      "command": "node",
+      "args": ["scripts/mcp/server.mjs"],
+      "env": {
+        "LANDFALL_API": "https://landfall-ib.vercel.app"
+      }
     }
-  ]
+  }
 }</pre>
     </div>
   </section>
@@ -128,6 +148,33 @@
     <span>© 2026 Landfall · MIT</span>
   </div>
 </footer>
+
+<script>
+  function testHealthCheck() {
+    const domain = document.getElementById('healthDomainInput').value.trim() || 'cowrie.exchange';
+    const out = document.getElementById('healthCheckOut');
+    out.textContent = 'Querying live ledger...';
+    fetch('/api/v1/anchors/' + encodeURIComponent(domain) + '/health-check')
+      .then(res => res.json())
+      .then(data => { out.textContent = JSON.stringify(data, null, 2); })
+      .catch(err => { out.textContent = 'Error: ' + err.message; });
+  }
+
+  function updateBadgePreview() {
+    const domain = document.getElementById('badgeDomainInput').value.trim() || 'cowrie.exchange';
+    const img = document.getElementById('badgePreviewImg');
+    img.src = '/api/v1/badges/' + encodeURIComponent(domain) + '.svg?t=' + Date.now();
+  }
+
+  function testCorridors() {
+    const out = document.getElementById('corridorsOut');
+    out.textContent = 'Querying corridors...';
+    fetch('/api/v1/corridors')
+      .then(res => res.json())
+      .then(data => { out.textContent = JSON.stringify(data, null, 2); })
+      .catch(err => { out.textContent = 'Error: ' + err.message; });
+  }
+</script>
 
 </body>
 </html>
