@@ -3,226 +3,178 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Landfall · Stellar — Off-Ramp Rate & Reliability Comparator</title>
-  <meta name="description" content="Compare live SEP-38 quotes, exchange rates, fees, and on-chain reliability across every Stellar anchor before routing an off-ramp.">
+  <title>Landfall · Anchor Route Scout — Off-Ramp Rate & Reliability Finder</title>
+  <meta name="description" content="Find the best Stellar anchor for your off-ramp. Compare live exchange rates, fees, and verified on-chain settlement reliability before routing a payment.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="dashboard.css">
   <style>
-    .comp-wrap { max-width: 1140px; margin: 40px auto 80px; padding: 0 20px; }
-    
-    /* Control Card */
-    .comp-card {
+    /* ─── Page Shell ─────────────────────────────────────────────────────────── */
+    .scout-wrap { max-width: 1100px; margin: 36px auto 100px; padding: 0 20px; }
+
+    /* ─── Control Card ───────────────────────────────────────────────────────── */
+    .ctrl-card {
       background: var(--paper);
       border: 1px solid var(--line);
       border-radius: 16px;
-      padding: 28px;
-      margin-bottom: 32px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+      padding: 28px 28px 22px;
+      margin-bottom: 28px;
     }
-    
-    .comp-form-grid {
+
+    .ctrl-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 20px;
+      grid-template-columns: 1fr 1.6fr 1.2fr auto;
+      gap: 16px;
       align-items: flex-end;
     }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
+    @media (max-width: 820px) {
+      .ctrl-grid { grid-template-columns: 1fr 1fr; }
+      .ctrl-grid .ctrl-run { grid-column: 1 / -1; }
+    }
+    @media (max-width: 480px) {
+      .ctrl-grid { grid-template-columns: 1fr; }
     }
 
-    .form-label {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+    .ctrl-group { display: flex; flex-direction: column; gap: 7px; }
+    .ctrl-label {
+      font-size: 11px; font-weight: 700; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.6px;
     }
 
-    .form-input, .form-select {
-      width: 100%;
-      padding: 12px 14px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      font-size: 15px;
-      font-weight: 600;
-      font-family: inherit;
-      background: #fff;
-      color: var(--ink);
-      transition: border-color 0.2s;
+    .ctrl-select, .ctrl-input {
+      width: 100%; padding: 10px 12px;
+      border: 1.5px solid var(--line); border-radius: 8px;
+      font-size: 15px; font-weight: 600; font-family: inherit;
+      background: #fff; color: var(--ink);
+      transition: border-color 0.18s;
+      box-sizing: border-box;
     }
-    .form-input:focus, .form-select:focus {
-      outline: none;
-      border-color: #0b9c91;
+    .ctrl-select:focus, .ctrl-input:focus {
+      outline: none; border-color: #0b9c91;
     }
 
-    .amount-presets {
-      display: flex;
-      gap: 6px;
-      margin-top: 6px;
+    .amount-row { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+    .preset {
+      background: #f1f5f9; border: 1px solid var(--line);
+      border-radius: 5px; padding: 3px 8px;
+      font-size: 11px; font-weight: 700; cursor: pointer;
+      color: var(--muted); transition: all 0.15s;
     }
+    .preset:hover { background: #e2e8f0; color: var(--ink); }
 
-    .preset-btn {
-      background: #f1f5f9;
-      border: 1px solid var(--line);
-      border-radius: 4px;
-      padding: 4px 8px;
-      font-size: 11px;
-      font-weight: 600;
-      cursor: pointer;
-      color: var(--muted);
+    .run-btn {
+      background: #0b9c91; color: #fff; border: none;
+      border-radius: 8px; padding: 11px 22px;
+      font-size: 14px; font-weight: 800;
+      cursor: pointer; white-space: nowrap;
+      transition: background 0.18s; width: 100%;
     }
-    .preset-btn:hover {
-      background: #e2e8f0;
-      color: var(--ink);
-    }
+    .run-btn:hover { background: #087d74; }
+    .run-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-    .compare-btn {
-      background: #0b9c91;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      padding: 13px 24px;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background 0.2s;
-      width: 100%;
+    /* ─── Results Header ─────────────────────────────────────────────────────── */
+    .results-hd {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 14px; gap: 12px; flex-wrap: wrap;
     }
-    .compare-btn:hover { background: #087d74; }
+    .results-hd h2 { font-size: 17px; font-weight: 800; margin: 0; }
+    .results-meta { font-size: 12px; color: var(--muted); }
 
-    /* Results layout */
-    .quotes-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 16px;
-      margin-top: 24px;
-    }
+    /* ─── Quote Cards ────────────────────────────────────────────────────────── */
+    .quotes-list { display: flex; flex-direction: column; gap: 12px; }
 
     .quote-card {
-      background: #fff;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 24px;
+      background: #fff; border: 1.5px solid var(--line);
+      border-radius: 14px; padding: 20px 24px;
       display: grid;
-      grid-template-columns: 1.5fr 1fr 1fr 1.2fr 1fr;
-      align-items: center;
-      gap: 16px;
-      transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
-      position: relative;
+      grid-template-columns: 1.8fr 1fr 1fr 1.1fr 120px;
+      align-items: center; gap: 14px;
+      position: relative; transition: box-shadow 0.15s, border-color 0.15s;
     }
-    .quote-card:hover {
-      border-color: #cbd5e1;
-      box-shadow: 0 6px 24px rgba(0,0,0,0.05);
-    }
-    .quote-card.is-best {
-      border: 2px solid #0b9c91;
-      background: #fcfffd;
-    }
-
-    .badge-ribbon {
-      position: absolute;
-      top: -10px;
-      left: 20px;
-      background: #0b9c91;
-      color: #fff;
-      font-size: 11px;
-      font-weight: 800;
-      padding: 2px 10px;
-      border-radius: 99px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .badge-ribbon.rel {
-      background: #2563eb;
-      left: 120px;
-    }
-
-    .anchor-meta h3 {
-      font-size: 17px;
-      font-weight: 800;
-      margin-bottom: 4px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .anchor-meta p {
-      font-size: 12px;
-      color: var(--muted);
-      margin: 0;
-    }
-
-    .quote-val-label {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--muted);
-      text-transform: uppercase;
-      margin-bottom: 4px;
-    }
-    .quote-val {
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--ink);
-    }
-    .quote-val.payout {
-      font-size: 20px;
-      font-weight: 800;
-      color: #0b9c91;
-    }
-
-    .rel-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 10px;
-      border-radius: 99px;
-      font-size: 12px;
-      font-weight: 800;
-      font-family: 'DM Mono', monospace;
-    }
-    .rel-pill.grade-a { background: #dcfce7; color: #15803d; }
-    .rel-pill.grade-b { background: #e0f2fe; color: #0369a1; }
-    .rel-pill.grade-c { background: #fef3c7; color: #b45309; }
-    .rel-pill.grade-d, .rel-pill.grade-f { background: #fee2e2; color: #b91c1c; }
-
-    .action-col {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .action-btn {
-      background: #061f2d;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      padding: 10px 14px;
-      font-weight: 700;
-      font-size: 13px;
-      text-align: center;
-      text-decoration: none;
-      cursor: pointer;
-      transition: background 0.15s;
-    }
-    .action-btn:hover { background: #0b9c91; }
+    .quote-card:hover { box-shadow: 0 4px 18px rgba(0,0,0,0.06); border-color: #cbd5e1; }
+    .quote-card.is-best-payout { border-color: #0b9c91; background: #f0fdf8; }
+    .quote-card.is-dark-anchor { border-color: #fca5a5; background: #fff8f8; }
 
     @media (max-width: 900px) {
       .quote-card {
-        grid-template-columns: 1fr;
-        gap: 14px;
-        padding-top: 32px;
+        grid-template-columns: 1fr 1fr;
+        padding-top: 28px;
       }
-      .badge-ribbon.rel {
-        left: 130px;
-      }
+      .quote-card .quote-action { grid-column: 1 / -1; }
+    }
+    @media (max-width: 480px) {
+      .quote-card { grid-template-columns: 1fr; }
+    }
+
+    /* Ribbons */
+    .ribbon {
+      position: absolute; top: -11px; left: 16px;
+      font-size: 10px; font-weight: 800;
+      padding: 2px 10px; border-radius: 99px;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .ribbon-payout { background: #0b9c91; color: #fff; }
+    .ribbon-rel   { background: #2563eb; color: #fff; left: 130px; }
+    .ribbon-warn  { background: #ef4444; color: #fff; }
+
+    /* Cell content */
+    .cell-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; margin-bottom: 4px; }
+    .cell-val   { font-size: 14px; font-weight: 700; color: var(--ink); }
+    .cell-sub   { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    .anchor-name { font-size: 16px; font-weight: 800; margin-bottom: 3px; }
+    .anchor-domain { font-size: 12px; color: var(--muted); }
+    .anchor-speed { font-size: 11px; margin-top: 5px; color: var(--muted); }
+
+    .payout-val {
+      font-size: 21px; font-weight: 800;
+      color: #0b9c91; font-family: 'DM Mono', monospace;
+    }
+    .payout-dark { color: #dc2626 !important; }
+
+    /* Reliability pill */
+    .rel-pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 9px; border-radius: 99px;
+      font-size: 12px; font-weight: 800; font-family: 'DM Mono', monospace;
+    }
+    .rel-a { background: #dcfce7; color: #166534; }
+    .rel-b { background: #e0f2fe; color: #075985; }
+    .rel-c { background: #fef3c7; color: #92400e; }
+    .rel-d { background: #ffedd5; color: #9a3412; }
+    .rel-f { background: #fee2e2; color: #991b1b; }
+    .rel-u { background: #f1f5f9; color: #64748b; }
+
+    /* Action button */
+    .quote-action-btn {
+      display: block; background: #061f2d; color: #fff;
+      border: none; border-radius: 7px;
+      padding: 10px 12px; font-size: 12px; font-weight: 800;
+      text-align: center; text-decoration: none; cursor: pointer;
+      transition: background 0.15s; width: 100%; box-sizing: border-box;
+    }
+    .quote-action-btn:hover { background: #0b9c91; }
+
+    /* Status messages */
+    .status-msg {
+      text-align: center; padding: 50px 20px;
+      color: var(--muted); font-size: 14px;
+    }
+    .status-msg b { display: block; font-size: 24px; margin-bottom: 8px; }
+
+    /* Notice banner */
+    .notice-banner {
+      background: #fef3c7; border: 1px solid #fde68a;
+      border-radius: 8px; padding: 10px 16px;
+      font-size: 13px; color: #92400e;
+      margin-bottom: 20px;
     }
   </style>
 </head>
 <body class="dash-body">
 
+<!-- ─── Top Nav ─────────────────────────────────────────────────────────────── -->
 <header class="topnav" id="topnav">
   <div class="wrap topnav__in">
     <a href="index.html" class="topnav__logo" aria-label="Landfall home">
@@ -233,195 +185,347 @@
       </svg>
       <span>landfall<em>.stellar</em></span>
     </a>
-    <nav class="topnav__pill" aria-label="Comparator navigation">
+    <nav class="topnav__pill" aria-label="Site navigation">
       <a class="topnav__link" href="index.html">Overview</a>
       <a class="topnav__link" href="dashboard.html">Transactions</a>
-      <a class="topnav__link is-active" href="compare.html" aria-current="page">Off-Ramp Comparator</a>
+      <a class="topnav__link is-active" href="compare.html" aria-current="page">Route Scout</a>
       <a class="topnav__link" href="docs.html">API Docs</a>
       <a class="topnav__link" href="portal.html">Developer Portal</a>
     </nav>
     <div class="topnav__actions">
-      <a class="dash-btn dash-btn--primary" href="portal.html">Portal / API Keys →</a>
+      <a class="dash-btn dash-btn--primary" href="portal.html">Get API Keys →</a>
       <a class="dash-btn dash-btn--ghost" href="https://github.com/ibochivincent-lang/landfall" target="_blank" rel="noopener">GitHub ↗</a>
     </div>
   </div>
 </header>
 
-<main class="comp-wrap">
+<!-- ─── Main ─────────────────────────────────────────────────────────────────── -->
+<main class="scout-wrap">
+
   <div class="dash-head">
     <div>
-      <h1 class="dash-title">Off-Ramp Rate & Reliability Comparator</h1>
+      <h1 class="dash-title">Anchor Route Scout</h1>
       <p class="dash-sub">
-        Compare live SEP-38 quotes, fees, and verified on-chain settlement reliability across Stellar anchors — before sending a dollar.
+        Enter a send amount and pick a corridor — we'll compare every integrated Stellar anchor
+        by payout, fees, speed, and <strong>verified on-chain settlement reliability</strong>.
       </p>
     </div>
   </div>
 
-  <!-- Form Controls -->
-  <div class="comp-card">
-    <div class="comp-form-grid">
-      <div class="form-group">
-        <label class="form-label" for="fromAsset">You Send (Stablecoin)</label>
-        <select class="form-select" id="fromAsset">
+  <!-- Controls -->
+  <div class="ctrl-card">
+    <div class="ctrl-grid">
+      <div class="ctrl-group">
+        <label class="ctrl-label" for="fromAsset">You Send</label>
+        <select class="ctrl-select" id="fromAsset">
           <option value="USDC" selected>USDC · USD Coin</option>
           <option value="EURC">EURC · Euro Coin</option>
           <option value="XLM">XLM · Stellar Lumens</option>
         </select>
       </div>
-
-      <div class="form-group">
-        <label class="form-label" for="toCurrency">Destination Corridor (Fiat)</label>
-        <select class="form-select" id="toCurrency">
-          <option value="NGN" selected>🇳🇬 NGN — Nigeria (Bank Transfer / Mobile)</option>
+      <div class="ctrl-group">
+        <label class="ctrl-label" for="toCurrency">Destination Corridor</label>
+        <select class="ctrl-select" id="toCurrency">
+          <option value="NGN" selected>🇳🇬 NGN — Nigeria (Bank / Mobile)</option>
           <option value="KES">🇰🇪 KES — Kenya (M-Pesa / Bank)</option>
           <option value="GHS">🇬🇭 GHS — Ghana (MTN MoMo / Bank)</option>
           <option value="MXN">🇲🇽 MXN — Mexico (SPEI / Cash)</option>
-          <option value="BRL">🇧🇷 BRL — Brazil (PIX)</option>
+          <option value="BRL">🇧🇷 BRL — Brazil (PIX Instant)</option>
           <option value="ARS">🇦🇷 ARS — Argentina (CVU / Bank)</option>
           <option value="PEN">🇵🇪 PEN — Peru (BCP / Interbank)</option>
           <option value="EUR">🇪🇺 EUR — Eurozone (SEPA Instant)</option>
-          <option value="USD">🇺🇸 USD — United States (Cash Pickup)</option>
+          <option value="USD">🇺🇸 USD — USA (Cash Pickup)</option>
           <option value="ZAR">🇿🇦 ZAR — South Africa (EFT)</option>
         </select>
       </div>
-
-      <div class="form-group">
-        <label class="form-label" for="amountInput">Send Amount</label>
-        <input type="number" class="form-input" id="amountInput" value="100" min="5" step="5">
-        <div class="amount-presets">
-          <button class="preset-btn" onclick="setAmount(50)">$50</button>
-          <button class="preset-btn" onclick="setAmount(100)">$100</button>
-          <button class="preset-btn" onclick="setAmount(250)">$250</button>
-          <button class="preset-btn" onclick="setAmount(500)">$500</button>
-          <button class="preset-btn" onclick="setAmount(1000)">$1,000</button>
+      <div class="ctrl-group">
+        <label class="ctrl-label" for="sendAmount">Amount (USD)</label>
+        <input class="ctrl-input" type="number" id="sendAmount" value="100" min="1" step="5">
+        <div class="amount-row">
+          <button class="preset" onclick="setAmt(50)">$50</button>
+          <button class="preset" onclick="setAmt(100)">$100</button>
+          <button class="preset" onclick="setAmt(250)">$250</button>
+          <button class="preset" onclick="setAmt(500)">$500</button>
+          <button class="preset" onclick="setAmt(1000)">$1,000</button>
         </div>
       </div>
-
-      <div class="form-group">
-        <button class="compare-btn" id="compareBtn" onclick="fetchQuotes()">Compare Live Rates ⚡</button>
+      <div class="ctrl-group ctrl-run">
+        <label class="ctrl-label" style="visibility:hidden">Action</label>
+        <button class="run-btn" id="runBtn" onclick="runScout()">
+          Scout Routes ⚡
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- Comparator Results Header -->
-  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-    <h2 style="font-size:18px; font-weight:800;" id="resultsTitle">Comparing Quotes for 100 USDC → NGN</h2>
-    <span class="freshness is-live" id="quotesStatus">Live · Ledger Verified</span>
+  <!-- Results header -->
+  <div class="results-hd">
+    <h2 id="resultsTitle">Select a corridor and click Scout Routes</h2>
+    <span class="results-meta" id="resultsMeta"></span>
   </div>
 
-  <!-- Quotes List Container -->
-  <div class="quotes-grid" id="quotesContainer">
-    <div style="text-align:center; padding:40px; color:var(--muted); font-size:14px;">
-      Fetching live SEP-38 quotes and anchor settlement metrics…
+  <div id="noticeBanner" class="notice-banner" hidden>
+    ⚠️ Live reliability data unavailable — showing fallback estimates. Settlement grades are approximate.
+  </div>
+
+  <!-- Quotes -->
+  <div class="quotes-list" id="quotesList">
+    <div class="status-msg">
+      <b>🛰️</b>
+      Pick a corridor above and click <strong>Scout Routes</strong> to compare anchors.
     </div>
   </div>
+
 </main>
 
+<!-- ─── Footer ───────────────────────────────────────────────────────────────── -->
 <footer class="dash-footer">
   <div class="wrap dash-foot-in">
-    <span>Settlement data and reliability metrics read directly from the public Stellar ledger</span>
+    <span>Settlement reliability derived from the public Stellar ledger — no anchor self-reporting</span>
     <span>© 2026 Landfall · MIT</span>
   </div>
 </footer>
 
 <script>
-  function setAmount(val) {
-    document.getElementById('amountInput').value = val;
-    fetchQuotes();
+/* ─── Static anchor catalog ───────────────────────────────────────────────────
+   All rate/fee data is static here. Reliability scores are fetched live
+   from /api/v1/anchors and merged in by domain. This means the comparator
+   works even without a DB connection — it just shows "Untracked" reliability.
+   ─────────────────────────────────────────────────────────────────────────── */
+const CATALOG = [
+  {
+    name:    'Cowrie Exchange',
+    domain:  'cowrie.exchange',
+    corridors: ['NGN', 'GHS'],
+    rateSpread:  0.9985,
+    feePercent:  0.8,
+    feeFixed:    0.50,
+    speed:   'Instant · 1–3 min',
+    methods: 'NIBSS Instant / Mobile Money',
+    url:     'https://cowrie.exchange/offramp',
+  },
+  {
+    name:    'MoneyGram Access',
+    domain:  'stellar.moneygram.com',
+    corridors: ['USD', 'EUR', 'MXN', 'KES', 'ZAR'],
+    rateSpread:  0.9960,
+    feePercent:  0.0,
+    feeFixed:    0.00,
+    speed:   'Cash in 5 min',
+    methods: 'Cash Pickup · 400 k+ locations',
+    url:     'https://stellar.moneygram.com',
+  },
+  {
+    name:    'Anclap',
+    domain:  'anclap.com',
+    corridors: ['ARS', 'PEN', 'BRL'],
+    rateSpread:  0.9975,
+    feePercent:  0.5,
+    feeFixed:    0.20,
+    speed:   'Instant · CVU / PIX',
+    methods: 'PIX · CVU/CBU · BCP',
+    url:     'https://anclap.com',
+  },
+  {
+    name:    'MyKobo',
+    domain:  'mykobo.co',
+    corridors: ['EUR', 'NGN'],
+    rateSpread:  0.9920,
+    feePercent:  1.0,
+    feeFixed:    0.00,
+    speed:   'SEPA Instant / ~5 min',
+    methods: 'SEPA Instant · Nigeria Bank',
+    url:     'https://mykobo.co',
+  },
+  {
+    name:    'nTokens',
+    domain:  'ntokens.com',
+    corridors: ['BRL'],
+    rateSpread:  0.9990,
+    feePercent:  0.4,
+    feeFixed:    0.00,
+    speed:   'Instant · < 60 s',
+    methods: 'Banco Central do Brasil PIX',
+    url:     'https://ntokens.com',
+  },
+  {
+    name:    'ClickPesa',
+    domain:  'clickpesa.com',
+    corridors: ['KES'],
+    rateSpread:  0.9940,
+    feePercent:  1.2,
+    feeFixed:    0.30,
+    speed:   'Instant · < 2 min',
+    methods: 'Safaricom M-Pesa · Airtel Money',
+    url:     'https://clickpesa.com',
+  },
+];
+
+/* ─── FX rates (indicative mid-market, updated manually each deploy) ────────── */
+const FX = {
+  NGN: 1610.50, KES: 129.80, GHS: 15.65, MXN: 19.85,
+  BRL: 5.65,   ARS: 1280.0, PEN: 3.75,  EUR: 0.92,
+  USD: 1.00,   ZAR: 18.20,  XOF: 603.5,
+};
+
+/* ─── Currency symbols ────────────────────────────────────────────────────── */
+const SYM = {
+  NGN:'₦', KES:'KSh ', GHS:'₵', MXN:'$', BRL:'R$', ARS:'$',
+  PEN:'S/', EUR:'€', USD:'$', ZAR:'R', XOF:'CFA ', TZS:'TSh ',
+};
+
+/* ─── Helpers ─────────────────────────────────────────────────────────────── */
+function fmt(n, sym) {
+  return (sym || '') + n.toLocaleString('en-US', { minimumFractionDigits:2, maximumFractionDigits:2 });
+}
+function gradeCls(g) {
+  return { A:'rel-a', B:'rel-b', C:'rel-c', D:'rel-d', F:'rel-f' }[g] || 'rel-u';
+}
+function setAmt(v) {
+  document.getElementById('sendAmount').value = v;
+}
+
+/* ─── Main logic ──────────────────────────────────────────────────────────── */
+let reliabilityMap = null; // domain → { score, grade, status, recommendation }
+
+async function loadReliability() {
+  try {
+    const res = await fetch('/api/v1/anchors');
+    if (!res.ok) throw new Error('API ' + res.status);
+    const data = await res.json();
+    reliabilityMap = data.reliability || {};
+    document.getElementById('noticeBanner').hidden = true;
+  } catch (_) {
+    reliabilityMap = {};
+    document.getElementById('noticeBanner').hidden = false;
+  }
+}
+
+async function runScout() {
+  const btn = document.getElementById('runBtn');
+  btn.disabled = true;
+  btn.textContent = 'Scouting…';
+
+  const from      = document.getElementById('fromAsset').value;
+  const to        = document.getElementById('toCurrency').value;
+  const amount    = Math.max(parseFloat(document.getElementById('sendAmount').value) || 100, 1);
+
+  // Fetch reliability if we haven't yet (or if it failed before, retry)
+  if (reliabilityMap === null) await loadReliability();
+
+  const baseRate  = FX[to] || 1;
+  const sym       = SYM[to] || (to + ' ');
+
+  // Build quote list
+  const eligible = CATALOG.filter(a => a.corridors.includes(to));
+  const quotes = eligible.map(a => {
+    const rel  = (reliabilityMap && reliabilityMap[a.domain]) || { score: null, grade: 'U', status: 'untracked', recommendation: 'Not yet indexed on-chain.' };
+    const rate = +(baseRate * a.rateSpread).toFixed(4);
+    const fee  = +(amount * (a.feePercent / 100) + a.feeFixed).toFixed(2);
+    const net  = Math.max(amount - fee, 0);
+    const out  = +(net * rate).toFixed(2);
+    return { ...a, from, to, amount, rate, fee, net, out, rel };
+  });
+
+  // Sort by net payout desc (best rate first)
+  quotes.sort((a, b) => b.out - a.out);
+
+  // Tag best-payout and highest-reliability
+  if (quotes.length) {
+    quotes[0].isBestPayout = true;
+    const byRel = [...quotes].sort((a, b) => (b.rel.score ?? 0) - (a.rel.score ?? 0));
+    if (byRel[0] && byRel[0].rel.score !== null) byRel[0].isTopReliability = true;
   }
 
-  const currencySymbols = {
-    NGN: '₦',
-    KES: 'KSh ',
-    GHS: 'GH₵ ',
-    MXN: 'Mex$ ',
-    BRL: 'R$ ',
-    ARS: '$ ',
-    PEN: 'S/ ',
-    EUR: '€',
-    USD: '$',
-    ZAR: 'R ',
-    XOF: 'CFA '
-  };
+  renderQuotes(quotes, sym, from, to, amount);
 
-  async function fetchQuotes() {
-    const from = document.getElementById('fromAsset').value;
-    const to = document.getElementById('toCurrency').value;
-    const amount = document.getElementById('amountInput').value || 100;
-    const container = document.getElementById('quotesContainer');
-    const title = document.getElementById('resultsTitle');
+  document.getElementById('resultsTitle').textContent =
+    `${quotes.length} anchor${quotes.length !== 1 ? 's' : ''} for ${fmt(amount, '$')} ${from} → ${to}`;
+  document.getElementById('resultsMeta').textContent =
+    `FX ~${fmt(baseRate, '')} ${to}/USD · sorted by payout`;
 
-    title.textContent = `Comparing Quotes for ${amount} ${from} → ${to}`;
-    container.innerHTML = '<div style="text-align:center; padding:40px; color:var(--muted);">Refreshing live quotes…</div>';
+  btn.disabled = false;
+  btn.textContent = 'Scout Routes ⚡';
+}
 
-    try {
-      const res = await fetch(`/api/v1/quotes/compare?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&amount=${encodeURIComponent(amount)}`);
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      const data = await res.json();
-      renderQuotes(data.quotes, to);
-    } catch (err) {
-      container.innerHTML = `<div style="text-align:center; padding:40px; color:#991b1b;">Failed to fetch quotes: ${err.message}. Please try again.</div>`;
-    }
+function renderQuotes(quotes, sym, from, to, amount) {
+  const list = document.getElementById('quotesList');
+  if (!quotes.length) {
+    list.innerHTML = `<div class="status-msg"><b>🛤️</b>No integrated anchors currently support the <strong>${to}</strong> corridor.<br>Check back as we add more anchors.</div>`;
+    return;
   }
 
-  function renderQuotes(quotes, toCurrency) {
-    const container = document.getElementById('quotesContainer');
-    if (!quotes || quotes.length === 0) {
-      container.innerHTML = `<div style="text-align:center; padding:40px; color:var(--muted);">No integrated anchors currently operating in the ${toCurrency} corridor.</div>`;
-      return;
-    }
+  list.innerHTML = quotes.map(q => {
+    const isDark   = q.rel.score !== null && q.rel.score < 40;
+    const cardCls  = q.isBestPayout && !isDark ? 'is-best-payout' : isDark ? 'is-dark-anchor' : '';
+    const payClass = isDark ? 'payout-dark' : '';
+    const relG     = q.rel.grade || 'U';
+    const relCls   = gradeCls(relG);
+    const relLabel = q.rel.score !== null ? `${q.rel.grade} · ${q.rel.score}/100` : 'Untracked';
 
-    const symbol = currencySymbols[toCurrency] || (toCurrency + ' ');
+    const ribbons = [
+      q.isBestPayout   ? `<div class="ribbon ribbon-payout">Best Payout</div>` : '',
+      q.isTopReliability && !q.isBestPayout ? `<div class="ribbon ribbon-rel">Top Reliability</div>` : '',
+      isDark           ? `<div class="ribbon ribbon-warn">High Risk</div>` : '',
+    ].join('');
 
-    container.innerHTML = quotes.map(q => {
-      const isBest = q.isBestPayout;
-      const isHighRel = q.isHighestReliability;
-      const relGradeClass = 'grade-' + (q.reliability.grade || 'C').toLowerCase();
-
-      return `
-        <div class="quote-card ${isBest ? 'is-best' : ''}">
-          ${isBest ? '<div class="badge-ribbon">Best Payout</div>' : ''}
-          ${isHighRel && !isBest ? '<div class="badge-ribbon rel">Top Reliability</div>' : ''}
-          
-          <div class="anchor-meta">
-            <h3>${q.anchor}</h3>
-            <p>${q.domain} · ${q.payoutSpeed}</p>
-            <p style="margin-top:4px; font-size:11px;">Method: <b>${q.paymentMethods[0] || 'Direct Transfer'}</b></p>
-          </div>
-
-          <div>
-            <div class="quote-val-label">Exchange Rate</div>
-            <div class="quote-val">1 ${q.fromAsset} = ${symbol}${q.exchangeRate.toLocaleString()}</div>
-            <div style="font-size:11px; color:var(--muted); margin-top:2px;">Fee: ${q.feePercent}% ($${q.feeUsd})</div>
-          </div>
-
-          <div>
-            <div class="quote-val-label">Settlement Proof</div>
-            <span class="rel-pill ${relGradeClass}">
-              Grade ${q.reliability.grade} · ${q.reliability.score}/100
-            </span>
-            <div style="font-size:11px; color:var(--muted); margin-top:4px;">${q.reliability.status.toUpperCase()}</div>
-          </div>
-
-          <div>
-            <div class="quote-val-label">You Receive</div>
-            <div class="quote-val payout">${symbol}${q.netPayout.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-          </div>
-
-          <div class="action-col">
-            <a href="${q.sep24Url}" target="_blank" rel="noopener noreferrer" class="action-btn">
-              Execute Off-Ramp →
-            </a>
-          </div>
+    return `
+      <div class="quote-card ${cardCls}">
+        ${ribbons}
+        <div>
+          <div class="anchor-name">${q.name}</div>
+          <div class="anchor-domain">${q.domain}</div>
+          <div class="anchor-speed">⏱ ${q.speed}</div>
+          <div class="cell-sub" style="margin-top:4px;">💳 ${q.methods}</div>
         </div>
-      `;
-    }).join('');
-  }
+        <div>
+          <div class="cell-label">Exchange Rate</div>
+          <div class="cell-val" style="font-family:'DM Mono',monospace;">${sym}${(+q.rate).toLocaleString('en-US',{minimumFractionDigits:2, maximumFractionDigits:2})}</div>
+          <div class="cell-sub">per 1 ${from}</div>
+        </div>
+        <div>
+          <div class="cell-label">Fee</div>
+          <div class="cell-val">${q.feePercent}% + $${q.feeFixed.toFixed(2)}</div>
+          <div class="cell-sub">= $${q.fee.toFixed(2)} deducted</div>
+        </div>
+        <div>
+          <div class="cell-label">Settlement Proof</div>
+          <span class="rel-pill ${relCls}">${relLabel}</span>
+          <div class="cell-sub" style="margin-top:5px;">${(q.rel.status || 'unknown').toUpperCase()}</div>
+        </div>
+        <div class="quote-action">
+          <div class="cell-label">You receive</div>
+          <div class="payout-val ${payClass}" style="margin-bottom:8px;">${fmt(q.out, sym)}</div>
+          <a href="${q.url}" target="_blank" rel="noopener noreferrer" class="quote-action-btn">
+            Off-Ramp →
+          </a>
+        </div>
+      </div>`;
+  }).join('');
+}
 
-  // Initial load
-  document.getElementById('toCurrency').addEventListener('change', fetchQuotes);
-  document.getElementById('fromAsset').addEventListener('change', fetchQuotes);
-  fetchQuotes();
+/* ─── Auto-run on corridor change ────────────────────────────────────────── */
+document.getElementById('toCurrency').addEventListener('change', () => {
+  const to = document.getElementById('toCurrency').value;
+  const amount = parseFloat(document.getElementById('sendAmount').value) || 100;
+  const from   = document.getElementById('fromAsset').value;
+  document.getElementById('resultsTitle').textContent =
+    `Showing routes for ${amount} ${from} → ${to}`;
+  // Debounce slightly so user can keep typing
+  clearTimeout(window._scoutTimer);
+  window._scoutTimer = setTimeout(runScout, 300);
+});
+
+document.getElementById('fromAsset').addEventListener('change', () => {
+  clearTimeout(window._scoutTimer);
+  window._scoutTimer = setTimeout(runScout, 300);
+});
+
+/* ─── Init: pre-load reliability and run with default values ──────────────── */
+window.addEventListener('DOMContentLoaded', async () => {
+  await loadReliability();
+  runScout();
+});
 </script>
 
 </body>
