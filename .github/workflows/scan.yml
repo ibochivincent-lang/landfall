@@ -77,7 +77,32 @@ jobs:
       - name: Convert scan → API JSON
         run: node scripts/scan-to-api.mjs
 
-      # ── 6. Commit updated JSON back to main ───────────────────────────────────
+      # ── 6. Dispatch dark-transition webhooks ───────────────────────────────────
+      # No-ops cleanly (exit 0, clear log line) until DATABASE_URL is set and
+      # there are two finished scans to diff — see scripts/dispatch-webhooks.mjs.
+      - name: Dispatch dark-transition webhooks
+        continue-on-error: true   # a delivery failure must not block the JSON commit
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: node scripts/dispatch-webhooks.mjs
+
+      # ── 7. Publish scan digest to the Soroban oracle ───────────────────────────
+      # No-ops cleanly until ORACLE_CONTRACT_ID/ORACLE_ADMIN_SECRET are set —
+      # see scripts/publish-oracle.mjs and docs/gaps.md.
+      - name: Publish scan digest to oracle
+        continue-on-error: true
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          ORACLE_CONTRACT_ID: ${{ secrets.ORACLE_CONTRACT_ID }}
+          ORACLE_ADMIN_SECRET: ${{ secrets.ORACLE_ADMIN_SECRET }}
+          SOROBAN_RPC_URL: ${{ secrets.SOROBAN_RPC_URL }}
+        run: |
+          if [ -n "$ORACLE_CONTRACT_ID" ] && [ -n "$ORACLE_ADMIN_SECRET" ]; then
+            command -v stellar >/dev/null 2>&1 || cargo install --locked stellar-cli
+          fi
+          node scripts/publish-oracle.mjs
+
+      # ── 8. Commit updated JSON back to main ───────────────────────────────────
       - name: Commit and push updated API snapshot
         run: |
           git config user.name  "github-actions[bot]"

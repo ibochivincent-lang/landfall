@@ -12,6 +12,7 @@
 import { readdir, readFile, writeFile } from 'node:fs/promises';
 import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { toAccountSummary } from './_lib/classify.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT      = resolve(__dirname, '..');
@@ -49,26 +50,7 @@ const staleHours  = parseFloat(
 //   account, domain, name, state, inbound (count), outbound (count),
 //   returns (count), returnRate (nullable), hoursSinceActivity (nullable)
 
-function classify(m) {
-  if (!m.hasLifetimeActivity)           return 'no_activity';
-  const h = m.hoursSinceLastActivity ?? Infinity;
-  if (h <= 72)                          return 'live';
-  if (h <= 720)                         return 'slow';
-  return 'dark';
-}
-
-const accounts = (raw.metrics ?? []).map(m => ({
-  account:           m.account,
-  domain:            m.domain,
-  name:              m.name ?? m.domain,
-  state:             classify(m),
-  inbound:           m.inbound?.count  ?? 0,
-  outbound:          m.outbound?.count ?? 0,
-  returns:           m.refundCount     ?? 0,
-  returnRate:        m.refundRate      ?? null,
-  hoursSinceActivity: m.hoursSinceLastActivity ?? null,
-  topCounterpartyShare: m.topCounterpartyShare ?? null,
-}));
+const accounts = (raw.metrics ?? []).map(toAccountSummary);
 
 // ── 4. Build the API response body ────────────────────────────────────────────
 const body = {

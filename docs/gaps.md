@@ -1,7 +1,8 @@
 # What Landfall doesn't have yet
 
-An honest inventory as of 12 August 2026, amended 13 August. Ordered by how
-much each gap could hurt, not by how hard it is to fix.
+An honest inventory as of 12 August 2026, amended 13 August, amended again
+14 August. Ordered by how much each gap could hurt, not by how hard it is to
+fix.
 
 Closed items are struck through rather than deleted. A gap list that only ever
 shrinks silently is a changelog wearing a disguise, and the point of this page
@@ -32,6 +33,27 @@ rule that we hold ourselves to what we measure in others:
 
 ---
 
+## Closed since this list was written — 14 August 2026
+
+The Developer Portal commit (multi-user auth, API keys, webhooks, password
+reset) landed the same day this list still said "no accounts, no auth" —
+which made this list wrong the moment it shipped. Fixed here, along with
+what a security/readiness pass on that commit found.
+
+| Was | Now |
+|---|---|
+| "Log in" — still no accounts, no auth | Portal auth shipped: register/login/session cookies, scrypt-hashed passwords. |
+| `forgot-password` returned the raw reset token in the API response | **This was a live account-takeover bug** — anyone who knew a victim's email could read the token off the response and reset their password with no further interaction. Fixed: the token is now only ever emailed (via Resend), never returned in the response, and the found/not-found responses are worded identically. |
+| No rate limiting on any auth endpoint | A Postgres-backed counter now throttles login, register, forgot-password, reset-password, and admin login (10/min/IP each). |
+| Password policy was a 6-character minimum only | Raised to 10 characters plus a common-password check. |
+| Webhook registration only string-checked for `https://` | Now resolves the target hostname and blocks private/loopback/link-local/cloud-metadata IP ranges, re-checked again immediately before every delivery (registration-time-only checking leaves a DNS-rebinding gap). |
+| "Webhooks when an anchor goes dark" — still none, nothing consumes the `dark` event | `scripts/dispatch-webhooks.mjs` runs after every hourly scan, diffs liveness state, and HMAC-signs + POSTs to registered webhooks on transition into `dark`. |
+| API keys were generated but never checked anywhere | Now enforced as a rate-limit tier: a valid key raises the public-read limit to that key's configured `rate_limit_per_min`; anonymous requests get a conservative default. **Reads are still fully public either way** — a key changes the rate, not access. This is not the metered/billed tier described below; that's still not built. |
+| Contact form — still submits to nothing | `POST /api/v1/contact` now sends via Resend and records every submission in `contact_messages`, so a failed send is visible instead of a fake "sent!" toast. |
+| "the indexer does not publish to it — so it is a deployed contract, not a working oracle" | `scripts/publish-oracle.mjs` runs after every scan (once `ORACLE_CONTRACT_ID`/`ORACLE_ADMIN_SECRET` are configured) and calls `publish(digest)`. Still **not on mainnet**. |
+
+---
+
 ## 0. The one that mattered most: the site promising things that don't exist
 
 The landing page advertised a product that was not there. Most of it is now
@@ -39,14 +61,14 @@ either real or labelled; what remains is listed as **still aspirational**.
 
 | Claim on the site | Reality, 13 August |
 |---|---|
-| "Get API access" | The API exists and is documented. There is no access control, so "get access" still overstates it. |
+| "Get API access" | The API exists and is documented. There is now a real key-issuing Developer Portal (see 14 August table above) — but a key only buys a higher rate limit, it doesn't gate access, so "get access" still overstates it a little. |
 | Pricing: $99/mo, 250k calls | **Still invented.** Nothing to bill for, no billing, no buyer has seen the number. |
 | `@landfall/sdk` with `pickAnchor()` | **Still not written**, not on npm. Labelled planned. |
-| "Log in" | **Still no accounts, no auth.** The button opens a waitlist. |
-| "Webhooks when an anchor goes dark" | **Still none.** The contract emits a `dark` event; nothing consumes it. |
+| ~~"Log in"~~ | ~~Still no accounts, no auth.~~ Real auth shipped 14 August — see the table above. |
+| ~~"Webhooks when an anchor goes dark"~~ | ~~Still none.~~ Dispatcher shipped 14 August — see the table above. |
 | "MCP server for agents" | **Still not built.** |
-| "1,000 API calls / month" free tier | There are calls to make now, but no metering and no tier. |
-| Contact form | **Still submits to nothing.** |
+| "1,000 API calls / month" free tier | There are calls to make now, and `rate_limit_per_min` is now enforced per key as of 14 August — but that's an anti-abuse limit, not a metered/billed tier. Still no metering, still no tier. |
+| ~~Contact form~~ | ~~Still submits to nothing.~~ Sends via Resend as of 14 August — see the table above. |
 
 **This is the exact flaw we identified in stellar-intel** — a landing page
 claiming 70 anchors tracked while the code probed 7. We criticised it, then
@@ -76,9 +98,9 @@ whole problem. The alternative is deleting those sections until they're real.
 - ~~**No API**~~ — shipped. **No SDK, no MCP server.**
 - ~~**The Soroban oracle has never been deployed.**~~ Live on **testnet** at
   `CA2IYHFKTKSJWR5IICY6HFD55BJEGE7OMKISWMLMPFSHLESZYO3VICAG` as of
-  13 August 2026. Still **not on mainnet**, and **the indexer does not publish
-  to it** — so it is a deployed contract, not a working oracle. The gap moved;
-  it did not close.
+  13 August 2026. ~~The indexer does not publish to it.~~ `scripts/publish-oracle.mjs`
+  now does, once configured — see the 14 August table above. Still **not on
+  mainnet**.
 - **No attestation layer**, so no slippage metric. The most valuable number the
   project could produce does not exist yet.
 - **No dispute portal**, despite the code of conduct and security policy both

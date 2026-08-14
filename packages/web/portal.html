@@ -84,7 +84,7 @@
       
       <label class="field">
         <span>Password (min 6 chars)</span>
-        <input type="password" id="regPassword" required minlength="6" placeholder="••••••••" autocomplete="new-password">
+        <input type="password" id="regPassword" required minlength="10" placeholder="••••••••••" autocomplete="new-password">
       </label>
       
       <button type="submit" class="dash-btn dash-btn--primary auth-btn">Register & Get API Key →</button>
@@ -93,24 +93,25 @@
     <!-- Forgot Password Form -->
     <form id="forgotForm" class="auth-form" hidden>
       <h2>Reset Password</h2>
-      <p class="auth-sub">Enter your email address to receive a secure password reset token.</p>
-      
+      <p class="auth-sub">Enter your email address and we'll send a reset code to your inbox.</p>
+
       <label class="field">
         <span>Account Email</span>
         <input type="email" id="forgotEmail" required placeholder="name@domain.com">
       </label>
-      
-      <button type="submit" class="dash-btn dash-btn--primary auth-btn">Generate Reset Token →</button>
+
+      <button type="submit" class="dash-btn dash-btn--primary auth-btn">Email Me a Reset Code →</button>
 
       <div id="resetStep2" class="reset-step2" hidden>
         <hr class="divider">
+        <p class="auth-sub">Check your inbox for the code, then paste it below.</p>
         <label class="field">
-          <span>Reset Token</span>
-          <input type="text" id="resetToken" required placeholder="Paste reset code">
+          <span>Reset Code</span>
+          <input type="text" id="resetToken" required placeholder="Paste the code from your email">
         </label>
         <label class="field">
           <span>New Password</span>
-          <input type="password" id="newPassword" required minlength="6" placeholder="••••••••">
+          <input type="password" id="newPassword" required minlength="10" placeholder="••••••••••">
         </label>
         <button type="button" class="dash-btn dash-btn--primary auth-btn" id="confirmResetBtn">Update Password</button>
       </div>

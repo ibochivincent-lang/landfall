@@ -137,10 +137,12 @@
         body: JSON.stringify({ email }),
       });
       toast(res.message);
-      if (res.resetToken) {
-        $('#resetToken').value = res.resetToken;
-        $('#resetStep2').hidden = false;
-      }
+      // The reset code now only ever arrives by email — the API no longer
+      // returns it in the response (that used to be a full account-takeover
+      // primitive: anyone who knew a victim's email could read the token
+      // straight off this response and reset their password). Just reveal
+      // the "paste your code" step; the code itself comes from the inbox.
+      $('#resetStep2').hidden = false;
     } catch (err) {
       toast(err.message, true);
     }

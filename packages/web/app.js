@@ -267,14 +267,42 @@
   });
 
   // ── CONTACT FORM ──────────────────────────────────────────────
-  $('contactForm')?.addEventListener('submit', (e) => {
+  $('contactForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
+    const form = e.currentTarget;
     const ok = $('formOk');
-    if (ok) {
-      ok.style.display = 'block';
-      setTimeout(() => { ok.style.display = 'none'; }, 5000);
+    const err = $('formErr');
+    if (err) err.style.display = 'none';
+
+    const payload = {
+      name: $('cname')?.value.trim() || '',
+      email: $('cmail')?.value.trim() || '',
+      topic: $('ctopic')?.value || '',
+      message: $('cmsg')?.value.trim() || '',
+    };
+
+    try {
+      const res = await fetch('/api/v1/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body.error || 'Could not send right now.');
+
+      if (ok) {
+        ok.textContent = body.message || 'Message sent — we reply to everything.';
+        ok.style.display = 'block';
+        setTimeout(() => { ok.style.display = 'none'; }, 5000);
+      }
+      form.reset();
+    } catch (sendErr) {
+      if (err) {
+        err.textContent = sendErr.message;
+        err.style.display = 'block';
+        setTimeout(() => { err.style.display = 'none'; }, 6000);
+      }
     }
-    e.currentTarget.reset();
   });
 
 })();
