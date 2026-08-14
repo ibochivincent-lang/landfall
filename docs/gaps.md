@@ -190,6 +190,13 @@ is driven from the payload's `asOf` instead of a string typed into the HTML, so
 a page that calls itself live can no longer date itself by hand. The empty
 `.catch` now warns to the console: a silent catch is how both bugs survived.
 
+The static fallbacks baked into `index.html` are now rewritten by the hourly
+scan itself (`scripts/scan-to-api.mjs`), so the date, account count, settlement
+count and dark figure stay correct for a crawler, a reader with JS off, or
+anyone hitting the page while the API is down. Previously those were typed by
+hand and drifted — the site was two days stale about its own freshness under a
+"LIVE" badge. The scan already knows the right numbers; now it writes them.
+
 ## 0c. Closed 14 August: the contact form discarded messages
 
 `preventDefault()`, show a green tick, `reset()`. Nothing was sent anywhere.
