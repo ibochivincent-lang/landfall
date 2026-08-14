@@ -1,5 +1,5 @@
 {
-  "asOf": "2026-08-14T20:30:31.842Z",
+  "asOf": "2026-08-14T21:24:13.273Z",
   "staleHours": 0,
   "returnRateCaveat": "A return is the honest failure mode. An anchor that accepts value, fails to settle and keeps it produces no return event and scores 0. A low rate is the absence of one kind of evidence, not evidence of good conduct.",
   "accounts": [
@@ -12,7 +12,7 @@
       "outbound": 1,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 82.38,
+      "hoursSinceActivity": 83.27,
       "topCounterpartyShare": 0.9182
     },
     {
@@ -24,7 +24,7 @@
       "outbound": 20,
       "returns": 1,
       "returnRate": 0.1667,
-      "hoursSinceActivity": 878.95,
+      "hoursSinceActivity": 879.84,
       "topCounterpartyShare": 0.8898
     },
     {
@@ -36,7 +36,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1813.54,
+      "hoursSinceActivity": 1814.43,
       "topCounterpartyShare": null
     },
     {
@@ -48,7 +48,7 @@
       "outbound": 2,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1421.88,
+      "hoursSinceActivity": 1422.77,
       "topCounterpartyShare": null
     },
     {
@@ -60,7 +60,7 @@
       "outbound": 31,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 86.89,
+      "hoursSinceActivity": 87.79,
       "topCounterpartyShare": 0.9991
     },
     {
@@ -72,7 +72,7 @@
       "outbound": 932,
       "returns": 10,
       "returnRate": 0.0116,
-      "hoursSinceActivity": 86.57,
+      "hoursSinceActivity": 87.47,
       "topCounterpartyShare": 0.529
     },
     {
@@ -84,7 +84,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 82.38,
+      "hoursSinceActivity": 83.27,
       "topCounterpartyShare": 0.9401
     },
     {
@@ -96,7 +96,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 1450.46,
+      "hoursSinceActivity": 1451.35,
       "topCounterpartyShare": 0.9999
     },
     {
@@ -105,10 +105,10 @@
       "name": "Grupo Anchor S.A.",
       "state": "live",
       "inbound": 1258,
-      "outbound": 669,
+      "outbound": 670,
       "returns": 1,
       "returnRate": 0.0008,
-      "hoursSinceActivity": 26.41,
+      "hoursSinceActivity": 0.57,
       "topCounterpartyShare": 0.0932
     },
     {
@@ -116,12 +116,12 @@
       "domain": "stellar.moneygram.com",
       "name": "MoneyGram",
       "state": "live",
-      "inbound": 1874,
+      "inbound": 1875,
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 0.12,
-      "topCounterpartyShare": 0.928
+      "hoursSinceActivity": 0.65,
+      "topCounterpartyShare": 0.9281
     },
     {
       "account": "GDKL5TOWWAVLJ2WRAUQS2QJEAGHEDJFXFEPQFB6LKW2WRB257BVLLMT6",
@@ -144,7 +144,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 879.78,
+      "hoursSinceActivity": 880.67,
       "topCounterpartyShare": 1
     },
     {
@@ -156,7 +156,7 @@
       "outbound": 444,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 876.89,
+      "hoursSinceActivity": 877.79,
       "topCounterpartyShare": 0.4281
     }
   ]
