@@ -76,12 +76,12 @@ async function getJson(
 ): Promise<Record<string, unknown>> {
   const res = await fetchImpl(url, {
     headers: { accept: "application/json" },
-    signal: AbortSignal.timeout(30_000),
+    signal: AbortSignal.timeout(8_000),
   });
 
-  // Horizon rate-limits with 429; back off and retry a few times.
-  if (res.status === 429 && attempt < 4) {
-    const waitMs = 1000 * 2 ** attempt;
+  // Horizon rate-limits with 429; back off and retry once or twice
+  if (res.status === 429 && attempt < 2) {
+    const waitMs = 500 * 2 ** attempt;
     await new Promise((r) => setTimeout(r, waitMs));
     return getJson(url, fetchImpl, attempt + 1);
   }
@@ -106,14 +106,18 @@ export async function fetchLastActivity(
   fetchImpl: typeof fetch = fetch,
 ): Promise<{ createdAt: string; totalKnown: number } | null> {
   const url = `${horizon.replace(/\/$/, "")}/accounts/${account}/payments?limit=1&order=desc`;
-  const body = await getJson(url, fetchImpl);
-  const embedded = body["_embedded"] as { records?: unknown[] } | undefined;
-  const records = embedded?.records ?? [];
-  const first = records[0] as Record<string, unknown> | undefined;
-  if (!first) return null;
-  const createdAt = String(first["created_at"] ?? "");
-  if (!createdAt) return null;
-  return { createdAt, totalKnown: records.length };
+  try {
+    const body = await getJson(url, fetchImpl);
+    const embedded = body["_embedded"] as { records?: unknown[] } | undefined;
+    const records = embedded?.records ?? [];
+    const first = records[0] as Record<string, unknown> | undefined;
+    if (!first) return null;
+    const createdAt = String(first["created_at"] ?? "");
+    if (!createdAt) return null;
+    return { createdAt, totalKnown: records.length };
+  } catch {
+    return null;
+  }
 }
 
 export interface FetchPaymentsArgs {
@@ -129,12 +133,10 @@ export interface FetchPaymentsArgs {
 }
 
 /**
- * Page an account's payment history newest-first.
+ * Page an account's payment history.
  *
- * The returned `nextCursor` is the paging token of the newest record seen, so
- * a later run can resume forward rather than re-reading history. This is why
- * the indexer degrades to "stale" rather than "broken": no probe to fail, and
- * nothing lost when it stops.
+ * When resuming from a stored cursor, queries forward (order=asc) to only
+ * fetch new transactions since the last scan, making hourly runs finish in seconds.
  */
 export async function fetchPayments({
   horizon,
@@ -148,39 +150,46 @@ export async function fetchPayments({
   const out: PaymentRecord[] = [];
   const sinceMs = since ? Date.parse(since) : undefined;
 
-  const params = new URLSearchParams({ limit: "200", order: "desc" });
+  const isIncremental = Boolean(cursor);
+  const order = isIncremental ? "asc" : "desc";
+  const params = new URLSearchParams({ limit: "200", order });
   if (cursor) params.set("cursor", cursor);
   let url = `${horizon.replace(/\/$/, "")}/accounts/${account}/payments?${params}`;
 
-  let newestCursor: string | undefined;
+  let newestCursor: string | undefined = cursor;
 
   while (url && out.length < maxRecords) {
-    const body = await getJson(url, fetchImpl);
-    const embedded = body["_embedded"] as { records?: unknown[] } | undefined;
-    const records = embedded?.records ?? [];
-    if (records.length === 0) break;
+    try {
+      const body = await getJson(url, fetchImpl);
+      const embedded = body["_embedded"] as { records?: unknown[] } | undefined;
+      const records = embedded?.records ?? [];
+      if (records.length === 0) break;
 
-    let hitSinceBoundary = false;
+      let hitSinceBoundary = false;
 
-    for (const raw of records) {
-      const rec = normalise(raw as Record<string, unknown>);
-      if (!rec) continue;
-      if (!newestCursor) newestCursor = rec.cursor;
-      if (sinceMs !== undefined && Date.parse(rec.createdAt) < sinceMs) {
-        hitSinceBoundary = true;
-        break;
+      for (const raw of records) {
+        const rec = normalise(raw as Record<string, unknown>);
+        if (!rec) continue;
+        newestCursor = rec.cursor;
+        if (sinceMs !== undefined && Date.parse(rec.createdAt) < sinceMs) {
+          hitSinceBoundary = true;
+          break;
+        }
+        out.push(rec);
+        if (out.length >= maxRecords) break;
       }
-      out.push(rec);
-      if (out.length >= maxRecords) break;
+
+      onProgress?.(out.length);
+      if (hitSinceBoundary || out.length >= maxRecords) break;
+
+      const links = body["_links"] as { next?: { href?: string } } | undefined;
+      const next = links?.next?.href;
+      if (!next || next === url) break;
+      url = next;
+    } catch (err) {
+      // Degrade gracefully on single page error rather than killing whole scan
+      break;
     }
-
-    onProgress?.(out.length);
-    if (hitSinceBoundary || out.length >= maxRecords) break;
-
-    const links = body["_links"] as { next?: { href?: string } } | undefined;
-    const next = links?.next?.href;
-    if (!next || next === url) break;
-    url = next;
   }
 
   return { records: out, newestCursor };

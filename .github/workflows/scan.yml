@@ -54,7 +54,7 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          FLAGS="--horizon https://horizon.stellar.org --max-records 2000 --concurrency 4 --dust 0.01 --out out"
+          FLAGS="--horizon https://horizon.stellar.org --max-records 500 --concurrency 6 --dust 0.01 --out out"
 
           # Only add --since if provided via manual trigger
           if [ -n "${{ github.event.inputs.since }}" ]; then
