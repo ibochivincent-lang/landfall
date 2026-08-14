@@ -69,6 +69,45 @@ await writeFile(SNAP_FILE, JSON.stringify(body, null, 2));
 
 console.log(`✓ Wrote ${API_FILE}`);
 console.log(`✓ Wrote ${SNAP_FILE}`);
+
+// ── 6. Keep the static fallbacks in index.html honest ─────────────────────────
+//
+// app.js overwrites these from the live API, so a browser always sees current
+// values. A crawler, a reader with JS off, or anyone hitting the page while the
+// API is down sees whatever is baked into the HTML — and until now that was a
+// scan date typed by hand, which drifted two days stale under a "LIVE" badge.
+// The scan already knows the right values, so it writes them.
+//
+// Never fatal: a scan that indexed the ledger correctly must not fail because a
+// marketing string would not substitute.
+try {
+  const INDEX_FILE = join(ROOT, 'packages', 'web', 'index.html');
+  let html = await readFile(INDEX_FILE, 'utf8');
+
+  const scanDate = new Date(body.asOf).toLocaleDateString('en-GB', {
+    day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC',
+  });
+  const inbound = accounts.reduce((sum, a) => sum + Number(a.inbound || 0), 0);
+  const dark    = accounts.filter(a => a.state === 'dark').length;
+
+  const before = html;
+  html = html
+    .replace(/(<span id="scanDate">)[^<]*(<\/span>)/,       `$1${scanDate}$2`)
+    .replace(/(<span id="footerAccounts">)[^<]*(<\/span>)/, `$1${accounts.length}$2`)
+    .replace(/(<strong id="cardVolume">)[^<]*(<\/strong>)/, `$1${inbound.toLocaleString('en-US')}$2`)
+    .replace(/(<span id="cardAccounts">)[^<]*(<\/span>)/,   `$1${accounts.length} accounts$2`)
+    .replace(/(<b class="ledger-panel__dark" id="heroDark">)[^<]*(<\/b>)/, `$1${dark} of ${accounts.length}$2`);
+
+  if (html !== before) {
+    await writeFile(INDEX_FILE, html);
+    console.log(`✓ Wrote ${INDEX_FILE} (static fallbacks: ${scanDate}, ${inbound} inbound, ${dark}/${accounts.length} dark)`);
+  } else {
+    console.log('  index.html fallbacks already current');
+  }
+} catch (err) {
+  console.warn(`! Could not refresh index.html fallbacks: ${err.message}`);
+  console.warn('  Scan output above is unaffected.');
+}
 console.log(`  ${accounts.length} accounts — staleHours: ${staleHours}`);
 console.log(`  live: ${accounts.filter(a => a.state === 'live').length}  ` +
             `dark: ${accounts.filter(a => a.state === 'dark').length}  ` +

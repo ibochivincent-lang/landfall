@@ -15,6 +15,21 @@ oracle digest, an agent queries the MCP server — and removing Landfall breaks
 them. Today nothing outside this repo depends on it yet. That is the honest
 line every horizon below is measured against.
 
+**Why the clock moved.** In July 2026 Stellar joined the
+[x402 Foundation](https://x402.org) with Visa, Stripe and Google, standardising
+autonomous software-to-software payment. Stellar's
+[own announcement](https://stellar.org/blog/foundation-news/x402-on-stellar)
+specifies the settlement path — facilitators, spending limits, budget controls —
+and leaves the counterparty question open: an agent can now pay without a human,
+but nothing tells it *who is safe to pay*. A human falls back on brand
+recognition; an agent has only the domain's self-description, which is the one
+input that can be edited in ten seconds.
+
+This does not change what Landfall is. It changes who needs it, and how soon.
+Every horizon below is ordered on the assumption that the consumer of this data
+is increasingly a program rather than a person — machine-readable first,
+dashboard second.
+
 **As of 13 August 2026.** Horizon 0 is what a stranger can verify against the
 repository and the live site today. Line items carry the backlog or issue
 number that tracks them where one exists, so this page stays checkable rather
@@ -26,22 +41,27 @@ than becoming a second changelog.
 
 - [x] Core thesis implemented: ledger observation instead of endpoint probing
 - [x] SEP-1 discovery — home domain → declared on-chain accounts (`packages/indexer/src/toml.ts`)
-- [x] Horizon indexer — pagination, retry/backoff, per-run resume cursor support
+- [x] Horizon indexer — fast `order=asc` cursor pagination, sub-minute sync runtime, retry/backoff
 - [x] BigInt stroop arithmetic throughout — no float drift on aggregate volume
 - [x] Refund-detection heuristic with documented limits (`docs/methodology.md`)
 - [x] Liveness classification (live / slow / dark / no-activity) and dust filtering
+- [x] **Path Payments Engine & Dual-Asset Tracking** — parses `source_amount` & `source_asset` for cross-asset payments
+- [x] **Settlement Corridors Matrix (`/corridors`)** — cross-asset flow analytics with compliance CSV export
+- [x] **Deterministic Anchor Reliability Score (0–100 & Grades A–F)** — liveness, throughput, and refund scoring
+- [x] **Pre-Flight Wallet Health Check API (`/health-check`)** — real-time verification before SEP-24/SEP-31 execution
+- [x] **Dynamic SVG Status Badges (`/badges/:domain.svg`)** — live status badges for repositories and docs
+- [x] **Developer & Admin Portal (`/portal.html`)** — multi-user auth, API key hashing (`lf_live_...`), token-bucket rate limits, and webhooks
+- [x] **Interactive Public API Docs (`/docs.html`)** — live interactive testing playground and badge previewer
+- [x] **Model Context Protocol (MCP) Server (`scripts/mcp/server.mjs`)** — native AI agent stdio integration
 - [x] 35 offline tests including a mock Horizon server; 16 Rust tests on the contract
-- [x] Postgres schema — 12 tables, applied and verified on real Postgres
-- [x] Read-only HTTP API — live, backed by Supabase, deployed on Vercel
-- [x] Transactions dashboard at `/dashboard` — keyset-paginated, live-only by design (no stale snapshot)
-- [x] Soroban oracle written and **deployed to testnet** — 16 tests, admin key set. Not on mainnet; the indexer does not publish to it yet, so it is a deployed contract, not a running oracle
-- [x] Real mainnet scan — 13 accounts, 5 home domains, ~4,000 payments
+- [x] Postgres schema — 15+ tables including `portal_users`, `api_keys`, `user_webhooks`, applied and verified on Supabase
+- [x] Read-only HTTP API — live, backed by Supabase pooler, deployed on Vercel
+- [x] Transactions dashboard at `/dashboard.html` — keyset-paginated, dark account highlights, live ledger feeds
+- [x] Soroban oracle written and **deployed to testnet** — 16 tests, admin key set
+- [x] Real mainnet scan — 13 accounts across candidate home domains
 - [x] Headline finding cross-checked against stellar.expert: **6 of 13 accounts dark for 30+ days**
-- [x] Two self-found measurement bugs fixed with named regression tests (liveness read inside the `--since` window; dust inflating phantom refund pairs)
-- [x] 20 contributor issues filed and labelled `Stellar Wave` (#4–#23)
-- [x] Stellar-branded site redesign, merged (PR #24), live at [landfall-ib.vercel.app](https://landfall-ib.vercel.app)
-- [x] Automated daily scan via GitHub Actions, feeding a static JSON API
-- [x] Repository public at `ibochivincent-lang/landfall`
+- [x] Automated **hourly scan via GitHub Actions** (`0 * * * *`), with `$0/month` hosting upkeep
+- [x] GraphQL API at `/api/v1/graphql` — reuses REST resolvers directly (`docs/GRAPHQL_API.md`)
 
 ---
 
@@ -62,7 +82,8 @@ than becoming a second changelog.
 
 ### Reconciling the site with reality
 
-- [ ] Label or remove every claim still ahead of what's built: invented $99/mo pricing, "Get API access" implying access control that doesn't exist, "Log in" with no accounts behind it, an advertised SDK/MCP server/webhooks that aren't built yet
+- [ ] Label or remove every claim still ahead of what's built: invented $99/mo pricing, "Get API access" implying access control that doesn't exist, "Log in" with no accounts behind it, an advertised SDK/webhooks that aren't built yet
+- [ ] **Route Scout publishes invented rates and fees — highest-priority honesty fix.** `/compare.html` says it compares anchors by "payout, fees, speed, and verified on-chain settlement reliability" and footers "no anchor self-reporting", while `GET /api/v1/quotes/compare` serves a hardcoded catalogue: static FX rates, per-anchor `rateSpread`, `feePercent`, `feeFixedUsd` and payout speeds, none of them fetched from anywhere. The reliability column is real; every commercial figure beside it is invented and attributed to a named business. Either label the rate/fee columns as illustrative until SEP-38 ingestion lands, or drop those columns and ship the reliability comparison alone. See [docs/gaps.md](docs/gaps.md)
 - [ ] Make a deliberate call on the AI chat explorer feature that shipped outside this backlog — decide whether it belongs in the grant pitch or gets held back, since it cuts against the "infrastructure, not application" positioning the whole submission argues for
 
 ---
@@ -70,7 +91,9 @@ than becoming a second changelog.
 ## 🎯 Horizon 2 — Layer 2: attested outcomes and distribution (months 1–6)
 
 - [ ] **Signed settlement receipt ingest** (backlog H1) — an attestation format so an anchor or user can assert the fiat leg, which the ledger alone cannot show
-- [ ] **Slippage metric: quoted versus landed** (backlog H2) — depends on receipts; nothing in the ecosystem currently publishes this number
+- [ ] **Slippage metric: quoted versus landed** (backlog H2) — depends on receipts; nothing in the ecosystem currently publishes this number. This is the number that makes Route Scout's rate column a measurement instead of a catalogue
+- [ ] **Dark-anchor early warning** — an anchor rarely stops instantly: volume falls, counterparty concentration tightens, gaps between settlements stretch, then silence. Every scan is already stored, so the training data exists and nothing reads it back. A degradation signal 48–72h ahead is worth more to a wallet than an accurate post-mortem, and it is the natural Tranche 2 milestone. Must ship with its false-positive rate published — an early warning that cries wolf about a named business is worse than none
+- [ ] **`pickAnchor()` multi-factor route scoring** — one weighted score over net payout, reliability grade, and degradation signal, with the caller choosing the emphasis (safest / cheapest / fastest) rather than the formula choosing for them. Blocked on live SEP-38 quotes: optimising over a hardcoded rate table produces a confident recommendation from invented inputs, which is worse than no recommendation
 - [ ] Talk to at least one wallet about embedding `pickAnchor()` — one real conversation in progress outweighs three more shipped features in a grant application
 - [ ] Publish `@landfall/sdk` with `pickAnchor()` to npm (backlog H3)
 - [ ] **CAP-67 unified event ingestion** — replaces N per-account REST cursors with one ledger-wide stream, and makes mint/burn distinguishable from transfer instead of inferred
@@ -85,7 +108,7 @@ than becoming a second changelog.
 
 - [ ] **Wire the indexer to publish digests to the oracle after every persisted scan** (issue #21) — the gap between "deployed contract" and "running oracle"
 - [ ] Oracle to **mainnet**, once there is a real dataset worth publishing
-- [ ] **MCP server** exposing anchor quality to payment agents (issue #23)
+- [x] ~~MCP server exposing anchor quality to payment agents~~ (issue #23) — shipped in Horizon 0, ahead of schedule; what's still open is a real external agent actually calling it
 - [ ] Anchor dispute portal — promised by the code of conduct and security policy today; doesn't exist yet
 - [ ] Paid API tier — sustainability without grant dependence
 - [ ] Move the repository to an organisation

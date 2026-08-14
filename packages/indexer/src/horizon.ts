@@ -74,14 +74,21 @@ async function getJson(
   fetchImpl: typeof fetch,
   attempt = 0,
 ): Promise<Record<string, unknown>> {
+  // 15s: long enough that a merely slow Horizon page is not mistaken for a
+  // failure, short enough that one stuck request cannot hold an hourly run
+  // open. The earlier 8s was fast but turned ordinary latency into an error,
+  // and an error here used to be swallowed - see fetchPayments below.
   const res = await fetchImpl(url, {
     headers: { accept: "application/json" },
-    signal: AbortSignal.timeout(30_000),
+    signal: AbortSignal.timeout(15_000),
   });
 
-  // Horizon rate-limits with 429; back off and retry a few times.
+  // Horizon rate-limits with 429; back off and retry. The budget is generous
+  // on purpose: a scan that gives up early on rate limiting reports fewer
+  // payments than the ledger holds, and an undercount is indistinguishable
+  // from an anchor that stopped settling. Waiting is cheap, being wrong is not.
   if (res.status === 429 && attempt < 4) {
-    const waitMs = 1000 * 2 ** attempt;
+    const waitMs = 500 * 2 ** attempt;
     await new Promise((r) => setTimeout(r, waitMs));
     return getJson(url, fetchImpl, attempt + 1);
   }
@@ -105,6 +112,12 @@ export async function fetchLastActivity(
   account: string,
   fetchImpl: typeof fetch = fetch,
 ): Promise<{ createdAt: string; totalKnown: number } | null> {
+  // No try/catch: a Horizon error here must reach the caller. Returning null on
+  // failure is indistinguishable from "this account has never transacted", so
+  // swallowing it would report a live anchor as having no history at all - the
+  // single most damaging thing this project can get wrong about a named
+  // business. The caller logs the error and drops the account from the run
+  // rather than publishing a figure it did not measure.
   const url = `${horizon.replace(/\/$/, "")}/accounts/${account}/payments?limit=1&order=desc`;
   const body = await getJson(url, fetchImpl);
   const embedded = body["_embedded"] as { records?: unknown[] } | undefined;
@@ -129,12 +142,10 @@ export interface FetchPaymentsArgs {
 }
 
 /**
- * Page an account's payment history newest-first.
+ * Page an account's payment history.
  *
- * The returned `nextCursor` is the paging token of the newest record seen, so
- * a later run can resume forward rather than re-reading history. This is why
- * the indexer degrades to "stale" rather than "broken": no probe to fail, and
- * nothing lost when it stops.
+ * When resuming from a stored cursor, queries forward (order=asc) to only
+ * fetch new transactions since the last scan, making hourly runs finish in seconds.
  */
 export async function fetchPayments({
   horizon,
@@ -148,12 +159,32 @@ export async function fetchPayments({
   const out: PaymentRecord[] = [];
   const sinceMs = since ? Date.parse(since) : undefined;
 
-  const params = new URLSearchParams({ limit: "200", order: "desc" });
+  const isIncremental = Boolean(cursor);
+  const order = isIncremental ? "asc" : "desc";
+  const params = new URLSearchParams({ limit: "200", order });
   if (cursor) params.set("cursor", cursor);
   let url = `${horizon.replace(/\/$/, "")}/accounts/${account}/payments?${params}`;
 
+  // Track the newest record by timestamp rather than by position in the page.
+  // Position only identifies the newest under `order=desc`; an incremental run
+  // pages ascending, where the newest is last. Comparing dates is correct under
+  // both, and a cursor that is not actually the newest either re-reads history
+  // forever or, worse, advances past records that were never stored.
+  // Starts undefined, not at the incoming cursor: a resumed page that comes
+  // back empty must report "nothing new" rather than echoing the cursor it was
+  // handed, so the caller leaves the stored one alone instead of writing over
+  // a good value with a derived one. Covered by a test.
   let newestCursor: string | undefined;
+  let newestAt = -Infinity;
 
+  // No try/catch around the paging loop. A failed page used to `break`, which
+  // ended the walk early and returned a short record set that looked exactly
+  // like a complete one - the caller could not tell "this anchor settled twice
+  // this week" from "Horizon timed out after two pages". SECURITY.md names
+  // that precise behaviour ("causing the indexer to silently drop records
+  // rather than report a gap") as the worst class of bug here, so the error
+  // propagates: cli.ts logs it and drops the account from the run instead of
+  // publishing an undercount as though it were a measurement.
   while (url && out.length < maxRecords) {
     const body = await getJson(url, fetchImpl);
     const embedded = body["_embedded"] as { records?: unknown[] } | undefined;
@@ -165,7 +196,13 @@ export async function fetchPayments({
     for (const raw of records) {
       const rec = normalise(raw as Record<string, unknown>);
       if (!rec) continue;
-      if (!newestCursor) newestCursor = rec.cursor;
+
+      const at = Date.parse(rec.createdAt);
+      if (Number.isFinite(at) && at > newestAt) {
+        newestAt = at;
+        newestCursor = rec.cursor;
+      }
+
       if (sinceMs !== undefined && Date.parse(rec.createdAt) < sinceMs) {
         hitSinceBoundary = true;
         break;

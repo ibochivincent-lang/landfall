@@ -82,7 +82,7 @@ export async function discoverDomain(
   try {
     const res = await fetchImpl(url, {
       redirect: "follow",
-      signal: AbortSignal.timeout(15_000),
+      signal: AbortSignal.timeout(5_000),
     });
     if (!res.ok) return { accounts: [], error: `HTTP ${res.status}` };
 

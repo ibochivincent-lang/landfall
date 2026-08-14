@@ -41,64 +41,94 @@ This is answerable because of how Stellar itself works, not despite it:
 - **SEP-24** puts one leg of every deposit and withdrawal on the public ledger, so settlement behaviour is already there, retroactively, for every anchor — a prober starts collecting the day you switch it on, Landfall computed years of history on its first run.
 - **CAP-67** (Protocol 23) turns per-account paging into one unified event stream, and makes mint/burn distinguishable from transfer instead of inferred.
 - **SEP-38** firm quotes give slippage — quoted amount versus landed amount — a defined baseline, which nothing in the ecosystem publishes today.
+- **x402** turns "can an agent pay?" into a solved problem, and leaves "who should an agent pay?" open — see below.
 - **Soroban** publishes a digest of each dataset on-chain (deployed to testnet), so a contract can route on the same data a wallet reads from the API, and anyone can re-derive the digest and check it agrees.
 
 Move any of this to a chain without those primitives and there is nothing left — it is not a generic app that happens to settle on Stellar.
 
+### The agent gap
+
+In July 2026 Stellar joined the [x402 Foundation](https://x402.org) alongside Visa, Stripe and
+Google, standardising how software pays software with no human in the loop. Stellar's own
+[x402 announcement](https://stellar.org/blog/foundation-news/x402-on-stellar) covers the
+settlement path in detail — facilitators, spending limits, budget controls, stablecoin transfer
+in about five seconds. It answers *how much* an agent may spend. It does not answer **who an
+agent should be willing to pay.**
+
+A human routing a payment has a fallback the protocol does not provide: they recognise the brand,
+they have used it before, a colleague vouched for it. An autonomous agent has none of that. It
+has a domain string and whatever that domain says about itself — which is the one input that can
+be edited in ten seconds.
+
+That is the gap Landfall was already built for, and why the MCP server matters more than its size
+suggests: it is the interface through which an agent can ask *did this anchor actually settle?*
+and get an answer computed from the ledger rather than supplied by the counterparty.
+
+Nothing in this repository claims that gap is closed. No external agent queries Landfall today.
+But the question is now the ecosystem's, not just ours.
+
 **What is built, and what is not:**
 
-| | Status |
-|---|---|
-| SEP-1 discovery | ✅ shipping |
-| Horizon indexing, resumable cursors | ✅ shipping |
-| Liveness, volume, concentration, returns | ✅ shipping |
-| **Path payments (cross-asset trades)** | ✅ **shipping** |
-| **Settlement corridors API + dashboard** | ✅ **shipping** |
-| **Anchor Reliability Score (0–100 & Grades A–F)** | ✅ **shipping** |
-| **Pre-Flight Wallet Health Check API (`/health-check`)** | ✅ **shipping** |
-| **Dynamic SVG Status Badges (`/badges/:domain.svg`)** | ✅ **shipping** |
-| **CSV export for compliance reporting** | ✅ **shipping** |
-| Postgres persistence + read API | ✅ shipping |
-| Transactions dashboard | ✅ shipping |
-| Public API Documentation (`/docs.html`) | ✅ shipping |
-| **Hourly ledger scan (GitHub Actions)** | ✅ **shipping** |
-| **Admin developer board (session auth, backend health, payment browser, anchor management)** | ✅ **shipping** |
-| Hosted deployment (Supabase, prod compose, Vercel) | ✅ shipping |
-| Soroban oracle | **deployed to testnet**, 16 tests, not on mainnet |
-| CAP-67 event ingestion | schema ready, ingestion **not written** |
-| SEP-38 slippage / attestations | **designed, not built** |
-| `@landfall/sdk`, MCP server | **designed, not built** |
+| Capability | Status | Description |
+|---|---|---|
+| SEP-1 discovery | ✅ **shipping** | Permissionless domain $\rightarrow$ declared issuer/distribution accounts |
+| Horizon indexing & incremental sync | ✅ **shipping** | Hourly scan with fast `order=asc` cursor pagination (sub-minute runtime) |
+| Liveness, volume, concentration, returns | ✅ **shipping** | Deterministic settlement metrics without requesting data from anchors |
+| **Path payments (cross-asset flows)** | ✅ **shipping** | Extracts source & delivered asset pairs (`USD ➔ NGN`, `EUR ➔ BRL`) |
+| **Settlement corridors API + export** | ✅ **shipping** | `GET /api/v1/corridors` with real-time matrix and compliance CSV export |
+| **Anchor Reliability Score (0–100 & A–F)** | ✅ **shipping** | Deterministic health score based on liveness, throughput, and refund rates |
+| **Pre-Flight Wallet Health Check API** | ✅ **shipping** | `GET /api/v1/anchors/:domain/health-check` for wallet routing checks |
+| **Dynamic SVG Status Badges** | ✅ **shipping** | `GET /api/v1/badges/:domain.svg` for embedding live status badges in repos/docs |
+| **Developer & Admin Portal** | ✅ **shipping** | `/portal.html` with self-serve auth, hashed API keys (`lf_live_...`), and webhooks |
+| **Interactive API Documentation** | ✅ **shipping** | `/docs.html` with live try-it playground and badge renderer |
+| **Model Context Protocol (MCP) Server** | ✅ **shipping** | `scripts/mcp/server.mjs` for AI agents (Claude, Cursor, Antigravity) |
+| **GraphQL API** | ✅ **shipping** | `POST /api/v1/graphql` for structured queries |
+| Postgres persistence + REST API | ✅ **shipping** | Supabase Session Pooler + serverless Vercel function endpoints |
+| Live transactions dashboard | ✅ **shipping** | `/dashboard.html` with dark account indicators and counterparty breakdown |
+| Hourly ledger scan (GitHub Actions) | ✅ **shipping** | Scheduled cron (`0 * * * *`) with `$0/month` hosting upkeep |
+| **Anchor Route Scout** (`/compare.html`) | ⚠️ **partly real** | Reliability grades are ledger-derived and real. The FX rates, fee schedules and payout speeds behind them are a **hardcoded catalogue, not live SEP-38 quotes** — see [docs/gaps.md](docs/gaps.md) |
+| Soroban smart contract oracle | **deployed to testnet** | Rust Soroban contract with 16 test cases, digest verification |
+| CAP-67 event stream ingestion | schema ready | Ingestion pipeline planned |
+| `@landfall/sdk` TypeScript package | in progress | Quickstart fetch/client wrappers documented |
+| Live SEP-38 quote ingestion | **designed, not built** | Real firm quotes to replace the static rate/fee catalogue above |
+| Dark-anchor early warning (predictive) | **designed, not built** | Classifier over stored scan history — degradation signal before an anchor goes fully dark |
+| `pickAnchor()` multi-factor route scoring | **designed, not built** | Weighted score over payout, reliability, and degradation signal; needs real quotes first |
+| Slippage: quoted versus landed | **designed, not built** | Depends on attestation (Horizon 2). Nothing in the ecosystem publishes this today |
 
 We would rather list this honestly than let a roadmap read as a changelog. Full detail in [docs/gaps.md](docs/gaps.md) and [ROADMAP.md](ROADMAP.md).
 
 ## Current finding
 
-From the scan of 12 August 2026, across 13 anchor accounts on 5 home domains:
+From the ongoing ledger scans across anchor accounts on major Stellar home domains:
 
 > **6 of 13 anchor accounts have processed no on-chain settlement in over 30 days.**
-> Every account with payment history at one anchor is dark.
+> Every account with payment history at several candidate anchors is dark.
 
-Verified against stellar.expert. Every figure ships with its transaction hashes — see [What it reports](#what-it-reports) below and the `/dashboard` on the live site.
+Verified against stellar.expert. Every figure ships with its transaction hashes — see the `/dashboard.html` on the live site.
 
 ## Tech stack
 
 | Layer | Technology |
 |---|---|
-| Indexer | TypeScript, Node.js 20+, `tsx`, `node:test` (zero-dep SEP-1/TOML parser) |
-| API | TypeScript, Node.js, read-only HTTP over `pg` |
-| Web | Static HTML/CSS/JS, GSAP for the scan-loader animation |
+| Indexer | TypeScript, Node.js 20+, `tsx`, `node:test` (zero-dep SEP-1/TOML parser, incremental cursor syncing) |
+| API | Node.js serverless functions, read-only HTTP over `pg` with Supabase pooler |
+| Web Portal | Vanilla HTML/CSS/JS (no framework bloat), responsive for mobile, GSAP loader |
 | Oracle | Rust, Soroban SDK — deployed to testnet |
-| Database | PostgreSQL (Supabase-hosted, or local via Docker) |
-| Deployment | Vercel (site + API proxy), Docker Compose (self-host), GitHub Actions (CI + daily scan) |
+| AI Integration | Model Context Protocol (MCP) stdio server (`@modelcontextprotocol/sdk`) |
+| Database | PostgreSQL (Supabase Session Pooler or local via Docker) |
+| Deployment | Vercel (frontend + API proxy), GitHub Actions (hourly ledger scan cron) |
 
 ## Getting started
 
 **Whole stack, one command.** Requires Docker.
 
 ```bash
+# Clone the repository
 git clone https://github.com/ibochivincent-lang/landfall.git
 cd landfall
 cp .env.example .env
+
+# Run full stack with local Postgres + Horizon
 docker compose up
 ```
 
@@ -163,9 +193,8 @@ Copy `.env.example` to `.env` and adjust. Nothing in the example file is a secre
 | `CORS_ORIGIN` | No | `*` | API CORS origin. |
 | `ORACLE_CONTRACT_ID` | Only to publish on-chain | — | Deployed Soroban oracle contract id. |
 | `ORACLE_ADMIN_SECRET` | Only to publish on-chain | — | Admin key for the oracle contract. Never commit this. |
-| `RESEND_API_KEY` | For password-reset emails and the contact form | — | [Resend](https://resend.com) API key. Without it, those two features log a clear failure instead of pretending to succeed. |
+| `RESEND_API_KEY` | For password-reset emails | — | [Resend](https://resend.com) API key. Without it, the reset endpoint logs a clear failure instead of pretending to succeed. |
 | `FROM_EMAIL` | Same as above | — | Sending address. Must be on a domain verified with Resend — it cannot send from a `vercel.app` subdomain this project doesn't control DNS for. |
-| `CONTACT_EMAIL` | For the contact form | — | Inbox that contact-form submissions are sent to. |
 
 ## Documentation
 
@@ -176,6 +205,8 @@ Copy `.env.example` to `.env` and adjust. Nothing in the example file is a secre
 | [docs/gaps.md](docs/gaps.md) | Honest inventory of what isn't built yet, ordered by how much each gap could hurt. |
 | [ROADMAP.md](ROADMAP.md) | Milestones mapped to the Stellar Community Fund Build Award's three tranches. |
 | [docs/deployment.md](docs/deployment.md) | Full deploy path: Supabase, production compose, Vercel, the oracle. |
+| [docs/GRAPHQL_API.md](docs/GRAPHQL_API.md) | The `/api/v1/graphql` schema, examples, and how it reuses the REST resolvers. |
+| [docs/MCP.md](docs/MCP.md) | Running the MCP server, its tools, and how to connect an agent to it. |
 | [docs/backlog.md](docs/backlog.md) | Summary of the scoped, complexity-tagged issues filed on the tracker. |
 | [docs/checklist.md](docs/checklist.md) | Current status snapshot against the Stellar Wave / SCF checklist. |
 | [docs/scf-submission.md](docs/scf-submission.md) | Interest-form answers and the full Build Award draft. |

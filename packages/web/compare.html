@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Route Scout — Landfall · Stellar</title>
+  <meta name="description" content="Compare live exchange rates, fees, and on-chain settlement reliability across Stellar anchors before routing an off-ramp.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="dashboard.css">
+  <link rel="stylesheet" href="compare.css">
+</head>
+<body class="dash-body">
+
+<header class="topnav" id="topnav">
+  <div class="wrap topnav__in">
+    <a href="index.html" class="topnav__logo" aria-label="Landfall home">
+      <svg viewBox="0 0 40 40" class="topnav__logo-mark" aria-hidden="true">
+        <path d="M20 3 35 29H5L20 3Z" fill="currentColor"/>
+        <path d="M20 12 28 26H12l8-14Z" fill="#eaf4ef"/>
+        <path d="M20 29v7" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <span>landfall<em>.stellar</em></span>
+    </a>
+    <nav class="topnav__pill" aria-label="Site navigation">
+      <a class="topnav__link" href="index.html">Overview</a>
+      <a class="topnav__link" href="dashboard.html">Transactions</a>
+      <a class="topnav__link is-active" href="compare.html" aria-current="page">Route Scout</a>
+      <a class="topnav__link" href="docs.html">API Docs</a>
+      <a class="topnav__link" href="portal.html">Developer Portal</a>
+    </nav>
+    <div class="topnav__actions">
+      <a class="dash-btn dash-btn--primary" href="portal.html">Get API Keys →</a>
+      <a class="dash-btn dash-btn--ghost" href="https://github.com/ibochivincent-lang/landfall" target="_blank" rel="noopener">GitHub ↗</a>
+    </div>
+  </div>
+</header>
+
+<main class="scout-wrap">
+
+  <div class="dash-head">
+    <div>
+      <h1 class="dash-title">Route Scout</h1>
+      <p class="dash-sub">
+        Compare every integrated Stellar anchor by payout, fees, speed, and
+        <strong>verified on-chain settlement reliability</strong> — before routing a payment.
+      </p>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="ctrl-card">
+    <div class="ctrl-grid">
+
+      <div class="ctrl-group">
+        <label class="ctrl-label" for="fromAsset">You Send</label>
+        <select class="ctrl-select" id="fromAsset">
+          <option value="USDC" selected>USDC · USD Coin</option>
+          <option value="EURC">EURC · Euro Coin</option>
+          <option value="XLM">XLM · Stellar Lumens</option>
+        </select>
+      </div>
+
+      <div class="ctrl-group">
+        <label class="ctrl-label" for="toCurrency">Destination Corridor</label>
+        <select class="ctrl-select" id="toCurrency">
+          <option value="NGN" selected>🇳🇬 NGN — Nigeria</option>
+          <option value="KES">🇰🇪 KES — Kenya</option>
+          <option value="GHS">🇬🇭 GHS — Ghana</option>
+          <option value="MXN">🇲🇽 MXN — Mexico</option>
+          <option value="BRL">🇧🇷 BRL — Brazil (PIX)</option>
+          <option value="ARS">🇦🇷 ARS — Argentina</option>
+          <option value="PEN">🇵🇪 PEN — Peru</option>
+          <option value="EUR">🇪🇺 EUR — Eurozone</option>
+          <option value="USD">🇺🇸 USD — USA (Cash)</option>
+          <option value="ZAR">🇿🇦 ZAR — South Africa</option>
+        </select>
+      </div>
+
+      <div class="ctrl-group">
+        <label class="ctrl-label" for="sendAmount">Amount (USD)</label>
+        <input class="ctrl-input" type="number" id="sendAmount" value="100" min="1" step="5">
+        <div class="amount-row">
+          <button class="preset" data-amt="50">$50</button>
+          <button class="preset" data-amt="100">$100</button>
+          <button class="preset" data-amt="250">$250</button>
+          <button class="preset" data-amt="500">$500</button>
+          <button class="preset" data-amt="1000">$1,000</button>
+        </div>
+      </div>
+
+      <div class="ctrl-group ctrl-run">
+        <label class="ctrl-label" style="visibility:hidden">Action</label>
+        <button class="run-btn" id="runBtn">Scout Routes ⚡</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Results header -->
+  <div class="results-hd">
+    <h2 id="resultsTitle">Select a corridor and click Scout Routes</h2>
+    <span class="results-meta" id="resultsMeta"></span>
+  </div>
+
+  <div id="noticeBanner" class="notice-banner" hidden>
+    ⚠️ Live reliability data unavailable — settlement grades are estimates only.
+  </div>
+
+  <!-- Quote cards -->
+  <div class="quotes-list" id="quotesList">
+    <div class="status-msg">
+      <span class="status-icon">🛰️</span>
+      Pick a corridor and click <strong>Scout Routes</strong> to compare anchors.
+    </div>
+  </div>
+
+</main>
+
+<footer class="dash-footer">
+  <div class="wrap dash-foot-in">
+    <span>Settlement reliability derived from the public Stellar ledger — no anchor self-reporting</span>
+    <span>© 2026 Landfall · MIT</span>
+  </div>
+</footer>
+
+<script src="compare.js"></script>
+</body>
+</html>

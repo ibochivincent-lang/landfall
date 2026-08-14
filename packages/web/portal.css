@@ -212,6 +212,8 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
 .section-head h2 { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
@@ -230,22 +232,34 @@
   align-items: center;
   gap: 12px;
   margin-top: 10px;
+  flex-wrap: wrap;
 }
 
 .key-copy-row code {
   background: #fff;
-  padding: 8px 14px;
+  padding: 10px 14px;
   border-radius: 6px;
   border: 1px solid #fde047;
   font-size: 13px;
   color: var(--ink);
   font-weight: 700;
+  word-break: break-all;
+  overflow-wrap: anywhere;
+  flex: 1;
+  min-width: 200px;
+}
+
+.table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .portal-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
+  min-width: 600px;
 }
 
 .portal-table th, .portal-table td {
@@ -262,11 +276,32 @@
   font-weight: 700;
 }
 
+.badge-active {
+  background: #dcfce7;
+  color: #166534;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 99px;
+  font-family: 'DM Mono', monospace;
+}
+
+.badge-revoked {
+  background: #fee2e2;
+  color: #991b1b;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 99px;
+  font-family: 'DM Mono', monospace;
+}
+
 /* Code Tabs & Explorer */
 .code-tabs {
   display: flex;
   gap: 6px;
   margin-top: 16px;
+  overflow-x: auto;
 }
 
 .code-tab {
@@ -278,11 +313,26 @@
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .code-tab.is-active {
   color: #fff;
   background: var(--ink);
+}
+
+.code-block {
+  background: #04121b;
+  color: #eaf4ef;
+  padding: 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-x: auto;
+  word-break: break-all;
+  white-space: pre-wrap;
+  max-height: 320px;
+  margin: 0;
 }
 
 .explorer-grid {
@@ -292,10 +342,20 @@
   margin-top: 20px;
 }
 
+.explorer-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.explorer-result {
+  overflow: hidden;
+}
+
 /* Admin Center */
 .admin-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 24px;
   margin-top: 20px;
 }
@@ -311,10 +371,12 @@
   display: flex;
   gap: 10px;
   margin: 16px 0;
+  flex-wrap: wrap;
 }
 
 .admin-input {
   flex: 1;
+  min-width: 180px;
   padding: 10px 14px;
   border-radius: 8px;
   border: 1px solid var(--line);
@@ -333,4 +395,52 @@
   background: var(--paper);
   font-size: 13px;
   color: var(--muted);
+}
+
+/* ============================================================
+   RESPONSIVE BREAKPOINTS (Mobile & Tablet)
+   ============================================================ */
+@media (max-width: 780px) {
+  .portal-header {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .explorer-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .key-copy-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .key-copy-row code {
+    width: 100%;
+  }
+
+  .key-copy-row button {
+    width: 100%;
+    text-align: center;
+  }
+
+  .auth-card {
+    padding: 24px 18px;
+    margin: 20px auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .portal-title {
+    font-size: 22px;
+  }
+  
+  .portal-nav-btn {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  .dev-card {
+    padding: 16px;
+  }
 }

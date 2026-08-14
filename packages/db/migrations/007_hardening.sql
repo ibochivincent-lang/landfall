@@ -1,9 +1,10 @@
--- Security/readiness hardening: rate limiting, webhook delivery audit,
--- contact form persistence.
+-- Security/readiness hardening: rate limiting, webhook delivery audit.
 --
--- Closes the gaps documented in docs/gaps.md's "14 August 2026" entry:
--- password-reset token leak, no rate limiting, webhooks that never fire,
--- a contact form that submits to nothing.
+-- Closes gaps documented in docs/gaps.md's "14 August 2026" entries:
+-- no rate limiting, webhooks that never fire. (The forgot-password
+-- token-leak and the contact form were both already fixed on main by the
+-- time this landed — see docs/gaps.md — so this migration only adds what
+-- was still missing.)
 
 -- Fixed 60-second-window request counter. One row per (bucket, minute).
 -- Shared by: per-IP auth-endpoint throttling (bucket = 'auth:<route>:<ip>'),
@@ -38,18 +39,4 @@ CREATE TABLE IF NOT EXISTS webhook_deliveries (
 CREATE INDEX IF NOT EXISTS webhook_deliveries_webhook_idx
   ON webhook_deliveries(webhook_id, created_at DESC);
 
--- Contact form submissions. Kept independent of Resend's own dashboard so a
--- failed send is visible in this database, not just in an email provider's
--- UI nobody on the team may have access to.
-CREATE TABLE IF NOT EXISTS contact_messages (
-  id         BIGSERIAL PRIMARY KEY,
-  name       TEXT NOT NULL,
-  email      TEXT NOT NULL,
-  topic      TEXT,
-  message    TEXT NOT NULL,
-  delivered  BOOLEAN NOT NULL DEFAULT false,
-  error      TEXT,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
-INSERT INTO schema_version (version) VALUES (6) ON CONFLICT DO NOTHING;
+INSERT INTO schema_version (version) VALUES (7) ON CONFLICT DO NOTHING;

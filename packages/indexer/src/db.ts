@@ -146,6 +146,79 @@ export class Store {
     });
   }
 
+  /**
+   * Every payment already persisted for one account, newest first.
+   *
+   * This exists because an incremental scan fetches only what is new since the
+   * stored cursor, and metrics computed from that alone describe the last hour
+   * rather than the anchor's settlement record. Published numbers must be
+   * cumulative, so they are computed over persisted history plus the new
+   * records — the ledger is the input, the `payments` table is our copy of it,
+   * and the fetch window is an implementation detail that must not leak into a
+   * figure. See computeMetrics() in cli.ts.
+   *
+   * `limit` is a memory guard, not a sampling decision. Hitting it means the
+   * published counts would understate reality, so the caller reports it rather
+   * than quietly truncating — silently dropping records is the one failure mode
+   * SECURITY.md calls the worst this project can have.
+   */
+  async paymentsForAccount(
+    account: string,
+    opts: { since?: string; limit?: number } = {},
+  ): Promise<{ records: PaymentRecord[]; truncated: boolean }> {
+    const limit = opts.limit ?? 100_000;
+    const { rows } = await this.pool.query<{
+      paging_token: string;
+      tx_hash: string;
+      op_type: string;
+      from_account: string;
+      to_account: string;
+      amount: string;
+      asset: string;
+      source_amount: string | null;
+      source_asset: string | null;
+      memo: string | null;
+      memo_type: string | null;
+      created_at: Date;
+    }>(
+      `SELECT paging_token, tx_hash, op_type, from_account, to_account,
+              amount::text        AS amount,
+              asset,
+              source_amount::text AS source_amount,
+              source_asset, memo, memo_type, created_at
+         FROM payments
+        WHERE (from_account = $1 OR to_account = $1)
+          AND ($2::timestamptz IS NULL OR created_at >= $2::timestamptz)
+        ORDER BY created_at DESC
+        LIMIT $3`,
+      [account, opts.since ?? null, limit + 1],
+    );
+
+    const truncated = rows.length > limit;
+    const use = truncated ? rows.slice(0, limit) : rows;
+
+    return {
+      truncated,
+      records: use.map((r) => ({
+        cursor: r.paging_token,
+        type: r.op_type,
+        txHash: r.tx_hash,
+        from: r.from_account,
+        to: r.to_account,
+        // NUMERIC comes back as a string via ::text so the exact seven-decimal
+        // value survives; going through a JS number here would reintroduce the
+        // float drift the stroop arithmetic exists to avoid.
+        amount: r.amount,
+        asset: r.asset,
+        sourceAmount: r.source_amount ?? undefined,
+        sourceAsset: r.source_asset ?? undefined,
+        createdAt: r.created_at.toISOString(),
+        memo: r.memo ?? undefined,
+        memoType: r.memo_type ?? undefined,
+      })),
+    };
+  }
+
   /* ---------------------------------------------------------------- scans */
 
   async startScan(horizon: string, options: ScanOptions): Promise<number> {

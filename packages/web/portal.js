@@ -136,12 +136,12 @@
         method: 'POST',
         body: JSON.stringify({ email }),
       });
+      // The API never returns the reset token itself (see docs/gaps.md) —
+      // that used to be a full account-takeover primitive: anyone who knew
+      // a victim's email could read the token straight off this response
+      // and reset their password. The code now only ever arrives by email;
+      // reveal the "paste your code" step once it's been sent.
       toast(res.message);
-      // The reset code now only ever arrives by email — the API no longer
-      // returns it in the response (that used to be a full account-takeover
-      // primitive: anyone who knew a victim's email could read the token
-      // straight off this response and reset their password). Just reveal
-      // the "paste your code" step; the code itself comes from the inbox.
       $('#resetStep2').hidden = false;
     } catch (err) {
       toast(err.message, true);

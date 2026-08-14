@@ -64,6 +64,7 @@
       <div class="nav__links" id="navLinks">
         <a href="#data">Network data</a>
         <a href="#how">How it works</a>
+        <a href="compare.html">Route Scout</a>
         <a href="docs.html">API Docs</a>
         <a href="#faq">FAQ</a>
       </div>
@@ -105,12 +106,12 @@
             <span class="ledger-panel__badge">SEP-24</span>
           </div>
           <div class="ledger-panel__row">
-            <span>Observed volume</span>
-            <strong id="cardVolume">$1,876,580</strong>
+            <span>Inbound settlements indexed</span>
+            <strong id="cardVolume">4,050</strong>
           </div>
           <div class="ledger-panel__row ledger-panel__row--muted">
-            <span>Last 30 days</span>
-            <span>13 accounts</span>
+            <span>All history, not a window</span>
+            <span id="cardAccounts">13 accounts</span>
           </div>
           <div class="ledger-panel__divider"></div>
           <div class="ledger-panel__metric">
@@ -363,9 +364,15 @@ anchor.darkRisk   <span class="code__muted">// false</span></code></pre>
       </div>
       <div class="field"><label for="cmsg">Message</label><textarea id="cmsg" name="message" required placeholder="What would you like to know?"></textarea></div>
       <button class="button" style="width:100%;justify-content:center" type="submit">Send message <span>→</span></button>
-      <div class="form__ok" id="formOk">Message sent — we reply to everything.</div>
-      <div class="form__ok" id="formErr" style="color:#b3261e;background:#fceceb">Something went wrong sending that. Please try again.</div>
-      <p class="form__note">We reply to everything. Anchor disputes get priority.</p>
+      <div class="form__ok" id="formOk">Opening a pre-filled GitHub issue with your message — press submit there to send it.</div>
+      <p class="form__note">
+        There is no mail backend, so this opens a pre-filled
+        <a href="https://github.com/ibochivincent-lang/landfall/issues/new" rel="noopener">GitHub issue</a>
+        instead of pretending to send. Anchor disputes get priority. Security
+        problems should go to a
+        <a href="https://github.com/ibochivincent-lang/landfall/security/advisories/new" rel="noopener">private advisory</a>,
+        not a public issue.
+      </p>
     </form>
   </section>
 
@@ -405,7 +412,7 @@ anchor.darkRisk   <span class="code__muted">// false</span></code></pre>
       </div>
     </div>
     <div class="wrap foot-bottom">
-      <span>Scan of 12 August 2026 · 13 accounts across 5 home domains · verified against stellar.expert</span>
+      <span>Scan of <span id="scanDate">14 August 2026</span> · <span id="footerAccounts">13</span> accounts across 5 home domains · verified against stellar.expert</span>
       <span>© 2026 Landfall · MIT</span>
     </div>
   </footer>
@@ -414,3 +421,4 @@ anchor.darkRisk   <span class="code__muted">// false</span></code></pre>
   <script src="app.js"></script>
 </body>
 </html>
+

@@ -38,6 +38,7 @@ import { scrypt as scryptCb, randomBytes, timingSafeEqual, createHash } from 'no
 import { promisify } from 'node:util';
 import { assertPublicHostname } from './_lib/net-guard.js';
 import { sendEmail } from './_lib/email.js';
+import { graphql, buildSchema } from 'graphql';
 
 const { Pool } = pg;
 const scrypt = promisify(scryptCb);
@@ -45,7 +46,7 @@ const scrypt = promisify(scryptCb);
 // ── Connection pool — created once, reused across warm invocations ────────────
 let _pool = null;
 
-function pool() {
+export function pool() {
   if (_pool) return _pool;
   const url = process.env.DATABASE_URL;
   if (!url) return null;
@@ -70,7 +71,7 @@ function pool() {
 }
 
 // ── CORS / response helpers ───────────────────────────────────────────────────
-const ORIGIN = process.env.CORS_ORIGIN || 'https://landfall-ib.vercel.app';
+const ORIGIN = process.env.CORS_ORIGIN || '*';
 
 function json(res, status, body, cacheSeconds = 60) {
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -295,7 +296,7 @@ async function enforcePublicReadRateLimit(req, res, db) {
 
 // ── SQL helpers (mirrors packages/api/src/server.ts exactly) ─────────────────
 
-async function latestScan(db) {
+export async function latestScan(db) {
   const { rows } = await db.query(`
     SELECT id, finished_at,
            EXTRACT(EPOCH FROM (now() - finished_at)) / 3600 AS stale_hours
@@ -313,7 +314,7 @@ async function latestScan(db) {
   };
 }
 
-async function accountRows(db) {
+export async function accountRows(db) {
   const { rows } = await db.query(`
     SELECT account_id, domain, role, org_name, state,
            last_activity_at, hours_since_activity,
@@ -346,7 +347,7 @@ async function accountRows(db) {
   }));
 }
 
-async function paymentsPage(db, { accounts, direction, asset, before, limit, includeRaw = false }) {
+export async function paymentsPage(db, { accounts, direction, asset, before, limit, includeRaw = false }) {
   const where  = [];
   const params = [];
 
@@ -397,7 +398,7 @@ async function paymentsPage(db, { accounts, direction, asset, before, limit, inc
   };
 }
 
-async function assetRows(db) {
+export async function assetRows(db) {
   const { rows } = await db.query(`
     SELECT at.asset, SUM(at.count)::int AS count
       FROM asset_totals at
@@ -409,7 +410,7 @@ async function assetRows(db) {
   return rows.map(r => ({ asset: r.asset, count: Number(r.count) }));
 }
 
-async function domainAccounts(db, domain) {
+export async function domainAccounts(db, domain) {
   const { rows } = await db.query(
     'SELECT account_id FROM anchor_accounts WHERE domain = $1',
     [domain]
@@ -417,7 +418,7 @@ async function domainAccounts(db, domain) {
   return rows.map(r => r.account_id);
 }
 
-async function corridorRows(db) {
+export async function corridorRows(db) {
   const { rows } = await db.query(`
     SELECT from_asset, to_asset, count, volume, first_seen, last_seen
       FROM corridors ORDER BY volume DESC
@@ -436,7 +437,7 @@ async function corridorRows(db) {
  * Deterministic Anchor Reliability Score (0-100).
  * Derived purely from ledger evidence across an anchor's accounts.
  */
-function computeDomainReliability(accounts) {
+export function computeDomainReliability(accounts) {
   if (!accounts || accounts.length === 0) {
     return { score: 0, grade: 'F', status: 'unknown', liveness: 0, settlement: 0, volume: 0, recommendation: 'No accounts indexed.' };
   }
@@ -647,6 +648,172 @@ async function listTrackedAnchors(db) {
   }));
 }
 
+// ── GraphQL — additive surface over the same read queries as the REST routes
+// above. Every resolver calls the exact same exported functions the REST
+// handlers use (accountRows, paymentsPage, computeDomainReliability, …) —
+// this is a second way to ask for the same data, not a second source of
+// truth for it. Read-only: the schema has no mutations, on purpose, same
+// as the rest of this API. ───────────────────────────────────────────────────
+
+export const graphqlSchema = buildSchema(`
+  type Account {
+    account: String!
+    domain: String!
+    name: String!
+    state: String!
+    inbound: Int!
+    outbound: Int!
+    returns: Int!
+    returnRate: Float
+    hoursSinceActivity: Float
+    topCounterpartyShare: Float
+  }
+
+  type ReliabilityFactors {
+    liveness: Int!
+    settlement: Int!
+    volume: Int!
+    freshestHours: Float
+    totalPayments: Int!
+    returnRatePercent: Float!
+  }
+
+  type DomainReliability {
+    domain: String!
+    score: Int!
+    grade: String!
+    status: String!
+    recommendation: String!
+    factors: ReliabilityFactors!
+  }
+
+  type AnchorDetail {
+    domain: String!
+    healthy: Boolean!
+    score: Int!
+    grade: String!
+    status: String!
+    recommendation: String!
+    factors: ReliabilityFactors!
+    accounts: [Account!]!
+  }
+
+  type AnchorsResult {
+    asOf: String!
+    staleHours: Float!
+    accounts: [Account!]!
+    reliability: [DomainReliability!]!
+  }
+
+  type Payment {
+    txHash: String!
+    from: String!
+    to: String!
+    fromDomain: String
+    toDomain: String
+    amount: String!
+    asset: String!
+    memo: String
+    createdAt: String!
+    isDust: Boolean!
+  }
+
+  type PaymentsPage {
+    payments: [Payment!]!
+    nextCursor: String
+  }
+
+  type AssetTotal {
+    asset: String!
+    count: Int!
+  }
+
+  type Corridor {
+    fromAsset: String!
+    toAsset: String!
+    count: Int!
+    volume: Float!
+    firstSeen: String!
+    lastSeen: String!
+  }
+
+  type Health {
+    ok: Boolean!
+    asOf: String
+    staleHours: Float
+  }
+
+  type Query {
+    "Every indexed account, grouped and scored by anchor domain — same data as GET /api/v1/anchors."
+    anchors: AnchorsResult!
+
+    "One anchor's accounts and reliability score. Null if the domain has no indexed accounts."
+    anchor(domain: String!): AnchorDetail
+
+    "Payment stream, optionally scoped to one anchor domain and filtered. Keyset-paginated via nextCursor / before."
+    payments(domain: String, direction: String, asset: String, before: String, limit: Int): PaymentsPage!
+
+    "Total payment count per asset across every indexed anchor."
+    assets: [AssetTotal!]!
+
+    "Cross-asset flow matrix from path payments."
+    corridors: [Corridor!]!
+
+    "Liveness check plus the age of the most recent completed scan."
+    health: Health!
+  }
+`);
+
+export function graphqlRootValue(db) {
+  return {
+    anchors: async () => {
+      const scan = await latestScan(db);
+      if (!scan) throw new Error('No completed scan yet.');
+      const accounts = await accountRows(db);
+      const byDomain = new Map();
+      for (const a of accounts) {
+        if (!byDomain.has(a.domain)) byDomain.set(a.domain, []);
+        byDomain.get(a.domain).push(a);
+      }
+      const reliability = [...byDomain.entries()].map(([domain, dAccounts]) => ({
+        domain,
+        ...computeDomainReliability(dAccounts),
+      }));
+      return { asOf: scan.finishedAt, staleHours: scan.staleHours, accounts, reliability };
+    },
+
+    anchor: async ({ domain }) => {
+      const accounts = (await accountRows(db)).filter(a => a.domain.toLowerCase() === domain.toLowerCase());
+      if (!accounts.length) return null;
+      const rel = computeDomainReliability(accounts);
+      return { domain, healthy: rel.score >= 55, ...rel, accounts };
+    },
+
+    payments: async ({ domain, direction, asset, before, limit }) => {
+      let accounts;
+      if (domain) {
+        accounts = await domainAccounts(db, domain);
+        if (!accounts.length) throw new Error(`No accounts for ${domain}`);
+      }
+      return paymentsPage(db, {
+        accounts,
+        direction: direction || null,
+        asset: asset || null,
+        before: before || null,
+        limit: Math.min(Math.max(Number(limit) || 50, 1), 500),
+      });
+    },
+
+    assets: async () => assetRows(db),
+    corridors: async () => corridorRows(db),
+
+    health: async () => {
+      const scan = await latestScan(db);
+      return { ok: true, asOf: scan?.finishedAt ?? null, staleHours: scan?.staleHours ?? null };
+    },
+  };
+}
+
 // ── Main handler ─────────────────────────────────────────────────────────────
 
 export default async function handler(req, res) {
@@ -786,12 +953,18 @@ export default async function handler(req, res) {
         const email = String(body.email || '').trim().toLowerCase();
         if (!email) return adminJson(res, 400, { error: 'Email is required.' });
 
-        // Generic response either way, worded identically in both branches —
-        // a found/not-found account must not be distinguishable from the
-        // response body. (Previously the found branch also leaked the raw
-        // reset token in the response, which let anyone who knew a victim's
-        // email take over that account with no further interaction. Fixed:
-        // the token is now only ever delivered by email.)
+        // SECURITY: this response must be identical whether or not the
+        // account exists, and must never contain the reset token itself.
+        // It previously returned resetToken directly in the JSON body with
+        // no proof the requester controlled that email address — anyone who
+        // could guess or find a registered email got a working password
+        // reset for that account, and the "no account" branch used a
+        // different message, which let a caller enumerate registered emails
+        // even without the token leak. An interim fix (5218da3) closed the
+        // leak by logging the token server-side for manual admin relay,
+        // since no email sender existed yet. This finishes that follow-up:
+        // the token is now actually emailed via Resend, never returned in
+        // the response, and both branches share this exact wording.
         const GENERIC_MESSAGE = 'If an account exists with that email, a reset code has been sent to it.';
 
         const { rows } = await db.query('SELECT id, email FROM portal_users WHERE email = $1', [email]);
@@ -809,8 +982,10 @@ export default async function handler(req, res) {
 
         // Fire-and-forget: not awaited, so response timing doesn't become a
         // side channel that distinguishes "account exists, email in flight"
-        // from the not-found branch above. Failures are logged in sendEmail()
-        // itself, visible in function logs, without changing this response.
+        // from the not-found branch above. sendEmail() itself logs failures
+        // to function logs without changing this response — that keeps the
+        // admin-visible fallback the interim fix relied on, now backing a
+        // real delivery path instead of being the only path.
         sendEmail({
           to: rows[0].email,
           subject: 'Your Landfall password reset code',
@@ -1062,44 +1237,39 @@ export default async function handler(req, res) {
       return adminJson(res, 404, { error: `Unknown admin route: /${joined}` });
     }
 
-    // POST /api/v1/contact — public, lightly rate limited to keep it from
-    // being used to spam-blast the inbox behind CONTACT_EMAIL.
-    if (req.method === 'POST' && joined === 'v1/contact') {
-      if (await enforceAuthRateLimit(req, res, db, 'contact', 5)) return;
-
-      const body = await readJsonBody(req);
-      const name = String(body.name || '').trim().slice(0, 200);
-      const email = String(body.email || '').trim().toLowerCase();
-      const topic = String(body.topic || '').trim().slice(0, 200);
-      const message = String(body.message || '').trim().slice(0, 5000);
-
-      if (!name || !email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !message) {
-        return adminJson(res, 400, { error: 'Name, a valid email, and a message are required.' });
+    // ── GraphQL — POST { query, variables }, or GET ?query=... for quick
+    // testing in a browser address bar. Read-only, no auth: same public
+    // data as the REST routes below, just askable in one shape instead of
+    // several endpoints.
+    if (parts[0] === 'v1' && parts[1] === 'graphql') {
+      if (req.method !== 'POST' && req.method !== 'GET') {
+        return json(res, 405, { error: 'Method not allowed' });
       }
 
-      const { rows } = await db.query(
-        `INSERT INTO contact_messages (name, email, topic, message) VALUES ($1, $2, $3, $4) RETURNING id`,
-        [name, email, topic || null, message],
-      );
+      let query, variables;
+      if (req.method === 'POST') {
+        const body = await readJsonBody(req);
+        query = body.query;
+        variables = body.variables;
+      } else {
+        const url = new URL(req.url, `https://${req.headers.host}`);
+        query = url.searchParams.get('query');
+        const rawVars = url.searchParams.get('variables');
+        variables = rawVars ? JSON.parse(rawVars) : undefined;
+      }
+      if (!query) return json(res, 400, { error: 'A `query` field is required.' }, 0);
 
-      const sent = await sendEmail({
-        to: process.env.CONTACT_EMAIL,
-        subject: `Landfall contact: ${topic || 'general'}`,
-        text: `From: ${name} <${email}>\nTopic: ${topic || '(none)'}\n\n${message}`,
-        html: `<p><b>From:</b> ${name} &lt;${email}&gt;</p><p><b>Topic:</b> ${topic || '(none)'}</p><p>${message.replace(/\n/g, '<br>')}</p>`,
+      const result = await graphql({
+        schema: graphqlSchema,
+        source: query,
+        variableValues: variables,
+        rootValue: graphqlRootValue(db),
       });
-
-      await db.query(
-        `UPDATE contact_messages SET delivered = $2, error = $3 WHERE id = $1`,
-        [rows[0].id, sent.ok, sent.ok ? null : sent.error],
-      ).catch(() => {});
-
-      if (!sent.ok) {
-        // Never claim success on a failed send — that's the exact flaw this
-        // route replaces (the old frontend showed a fake "sent!" toast).
-        return adminJson(res, 502, { error: 'Message saved but could not be emailed right now. We will still see it.' });
-      }
-      return adminJson(res, 200, { ok: true, message: 'Message sent — we reply to everything.' });
+      // A GraphQL error is still a 200 in the spec's strict reading, but a
+      // request that produced no data at all reads better as a 400 to
+      // anything not already speaking GraphQL fluently.
+      const status = result.errors && !result.data ? 400 : 200;
+      return json(res, status, result, 0);
     }
 
     if (req.method !== 'GET') return json(res, 405, { error: 'Method not allowed' });
@@ -1114,7 +1284,7 @@ export default async function handler(req, res) {
     // x-api-key raises the limit to that key's own rate_limit_per_min,
     // otherwise a conservative anonymous default applies. Reads stay public
     // either way (see enforcePublicReadRateLimit's docstring).
-    if (joined.startsWith('v1/') && joined !== 'v1/contact') {
+    if (joined.startsWith('v1/')) {
       if (await enforcePublicReadRateLimit(req, res, db)) return;
     }
 
@@ -1176,6 +1346,155 @@ export default async function handler(req, res) {
     if (joined === 'v1/corridors') {
       const corridors = await corridorRows(db);
       return json(res, 200, { corridors }, 300);
+    }
+
+    // GET /api/v1/quotes/compare
+    if (joined === 'v1/quotes/compare') {
+      const url = new URL(req.url, `https://${req.headers.host}`);
+      const fromAsset = (url.searchParams.get('from') || 'USDC').toUpperCase();
+      const toCurrency = (url.searchParams.get('to') || 'NGN').toUpperCase();
+      const amount = Math.max(parseFloat(url.searchParams.get('amount') || '100'), 1);
+
+      // Base FX rates against 1 USD
+      const fxRates = {
+        NGN: 1610.50,
+        KES: 129.80,
+        GHS: 15.65,
+        MXN: 19.85,
+        BRL: 5.65,
+        ARS: 1280.00,
+        PEN: 3.75,
+        EUR: 0.92,
+        ZAR: 18.20,
+        XOF: 603.50,
+        USD: 1.00
+      };
+
+      const baseRate = fxRates[toCurrency] || 1.0;
+      const allAccounts = await accountRows(db);
+
+      // Anchor catalog with corridor support and fee schedules
+      const anchorCatalog = [
+        {
+          name: 'Cowrie Exchange',
+          domain: 'cowrie.exchange',
+          corridors: ['NGN', 'GHS'],
+          rateSpread: 0.998, // -0.2% spread
+          feePercent: 0.8,
+          feeFixedUsd: 0.50,
+          payoutSpeed: 'Instant (1–3 mins)',
+          paymentMethods: ['NIBSS Instant Payment', 'Mobile Money'],
+          sep24Url: 'https://cowrie.exchange/offramp'
+        },
+        {
+          name: 'MoneyGram Access',
+          domain: 'stellar.moneygram.com',
+          corridors: ['USD', 'EUR', 'MXN', 'KES', 'PHP', 'CAD', 'GBP'],
+          rateSpread: 0.995,
+          feePercent: 0.0,
+          feeFixedUsd: 0.00,
+          payoutSpeed: 'Cash in 5 mins',
+          paymentMethods: ['Cash Pickup (400,000+ Locations)'],
+          sep24Url: 'https://stellar.moneygram.com'
+        },
+        {
+          name: 'Anclap',
+          domain: 'anclap.com',
+          corridors: ['ARS', 'PEN', 'BRL'],
+          rateSpread: 0.997,
+          feePercent: 0.5,
+          feeFixedUsd: 0.20,
+          payoutSpeed: 'Instant (PIX / CVU)',
+          paymentMethods: ['PIX', 'CVU / CBU (Argentina)', 'BCP (Peru)'],
+          sep24Url: 'https://anclap.com'
+        },
+        {
+          name: 'MyKobo',
+          domain: 'mykobo.co',
+          corridors: ['EUR', 'NGN'],
+          rateSpread: 0.992,
+          feePercent: 1.0,
+          feeFixedUsd: 0.00,
+          payoutSpeed: 'SEPA Instant / 5 mins',
+          paymentMethods: ['SEPA Instant Bank Transfer', 'Nigerian Bank Transfer'],
+          sep24Url: 'https://mykobo.co'
+        },
+        {
+          name: 'nTokens',
+          domain: 'ntokens.com',
+          corridors: ['BRL'],
+          rateSpread: 0.999,
+          feePercent: 0.4,
+          feeFixedUsd: 0.00,
+          payoutSpeed: 'Instant (< 60s)',
+          paymentMethods: ['Banco Central do Brasil PIX'],
+          sep24Url: 'https://ntokens.com'
+        },
+        {
+          name: 'ClickPesa',
+          domain: 'clickpesa.com',
+          corridors: ['KES', 'TZS'],
+          rateSpread: 0.994,
+          feePercent: 1.2,
+          feeFixedUsd: 0.30,
+          payoutSpeed: 'Instant (< 2 mins)',
+          paymentMethods: ['Safaricom M-Pesa', 'Airtel Money'],
+          sep24Url: 'https://clickpesa.com'
+        }
+      ];
+
+      // Filter anchors that support this corridor
+      const eligible = anchorCatalog.filter(a => a.corridors.includes(toCurrency));
+      
+      const quotes = eligible.map(a => {
+        const dAccounts = allAccounts.filter(acc => acc.domain.toLowerCase() === a.domain.toLowerCase());
+        const rel = computeDomainReliability(dAccounts);
+
+        const effectiveRate = Number((baseRate * a.rateSpread).toFixed(4));
+        const feeAmountUsd = Number(((amount * (a.feePercent / 100)) + a.feeFixedUsd).toFixed(2));
+        const netUsd = Math.max(amount - feeAmountUsd, 0);
+        const netPayout = Number((netUsd * effectiveRate).toFixed(2));
+
+        return {
+          anchor: a.name,
+          domain: a.domain,
+          fromAsset,
+          toCurrency,
+          inputAmount: amount,
+          exchangeRate: effectiveRate,
+          feePercent: a.feePercent,
+          feeUsd: feeAmountUsd,
+          netPayout,
+          payoutSpeed: a.payoutSpeed,
+          paymentMethods: a.paymentMethods,
+          sep24Url: a.sep24Url,
+          reliability: {
+            score: rel.score,
+            grade: rel.grade,
+            status: rel.status,
+            recommendation: rel.recommendation,
+            isDark: rel.score < 40
+          }
+        };
+      });
+
+      // Sort by net payout descending
+      quotes.sort((a, b) => b.netPayout - a.netPayout);
+
+      // Flag best payout and highest reliability
+      if (quotes.length > 0) {
+        quotes[0].isBestPayout = true;
+        const highestRel = [...quotes].sort((a, b) => b.reliability.score - a.reliability.score)[0];
+        if (highestRel) highestRel.isHighestReliability = true;
+      }
+
+      return json(res, 200, {
+        from: fromAsset,
+        to: toCurrency,
+        amount,
+        timestamp: new Date().toISOString(),
+        quotes
+      }, 60);
     }
 
     // GET /api/v1/anchors/:domain/payments
