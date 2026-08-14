@@ -93,20 +93,24 @@
     <!-- Forgot Password Form -->
     <form id="forgotForm" class="auth-form" hidden>
       <h2>Reset Password</h2>
-      <p class="auth-sub">Enter your email address to receive a secure password reset token.</p>
-      
+      <p class="auth-sub">
+        Self-serve email delivery isn't wired up yet. Submitting this records a
+        reset request; a project admin will need to relay you a reset code
+        out-of-band. Once you have a code, paste it below.
+      </p>
+
       <label class="field">
         <span>Account Email</span>
         <input type="email" id="forgotEmail" required placeholder="name@domain.com">
       </label>
-      
-      <button type="submit" class="dash-btn dash-btn--primary auth-btn">Generate Reset Token →</button>
 
-      <div id="resetStep2" class="reset-step2" hidden>
+      <button type="submit" class="dash-btn dash-btn--primary auth-btn">Record Reset Request →</button>
+
+      <div id="resetStep2" class="reset-step2">
         <hr class="divider">
         <label class="field">
-          <span>Reset Token</span>
-          <input type="text" id="resetToken" required placeholder="Paste reset code">
+          <span>Reset Code</span>
+          <input type="text" id="resetToken" required placeholder="Paste the code an admin gave you">
         </label>
         <label class="field">
           <span>New Password</span>

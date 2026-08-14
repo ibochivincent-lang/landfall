@@ -136,11 +136,10 @@
         method: 'POST',
         body: JSON.stringify({ email }),
       });
+      // The API never returns the reset token itself (see docs/gaps.md) -
+      // an admin relays it out-of-band, and the field below is always
+      // available for pasting whatever code they send.
       toast(res.message);
-      if (res.resetToken) {
-        $('#resetToken').value = res.resetToken;
-        $('#resetStep2').hidden = false;
-      }
     } catch (err) {
       toast(err.message, true);
     }

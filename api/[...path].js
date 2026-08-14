@@ -849,10 +849,25 @@ export default async function handler(req, res) {
         const email = String(body.email || '').trim().toLowerCase();
         if (!email) return adminJson(res, 400, { error: 'Email is required.' });
 
+        // SECURITY: this response must be identical whether or not the
+        // account exists, and must never contain the reset token itself.
+        // It previously returned resetToken directly in the JSON body with
+        // no proof the requester controlled that email address - anyone who
+        // could guess or find a registered email got a working password
+        // reset for that account. It also used a different message for the
+        // "no account" case, which let a caller enumerate which emails were
+        // registered even without the token leak. Both are fixed here:
+        // same message either way, and the token goes nowhere but the
+        // hashed row in `password_resets` and the server log below, which
+        // only the team can read.
+        const GENERIC_MESSAGE =
+          "If an account exists with that email, a password reset has been recorded. " +
+          "Self-serve delivery isn't wired up yet - contact an admin with your account email " +
+          "to complete the reset.";
+
         const { rows } = await db.query('SELECT id, email FROM portal_users WHERE email = $1', [email]);
         if (!rows[0]) {
-          // Keep response generic to prevent user enumeration
-          return adminJson(res, 200, { ok: true, message: 'If an account exists with that email, reset instructions have been generated.' });
+          return adminJson(res, 200, { ok: true, message: GENERIC_MESSAGE });
         }
 
         const resetToken = randomBytes(24).toString('hex');
@@ -863,11 +878,14 @@ export default async function handler(req, res) {
           [rows[0].id, sha256Hex(resetToken), expiresAt.toISOString()],
         );
 
-        return adminJson(res, 200, {
-          ok: true,
-          resetToken, // Returned for instant in-portal reset demonstration
-          message: 'Password reset code generated. Use it below to set your new password.'
-        });
+        // Stopgap until real email delivery exists (see docs/gaps.md): log
+        // the token server-side, where only the team can read it, so an
+        // admin can relay it to the account owner out-of-band. This makes
+        // self-serve reset temporarily manual instead of fully automated -
+        // a much smaller problem than handing the token to whoever asked.
+        console.log(`[password-reset] token for portal_users.id=${rows[0].id} (${email}), expires ${expiresAt.toISOString()}: ${resetToken}`);
+
+        return adminJson(res, 200, { ok: true, message: GENERIC_MESSAGE });
       }
 
       if (req.method === 'POST' && action === 'reset-password') {

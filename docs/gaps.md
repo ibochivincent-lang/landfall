@@ -39,6 +39,7 @@ rule that we hold ourselves to what we measure in others:
 |---|---|
 | No GraphQL API | `/api/v1/graphql`, reusing the REST resolvers directly — `docs/GRAPHQL_API.md` |
 | "MCP server for agents" advertised, not built | `scripts/mcp/server.mjs`, six tools, verified against a real database with the MCP SDK's own client — `docs/MCP.md` |
+| `forgot-password` returned the reset token to anyone who asked — account takeover | Token never leaves the server now; response no longer leaks whether an account exists either. Self-serve delivery is still unbuilt (no email sender exists), so resets are manual via an admin until that's wired up — full detail below. |
 
 Two more things were found while doing this, in the same spirit as the two
 listed above:
@@ -65,11 +66,11 @@ listed above:
 
 ---
 
-## Undisclosed until now: a real account-takeover path in the Developer Portal
+## Found and fixed, 14 August 2026: a real account-takeover path in the Developer Portal
 
 `POST /api/v1/auth/forgot-password` (added with the Developer Portal,
-`005_developer_portal.sql`) returns the password-reset token directly in the
-JSON response body instead of emailing it:
+`005_developer_portal.sql`) used to return the password-reset token directly
+in the JSON response body instead of emailing it:
 
 ```js
 return adminJson(res, 200, {
@@ -79,14 +80,28 @@ return adminJson(res, 200, {
 });
 ```
 
-Anyone who submits an email address — their own, a guessed one, or one
-scraped from anywhere — gets back a valid token to reset that account's
-password on the spot. There is no verification that the requester controls
-the email. This is a full account-takeover route for every `portal_users`
-account, found while reading `api/[...path].js` to build the GraphQL/MCP
-layer on top of it, not something introduced by this work. It needs fixing
-before the portal is treated as real auth for anything that matters — either
-actually email the token, or don't return it in the response at all.
+Anyone who submitted an email address — their own, a guessed one, or one
+scraped from anywhere — got back a valid token to reset that account's
+password on the spot, with no verification the requester controlled the
+email. A second, smaller issue sat next to it: the "no account found" branch
+returned a different message than the "found" branch, which let a caller
+enumerate registered emails even without the token leak. Both found while
+reading `api/[...path].js` to build the GraphQL/MCP layer on top of it, not
+introduced by that work.
+
+**Fix:** the endpoint now returns the exact same generic message whether or
+not the account exists, and never returns the token. There's no email
+sender wired up anywhere in this project yet, so for now the token is logged
+server-side only (readable by the team via Vercel logs, not returned to the
+caller) and an admin has to relay it to the account owner out-of-band — the
+Developer Portal's "Forgot password" flow (`packages/web/portal.html`,
+`portal.js`) now says exactly that instead of implying automated delivery
+that doesn't exist. Self-serve reset is temporarily manual rather than fully
+automated. That's a real regression in convenience and a project without real
+email delivery yet is a smaller problem than a live account-takeover
+primitive. Wiring up an actual transactional email sender (Resend, SES, or
+similar) is the real fix and isn't done — track it as a follow-up, not as
+closed.
 
 ---
 
