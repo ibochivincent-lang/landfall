@@ -41,9 +41,31 @@ This is answerable because of how Stellar itself works, not despite it:
 - **SEP-24** puts one leg of every deposit and withdrawal on the public ledger, so settlement behaviour is already there, retroactively, for every anchor — a prober starts collecting the day you switch it on, Landfall computed years of history on its first run.
 - **CAP-67** (Protocol 23) turns per-account paging into one unified event stream, and makes mint/burn distinguishable from transfer instead of inferred.
 - **SEP-38** firm quotes give slippage — quoted amount versus landed amount — a defined baseline, which nothing in the ecosystem publishes today.
+- **x402** turns "can an agent pay?" into a solved problem, and leaves "who should an agent pay?" open — see below.
 - **Soroban** publishes a digest of each dataset on-chain (deployed to testnet), so a contract can route on the same data a wallet reads from the API, and anyone can re-derive the digest and check it agrees.
 
 Move any of this to a chain without those primitives and there is nothing left — it is not a generic app that happens to settle on Stellar.
+
+### The agent gap
+
+In July 2026 Stellar joined the [x402 Foundation](https://x402.org) alongside Visa, Stripe and
+Google, standardising how software pays software with no human in the loop. Stellar's own
+[x402 announcement](https://stellar.org/blog/foundation-news/x402-on-stellar) covers the
+settlement path in detail — facilitators, spending limits, budget controls, stablecoin transfer
+in about five seconds. It answers *how much* an agent may spend. It does not answer **who an
+agent should be willing to pay.**
+
+A human routing a payment has a fallback the protocol does not provide: they recognise the brand,
+they have used it before, a colleague vouched for it. An autonomous agent has none of that. It
+has a domain string and whatever that domain says about itself — which is the one input that can
+be edited in ten seconds.
+
+That is the gap Landfall was already built for, and why the MCP server matters more than its size
+suggests: it is the interface through which an agent can ask *did this anchor actually settle?*
+and get an answer computed from the ledger rather than supplied by the counterparty.
+
+Nothing in this repository claims that gap is closed. No external agent queries Landfall today.
+But the question is now the ecosystem's, not just ours.
 
 **What is built, and what is not:**
 
@@ -64,9 +86,14 @@ Move any of this to a chain without those primitives and there is nothing left �
 | Postgres persistence + REST API | ✅ **shipping** | Supabase Session Pooler + serverless Vercel function endpoints |
 | Live transactions dashboard | ✅ **shipping** | `/dashboard.html` with dark account indicators and counterparty breakdown |
 | Hourly ledger scan (GitHub Actions) | ✅ **shipping** | Scheduled cron (`0 * * * *`) with `$0/month` hosting upkeep |
+| **Anchor Route Scout** (`/compare.html`) | ⚠️ **partly real** | Reliability grades are ledger-derived and real. The FX rates, fee schedules and payout speeds behind them are a **hardcoded catalogue, not live SEP-38 quotes** — see [docs/gaps.md](docs/gaps.md) |
 | Soroban smart contract oracle | **deployed to testnet** | Rust Soroban contract with 16 test cases, digest verification |
 | CAP-67 event stream ingestion | schema ready | Ingestion pipeline planned |
 | `@landfall/sdk` TypeScript package | in progress | Quickstart fetch/client wrappers documented |
+| Live SEP-38 quote ingestion | **designed, not built** | Real firm quotes to replace the static rate/fee catalogue above |
+| Dark-anchor early warning (predictive) | **designed, not built** | Classifier over stored scan history — degradation signal before an anchor goes fully dark |
+| `pickAnchor()` multi-factor route scoring | **designed, not built** | Weighted score over payout, reliability, and degradation signal; needs real quotes first |
+| Slippage: quoted versus landed | **designed, not built** | Depends on attestation (Horizon 2). Nothing in the ecosystem publishes this today |
 
 We would rather list this honestly than let a roadmap read as a changelog. Full detail in [docs/gaps.md](docs/gaps.md) and [ROADMAP.md](ROADMAP.md).
 

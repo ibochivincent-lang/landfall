@@ -152,6 +152,61 @@ closed.
 
 ---
 
+## 0a. Open and live: Route Scout publishes invented rates and fees
+
+Found 14 August, unfixed at time of writing. This is the most serious open item
+on this page.
+
+`/compare.html` headlines itself:
+
+> "Compare every integrated Stellar anchor by payout, fees, speed, and
+> **verified on-chain settlement reliability** — before routing a payment."
+
+and footers "Settlement reliability derived from the public Stellar ledger — no
+anchor self-reporting."
+
+The reliability column is real and does come from the ledger. Everything beside
+it does not. `GET /api/v1/quotes/compare` returns a hardcoded catalogue that
+lives in the source:
+
+```js
+const fxRates = { NGN: 1610.50, KES: 129.80, GHS: 15.65, /* ... */ };
+{ name: 'Cowrie Exchange', rateSpread: 0.998, feePercent: 0.8,
+  feeFixedUsd: 0.50, payoutSpeed: 'Instant (1–3 mins)' }
+{ name: 'MoneyGram Access', rateSpread: 0.995, feePercent: 0.0,
+  feeFixedUsd: 0.00, payoutSpeed: 'Cash in 5 mins' }
+```
+
+Nothing fetches these. There is no SEP-38 call anywhere in the codebase despite
+the commit message describing the feature as shipping "with SEP-38 quotes". The
+FX rates are static, so they are also wrong by however much the market has moved
+since they were typed.
+
+Why this is worse than the reliability bug fixed the same day: those scores were
+at least computed from real ledger records, and the failure was a window that had
+silently narrowed. These are commercial terms — a 0.8% fee, a $0.50 charge, a
+0% fee for MoneyGram, a 1–3 minute payout — asserted about named financial
+businesses, on a page that says "verified" and "no anchor self-reporting", with
+no disclaimer anywhere. A user could route real money on them. A competitor
+could reasonably call it misrepresentation.
+
+It also reproduces, exactly, the flaw section 0 below says we criticised
+stellar-intel for and then committed ourselves.
+
+**Two honest fixes, either acceptable:**
+
+1. Label the rate, fee and speed columns as illustrative until SEP-38 ingestion
+   lands, and change the headline so "verified" clearly scopes to reliability
+   only.
+2. Ship the reliability comparison alone and add the commercial columns when
+   there is a real quote behind them.
+
+The second is stronger. Landfall's whole claim is that it publishes only what
+the ledger proves, and a rate table is precisely the kind of anchor-supplied
+number the project exists to distrust.
+
+---
+
 ## 0. The one that mattered most: the site promising things that don't exist
 
 The landing page advertised a product that was not there. Most of it is now
@@ -195,6 +250,14 @@ whole problem. The alternative is deleting those sections until they're real.
   is still no alerting on state change.
 - ~~**No API**~~ — shipped. ~~**No MCP server.**~~ — shipped, unlinked from
   the site, no external consumer yet. **Still no SDK.**
+- **No live quote data.** Route Scout compares rates and fees from a hardcoded
+  table (section 0a). Until SEP-38 ingestion exists, every commercial figure on
+  that page is invented, and `pickAnchor()` cannot be built on top of it —
+  optimising over fabricated inputs returns a confident answer with nothing
+  behind it.
+- **No predictive signal.** Every scan is stored, so the data to detect an
+  anchor degrading before it goes dark exists and nothing reads it back. A
+  wallet would rather have 48 hours' warning than an accurate post-mortem.
 - ~~**The Soroban oracle has never been deployed.**~~ Live on **testnet** at
   `CA2IYHFKTKSJWR5IICY6HFD55BJEGE7OMKISWMLMPFSHLESZYO3VICAG` as of
   13 August 2026. Still **not on mainnet**, and **the indexer does not publish

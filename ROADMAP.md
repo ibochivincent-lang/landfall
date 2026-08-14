@@ -15,6 +15,21 @@ oracle digest, an agent queries the MCP server — and removing Landfall breaks
 them. Today nothing outside this repo depends on it yet. That is the honest
 line every horizon below is measured against.
 
+**Why the clock moved.** In July 2026 Stellar joined the
+[x402 Foundation](https://x402.org) with Visa, Stripe and Google, standardising
+autonomous software-to-software payment. Stellar's
+[own announcement](https://stellar.org/blog/foundation-news/x402-on-stellar)
+specifies the settlement path — facilitators, spending limits, budget controls —
+and leaves the counterparty question open: an agent can now pay without a human,
+but nothing tells it *who is safe to pay*. A human falls back on brand
+recognition; an agent has only the domain's self-description, which is the one
+input that can be edited in ten seconds.
+
+This does not change what Landfall is. It changes who needs it, and how soon.
+Every horizon below is ordered on the assumption that the consumer of this data
+is increasingly a program rather than a person — machine-readable first,
+dashboard second.
+
 **As of 13 August 2026.** Horizon 0 is what a stranger can verify against the
 repository and the live site today. Line items carry the backlog or issue
 number that tracks them where one exists, so this page stays checkable rather
@@ -68,6 +83,7 @@ than becoming a second changelog.
 ### Reconciling the site with reality
 
 - [ ] Label or remove every claim still ahead of what's built: invented $99/mo pricing, "Get API access" implying access control that doesn't exist, "Log in" with no accounts behind it, an advertised SDK/webhooks that aren't built yet
+- [ ] **Route Scout publishes invented rates and fees — highest-priority honesty fix.** `/compare.html` says it compares anchors by "payout, fees, speed, and verified on-chain settlement reliability" and footers "no anchor self-reporting", while `GET /api/v1/quotes/compare` serves a hardcoded catalogue: static FX rates, per-anchor `rateSpread`, `feePercent`, `feeFixedUsd` and payout speeds, none of them fetched from anywhere. The reliability column is real; every commercial figure beside it is invented and attributed to a named business. Either label the rate/fee columns as illustrative until SEP-38 ingestion lands, or drop those columns and ship the reliability comparison alone. See [docs/gaps.md](docs/gaps.md)
 - [ ] Make a deliberate call on the AI chat explorer feature that shipped outside this backlog — decide whether it belongs in the grant pitch or gets held back, since it cuts against the "infrastructure, not application" positioning the whole submission argues for
 
 ---
@@ -75,7 +91,9 @@ than becoming a second changelog.
 ## 🎯 Horizon 2 — Layer 2: attested outcomes and distribution (months 1–6)
 
 - [ ] **Signed settlement receipt ingest** (backlog H1) — an attestation format so an anchor or user can assert the fiat leg, which the ledger alone cannot show
-- [ ] **Slippage metric: quoted versus landed** (backlog H2) — depends on receipts; nothing in the ecosystem currently publishes this number
+- [ ] **Slippage metric: quoted versus landed** (backlog H2) — depends on receipts; nothing in the ecosystem currently publishes this number. This is the number that makes Route Scout's rate column a measurement instead of a catalogue
+- [ ] **Dark-anchor early warning** — an anchor rarely stops instantly: volume falls, counterparty concentration tightens, gaps between settlements stretch, then silence. Every scan is already stored, so the training data exists and nothing reads it back. A degradation signal 48–72h ahead is worth more to a wallet than an accurate post-mortem, and it is the natural Tranche 2 milestone. Must ship with its false-positive rate published — an early warning that cries wolf about a named business is worse than none
+- [ ] **`pickAnchor()` multi-factor route scoring** — one weighted score over net payout, reliability grade, and degradation signal, with the caller choosing the emphasis (safest / cheapest / fastest) rather than the formula choosing for them. Blocked on live SEP-38 quotes: optimising over a hardcoded rate table produces a confident recommendation from invented inputs, which is worse than no recommendation
 - [ ] Talk to at least one wallet about embedding `pickAnchor()` — one real conversation in progress outweighs three more shipped features in a grant application
 - [ ] Publish `@landfall/sdk` with `pickAnchor()` to npm (backlog H3)
 - [ ] **CAP-67 unified event ingestion** — replaces N per-account REST cursors with one ledger-wide stream, and makes mint/burn distinguishable from transfer instead of inferred
