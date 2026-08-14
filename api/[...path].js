@@ -36,6 +36,8 @@
 import pg from 'pg';
 import { scrypt as scryptCb, randomBytes, timingSafeEqual, createHash } from 'node:crypto';
 import { promisify } from 'node:util';
+import { assertPublicHostname } from './_lib/net-guard.js';
+import { sendEmail } from './_lib/email.js';
 import { graphql, buildSchema } from 'graphql';
 
 const { Pool } = pg;
@@ -194,6 +196,102 @@ async function requireSession(req, db) {
   } catch {}
 
   return null;
+}
+
+// ── Rate limiting & password policy ───────────────────────────────────────────
+//
+// Fixed 60-second-window counters in Postgres (rate_limit_counters, added by
+// migration 006) — reused for per-IP auth-endpoint throttling, per-API-key
+// elevated limits on the public reads, and anonymous fallback throttling.
+// No Redis: this project already pays for one Postgres connection, and the
+// counter table is small and self-pruning (see rateLimit() below).
+
+const COMMON_PASSWORDS = new Set([
+  'password', 'password1', '123456789', '12345678', 'qwerty123',
+  'letmein123', 'welcome123', 'password123', 'abcdefgh12', 'iloveyou12',
+  'admin12345', 'passw0rd12', 'trustno1ab', 'monkey12345', 'dragon12345',
+  'football12', 'baseball12', 'sunshine12', 'princess12', 'superman12',
+]);
+
+function isWeakPassword(pw) {
+  return pw.length < 10 || COMMON_PASSWORDS.has(pw.toLowerCase());
+}
+
+function clientIp(req) {
+  const fwd = req.headers['x-forwarded-for'];
+  if (fwd) return String(fwd).split(',')[0].trim();
+  return req.socket?.remoteAddress || 'unknown';
+}
+
+/**
+ * Upserts a fixed 60-second-window counter and returns whether this call is
+ * still within `limitPerMinute`. Opportunistically prunes rows older than an
+ * hour on ~2% of calls rather than running a dedicated cleanup job.
+ */
+async function rateLimit(db, bucketKey, limitPerMinute) {
+  const { rows } = await db.query(
+    `INSERT INTO rate_limit_counters (bucket_key, window_start, count)
+     VALUES ($1, date_trunc('minute', now()), 1)
+     ON CONFLICT (bucket_key, window_start)
+     DO UPDATE SET count = rate_limit_counters.count + 1
+     RETURNING count`,
+    [bucketKey],
+  );
+  if (Math.random() < 0.02) {
+    db.query(`DELETE FROM rate_limit_counters WHERE window_start < now() - interval '1 hour'`).catch(() => {});
+  }
+  const count = rows[0]?.count ?? 1;
+  return { allowed: count <= limitPerMinute, count };
+}
+
+/**
+ * Convenience wrapper for the auth-ish routes (login, register, password
+ * reset, admin login, contact). Sends the 429 itself; callers do
+ * `if (await enforceAuthRateLimit(...)) return;` as their first line.
+ */
+async function enforceAuthRateLimit(req, res, db, routeName, limit = 10) {
+  const bucket = `auth:${routeName}:${clientIp(req)}`;
+  const { allowed } = await rateLimit(db, bucket, limit);
+  if (!allowed) {
+    adminJson(res, 429, { error: 'Too many attempts. Try again in a minute.' });
+    return true;
+  }
+  return false;
+}
+
+/** Looks up a presented x-api-key against api_keys. Returns null if absent/invalid/revoked. */
+async function apiKeyContext(req, db) {
+  const key = req.headers['x-api-key'];
+  if (!key || typeof key !== 'string') return null;
+  const { rows } = await db.query(
+    `SELECT id, rate_limit_per_min FROM api_keys WHERE key_hash = $1 AND revoked_at IS NULL`,
+    [sha256Hex(key)],
+  );
+  if (!rows[0]) return null;
+  db.query('UPDATE api_keys SET last_used_at = now() WHERE id = $1', [rows[0].id]).catch(() => {});
+  return { keyId: rows[0].id, limitPerMinute: rows[0].rate_limit_per_min };
+}
+
+const ANONYMOUS_READ_LIMIT_PER_MIN = 30;
+
+/**
+ * Gate for the six public v1/* read routes. A valid API key raises the limit
+ * to that key's own rate_limit_per_min (finally making key generation do
+ * something real instead of being decorative); no key, or an invalid one,
+ * falls back to a conservative anonymous limit. Reads stay public either
+ * way — this only ever changes the *rate*, never whether the request is
+ * served, matching this project's no-login-wall public-API framing.
+ */
+async function enforcePublicReadRateLimit(req, res, db) {
+  const ctx = await apiKeyContext(req, db);
+  const bucket = ctx ? `apikey:${ctx.keyId}` : `anon:${clientIp(req)}`;
+  const limit = ctx ? ctx.limitPerMinute : ANONYMOUS_READ_LIMIT_PER_MIN;
+  const { allowed } = await rateLimit(db, bucket, limit);
+  if (!allowed) {
+    json(res, 429, { error: 'Rate limit exceeded.' }, 0);
+    return true;
+  }
+  return false;
 }
 
 // ── SQL helpers (mirrors packages/api/src/server.ts exactly) ─────────────────
@@ -743,13 +841,15 @@ export default async function handler(req, res) {
       const action = parts[2];
 
       if (req.method === 'POST' && action === 'register') {
+        if (await enforceAuthRateLimit(req, res, db, 'register')) return;
+
         const body = await readJsonBody(req);
         const email = String(body.email || '').trim().toLowerCase();
         const username = String(body.username || '').trim().toLowerCase();
         const password = String(body.password || '');
 
-        if (!email || !username || password.length < 6) {
-          return adminJson(res, 400, { error: 'Valid email, username, and password (min 6 chars) required.' });
+        if (!email || !username || isWeakPassword(password)) {
+          return adminJson(res, 400, { error: 'Valid email, username, and password (min 10 chars, not a commonly used password) required.' });
         }
 
         const pwdHash = await hashPassword(password);
@@ -790,6 +890,8 @@ export default async function handler(req, res) {
       }
 
       if (req.method === 'POST' && action === 'login') {
+        if (await enforceAuthRateLimit(req, res, db, 'login')) return;
+
         const body = await readJsonBody(req);
         const loginIdent = String(body.username || body.email || '').trim().toLowerCase();
         const password = String(body.password || '');
@@ -845,6 +947,8 @@ export default async function handler(req, res) {
       }
 
       if (req.method === 'POST' && action === 'forgot-password') {
+        if (await enforceAuthRateLimit(req, res, db, 'forgot-password')) return;
+
         const body = await readJsonBody(req);
         const email = String(body.email || '').trim().toLowerCase();
         if (!email) return adminJson(res, 400, { error: 'Email is required.' });
@@ -852,18 +956,16 @@ export default async function handler(req, res) {
         // SECURITY: this response must be identical whether or not the
         // account exists, and must never contain the reset token itself.
         // It previously returned resetToken directly in the JSON body with
-        // no proof the requester controlled that email address - anyone who
+        // no proof the requester controlled that email address — anyone who
         // could guess or find a registered email got a working password
-        // reset for that account. It also used a different message for the
-        // "no account" case, which let a caller enumerate which emails were
-        // registered even without the token leak. Both are fixed here:
-        // same message either way, and the token goes nowhere but the
-        // hashed row in `password_resets` and the server log below, which
-        // only the team can read.
-        const GENERIC_MESSAGE =
-          "If an account exists with that email, a password reset has been recorded. " +
-          "Self-serve delivery isn't wired up yet - contact an admin with your account email " +
-          "to complete the reset.";
+        // reset for that account, and the "no account" branch used a
+        // different message, which let a caller enumerate registered emails
+        // even without the token leak. An interim fix (5218da3) closed the
+        // leak by logging the token server-side for manual admin relay,
+        // since no email sender existed yet. This finishes that follow-up:
+        // the token is now actually emailed via Resend, never returned in
+        // the response, and both branches share this exact wording.
+        const GENERIC_MESSAGE = 'If an account exists with that email, a reset code has been sent to it.';
 
         const { rows } = await db.query('SELECT id, email FROM portal_users WHERE email = $1', [email]);
         if (!rows[0]) {
@@ -878,23 +980,31 @@ export default async function handler(req, res) {
           [rows[0].id, sha256Hex(resetToken), expiresAt.toISOString()],
         );
 
-        // Stopgap until real email delivery exists (see docs/gaps.md): log
-        // the token server-side, where only the team can read it, so an
-        // admin can relay it to the account owner out-of-band. This makes
-        // self-serve reset temporarily manual instead of fully automated -
-        // a much smaller problem than handing the token to whoever asked.
-        console.log(`[password-reset] token for portal_users.id=${rows[0].id} (${email}), expires ${expiresAt.toISOString()}: ${resetToken}`);
+        // Fire-and-forget: not awaited, so response timing doesn't become a
+        // side channel that distinguishes "account exists, email in flight"
+        // from the not-found branch above. sendEmail() itself logs failures
+        // to function logs without changing this response — that keeps the
+        // admin-visible fallback the interim fix relied on, now backing a
+        // real delivery path instead of being the only path.
+        sendEmail({
+          to: rows[0].email,
+          subject: 'Your Landfall password reset code',
+          text: `Your password reset code is: ${resetToken}\n\nPaste this into the "Reset Password" form on the Landfall developer portal. It expires in 1 hour. If you did not request this, ignore this email.`,
+          html: `<p>Your password reset code is:</p><p style="font-size:20px;font-weight:bold;letter-spacing:1px">${resetToken}</p><p>Paste this into the "Reset Password" form on the Landfall developer portal. It expires in 1 hour.</p><p>If you did not request this, ignore this email.</p>`,
+        }).catch(() => {});
 
         return adminJson(res, 200, { ok: true, message: GENERIC_MESSAGE });
       }
 
       if (req.method === 'POST' && action === 'reset-password') {
+        if (await enforceAuthRateLimit(req, res, db, 'reset-password')) return;
+
         const body = await readJsonBody(req);
         const resetToken = String(body.token || '').trim();
         const newPassword = String(body.newPassword || '');
 
-        if (!resetToken || newPassword.length < 6) {
-          return adminJson(res, 400, { error: 'Valid reset token and new password (min 6 chars) required.' });
+        if (!resetToken || isWeakPassword(newPassword)) {
+          return adminJson(res, 400, { error: 'Valid reset token and new password (min 10 chars, not a commonly used password) required.' });
         }
 
         const tokenHash = sha256Hex(resetToken);
@@ -995,6 +1105,21 @@ export default async function handler(req, res) {
         if (!targetUrl.startsWith('https://')) {
           return adminJson(res, 400, { error: 'Webhooks must use HTTPS URLs.' });
         }
+        let hostname;
+        try {
+          hostname = new URL(targetUrl).hostname;
+        } catch {
+          return adminJson(res, 400, { error: 'Invalid webhook URL.' });
+        }
+        try {
+          // Blocks private/loopback/link-local/cloud-metadata targets (SSRF).
+          // Re-checked again immediately before every delivery in
+          // scripts/dispatch-webhooks.mjs, since DNS can be repointed after
+          // this registration-time check passes.
+          await assertPublicHostname(hostname);
+        } catch {
+          return adminJson(res, 400, { error: 'Webhook target resolves to a blocked network range.' });
+        }
         const secret = 'whsec_' + randomBytes(20).toString('hex');
         const { rows } = await db.query(
           `INSERT INTO user_webhooks (user_id, target_url, secret)
@@ -1017,6 +1142,8 @@ export default async function handler(req, res) {
       const sub = parts.slice(2);
 
       if (req.method === 'POST' && sub.join('/') === 'login') {
+        if (await enforceAuthRateLimit(req, res, db, 'admin-login')) return;
+
         const body = await readJsonBody(req);
         const username = String(body.username || '').trim().toLowerCase();
         const password = String(body.password || '');
@@ -1151,6 +1278,14 @@ export default async function handler(req, res) {
     if (joined === 'health' || joined === '') {
       await db.query('SELECT 1');
       return json(res, 200, { ok: true }, 0);
+    }
+
+    // Public v1/* reads below this point share one rate-limit gate: a valid
+    // x-api-key raises the limit to that key's own rate_limit_per_min,
+    // otherwise a conservative anonymous default applies. Reads stay public
+    // either way (see enforcePublicReadRateLimit's docstring).
+    if (joined.startsWith('v1/')) {
+      if (await enforcePublicReadRateLimit(req, res, db)) return;
     }
 
     // GET /api/v1/anchors

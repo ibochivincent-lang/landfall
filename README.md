@@ -193,6 +193,8 @@ Copy `.env.example` to `.env` and adjust. Nothing in the example file is a secre
 | `CORS_ORIGIN` | No | `*` | API CORS origin. |
 | `ORACLE_CONTRACT_ID` | Only to publish on-chain | — | Deployed Soroban oracle contract id. |
 | `ORACLE_ADMIN_SECRET` | Only to publish on-chain | — | Admin key for the oracle contract. Never commit this. |
+| `RESEND_API_KEY` | For password-reset emails | — | [Resend](https://resend.com) API key. Without it, the reset endpoint logs a clear failure instead of pretending to succeed. |
+| `FROM_EMAIL` | Same as above | — | Sending address. Must be on a domain verified with Resend — it cannot send from a `vercel.app` subdomain this project doesn't control DNS for. |
 
 ## Documentation
 

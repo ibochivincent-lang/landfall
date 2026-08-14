@@ -35,12 +35,24 @@ rule that we hold ourselves to what we measure in others:
 
 ## Closed since this list was written — 14 August 2026
 
+The Developer Portal commit (multi-user auth, API keys, webhooks, password
+reset) landed the same day this list still said "no accounts, no auth" —
+which made this list wrong the moment it shipped. This section covers
+everything closed on 14 August, from three independent passes over the same
+commit that landed within hours of each other.
+
 | Was | Now |
 |---|---|
 | No GraphQL API | `/api/v1/graphql`, reusing the REST resolvers directly — `docs/GRAPHQL_API.md` |
 | "MCP server for agents" advertised, not built | `scripts/mcp/server.mjs`, six tools, verified against a real database with the MCP SDK's own client — `docs/MCP.md` |
-| `forgot-password` returned the reset token to anyone who asked — account takeover | Token never leaves the server now; response no longer leaks whether an account exists either. Self-serve delivery is still unbuilt (no email sender exists), so resets are manual via an admin until that's wired up — full detail below. |
+| `forgot-password` returned the reset token to anyone who asked — account takeover | Fixed in two stages: first (5218da3) the token stopped leaving the server at all — logged for manual admin relay, since no email sender existed. Then real delivery was wired up: the token is now emailed via Resend, never returned in the response, and both the found/not-found branches share identical wording — full detail below. |
 | An incremental scan published one hour's payments as the anchor's whole record, and graded named anchors on it | Metrics computed over persisted history plus the new fetch. Fetch stays incremental, arithmetic is cumulative again — full detail below. |
+| No rate limiting on any auth endpoint | A Postgres-backed counter now throttles login, register, forgot-password, reset-password, and admin login (10/min/IP each). |
+| Password policy was a 6-character minimum only | Raised to 10 characters plus a common-password check. |
+| Webhook registration only string-checked for `https://` | Now resolves the target hostname and blocks private/loopback/link-local/cloud-metadata IP ranges, re-checked again immediately before every delivery (registration-time-only checking leaves a DNS-rebinding gap). |
+| "Webhooks when an anchor goes dark" — still none, nothing consumes the `dark` event | `scripts/dispatch-webhooks.mjs` runs after every hourly scan, diffs liveness state, and HMAC-signs + POSTs to registered webhooks on transition into `dark`. |
+| API keys were generated but never checked anywhere | Now enforced as a rate-limit tier: a valid key raises the public-read limit to that key's configured `rate_limit_per_min`; anonymous requests get a conservative default. **Reads are still fully public either way** — a key changes the rate, not access. This is not the metered/billed tier described below; that's still not built. |
+| "the indexer does not publish to it — so it is a deployed contract, not a working oracle" | `scripts/publish-oracle.mjs` runs after every scan (once `ORACLE_CONTRACT_ID`/`ORACLE_ADMIN_SECRET` are configured) and calls `publish(digest)`. Still **not on mainnet**. |
 
 ### The scan published an hour as though it were a history — 14 August 2026
 
@@ -137,18 +149,22 @@ reading `api/[...path].js` to build the GraphQL/MCP layer on top of it, not
 introduced by that work.
 
 **Fix:** the endpoint now returns the exact same generic message whether or
-not the account exists, and never returns the token. There's no email
+not the account exists, and never returns the token. ~~There's no email
 sender wired up anywhere in this project yet, so for now the token is logged
 server-side only (readable by the team via Vercel logs, not returned to the
-caller) and an admin has to relay it to the account owner out-of-band — the
-Developer Portal's "Forgot password" flow (`packages/web/portal.html`,
-`portal.js`) now says exactly that instead of implying automated delivery
-that doesn't exist. Self-serve reset is temporarily manual rather than fully
-automated. That's a real regression in convenience and a project without real
-email delivery yet is a smaller problem than a live account-takeover
-primitive. Wiring up an actual transactional email sender (Resend, SES, or
-similar) is the real fix and isn't done — track it as a follow-up, not as
-closed.
+caller) and an admin has to relay it to the account owner out-of-band~~ —
+~~Self-serve reset is temporarily manual rather than fully automated.~~
+~~Wiring up an actual transactional email sender (Resend, SES, or similar) is
+the real fix and isn't done — track it as a follow-up, not as closed.~~
+
+**Update, same day:** that follow-up is done. The token is now emailed via
+Resend (`api/_lib/email.js`), never logged in full and never returned in the
+response; the Developer Portal's "Forgot password" flow
+(`packages/web/portal.html`, `portal.js`) says "check your email" instead of
+describing a manual admin relay. Self-serve reset is fully automated again —
+requires `RESEND_API_KEY` and a `FROM_EMAIL` on a domain verified with
+Resend to actually deliver; without them the send fails loudly (logged, not
+silent), it does not fall back to the old behavior.
 
 ---
 
@@ -270,6 +286,47 @@ number the project exists to distrust.
 
 ---
 
+## Also closed 14 August: password-reset delivery, rate limiting, webhooks, oracle publish
+
+Three more things closed the same day, on top of what's above:
+
+- **`forgot-password` — real delivery.** 5218da3 (above) stopped the token
+  leaving the server, but left resets manual: the token was logged
+  server-side for an admin to relay by hand, since no email sender existed.
+  That gap is now closed too — the token is emailed via
+  [Resend](https://resend.com), never returned in the response, and the
+  found/not-found responses share identical wording. Requires
+  `RESEND_API_KEY` and a `FROM_EMAIL` on a domain verified with Resend to
+  actually deliver; without them the send fails loudly (logged, not silent).
+- **No rate limiting on any auth endpoint.** A Postgres-backed counter
+  (`rate_limit_counters`) now throttles login, register, forgot-password,
+  reset-password, and admin login at 10/min/IP each. Also raised the
+  password minimum from 6 to 10 characters plus a common-password check.
+- **Webhooks were entirely inert.** `user_webhooks` rows were stored but
+  nothing ever fired one, and registration only string-checked the URL
+  started with `https://` — no protection against a target that resolves to
+  a private/loopback/link-local/cloud-metadata address. Both fixed:
+  `api/_lib/net-guard.js` resolves and blocks those ranges at registration
+  *and* again immediately before every delivery (a registration-time-only
+  check leaves a DNS-rebinding gap), and `scripts/dispatch-webhooks.mjs` now
+  runs after every hourly scan, diffs liveness state account-by-account, and
+  HMAC-signs + POSTs to every active, subscribed webhook when an account
+  transitions into `dark`, with retry/backoff and a delivery audit trail
+  (`webhook_deliveries`).
+- **API keys were generated but never checked.** Now enforced as a
+  rate-limit tier: a valid `x-api-key` raises the public-read limit to that
+  key's own `rate_limit_per_min`; no key (or an invalid one) gets a
+  conservative anonymous default. **Reads stay fully public either way** —
+  a key changes the rate, not access. This is not the metered/billed tier
+  described below in section 0; that's still not built.
+- **The oracle was deployed but never published to.** `scripts/publish-oracle.mjs`
+  now runs after every scan, computes a digest over the scan's account
+  summaries, and calls the deployed contract's `publish()` — once
+  `ORACLE_CONTRACT_ID`/`ORACLE_ADMIN_SECRET` are configured as secrets; it
+  no-ops cleanly (logged, not silent) until then. Still **not on mainnet**.
+
+---
+
 ## 0. The one that mattered most: the site promising things that don't exist
 
 The landing page advertised a product that was not there. Most of it is now
@@ -277,14 +334,14 @@ either real or labelled; what remains is listed as **still aspirational**.
 
 | Claim on the site | Reality, 13 August |
 |---|---|
-| "Get API access" | The API exists and is documented. There is no access control, so "get access" still overstates it. |
+| "Get API access" | The API exists and is documented. There is now a real key-issuing Developer Portal (see 14 August table above) — but a key only buys a higher rate limit, it doesn't gate access, so "get access" still overstates it a little. |
 | Pricing: $99/mo, 250k calls | **Still invented.** Nothing to bill for, no billing, no buyer has seen the number. |
 | `@landfall/sdk` with `pickAnchor()` | **Still not written**, not on npm. Labelled planned. |
-| "Log in" | **Still no accounts, no auth.** The button opens a waitlist. |
-| "Webhooks when an anchor goes dark" | **Still none.** The contract emits a `dark` event; nothing consumes it. |
+| ~~"Log in"~~ | ~~Still no accounts, no auth.~~ Real auth shipped 14 August — see the tables above. |
+| ~~"Webhooks when an anchor goes dark"~~ | ~~Still none.~~ Dispatcher shipped 14 August — see the tables above. |
 | "MCP server for agents" | Built — `scripts/mcp/server.mjs`, `docs/MCP.md`. Not linked from the site, and no external agent has connected to it yet. |
-| "1,000 API calls / month" free tier | There are calls to make now, but no metering and no tier. |
-| Contact form | **Still submits to nothing.** |
+| "1,000 API calls / month" free tier | There are calls to make now, and `rate_limit_per_min` is now enforced per key as of 14 August — but that's an anti-abuse limit, not a metered/billed tier. Still no metering, still no tier. |
+| ~~Contact form~~ | ~~Still submits to nothing.~~ Fixed 14 August — see 0c above. |
 
 **This is the exact flaw we identified in stellar-intel** — a landing page
 claiming 70 anchors tracked while the code probed 7. We criticised it, then
@@ -323,9 +380,9 @@ whole problem. The alternative is deleting those sections until they're real.
   wallet would rather have 48 hours' warning than an accurate post-mortem.
 - ~~**The Soroban oracle has never been deployed.**~~ Live on **testnet** at
   `CA2IYHFKTKSJWR5IICY6HFD55BJEGE7OMKISWMLMPFSHLESZYO3VICAG` as of
-  13 August 2026. Still **not on mainnet**, and **the indexer does not publish
-  to it** — so it is a deployed contract, not a working oracle. The gap moved;
-  it did not close.
+  13 August 2026. ~~The indexer does not publish to it.~~ `scripts/publish-oracle.mjs`
+  now does, once configured — see the 14 August table above. Still **not on
+  mainnet**.
 - **No attestation layer**, so no slippage metric. The most valuable number the
   project could produce does not exist yet.
 - **No dispute portal**, despite the code of conduct and security policy both

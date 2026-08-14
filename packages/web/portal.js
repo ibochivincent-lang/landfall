@@ -136,10 +136,13 @@
         method: 'POST',
         body: JSON.stringify({ email }),
       });
-      // The API never returns the reset token itself (see docs/gaps.md) -
-      // an admin relays it out-of-band, and the field below is always
-      // available for pasting whatever code they send.
+      // The API never returns the reset token itself (see docs/gaps.md) —
+      // that used to be a full account-takeover primitive: anyone who knew
+      // a victim's email could read the token straight off this response
+      // and reset their password. The code now only ever arrives by email;
+      // reveal the "paste your code" step once it's been sent.
       toast(res.message);
+      $('#resetStep2').hidden = false;
     } catch (err) {
       toast(err.message, true);
     }
