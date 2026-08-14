@@ -32,28 +32,37 @@ That asymmetry drives every choice below.
 
 ### The two connection strings
 
-Supabase hands out two, and using the wrong one is the most common way to lose
-an afternoon here. **Project settings → Database → Connection string.**
+Supabase hands out three, and using the wrong one is the most common way to
+lose an afternoon here. **Project settings → Database → Connection string.**
 
 ```
-Direct       postgresql://postgres:PASSWORD@db.PROJECT_REF.supabase.co:5432/postgres
-Transaction  postgresql://postgres.PROJECT_REF:PASSWORD@aws-0-REGION.pooler.supabase.com:6543/postgres
+Direct           postgresql://postgres:PASSWORD@db.PROJECT_REF.supabase.co:5432/postgres
+Session pooler   postgresql://postgres.PROJECT_REF:PASSWORD@aws-0-REGION.pooler.supabase.com:5432/postgres
+Transaction      postgresql://postgres.PROJECT_REF:PASSWORD@aws-0-REGION.pooler.supabase.com:6543/postgres
 ```
 
-**Migrations use the direct string, port 5432.** The pooler on 6543 is
-PgBouncer in transaction mode: it hands your statements to whichever backend
-is free, so a session does not survive from one statement to the next. Our
-migrations are wrapped in `BEGIN`/`COMMIT` and use `DO $$ … $$` blocks, and
-under the pooler that can end up partly applied with no error to tell you.
+**Migrations use the direct string, port 5432,** normally. The transaction
+pooler on 6543 is PgBouncer in transaction mode: it hands your statements to
+whichever backend is free, so a session does not survive from one statement to
+the next. Our migrations are wrapped in `BEGIN`/`COMMIT` and use
+`DO $$ … $$` blocks, and under that pooler they can end up partly applied with
+no error to tell you.
 
-**The API and indexer use the pooled string, port 6543.** Direct connections
-are capped low on the free tier, and on some plans are IPv6-only, which
-container hosts frequently are not. Note the username changes to
-`postgres.PROJECT_REF` in the pooled form — it is not a typo.
+**If the direct hostname will not resolve** — `could not translate host name`
+— your network most likely lacks IPv6, and `db.PROJECT_REF.supabase.co` is
+IPv6-only on most current Supabase projects. Use the **session pooler**
+string instead: same port 5432, same session-persistence guarantee migrations
+need, but IPv4-reachable. Note the username changes to
+`postgres.PROJECT_REF` in both pooled forms — it is not a typo.
 
-Append `?sslmode=require` to both. The API already forces TLS for hostnames
-matching `supabase.`, but being explicit means the string still does the right
-thing if you paste it into `psql`.
+**The API and indexer use the transaction pooler, port 6543.** Direct
+connections are capped low on the free tier.
+
+Append `?sslmode=require` to all of these when pasting into `psql` or
+`.env`. The API and admin scripts already force TLS for hostnames matching
+`supabase.` in code — see the admin board section below for a `pg`-specific
+catch when a connection string carries `sslmode=require` *and* an explicit
+`ssl` option at the same time.
 
 ### Run the migrations
 
@@ -68,12 +77,14 @@ MIGRATE_DATABASE_URL="postgresql://postgres:PASSWORD@db.REF.supabase.co:5432/pos
 ```
 
 Both apply every file in `packages/db/migrations` in order, stop on the first
-error, and print the resulting `schema_version`. You should see versions 1 and
-2. They are safe to re-run.
+error, and print the resulting `schema_version`. You should see versions 1
+through 4. They are safe to re-run.
 
 Needs `psql`. On Windows: `winget install PostgreSQL.PostgreSQL.16`, then
-reopen the terminal. Or paste each migration into the Supabase SQL editor —
-`001_init.sql` first, `002_hosted_lockdown.sql` second.
+**open a new terminal** — an already-open one keeps the pre-install PATH and
+still will not find it. Or paste each migration into the Supabase SQL editor
+in order: `001_init.sql`, `002_hosted_lockdown.sql`, `003_path_payments.sql`,
+`004_admin_auth.sql`.
 
 ### What migration 002 is for, and the trap inside it
 
@@ -117,7 +128,38 @@ psql "$MIGRATE_DATABASE_URL" -c "SELECT version FROM schema_version ORDER BY ver
 psql "$MIGRATE_DATABASE_URL" -c "\dt"
 ```
 
-Twelve tables, versions 1 and 2.
+Fifteen tables, versions 1 through 4.
+
+### Admin board
+
+`004_admin_auth.sql` is the migration behind the `/admin` developer board — it
+adds `admin_users`, `admin_sessions`, and `tracked_anchors`. It runs as part
+of the same `db:migrate` step above; there is nothing extra to apply.
+
+Create the first account once the migration has run — there is no public
+sign-up route, by design:
+
+```bash
+DATABASE_URL="postgresql://postgres:PASSWORD@db.REF.supabase.co:5432/postgres?sslmode=require" \
+  node scripts/create-admin.mjs <username>
+```
+
+Prompts for a password (hidden input, 12+ characters, confirmed twice). Log in
+at `/admin` on the deployed site, or `localhost:8080/admin` locally.
+
+**The `pg` + `sslmode=require` catch.** The admin board's Pool needs
+`ssl: { rejectUnauthorized: false }` to accept Supabase's certificate chain —
+same as the API pool. But if the connection string *also* carries
+`?sslmode=require`, `pg` (>=8.23) treats that as `verify-full` and, when both
+a connection string and an explicit `ssl` option are given, the
+string-parsed setting silently **overrides** `rejectUnauthorized: false`
+rather than merging with it. The symptom is
+`self-signed certificate in certificate chain` on a connection string that
+looks completely correct. `create-admin.mjs`, `api/[...path].js`, and
+`packages/api/src/server.ts` all strip `sslmode` from the string right before
+constructing the Pool, specifically to avoid this — `psql` is not affected,
+it parses `sslmode` on its own and does not have an equivalent explicit
+option to clash with.
 
 ---
 
@@ -433,7 +475,7 @@ is the same defect this project measures in other people:
   schedule.
 - **No alerting.** Nothing tells you the indexer stopped. The `staleHours`
   field in every API response is the manual version of that alarm.
-- **No migration rollback.** Forward-only. Both migrations are re-runnable;
-  neither is reversible.
+- **No migration rollback.** Forward-only. All four migrations are
+  re-runnable; none are reversible.
 - **The indexer does not publish to the oracle.** The contract is on testnet;
   nothing writes to it, so it holds no data.

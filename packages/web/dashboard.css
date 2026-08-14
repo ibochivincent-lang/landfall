@@ -431,3 +431,134 @@
 
 /* Muted arrow cell in corridor table */
 .corridor-panel td.muted { color: var(--muted); font-size: 18px; padding: 0 4px; }
+
+/* ============================================================
+   RELIABILITY BADGES & PILLS
+   ============================================================ */
+.anchor-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.rel-badge {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 99px;
+  letter-spacing: 0.5px;
+}
+
+.grade--a { background: #dcfce7; color: #166534; }
+.grade--b { background: #dbeafe; color: #1e40af; }
+.grade--c { background: #fef3c7; color: #92400e; }
+.grade--d { background: #ffedd5; color: #9a3412; }
+.grade--f { background: #fee2e2; color: #991b1b; }
+
+.stat-grade--a { color: #16a34a; font-weight: 800; font-size: 18px; }
+.stat-grade--b { color: #2563eb; font-weight: 800; font-size: 18px; }
+.stat-grade--c { color: #d97706; font-weight: 800; font-size: 18px; }
+.stat-grade--d { color: #ea580c; font-weight: 800; font-size: 18px; }
+.stat-grade--f { color: #dc2626; font-weight: 800; font-size: 18px; }
+
+/* ============================================================
+   DEVELOPER INTEGRATION PANEL
+   ============================================================ */
+.dev-panel {
+  margin-top: 40px;
+  border-top: 2px solid var(--line);
+  padding-top: 32px;
+}
+
+.dev-head {
+  margin-bottom: 24px;
+}
+
+.dev-title {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+
+.dev-sub {
+  font-size: 14px;
+  color: var(--muted);
+  margin: 0;
+}
+
+.dev-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.dev-card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.dev-card h3 {
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0 0 8px;
+  color: var(--ink);
+}
+
+.dev-card p {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0 0 16px;
+  line-height: 1.4;
+}
+
+.code-box {
+  background: var(--ink);
+  color: #c5ee6b;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  margin-bottom: 12px;
+  overflow-x: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.code-method {
+  background: #0b9c91;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.code-block {
+  background: #04121b;
+  color: #eaf4ef;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 11px;
+  line-height: 1.5;
+  overflow-x: auto;
+  max-height: 160px;
+  margin: 0;
+}
+
+.badge-preview-wrap {
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+}
+
+.btn-sm {
+  padding: 6px 14px;
+  font-size: 12px;
+}

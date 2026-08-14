@@ -8,7 +8,10 @@
  * Public routes handled:
  *   GET  /api/v1/anchors
  *   GET  /api/v1/anchors/:domain/payments
+ *   GET  /api/v1/anchors/:domain/health-check -- pre-flight wallet health score (0-100)
+ *   GET  /api/v1/badges/:domain.svg          -- dynamic SVG reliability status badge
  *   GET  /api/v1/assets
+ *   GET  /api/v1/corridors           -- cross-asset flow matrix (path payments)
  *   GET  /health
  *
  * Admin routes (session-cookie gated, see requireSession()):
@@ -296,6 +299,153 @@ async function domainAccounts(db, domain) {
   return rows.map(r => r.account_id);
 }
 
+async function corridorRows(db) {
+  const { rows } = await db.query(`
+    SELECT from_asset, to_asset, count, volume, first_seen, last_seen
+      FROM corridors ORDER BY volume DESC
+  `);
+  return rows.map(r => ({
+    fromAsset:  r.from_asset,
+    toAsset:    r.to_asset,
+    count:      Number(r.count),
+    volume:     Number(r.volume),
+    firstSeen:  new Date(r.first_seen).toISOString(),
+    lastSeen:   new Date(r.last_seen).toISOString(),
+  }));
+}
+
+/**
+ * Deterministic Anchor Reliability Score (0-100).
+ * Derived purely from ledger evidence across an anchor's accounts.
+ */
+function computeDomainReliability(accounts) {
+  if (!accounts || accounts.length === 0) {
+    return { score: 0, grade: 'F', status: 'unknown', liveness: 0, settlement: 0, volume: 0, recommendation: 'No accounts indexed.' };
+  }
+
+  // 1. Liveness (Max 40 pts)
+  const activeHours = accounts
+    .map(a => a.hoursSinceActivity)
+    .filter(h => h !== null && h !== undefined)
+    .sort((a, b) => a - b);
+  
+  const freshest = activeHours[0];
+  let livenessPts = 0;
+  if (freshest !== undefined) {
+    if (freshest <= 24) livenessPts = 40;
+    else if (freshest <= 72) livenessPts = 30;
+    else if (freshest <= 168) livenessPts = 20; // 7d
+    else if (freshest <= 720) livenessPts = 10; // 30d
+    else livenessPts = 0;
+  }
+
+  // 2. Settlement & Return Rate (Max 40 pts)
+  const totalInbound = accounts.reduce((s, a) => s + (a.inbound || 0), 0);
+  const totalOutbound = accounts.reduce((s, a) => s + (a.outbound || 0), 0);
+  const totalReturns = accounts.reduce((s, a) => s + (a.returns || 0), 0);
+  
+  let settlementPts = 40;
+  if (totalInbound + totalReturns > 0) {
+    const rate = totalReturns / (totalInbound + totalReturns);
+    if (rate <= 0.01) settlementPts = 40;
+    else if (rate <= 0.03) settlementPts = 32;
+    else if (rate <= 0.05) settlementPts = 24;
+    else if (rate <= 0.10) settlementPts = 12;
+    else settlementPts = 0;
+  } else if (totalInbound === 0 && totalOutbound === 0) {
+    settlementPts = 10;
+  }
+
+  // 3. Activity / Throughput (Max 20 pts)
+  const totalActivity = totalInbound + totalOutbound;
+  let volumePts = 0;
+  if (totalActivity >= 500) volumePts = 20;
+  else if (totalActivity >= 100) volumePts = 15;
+  else if (totalActivity >= 20) volumePts = 10;
+  else if (totalActivity > 0) volumePts = 5;
+  else volumePts = 0;
+
+  // Dark account penalty
+  const darkAccounts = accounts.filter(a => a.state === 'dark').length;
+  if (darkAccounts > 0 && darkAccounts === accounts.length) {
+    livenessPts = 0;
+  }
+
+  const score = Math.min(100, Math.max(0, livenessPts + settlementPts + volumePts));
+
+  let grade = 'F';
+  let status = 'dark';
+  let recommendation = 'High failure risk. Not recommended for immediate routing.';
+
+  if (score >= 90) {
+    grade = 'A';
+    status = 'optimal';
+    recommendation = 'Excellent on-chain settlement health. Safe to route.';
+  } else if (score >= 75) {
+    grade = 'B';
+    status = 'operational';
+    recommendation = 'Operational with steady ledger settlement.';
+  } else if (score >= 55) {
+    grade = 'C';
+    status = 'degraded';
+    recommendation = 'Occasional return delays or slow settlement detected.';
+  } else if (score >= 35) {
+    grade = 'D';
+    status = 'inactive';
+    recommendation = 'Low activity or elevated refund rate. Use caution.';
+  }
+
+  return {
+    score,
+    grade,
+    status,
+    factors: {
+      liveness: livenessPts,
+      settlement: settlementPts,
+      volume: volumePts,
+      freshestHours: freshest !== undefined ? Math.round(freshest * 10) / 10 : null,
+      totalPayments: totalActivity,
+      returnRatePercent: totalInbound > 0 ? Math.round((totalReturns / totalInbound) * 1000) / 10 : 0
+    },
+    recommendation
+  };
+}
+
+function renderBadgeSvg(domain, score, grade) {
+  let color = '#e55d50'; // Red
+  if (score >= 90) color = '#0b9c91';      // Teal / Mint
+  else if (score >= 75) color = '#2b7fff'; // Blue
+  else if (score >= 55) color = '#d97706'; // Amber
+
+  const label = 'landfall · ' + domain;
+  const value = `${score}/100 ${grade}`;
+  const labelWidth = Math.max(80, label.length * 6.8);
+  const valueWidth = 64;
+  const totalWidth = labelWidth + valueWidth;
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${totalWidth}" height="20" role="img" aria-label="${label}: ${value}">
+  <title>${label}: ${value}</title>
+  <linearGradient id="s" x2="0" y2="100%">
+    <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
+    <stop offset="1" stop-opacity=".1"/>
+  </linearGradient>
+  <clipPath id="r">
+    <rect width="${totalWidth}" height="20" rx="3" fill="#fff"/>
+  </clipPath>
+  <g clip-path="url(#r)">
+    <rect width="${labelWidth}" height="20" fill="#061f2d"/>
+    <rect x="${labelWidth}" width="${valueWidth}" height="20" fill="${color}"/>
+    <rect width="${totalWidth}" height="20" fill="url(#s)"/>
+  </g>
+  <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" text-rendering="geometricPrecision" font-size="110">
+    <text aria-hidden="true" x="${(labelWidth * 10) / 2}" y="150" fill="#010101" fill-opacity=".3" transform="scale(.1)">${label}</text>
+    <text x="${(labelWidth * 10) / 2}" y="140" transform="scale(.1)" fill="#fff">${label}</text>
+    <text aria-hidden="true" x="${labelWidth * 10 + (valueWidth * 10) / 2}" y="150" fill="#010101" fill-opacity=".3" transform="scale(.1)">${value}</text>
+    <text x="${labelWidth * 10 + (valueWidth * 10) / 2}" y="140" transform="scale(.1)" fill="#fff"><b>${value}</b></text>
+  </g>
+</svg>`;
+}
+
 // ── Admin: ops/backend health board ───────────────────────────────────────────
 
 const HEALTH_TABLES = [
@@ -515,12 +665,59 @@ export default async function handler(req, res) {
       const scan = await latestScan(db);
       if (!scan) return json(res, 503, { error: 'No completed scan yet.' }, 0);
       const accounts = await accountRows(db);
-      return json(res, 200, { asOf: scan.finishedAt, staleHours: scan.staleHours, accounts });
+
+      // Group by domain and attach reliability
+      const byDomain = new Map();
+      for (const a of accounts) {
+        if (!byDomain.has(a.domain)) byDomain.set(a.domain, []);
+        byDomain.get(a.domain).push(a);
+      }
+
+      const summaries = {};
+      for (const [domain, dAccounts] of byDomain.entries()) {
+        summaries[domain] = computeDomainReliability(dAccounts);
+      }
+
+      return json(res, 200, { asOf: scan.finishedAt, staleHours: scan.staleHours, accounts, reliability: summaries });
+    }
+
+    // GET /api/v1/anchors/:domain/health-check
+    if (parts.length === 4 && parts[0] === 'v1' && parts[1] === 'anchors' && parts[3] === 'health-check') {
+      const domain = decodeURIComponent(parts[2]).toLowerCase();
+      const accounts = (await accountRows(db)).filter(a => a.domain.toLowerCase() === domain);
+      if (!accounts.length) return json(res, 404, { error: `No accounts tracked for ${domain}` });
+
+      const rel = computeDomainReliability(accounts);
+      return json(res, 200, {
+        domain,
+        healthy: rel.score >= 55,
+        ...rel
+      }, 120);
+    }
+
+    // GET /api/v1/badges/:domain.svg
+    if (parts.length === 3 && parts[0] === 'v1' && parts[1] === 'badges') {
+      const rawDomain = parts[2].replace(/\.svg$/i, '').toLowerCase();
+      const domain = decodeURIComponent(rawDomain);
+      const accounts = (await accountRows(db)).filter(a => a.domain.toLowerCase() === domain);
+      const rel = computeDomainReliability(accounts);
+
+      const svg = renderBadgeSvg(domain, rel.score, rel.grade);
+      res.setHeader('Content-Type', 'image/svg+xml; charset=utf-8');
+      res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=600');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      return res.status(200).send(svg);
     }
 
     // GET /api/v1/assets
     if (joined === 'v1/assets') {
       return json(res, 200, { assets: await assetRows(db) });
+    }
+
+    // GET /api/v1/corridors
+    if (joined === 'v1/corridors') {
+      const corridors = await corridorRows(db);
+      return json(res, 200, { corridors }, 300);
     }
 
     // GET /api/v1/anchors/:domain/payments

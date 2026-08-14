@@ -31,6 +31,7 @@
       <a class="topnav__link" href="index.html#how">How it works</a>
     </nav>
     <div class="topnav__actions">
+      <button class="dash-btn dash-btn--ghost" id="openDevBtn">API & Badges ⚡</button>
       <a class="dash-btn dash-btn--ghost" href="https://github.com/ibochivincent-lang/landfall" target="_blank" rel="noopener">GitHub ↗</a>
     </div>
   </div>
@@ -146,6 +147,40 @@
           </table>
         </div>
       </div>
+
+      <!-- developer / wallet integration panel -->
+      <div class="panel dev-panel" id="devPanel">
+        <div class="dev-head">
+          <div>
+            <h2 class="dev-title">Wallet & Developer Integration</h2>
+            <p class="dev-sub">Integrate Landfall's zero-trust settlement oracle into your Stellar wallet or application.</p>
+          </div>
+        </div>
+
+        <div class="dev-grid">
+          <div class="dev-card">
+            <h3>1. Pre-Flight Health Check</h3>
+            <p>Query before routing a SEP-24 / SEP-31 transfer to prevent user funds getting stuck.</p>
+            <div class="code-box">
+              <span class="code-method">GET</span> <code class="mono" id="healthCheckUrl">/api/v1/anchors/{domain}/health-check</code>
+            </div>
+            <pre class="code-block mono" id="healthCheckPreview">Loading health check sample…</pre>
+          </div>
+
+          <div class="dev-card">
+            <h3>2. Dynamic SVG Status Badge</h3>
+            <p>Embed an auto-updating reliability badge in your README or website.</p>
+            <div class="badge-preview-wrap">
+              <img id="liveBadgeImg" src="/api/v1/badges/cowrie.exchange.svg" alt="Status Badge" height="24">
+            </div>
+            <div class="code-box">
+              <code class="mono" id="badgeMarkdown">[![Landfall](https://landfall-ib.vercel.app/api/v1/badges/{domain}.svg)](https://landfall-ib.vercel.app/dashboard.html)</code>
+            </div>
+            <button class="dash-btn dash-btn--ghost btn-sm" id="copyBadgeBtn">Copy Markdown</button>
+          </div>
+        </div>
+      </div>
+
     </div>
 
   </div>

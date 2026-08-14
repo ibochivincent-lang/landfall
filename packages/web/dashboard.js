@@ -96,7 +96,7 @@
     $('#live').hidden = false;
     $('#offline').hidden = true;
     stampFreshness(body, isSnapshot);
-    renderAnchors(body.accounts);
+    renderAnchors(body.accounts, body.reliability || {});
     if (!isSnapshot) loadAssets();
     state.isSnapshot = isSnapshot;
 
@@ -147,73 +147,128 @@
   function renderAnchors(accounts) {
     ANCHORS = accounts;
     const byDomain = new Map();
-    for (const a of accounts) {
-      const g = byDomain.get(a.domain) ?? { domain: a.domain, accounts: [], dark: 0, live: 0 };
-      g.accounts.push(a);
-      if (a.state === 'dark') g.dark++;
-      if (a.state === 'live') g.live++;
-      byDomain.set(a.domain, g);
+    let ANCHORS = [];
+    let RELIABILITY = {};
+
+    function renderAnchors(accounts, reliability = {}) {
+      ANCHORS = accounts;
+      RELIABILITY = reliability;
+      const byDomain = new Map();
+      for (const a of accounts) {
+        const g = byDomain.get(a.domain) ?? { domain: a.domain, accounts: [], dark: 0, live: 0 };
+        g.accounts.push(a);
+        if (a.state === 'dark') g.dark++;
+        if (a.state === 'live') g.live++;
+        byDomain.set(a.domain, g);
+      }
+
+      const strip = $('#anchorStrip');
+      strip.innerHTML = '';
+      // Dark anchors first — they are the reason anyone opens this page.
+      const groups = [...byDomain.values()].sort((a, b) => b.dark - a.dark || a.domain.localeCompare(b.domain));
+
+      for (const g of groups) {
+        const allDark = g.dark > 0 && g.live === 0;
+        const rel = RELIABILITY[g.domain] || { score: allDark ? 0 : 50, grade: allDark ? 'F' : 'C' };
+        const gradeCls = 'grade--' + rel.grade.toLowerCase();
+
+        const btn = el('button', 'anchor-card' + (allDark ? ' is-dark' : ''));
+        btn.dataset.domain = g.domain;
+        btn.innerHTML =
+          '<div class="anchor-card__head">' +
+            '<span class="anchor-card__name">' + esc(g.domain) + '</span>' +
+            '<span class="rel-badge ' + gradeCls + '">' + rel.score + ' ' + rel.grade + '</span>' +
+          '</div>' +
+          '<span class="anchor-card__meta">' + g.accounts.length + ' account' +
+          (g.accounts.length === 1 ? '' : 's') +
+          (g.dark ? ' · <b>' + g.dark + ' dark</b>' : '') + '</span>';
+        btn.addEventListener('click', () => selectDomain(g.domain));
+        strip.appendChild(btn);
+      }
     }
 
-    const strip = $('#anchorStrip');
-    strip.innerHTML = '';
-    // Dark anchors first — they are the reason anyone opens this page.
-    const groups = [...byDomain.values()].sort((a, b) => b.dark - a.dark || a.domain.localeCompare(b.domain));
+    function selectDomain(domain) {
+      state.domain = domain;
+      state.cursor = null;
+      state.rows = 0;
+      $$('.anchor-card').forEach((c) => c.classList.toggle('is-on', c.dataset.domain === domain));
 
-    for (const g of groups) {
-      const allDark = g.dark > 0 && g.live === 0;
-      const btn = el('button', 'anchor-card' + (allDark ? ' is-dark' : ''));
-      btn.dataset.domain = g.domain;
-      btn.innerHTML =
-        '<span class="anchor-card__name">' + esc(g.domain) + '</span>' +
-        '<span class="anchor-card__meta">' + g.accounts.length + ' account' +
-        (g.accounts.length === 1 ? '' : 's') +
-        (g.dark ? ' · <b>' + g.dark + ' dark</b>' : '') + '</span>';
-      btn.addEventListener('click', () => selectDomain(g.domain));
-      strip.appendChild(btn);
+      const accounts = ANCHORS.filter((a) => a.domain === domain);
+      state.accounts = accounts.map((a) => a.account);
+      state.meta = accounts;
+      renderStats(accounts, domain);
+      updateDevPanel(domain);
+
+      $('#txBody').innerHTML = '';
+      loadPage(true);
     }
-  }
 
-  function selectDomain(domain) {
-    state.domain = domain;
-    state.cursor = null;
-    state.rows = 0;
-    $$('.anchor-card').forEach((c) => c.classList.toggle('is-on', c.dataset.domain === domain));
+    function renderStats(accounts, domain) {
+      const dark = accounts.filter((a) => a.state === 'dark').length;
+      const inbound = accounts.reduce((s, a) => s + (a.inbound ?? 0), 0);
+      const outbound = accounts.reduce((s, a) => s + (a.outbound ?? 0), 0);
+      const returns = accounts.reduce((s, a) => s + (a.returns ?? 0), 0);
+      const freshest = accounts
+        .map((a) => a.hoursSinceActivity)
+        .filter((h) => h !== null && h !== undefined)
+        .sort((a, b) => a - b)[0];
 
-    const accounts = ANCHORS.filter((a) => a.domain === domain);
-    state.accounts = accounts.map((a) => a.account);
-    state.meta = accounts;
-    renderStats(accounts);
+      const rel = RELIABILITY[domain] || { score: dark === accounts.length ? 0 : 50, grade: dark === accounts.length ? 'F' : 'C', status: 'unknown', recommendation: 'Analyzing...' };
+      const gradeCls = 'stat-grade--' + rel.grade.toLowerCase();
 
-    $('#txBody').innerHTML = '';
-    loadPage(true);
-  }
+      const tile = (v, k, n, cls) =>
+        '<div class="stat"><div class="stat__v ' + (cls || '') + '">' + v + '</div>' +
+        '<div class="stat__k">' + k + '</div><div class="stat__n">' + (n || '') + '</div></div>';
 
-  function renderStats(accounts) {
-    const dark = accounts.filter((a) => a.state === 'dark').length;
-    const inbound = accounts.reduce((s, a) => s + (a.inbound ?? 0), 0);
-    const outbound = accounts.reduce((s, a) => s + (a.outbound ?? 0), 0);
-    const returns = accounts.reduce((s, a) => s + (a.returns ?? 0), 0);
-    const freshest = accounts
-      .map((a) => a.hoursSinceActivity)
-      .filter((h) => h !== null && h !== undefined)
-      .sort((a, b) => a - b)[0];
+      $('#anchorStats').innerHTML =
+        tile(rel.score + ' <small class="' + gradeCls + '">(' + rel.grade + ')</small>', 'Reliability Score', rel.status.toUpperCase() + ' · ' + rel.recommendation, 'stat-rel') +
+        tile(accounts.length, accounts.length === 1 ? 'Account' : 'Accounts',
+             dark ? dark + ' dark' : 'none dark', dark ? 'pop' : '') +
+        tile(inbound.toLocaleString(), 'Inbound', 'payments received') +
+        tile(outbound.toLocaleString(), 'Outbound', 'payments sent') +
+        tile(
+          freshest === undefined ? '—' : freshest < 48 ? freshest.toFixed(1) + 'h' : (freshest / 24).toFixed(1) + 'd',
+          'Last settlement',
+          returns ? returns + ' returned' : 'no returns seen',
+        );
+    }
 
-    const tile = (v, k, n, cls) =>
-      '<div class="stat"><div class="stat__v ' + (cls || '') + '">' + v + '</div>' +
-      '<div class="stat__k">' + k + '</div><div class="stat__n">' + (n || '') + '</div></div>';
+    function updateDevPanel(domain) {
+      const origin = window.location.origin;
+      const healthUrl = origin + '/api/v1/anchors/' + encodeURIComponent(domain) + '/health-check';
+      const badgeUrl = origin + '/api/v1/badges/' + encodeURIComponent(domain) + '.svg';
+      const dashboardUrl = origin + '/dashboard.html';
 
-    $('#anchorStats').innerHTML =
-      tile(accounts.length, accounts.length === 1 ? 'Account' : 'Accounts',
-           dark ? dark + ' dark' : 'none dark', dark ? 'pop' : '') +
-      tile(inbound.toLocaleString(), 'Inbound', 'payments received') +
-      tile(outbound.toLocaleString(), 'Outbound', 'payments sent') +
-      tile(
-        freshest === undefined ? '—' : freshest < 48 ? freshest.toFixed(1) + 'h' : (freshest / 24).toFixed(1) + 'd',
-        'Last settlement',
-        returns ? returns + ' returned' : 'no returns seen',
-      );
-  }
+      const healthEl = $('#healthCheckUrl');
+      if (healthEl) healthEl.textContent = '/api/v1/anchors/' + domain + '/health-check';
+
+      const badgeImg = $('#liveBadgeImg');
+      if (badgeImg) badgeImg.src = badgeUrl;
+
+      const mdEl = $('#badgeMarkdown');
+      const mdCode = '[![Landfall Reliability](' + badgeUrl + ')](' + dashboardUrl + ')';
+      if (mdEl) mdEl.textContent = mdCode;
+
+      const copyBtn = $('#copyBadgeBtn');
+      if (copyBtn) {
+        copyBtn.onclick = () => {
+          navigator.clipboard.writeText(mdCode);
+          copyBtn.textContent = 'Copied! ✓';
+          setTimeout(() => { copyBtn.textContent = 'Copy Markdown'; }, 2000);
+        };
+      }
+
+      // Fetch live health preview sample
+      api('/api/v1/anchors/' + encodeURIComponent(domain) + '/health-check')
+        .then(sample => {
+          const previewEl = $('#healthCheckPreview');
+          if (previewEl) previewEl.textContent = JSON.stringify(sample, null, 2);
+        })
+        .catch(() => {
+          const previewEl = $('#healthCheckPreview');
+          if (previewEl) previewEl.textContent = '// Run live scan to populate health check';
+        });
+    }
 
   /* ---------------------------------------------------------- transactions */
 
@@ -443,6 +498,14 @@
     } catch {
       // corridors panel stays hidden if no data or API error
     }
+  }
+
+  const devBtn = $('#openDevBtn');
+  if (devBtn) {
+    devBtn.addEventListener('click', () => {
+      const panel = $('#devPanel');
+      if (panel) panel.scrollIntoView({ behavior: 'smooth' });
+    });
   }
 
   boot().then(() => {

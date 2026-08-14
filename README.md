@@ -58,6 +58,7 @@ Move any of this to a chain without those primitives and there is nothing left �
 | Postgres persistence + read API | ✅ shipping |
 | Transactions dashboard | ✅ shipping |
 | **Hourly ledger scan (GitHub Actions)** | ✅ **shipping** |
+| **Admin developer board (session auth, backend health, payment browser, anchor management)** | ✅ **shipping** |
 | Hosted deployment (Supabase, prod compose, Vercel) | ✅ shipping |
 | Soroban oracle | **deployed to testnet**, 16 tests, not on mainnet |
 | CAP-67 event ingestion | schema ready, ingestion **not written** |
@@ -130,6 +131,17 @@ example-anchor.com         GABC…WXYZ    1204    1190    47        3.90%     2.
 ```
 
 Followed by a headline finding — the aggregate refund rate across every account with enough inbound traffic to support the claim.
+
+### Admin / developer board
+
+An internal `/admin` view for maintainers — backend health (scan status, table sizes, resume cursors), the full raw payment stream, and tracked-anchor management (added domains feed straight into the next scan, no redeploy needed). Session-based login only: scrypt-hashed passwords, httpOnly cookies, 24h expiry. There is no public sign-up route and it is not linked from the public nav.
+
+```bash
+npm run db:migrate
+DATABASE_URL=... node scripts/create-admin.mjs <username>
+```
+
+Then log in at `/admin` on the deployed site, or `localhost:8080/admin` locally. Full setup notes in [docs/deployment.md](docs/deployment.md#admin-board).
 
 ## Environment variables
 

@@ -38,9 +38,16 @@ shopt -s nullglob
 for f in "$DIR"/*.sql; do
   echo "  -> $(basename "$f")"
   # ON_ERROR_STOP, or psql prints the error and still exits 0.
-  psql "$URL" -v ON_ERROR_STOP=1 -q -f "$f"
+  #
+  # Options before the connection string, "--" to end them, conninfo last.
+  # GNU getopt on Linux/Mac permutes a leading positional past later flags
+  # fine, but that is not guaranteed POSIX behaviour - the Windows EDB psql
+  # build does not do it, and silently drops -v/-q/-f when the conninfo
+  # comes first, falling through to an interactive prompt instead of
+  # running the migration. This order works everywhere.
+  psql -v ON_ERROR_STOP=1 -q -f "$f" -- "$URL"
 done
 
 echo
-psql "$URL" -c "SELECT version, applied_at FROM schema_version ORDER BY version;"
+psql -c "SELECT version, applied_at FROM schema_version ORDER BY version;" -- "$URL"
 echo "Done."
