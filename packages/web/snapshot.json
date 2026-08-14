@@ -1,5 +1,5 @@
 {
-  "asOf": "2026-08-14T09:06:30.906Z",
+  "asOf": "2026-08-14T10:57:12.630Z",
   "staleHours": 0,
   "returnRateCaveat": "A return is the honest failure mode. An anchor that accepts value, fails to settle and keeps it produces no return event and scores 0. A low rate is the absence of one kind of evidence, not evidence of good conduct.",
   "accounts": [
@@ -7,25 +7,25 @@
       "account": "GAWODAROMJ33V5YDFY3NPYTHVYQG7MJXVJ2ND3AOGIHYRWINES6ACCPD",
       "domain": "cowrie.exchange",
       "name": "Cowrie Integrated Systems",
-      "state": "live",
-      "inbound": 0,
-      "outbound": 0,
+      "state": "slow",
+      "inbound": 23,
+      "outbound": 1,
       "returns": 0,
-      "returnRate": null,
-      "hoursSinceActivity": 70.98,
-      "topCounterpartyShare": null
+      "returnRate": 0,
+      "hoursSinceActivity": 72.82,
+      "topCounterpartyShare": 0.9182
     },
     {
       "account": "GBQZOJE2GWJU5VBT6NBLD2F3IOVOYUBDAXYUU32XMHDF4RMDOURWV3GT",
       "domain": "cowrie.exchange",
       "name": "Cowrie Integrated Systems",
       "state": "dark",
-      "inbound": 0,
-      "outbound": 0,
-      "returns": 0,
-      "returnRate": null,
-      "hoursSinceActivity": 867.55,
-      "topCounterpartyShare": null
+      "inbound": 6,
+      "outbound": 20,
+      "returns": 1,
+      "returnRate": 0.1667,
+      "hoursSinceActivity": 869.39,
+      "topCounterpartyShare": 0.8898
     },
     {
       "account": "GDI5EK4HNMBHJJQGP3GUXQJIIOHU2CJO3LABPWD6WYSPJZP5NP67TMNN",
@@ -36,7 +36,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1802.14,
+      "hoursSinceActivity": 1803.98,
       "topCounterpartyShare": null
     },
     {
@@ -45,10 +45,10 @@
       "name": "Cowrie Integrated Systems",
       "state": "dark",
       "inbound": 0,
-      "outbound": 0,
+      "outbound": 2,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1410.48,
+      "hoursSinceActivity": 1412.32,
       "topCounterpartyShare": null
     },
     {
@@ -56,72 +56,72 @@
       "domain": "mykobo.co",
       "name": "MYKOBO",
       "state": "slow",
-      "inbound": 0,
-      "outbound": 0,
+      "inbound": 4,
+      "outbound": 31,
       "returns": 0,
-      "returnRate": null,
-      "hoursSinceActivity": 75.49,
-      "topCounterpartyShare": null
+      "returnRate": 0,
+      "hoursSinceActivity": 77.34,
+      "topCounterpartyShare": 0.9991
     },
     {
       "account": "GCY37QZUH2P24CMCTGT2XNMRFSHVQF2DKL4N5VCY22TQ52DFUNEUTKBD",
       "domain": "mykobo.co",
       "name": "MYKOBO",
       "state": "slow",
-      "inbound": 0,
-      "outbound": 0,
-      "returns": 0,
-      "returnRate": null,
-      "hoursSinceActivity": 75.17,
-      "topCounterpartyShare": null
+      "inbound": 861,
+      "outbound": 932,
+      "returns": 10,
+      "returnRate": 0.0116,
+      "hoursSinceActivity": 77.02,
+      "topCounterpartyShare": 0.529
     },
     {
       "account": "GCYE7C77EB5AWAA25R5XMWNI2EDOKTTFTTPZKM2SR5DI4B4WFD52DARS",
       "domain": "anclap.com",
       "name": "Grupo Anchor S.A.",
-      "state": "live",
-      "inbound": 0,
+      "state": "slow",
+      "inbound": 9,
       "outbound": 0,
       "returns": 0,
-      "returnRate": null,
-      "hoursSinceActivity": 70.98,
-      "topCounterpartyShare": null
+      "returnRate": 0,
+      "hoursSinceActivity": 72.82,
+      "topCounterpartyShare": 0.9401
     },
     {
       "account": "GA4TDPNUCZPTOHB3TKUYMDCRVATXKEADH7ZEYEBWJKQKE2UBFCYNBPEN",
       "domain": "anclap.com",
       "name": "Grupo Anchor S.A.",
       "state": "dark",
-      "inbound": 0,
+      "inbound": 5,
       "outbound": 0,
       "returns": 0,
-      "returnRate": null,
-      "hoursSinceActivity": 1439.06,
-      "topCounterpartyShare": null
+      "returnRate": 0,
+      "hoursSinceActivity": 1440.9,
+      "topCounterpartyShare": 0.9999
     },
     {
       "account": "GARDJZ33FTTLVKGABXDS22SYNTP4VCLYARIEWKMZKYHX3RRLPMNR3HOT",
       "domain": "anclap.com",
       "name": "Grupo Anchor S.A.",
       "state": "live",
-      "inbound": 0,
-      "outbound": 0,
-      "returns": 0,
-      "returnRate": null,
-      "hoursSinceActivity": 15.01,
-      "topCounterpartyShare": null
+      "inbound": 1258,
+      "outbound": 669,
+      "returns": 1,
+      "returnRate": 0.0008,
+      "hoursSinceActivity": 16.85,
+      "topCounterpartyShare": 0.0932
     },
     {
       "account": "GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN",
       "domain": "stellar.moneygram.com",
       "name": "MoneyGram",
       "state": "live",
-      "inbound": 1,
+      "inbound": 1837,
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 0.27,
-      "topCounterpartyShare": 1
+      "hoursSinceActivity": 0.03,
+      "topCounterpartyShare": 0.927
     },
     {
       "account": "GDKL5TOWWAVLJ2WRAUQS2QJEAGHEDJFXFEPQFB6LKW2WRB257BVLLMT6",
@@ -140,24 +140,24 @@
       "domain": "ntokens.com",
       "name": "nTokens Serviços Digitais Ltda",
       "state": "dark",
-      "inbound": 0,
+      "inbound": 1,
       "outbound": 0,
       "returns": 0,
-      "returnRate": null,
-      "hoursSinceActivity": 868.38,
-      "topCounterpartyShare": null
+      "returnRate": 0,
+      "hoursSinceActivity": 870.22,
+      "topCounterpartyShare": 1
     },
     {
       "account": "GDVKY2GU2DRXWTBEYJJWSFXIGBZV6AZNBVVSUHEPZI54LIS6BA7DVVSP",
       "domain": "ntokens.com",
       "name": "nTokens Serviços Digitais Ltda",
       "state": "dark",
-      "inbound": 0,
-      "outbound": 0,
+      "inbound": 46,
+      "outbound": 444,
       "returns": 0,
-      "returnRate": null,
-      "hoursSinceActivity": 865.49,
-      "topCounterpartyShare": null
+      "returnRate": 0,
+      "hoursSinceActivity": 867.34,
+      "topCounterpartyShare": 0.4281
     }
   ]
 }
