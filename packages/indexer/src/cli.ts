@@ -5,6 +5,7 @@ import { computeMetrics } from "./metrics.js";
 import { renderTable, renderHeadline, renderDiscovery } from "./report.js";
 import { classifyLiveness } from "./report.js";
 import { Store, connectionStringFromEnv } from "./db.js";
+import { mergeWithHistory } from "./history.js";
 import { DEFAULT_SCAN_OPTIONS, type AccountMetrics, type AnchorAccount } from "./types.js";
 
 interface Args {
@@ -143,6 +144,9 @@ async function scan(args: Args): Promise<void> {
   // --persist. Without a database the scan is stateless and re-pages, which is
   // correct: there is nowhere to have remembered.
   const cursorStore = args.persist ? storeFromEnv() : null;
+  // Same connection, second job: it also supplies the persisted history that
+  // keeps a resumed scan's published numbers cumulative. See mergeWithHistory().
+  const historyStore = cursorStore;
   const resumeFrom = new Map<string, string>();
   const newestSeen = new Map<string, string>();
   if (cursorStore) {
@@ -170,11 +174,35 @@ async function scan(args: Args): Promise<void> {
       });
       if (newestCursor) newestSeen.set(anchor.account, newestCursor);
       rawByAccount.set(anchor.account, records);
-      const dormant = lifetime && records.length === 0 ? "  [dormant before window]" : "";
+
+      // Metrics are computed over persisted history plus what this run fetched,
+      // never over the fetch alone.
+      //
+      // A resumed scan deliberately fetches only what is new since the stored
+      // cursor - that is the whole point of the cursor, and it is what makes an
+      // hourly run finish in seconds instead of re-paging years of history.
+      // But `inbound: 4` meaning "four payments in the last hour" published in
+      // the same field that used to mean "four thousand payments, ever" turns a
+      // settlement record into a one-hour sample wearing its clothes, and the
+      // reliability score computed from it grades a named business on evidence
+      // that was never gathered. Honesty rule 1: no number the code cannot
+      // prove. The proof lives in the `payments` table, so read it back.
+      //
+      // Without a database there is no history to read and the scan is
+      // stateless, so it re-pages in full and this merge is a no-op.
+      const merged = await mergeWithHistory(historyStore, anchor.account, records, {
+        since: args.since,
+        onWarning: (msg) =>
+          process.stderr.write(`  WARNING ${anchor.domain} ${anchor.account.slice(0, 8)} — ${msg}.\n`),
+      });
+
+      const dormant = lifetime && merged.length === 0 ? "  [dormant before window]" : "";
+      const fromHistory = merged.length - records.length;
+      const historyNote = fromHistory > 0 ? ` (+${fromHistory} from history)` : "";
       process.stderr.write(
-        `  ${anchor.domain} ${anchor.account.slice(0, 8)} — ${records.length} records${dormant}\n`,
+        `  ${anchor.domain} ${anchor.account.slice(0, 8)} — ${records.length} new${historyNote}${dormant}\n`,
       );
-      return computeMetrics(anchor, records, opts, new Date(), lifetime?.createdAt);
+      return computeMetrics(anchor, merged, opts, new Date(), lifetime?.createdAt);
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       process.stderr.write(`  ${anchor.domain} ${anchor.account.slice(0, 8)} — ERROR ${message}\n`);

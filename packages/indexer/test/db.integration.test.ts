@@ -11,6 +11,7 @@
 import { test, before, after } from "node:test";
 import assert from "node:assert/strict";
 import { Store } from "../src/db.js";
+import { mergeWithHistory } from "../src/history.js";
 import { computeMetrics } from "../src/metrics.js";
 import { classifyLiveness } from "../src/report.js";
 import { DEFAULT_SCAN_OPTIONS, type AnchorAccount, type PaymentRecord } from "../src/types.js";
@@ -92,6 +93,61 @@ test("cursors survive a round trip", { skip }, async () => {
   assert.equal(await store.getCursor("payments", ANCHOR), "12345");
   await store.setCursor("payments", ANCHOR, "67890");
   assert.equal(await store.getCursor("payments", ANCHOR), "67890", "cursor advances");
+});
+
+test("an incremental scan still publishes cumulative figures", { skip }, async () => {
+  // Regression test for the scan that reported 4,039 payments at 07:00 and 4 at
+  // 08:00 because a cursor-resumed run began computing metrics from its own
+  // fetch instead of from stored history. Nothing about the ledger changed;
+  // only the size of the window we looked through did, and every published
+  // figure silently changed meaning with it.
+  //
+  // The account below has history and receives exactly one new payment, which
+  // is the normal, healthy shape of an hourly run. The figures must describe
+  // the account, not the hour.
+  const account = "GCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC";
+  const incremental: AnchorAccount = { domain: DOMAIN, account, role: "declared" };
+  await store.upsertAccounts([incremental]);
+
+  const history = Array.from({ length: 40 }, (_, i) =>
+    pay(USER, account, "25.0000000", new Date(Date.UTC(2026, 5, 1, i)).toISOString()),
+  );
+  await store.insertPayments(history, new Set());
+
+  const fetchedThisRun = [
+    pay(USER, account, "500.0000000", new Date(Date.UTC(2026, 5, 2, 0)).toISOString()),
+  ];
+
+  const merged = await mergeWithHistory(store, account, fetchedThisRun);
+  assert.equal(merged.length, history.length + 1, "history is read back and merged");
+
+  const m = computeMetrics(incremental, merged, DEFAULT_SCAN_OPTIONS, new Date());
+  assert.equal(m.inbound.count, 41, "inbound counts the account's history, not the hour");
+
+  const fetchOnly = computeMetrics(incremental, fetchedThisRun, DEFAULT_SCAN_OPTIONS, new Date());
+  assert.equal(fetchOnly.inbound.count, 1, "and the un-merged figure is the bug being guarded against");
+
+  // Replaying the same fetch must not inflate anything: the paging token is the
+  // same key `payments` conflicts on, so an overlap collapses.
+  const replayed = await mergeWithHistory(store, account, [...fetchedThisRun, ...fetchedThisRun]);
+  assert.equal(replayed.length, history.length + 1, "duplicate paging tokens collapse");
+});
+
+test("a history read that fails degrades loudly, never silently", { skip }, async () => {
+  // A database hiccup must not turn into a published undercount. The scan keeps
+  // going with what it fetched, and says so.
+  const warnings: string[] = [];
+  const failing = {
+    paymentsForAccount: async () => {
+      throw new Error("connection reset");
+    },
+  };
+  const fetched = [pay(USER, ANCHOR, "10.0000000", "2026-06-01T00:00:00.000Z")];
+  const out = await mergeWithHistory(failing, ANCHOR, fetched, {
+    onWarning: (m) => warnings.push(m),
+  });
+  assert.equal(out.length, 1, "falls back to the fetch");
+  assert.equal(warnings.length, 1, "and does not do it quietly");
 });
 
 test("liveness is stored from the lifetime reading, not the window", { skip }, async () => {
