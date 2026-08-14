@@ -60,7 +60,7 @@ Move any of this to a chain without those primitives and there is nothing left â
 | SEP-38 slippage / attestations | **designed, not built** |
 | `@landfall/sdk`, MCP server | **designed, not built** |
 
-We would rather list this honestly than let a roadmap read as a changelog. Full detail in [docs/gaps.md](docs/gaps.md) and [docs/roadmap.md](docs/roadmap.md).
+We would rather list this honestly than let a roadmap read as a changelog. Full detail in [docs/gaps.md](docs/gaps.md) and [ROADMAP.md](ROADMAP.md).
 
 ## Current finding
 
@@ -151,7 +151,7 @@ Copy `.env.example` to `.env` and adjust. Nothing in the example file is a secre
 | [docs/architecture.md](docs/architecture.md) | Package layout, the request/scan flow, and where each piece runs. |
 | [docs/methodology.md](docs/methodology.md) | Exactly how each published metric is computed, and where the method is weak. |
 | [docs/gaps.md](docs/gaps.md) | Honest inventory of what isn't built yet, ordered by how much each gap could hurt. |
-| [docs/roadmap.md](docs/roadmap.md) | Milestones mapped to the Stellar Community Fund Build Award's three tranches. |
+| [ROADMAP.md](ROADMAP.md) | Milestones mapped to the Stellar Community Fund Build Award's three tranches. |
 | [docs/deployment.md](docs/deployment.md) | Full deploy path: Supabase, production compose, Vercel, the oracle. |
 | [docs/backlog.md](docs/backlog.md) | Summary of the scoped, complexity-tagged issues filed on the tracker. |
 | [docs/checklist.md](docs/checklist.md) | Current status snapshot against the Stellar Wave / SCF checklist. |

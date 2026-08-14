@@ -117,7 +117,7 @@ whether or not they consented. First run, full history.
 | Transaction dashboard | shipping | `/dashboard` |
 | Soroban oracle | **deployed to testnet** | [`CA2IYHF…VICAG`](https://stellar.expert/explorer/testnet/contract/CA2IYHFKTKSJWR5IICY6HFD55BJEGE7OMKISWMLMPFSHLESZYO3VICAG) |
 | CAP-67 event ingestion | schema ready, not written | `docs/gaps.md` |
-| Attestation, slippage, SDK, MCP | designed, not built | `docs/roadmap.md` |
+| Attestation, slippage, SDK, MCP | designed, not built | `ROADMAP.md` |
 
 58 tests pass — 37 offline including a mock Horizon server, 5 integration
 against real Postgres, 16 against the contract. MIT licensed. 20 scoped issues

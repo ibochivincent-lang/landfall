@@ -1,7 +1,7 @@
 # Landfall — Master Roadmap
 
-**Consolidated from:** [`docs/gaps.md`](gaps.md) · [`docs/checklist.md`](checklist.md) ·
-[`docs/backlog.md`](backlog.md) · [`docs/scf-submission.md`](scf-submission.md) ·
+**Consolidated from:** [`docs/gaps.md`](docs/gaps.md) · [`docs/checklist.md`](docs/checklist.md) ·
+[`docs/backlog.md`](docs/backlog.md) · [`docs/scf-submission.md`](docs/scf-submission.md) ·
 the 13 August audit · verified GitHub issue tracker state.
 
 **North star:** become the settlement-quality primitive Stellar wallets,
