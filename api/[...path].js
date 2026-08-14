@@ -1213,6 +1213,155 @@ export default async function handler(req, res) {
       return json(res, 200, { corridors }, 300);
     }
 
+    // GET /api/v1/quotes/compare
+    if (joined === 'v1/quotes/compare') {
+      const url = new URL(req.url, `https://${req.headers.host}`);
+      const fromAsset = (url.searchParams.get('from') || 'USDC').toUpperCase();
+      const toCurrency = (url.searchParams.get('to') || 'NGN').toUpperCase();
+      const amount = Math.max(parseFloat(url.searchParams.get('amount') || '100'), 1);
+
+      // Base FX rates against 1 USD
+      const fxRates = {
+        NGN: 1610.50,
+        KES: 129.80,
+        GHS: 15.65,
+        MXN: 19.85,
+        BRL: 5.65,
+        ARS: 1280.00,
+        PEN: 3.75,
+        EUR: 0.92,
+        ZAR: 18.20,
+        XOF: 603.50,
+        USD: 1.00
+      };
+
+      const baseRate = fxRates[toCurrency] || 1.0;
+      const allAccounts = await accountRows(db);
+
+      // Anchor catalog with corridor support and fee schedules
+      const anchorCatalog = [
+        {
+          name: 'Cowrie Exchange',
+          domain: 'cowrie.exchange',
+          corridors: ['NGN', 'GHS'],
+          rateSpread: 0.998, // -0.2% spread
+          feePercent: 0.8,
+          feeFixedUsd: 0.50,
+          payoutSpeed: 'Instant (1–3 mins)',
+          paymentMethods: ['NIBSS Instant Payment', 'Mobile Money'],
+          sep24Url: 'https://cowrie.exchange/offramp'
+        },
+        {
+          name: 'MoneyGram Access',
+          domain: 'stellar.moneygram.com',
+          corridors: ['USD', 'EUR', 'MXN', 'KES', 'PHP', 'CAD', 'GBP'],
+          rateSpread: 0.995,
+          feePercent: 0.0,
+          feeFixedUsd: 0.00,
+          payoutSpeed: 'Cash in 5 mins',
+          paymentMethods: ['Cash Pickup (400,000+ Locations)'],
+          sep24Url: 'https://stellar.moneygram.com'
+        },
+        {
+          name: 'Anclap',
+          domain: 'anclap.com',
+          corridors: ['ARS', 'PEN', 'BRL'],
+          rateSpread: 0.997,
+          feePercent: 0.5,
+          feeFixedUsd: 0.20,
+          payoutSpeed: 'Instant (PIX / CVU)',
+          paymentMethods: ['PIX', 'CVU / CBU (Argentina)', 'BCP (Peru)'],
+          sep24Url: 'https://anclap.com'
+        },
+        {
+          name: 'MyKobo',
+          domain: 'mykobo.co',
+          corridors: ['EUR', 'NGN'],
+          rateSpread: 0.992,
+          feePercent: 1.0,
+          feeFixedUsd: 0.00,
+          payoutSpeed: 'SEPA Instant / 5 mins',
+          paymentMethods: ['SEPA Instant Bank Transfer', 'Nigerian Bank Transfer'],
+          sep24Url: 'https://mykobo.co'
+        },
+        {
+          name: 'nTokens',
+          domain: 'ntokens.com',
+          corridors: ['BRL'],
+          rateSpread: 0.999,
+          feePercent: 0.4,
+          feeFixedUsd: 0.00,
+          payoutSpeed: 'Instant (< 60s)',
+          paymentMethods: ['Banco Central do Brasil PIX'],
+          sep24Url: 'https://ntokens.com'
+        },
+        {
+          name: 'ClickPesa',
+          domain: 'clickpesa.com',
+          corridors: ['KES', 'TZS'],
+          rateSpread: 0.994,
+          feePercent: 1.2,
+          feeFixedUsd: 0.30,
+          payoutSpeed: 'Instant (< 2 mins)',
+          paymentMethods: ['Safaricom M-Pesa', 'Airtel Money'],
+          sep24Url: 'https://clickpesa.com'
+        }
+      ];
+
+      // Filter anchors that support this corridor
+      const eligible = anchorCatalog.filter(a => a.corridors.includes(toCurrency));
+      
+      const quotes = eligible.map(a => {
+        const dAccounts = allAccounts.filter(acc => acc.domain.toLowerCase() === a.domain.toLowerCase());
+        const rel = computeDomainReliability(dAccounts);
+
+        const effectiveRate = Number((baseRate * a.rateSpread).toFixed(4));
+        const feeAmountUsd = Number(((amount * (a.feePercent / 100)) + a.feeFixedUsd).toFixed(2));
+        const netUsd = Math.max(amount - feeAmountUsd, 0);
+        const netPayout = Number((netUsd * effectiveRate).toFixed(2));
+
+        return {
+          anchor: a.name,
+          domain: a.domain,
+          fromAsset,
+          toCurrency,
+          inputAmount: amount,
+          exchangeRate: effectiveRate,
+          feePercent: a.feePercent,
+          feeUsd: feeAmountUsd,
+          netPayout,
+          payoutSpeed: a.payoutSpeed,
+          paymentMethods: a.paymentMethods,
+          sep24Url: a.sep24Url,
+          reliability: {
+            score: rel.score,
+            grade: rel.grade,
+            status: rel.status,
+            recommendation: rel.recommendation,
+            isDark: rel.score < 40
+          }
+        };
+      });
+
+      // Sort by net payout descending
+      quotes.sort((a, b) => b.netPayout - a.netPayout);
+
+      // Flag best payout and highest reliability
+      if (quotes.length > 0) {
+        quotes[0].isBestPayout = true;
+        const highestRel = [...quotes].sort((a, b) => b.reliability.score - a.reliability.score)[0];
+        if (highestRel) highestRel.isHighestReliability = true;
+      }
+
+      return json(res, 200, {
+        from: fromAsset,
+        to: toCurrency,
+        amount,
+        timestamp: new Date().toISOString(),
+        quotes
+      }, 60);
+    }
+
     // GET /api/v1/anchors/:domain/payments
     if (parts.length === 4 && parts[0] === 'v1' && parts[1] === 'anchors' && parts[3] === 'payments') {
       const domain    = decodeURIComponent(parts[2]);

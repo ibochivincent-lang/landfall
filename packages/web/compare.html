@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Landfall · Stellar — Off-Ramp Rate & Reliability Comparator</title>
+  <meta name="description" content="Compare live SEP-38 quotes, exchange rates, fees, and on-chain reliability across every Stellar anchor before routing an off-ramp.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="dashboard.css">
+  <style>
+    .comp-wrap { max-width: 1140px; margin: 40px auto 80px; padding: 0 20px; }
+    
+    /* Control Card */
+    .comp-card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 32px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+    }
+    
+    .comp-form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      align-items: flex-end;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-input, .form-select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: inherit;
+      background: #fff;
+      color: var(--ink);
+      transition: border-color 0.2s;
+    }
+    .form-input:focus, .form-select:focus {
+      outline: none;
+      border-color: #0b9c91;
+    }
+
+    .amount-presets {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .preset-btn {
+      background: #f1f5f9;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--muted);
+    }
+    .preset-btn:hover {
+      background: #e2e8f0;
+      color: var(--ink);
+    }
+
+    .compare-btn {
+      background: #0b9c91;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 13px 24px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+      width: 100%;
+    }
+    .compare-btn:hover { background: #087d74; }
+
+    /* Results layout */
+    .quotes-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .quote-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 24px;
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr 1.2fr 1fr;
+      align-items: center;
+      gap: 16px;
+      transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+      position: relative;
+    }
+    .quote-card:hover {
+      border-color: #cbd5e1;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.05);
+    }
+    .quote-card.is-best {
+      border: 2px solid #0b9c91;
+      background: #fcfffd;
+    }
+
+    .badge-ribbon {
+      position: absolute;
+      top: -10px;
+      left: 20px;
+      background: #0b9c91;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 2px 10px;
+      border-radius: 99px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .badge-ribbon.rel {
+      background: #2563eb;
+      left: 120px;
+    }
+
+    .anchor-meta h3 {
+      font-size: 17px;
+      font-weight: 800;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .anchor-meta p {
+      font-size: 12px;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .quote-val-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .quote-val {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .quote-val.payout {
+      font-size: 20px;
+      font-weight: 800;
+      color: #0b9c91;
+    }
+
+    .rel-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: 800;
+      font-family: 'DM Mono', monospace;
+    }
+    .rel-pill.grade-a { background: #dcfce7; color: #15803d; }
+    .rel-pill.grade-b { background: #e0f2fe; color: #0369a1; }
+    .rel-pill.grade-c { background: #fef3c7; color: #b45309; }
+    .rel-pill.grade-d, .rel-pill.grade-f { background: #fee2e2; color: #b91c1c; }
+
+    .action-col {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .action-btn {
+      background: #061f2d;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-weight: 700;
+      font-size: 13px;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .action-btn:hover { background: #0b9c91; }
+
+    @media (max-width: 900px) {
+      .quote-card {
+        grid-template-columns: 1fr;
+        gap: 14px;
+        padding-top: 32px;
+      }
+      .badge-ribbon.rel {
+        left: 130px;
+      }
+    }
+  </style>
+</head>
+<body class="dash-body">
+
+<header class="topnav" id="topnav">
+  <div class="wrap topnav__in">
+    <a href="index.html" class="topnav__logo" aria-label="Landfall home">
+      <svg viewBox="0 0 40 40" class="topnav__logo-mark" aria-hidden="true">
+        <path d="M20 3 35 29H5L20 3Z" fill="currentColor"/>
+        <path d="M20 12 28 26H12l8-14Z" fill="#eaf4ef"/>
+        <path d="M20 29v7" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <span>landfall<em>.stellar</em></span>
+    </a>
+    <nav class="topnav__pill" aria-label="Comparator navigation">
+      <a class="topnav__link" href="index.html">Overview</a>
+      <a class="topnav__link" href="dashboard.html">Transactions</a>
+      <a class="topnav__link is-active" href="compare.html" aria-current="page">Off-Ramp Comparator</a>
+      <a class="topnav__link" href="docs.html">API Docs</a>
+      <a class="topnav__link" href="portal.html">Developer Portal</a>
+    </nav>
+    <div class="topnav__actions">
+      <a class="dash-btn dash-btn--primary" href="portal.html">Portal / API Keys →</a>
+      <a class="dash-btn dash-btn--ghost" href="https://github.com/ibochivincent-lang/landfall" target="_blank" rel="noopener">GitHub ↗</a>
+    </div>
+  </div>
+</header>
+
+<main class="comp-wrap">
+  <div class="dash-head">
+    <div>
+      <h1 class="dash-title">Off-Ramp Rate & Reliability Comparator</h1>
+      <p class="dash-sub">
+        Compare live SEP-38 quotes, fees, and verified on-chain settlement reliability across Stellar anchors — before sending a dollar.
+      </p>
+    </div>
+  </div>
+
+  <!-- Form Controls -->
+  <div class="comp-card">
+    <div class="comp-form-grid">
+      <div class="form-group">
+        <label class="form-label" for="fromAsset">You Send (Stablecoin)</label>
+        <select class="form-select" id="fromAsset">
+          <option value="USDC" selected>USDC · USD Coin</option>
+          <option value="EURC">EURC · Euro Coin</option>
+          <option value="XLM">XLM · Stellar Lumens</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="toCurrency">Destination Corridor (Fiat)</label>
+        <select class="form-select" id="toCurrency">
+          <option value="NGN" selected>🇳🇬 NGN — Nigeria (Bank Transfer / Mobile)</option>
+          <option value="KES">🇰🇪 KES — Kenya (M-Pesa / Bank)</option>
+          <option value="GHS">🇬🇭 GHS — Ghana (MTN MoMo / Bank)</option>
+          <option value="MXN">🇲🇽 MXN — Mexico (SPEI / Cash)</option>
+          <option value="BRL">🇧🇷 BRL — Brazil (PIX)</option>
+          <option value="ARS">🇦🇷 ARS — Argentina (CVU / Bank)</option>
+          <option value="PEN">🇵🇪 PEN — Peru (BCP / Interbank)</option>
+          <option value="EUR">🇪🇺 EUR — Eurozone (SEPA Instant)</option>
+          <option value="USD">🇺🇸 USD — United States (Cash Pickup)</option>
+          <option value="ZAR">🇿🇦 ZAR — South Africa (EFT)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="amountInput">Send Amount</label>
+        <input type="number" class="form-input" id="amountInput" value="100" min="5" step="5">
+        <div class="amount-presets">
+          <button class="preset-btn" onclick="setAmount(50)">$50</button>
+          <button class="preset-btn" onclick="setAmount(100)">$100</button>
+          <button class="preset-btn" onclick="setAmount(250)">$250</button>
+          <button class="preset-btn" onclick="setAmount(500)">$500</button>
+          <button class="preset-btn" onclick="setAmount(1000)">$1,000</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <button class="compare-btn" id="compareBtn" onclick="fetchQuotes()">Compare Live Rates ⚡</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Comparator Results Header -->
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+    <h2 style="font-size:18px; font-weight:800;" id="resultsTitle">Comparing Quotes for 100 USDC → NGN</h2>
+    <span class="freshness is-live" id="quotesStatus">Live · Ledger Verified</span>
+  </div>
+
+  <!-- Quotes List Container -->
+  <div class="quotes-grid" id="quotesContainer">
+    <div style="text-align:center; padding:40px; color:var(--muted); font-size:14px;">
+      Fetching live SEP-38 quotes and anchor settlement metrics…
+    </div>
+  </div>
+</main>
+
+<footer class="dash-footer">
+  <div class="wrap dash-foot-in">
+    <span>Settlement data and reliability metrics read directly from the public Stellar ledger</span>
+    <span>© 2026 Landfall · MIT</span>
+  </div>
+</footer>
+
+<script>
+  function setAmount(val) {
+    document.getElementById('amountInput').value = val;
+    fetchQuotes();
+  }
+
+  const currencySymbols = {
+    NGN: '₦',
+    KES: 'KSh ',
+    GHS: 'GH₵ ',
+    MXN: 'Mex$ ',
+    BRL: 'R$ ',
+    ARS: '$ ',
+    PEN: 'S/ ',
+    EUR: '€',
+    USD: '$',
+    ZAR: 'R ',
+    XOF: 'CFA '
+  };
+
+  async function fetchQuotes() {
+    const from = document.getElementById('fromAsset').value;
+    const to = document.getElementById('toCurrency').value;
+    const amount = document.getElementById('amountInput').value || 100;
+    const container = document.getElementById('quotesContainer');
+    const title = document.getElementById('resultsTitle');
+
+    title.textContent = `Comparing Quotes for ${amount} ${from} → ${to}`;
+    container.innerHTML = '<div style="text-align:center; padding:40px; color:var(--muted);">Refreshing live quotes…</div>';
+
+    try {
+      const res = await fetch(`/api/v1/quotes/compare?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&amount=${encodeURIComponent(amount)}`);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      renderQuotes(data.quotes, to);
+    } catch (err) {
+      container.innerHTML = `<div style="text-align:center; padding:40px; color:#991b1b;">Failed to fetch quotes: ${err.message}. Please try again.</div>`;
+    }
+  }
+
+  function renderQuotes(quotes, toCurrency) {
+    const container = document.getElementById('quotesContainer');
+    if (!quotes || quotes.length === 0) {
+      container.innerHTML = `<div style="text-align:center; padding:40px; color:var(--muted);">No integrated anchors currently operating in the ${toCurrency} corridor.</div>`;
+      return;
+    }
+
+    const symbol = currencySymbols[toCurrency] || (toCurrency + ' ');
+
+    container.innerHTML = quotes.map(q => {
+      const isBest = q.isBestPayout;
+      const isHighRel = q.isHighestReliability;
+      const relGradeClass = 'grade-' + (q.reliability.grade || 'C').toLowerCase();
+
+      return `
+        <div class="quote-card ${isBest ? 'is-best' : ''}">
+          ${isBest ? '<div class="badge-ribbon">Best Payout</div>' : ''}
+          ${isHighRel && !isBest ? '<div class="badge-ribbon rel">Top Reliability</div>' : ''}
+          
+          <div class="anchor-meta">
+            <h3>${q.anchor}</h3>
+            <p>${q.domain} · ${q.payoutSpeed}</p>
+            <p style="margin-top:4px; font-size:11px;">Method: <b>${q.paymentMethods[0] || 'Direct Transfer'}</b></p>
+          </div>
+
+          <div>
+            <div class="quote-val-label">Exchange Rate</div>
+            <div class="quote-val">1 ${q.fromAsset} = ${symbol}${q.exchangeRate.toLocaleString()}</div>
+            <div style="font-size:11px; color:var(--muted); margin-top:2px;">Fee: ${q.feePercent}% ($${q.feeUsd})</div>
+          </div>
+
+          <div>
+            <div class="quote-val-label">Settlement Proof</div>
+            <span class="rel-pill ${relGradeClass}">
+              Grade ${q.reliability.grade} · ${q.reliability.score}/100
+            </span>
+            <div style="font-size:11px; color:var(--muted); margin-top:4px;">${q.reliability.status.toUpperCase()}</div>
+          </div>
+
+          <div>
+            <div class="quote-val-label">You Receive</div>
+            <div class="quote-val payout">${symbol}${q.netPayout.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+          </div>
+
+          <div class="action-col">
+            <a href="${q.sep24Url}" target="_blank" rel="noopener noreferrer" class="action-btn">
+              Execute Off-Ramp →
+            </a>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Initial load
+  document.getElementById('toCurrency').addEventListener('change', fetchQuotes);
+  document.getElementById('fromAsset').addEventListener('change', fetchQuotes);
+  fetchQuotes();
+</script>
+
+</body>
+</html>
