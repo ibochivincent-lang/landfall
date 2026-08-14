@@ -41,8 +41,16 @@ if (!DATABASE_URL) {
 // those hosts only — the connection is still encrypted. A plain local socket
 // gets no TLS at all.
 const needsTls = /sslmode=require|neon\.tech|supabase\.|railway\.app|render\.com|rds\.amazonaws/.test(DATABASE_URL);
+// pg (>=8.23) treats a `sslmode=require` query param as "verify-full", and
+// when both connectionString and an explicit ssl option are given, the
+// string-parsed setting silently wins over rejectUnauthorized: false rather
+// than merging with it. Strip sslmode so TLS is driven purely by the
+// explicit ssl option below - otherwise a managed host's pooler cert (not
+// in Node's default CA store) fails with "self-signed certificate in
+// certificate chain" even with rejectUnauthorized: false set.
+const poolConnectionString = DATABASE_URL.replace(/([?&])sslmode=[^&]*&?/, "$1").replace(/[?&]$/, "");
 const pool = new Pool({
-  connectionString: DATABASE_URL,
+  connectionString: poolConnectionString,
   max: Number(process.env["PG_POOL_MAX"] ?? 8),
   connectionTimeoutMillis: 8_000,
   ...(needsTls ? { ssl: { rejectUnauthorized: false } } : {}),

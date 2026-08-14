@@ -9,7 +9,6 @@
  *   GET  /api/v1/anchors
  *   GET  /api/v1/anchors/:domain/payments
  *   GET  /api/v1/assets
- *   GET  /api/v1/corridors           -- cross-asset flow matrix (path payments)
  *   GET  /health
  *
  * Admin routes (session-cookie gated, see requireSession()):
@@ -46,8 +45,17 @@ function pool() {
   const url = process.env.DATABASE_URL;
   if (!url) return null;
 
+  // pg (>=8.23) treats a `sslmode=require` query param as "verify-full", and
+  // when both connectionString and an explicit ssl option are given, the
+  // string-parsed setting silently wins over rejectUnauthorized: false
+  // rather than merging with it. Strip sslmode so TLS is driven purely by
+  // the explicit ssl option below - otherwise Supabase's pooler cert (not
+  // in Node's default CA store) fails with "self-signed certificate in
+  // certificate chain" even with rejectUnauthorized: false set.
+  const poolConnectionString = url.replace(/([?&])sslmode=[^&]*&?/, '$1').replace(/[?&]$/, '');
+
   _pool = new Pool({
-    connectionString: url,
+    connectionString: poolConnectionString,
     max: 2,                          // stay within Supabase free-tier limits
     idleTimeoutMillis: 20_000,
     connectionTimeoutMillis: 8_000,
@@ -235,7 +243,7 @@ async function paymentsPage(db, { accounts, direction, asset, before, limit, inc
   params.push(limit + 1);  // one extra tells us if there's another page
   const sql = `
     SELECT p.id, p.tx_hash, p.op_type, p.from_account, p.to_account,
-           p.amount::text AS amount, p.asset, p.source_amount::text AS source_amount, p.source_asset, p.memo,
+           p.amount::text AS amount, p.asset, p.memo,
            p.created_at, p.is_dust, p.source,
            ai.domain AS to_domain, af.domain AS from_domain
       FROM payments p
@@ -253,18 +261,16 @@ async function paymentsPage(db, { accounts, direction, asset, before, limit, inc
   return {
     payments: page.map(r => ({
       ...(includeRaw ? { id: String(r.id), source: r.source, opType: r.op_type } : {}),
-      txHash:       r.tx_hash,
-      from:         r.from_account,
-      to:           r.to_account,
-      fromDomain:   r.from_domain,
-      toDomain:     r.to_domain,
-      amount:       r.amount,
-      asset:        r.asset,
-      sourceAmount: r.source_amount,
-      sourceAsset:  r.source_asset,
-      memo:         r.memo,
-      createdAt:    new Date(r.created_at).toISOString(),
-      isDust:       r.is_dust,
+      txHash:     r.tx_hash,
+      from:       r.from_account,
+      to:         r.to_account,
+      fromDomain: r.from_domain,
+      toDomain:   r.to_domain,
+      amount:     r.amount,
+      asset:      r.asset,
+      memo:       r.memo,
+      createdAt:  new Date(r.created_at).toISOString(),
+      isDust:     r.is_dust,
     })),
     nextCursor: hasMore ? String(page[page.length - 1].id) : null,
   };
@@ -280,38 +286,6 @@ async function assetRows(db) {
      ORDER BY count DESC
   `);
   return rows.map(r => ({ asset: r.asset, count: Number(r.count) }));
-}
-
-/**
- * Aggregate cross-asset payment corridors.
- * Groups path payments by source_asset → destination asset, summing count
- * and total delivered volume. Only rows where source_asset differs from
- * the delivered asset are true cross-asset trades.
- */
-async function corridorRows(db) {
-  const { rows } = await db.query(`
-    SELECT
-      source_asset                         AS from_asset,
-      asset                                AS to_asset,
-      COUNT(*)::int                        AS count,
-      SUM(amount)::text                    AS volume,
-      MIN(created_at)                      AS first_seen,
-      MAX(created_at)                      AS last_seen
-    FROM payments
-    WHERE source_asset IS NOT NULL
-      AND source_asset <> asset
-    GROUP BY source_asset, asset
-    ORDER BY count DESC
-    LIMIT 100
-  `);
-  return rows.map(r => ({
-    fromAsset:  r.from_asset,
-    toAsset:    r.to_asset,
-    count:      r.count,
-    volume:     r.volume,
-    firstSeen:  new Date(r.first_seen).toISOString(),
-    lastSeen:   new Date(r.last_seen).toISOString(),
-  }));
 }
 
 async function domainAccounts(db, domain) {
@@ -547,12 +521,6 @@ export default async function handler(req, res) {
     // GET /api/v1/assets
     if (joined === 'v1/assets') {
       return json(res, 200, { assets: await assetRows(db) });
-    }
-
-    // GET /api/v1/corridors
-    if (joined === 'v1/corridors') {
-      const corridors = await corridorRows(db);
-      return json(res, 200, { corridors }, 300);
     }
 
     // GET /api/v1/anchors/:domain/payments

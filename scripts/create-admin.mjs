@@ -84,8 +84,17 @@ async function main() {
   }
 
   const needsTls = /sslmode=require|neon\.tech|supabase\.|railway\.app|render\.com|rds\.amazonaws/.test(connectionString);
+  // pg (>=8.23) treats a `sslmode=require` query param on the connection
+  // string as "verify-full" and, when both a connectionString and an
+  // explicit `ssl` option are given, the string-parsed setting silently
+  // wins over rejectUnauthorized: false - the two don't merge, the second
+  // one clobbers the first. Strip sslmode here and drive TLS purely from
+  // the explicit ssl option below, or Supabase's pooler cert (which isn't
+  // in Node's default CA store) fails with "self-signed certificate in
+  // certificate chain" even though rejectUnauthorized: false is set.
+  const poolConnectionString = connectionString.replace(/([?&])sslmode=[^&]*&?/, '$1').replace(/[?&]$/, '');
   const pool = new Pool({
-    connectionString,
+    connectionString: poolConnectionString,
     connectionTimeoutMillis: 8_000,
     ...(needsTls ? { ssl: { rejectUnauthorized: false } } : {}),
   });
