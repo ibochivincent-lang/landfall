@@ -160,14 +160,14 @@ async function loadPayments(append = false) {
   const rows = data.payments.map(p => `
     <tr>
       <td class="mono">${esc(p.id)}</td>
-      <td>${fmtDate(p.createdAt)}</td>
+      <td class="admin-nowrap">${fmtDate(p.createdAt)}</td>
       <td class="mono">${esc(p.source)}</td>
       <td class="mono">${esc(p.opType)}</td>
       <td class="mono" title="${esc(p.from)}">${esc(p.fromDomain || short(p.from))}</td>
       <td class="mono" title="${esc(p.to)}">${esc(p.toDomain || short(p.to))}</td>
       <td class="num mono">${esc(p.amount)}</td>
-      <td class="mono">${esc(p.asset)}</td>
-      <td class="mono">${esc(p.memo || '—')}</td>
+      <td class="mono" title="${esc(p.asset)}">${esc(shortAsset(p.asset))}</td>
+      <td class="mono" title="${esc(p.memo || '')}">${esc(shortMemo(p.memo))}</td>
       <td>${p.isDust ? '<span class="admin-badge admin-badge--warn">dust</span>' : ''}</td>
       <td><a href="https://stellar.expert/explorer/public/tx/${esc(p.txHash)}" target="_blank" rel="noopener">↗</a></td>
     </tr>`).join('');
@@ -178,6 +178,28 @@ async function loadPayments(append = false) {
   $('#paymentsCount').textContent = `${$('#paymentsBody').children.length} row(s) shown`;
 }
 function short(account) { return account ? `${account.slice(0, 4)}…${account.slice(-4)}` : '—'; }
+
+// Non-native assets are 'CODE:ISSUER' with ISSUER a full 56-char Stellar
+// account id - shown in full it blows out the table width and pushes the
+// dust/tx columns off-screen. Truncate the issuer (never the code, that's
+// the part a human actually reads) and keep the full value in a title
+// tooltip, same pattern as the From/To columns - the point of this table
+// is to let an admin tell two same-code, different-issuer assets apart,
+// which the public dashboard's code-only view can't do.
+function shortAsset(asset) {
+  if (!asset || asset === 'native') return asset || '—';
+  const i = asset.indexOf(':');
+  if (i === -1) return asset;
+  const code = asset.slice(0, i);
+  const issuer = asset.slice(i + 1);
+  return issuer.length > 10 ? `${code}:${issuer.slice(0, 4)}…${issuer.slice(-4)}` : asset;
+}
+
+// Hash memos (SEP-24 correlation ids) are 64 hex chars - truncate the same
+// way, full value stays in the title tooltip.
+function shortMemo(memo) {
+  return memo && memo.length > 20 ? `${memo.slice(0, 10)}…${memo.slice(-6)}` : (memo || '—');
+}
 
 $$('.filters [data-dir]', $('#tab-payments')).forEach(btn => {
   btn.addEventListener('click', () => {

@@ -55,3 +55,8 @@
 
 .admin-row-actions { display: flex; gap: 6px; white-space: nowrap; }
 .admin-row-actions .dash-btn { padding: 4px 10px; font-size: 12px; }
+
+/* Keeps the payment browser's "When" column on one line - without this it
+   wraps to 3-4 lines per row, which combined with the wide asset/memo
+   columns made every row absurdly tall. */
+.admin-nowrap { white-space: nowrap; }
