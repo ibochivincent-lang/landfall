@@ -143,16 +143,11 @@
   /* ------------------------------------------------------- anchor selection */
 
   let ANCHORS = [];
+  let RELIABILITY = {};
 
-  function renderAnchors(accounts) {
+  function renderAnchors(accounts, reliability = {}) {
     ANCHORS = accounts;
-    const byDomain = new Map();
-    let ANCHORS = [];
-    let RELIABILITY = {};
-
-    function renderAnchors(accounts, reliability = {}) {
-      ANCHORS = accounts;
-      RELIABILITY = reliability;
+    RELIABILITY = reliability;
       const byDomain = new Map();
       for (const a of accounts) {
         const g = byDomain.get(a.domain) ?? { domain: a.domain, accounts: [], dark: 0, live: 0 };
