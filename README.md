@@ -1,147 +1,51 @@
 # Landfall
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![CI](https://github.com/ibochivincent-lang/landfall/actions/workflows/ci.yml/badge.svg)](https://github.com/ibochivincent-lang/landfall/actions/workflows/ci.yml)
+[![Deployed on Vercel](https://img.shields.io/badge/Deployed-Vercel-black?logo=vercel)](https://landfall-ib.vercel.app)
+
 **Did the money land?**
 
-Ledger-derived settlement record for Stellar anchors.
+A settlement-quality record for Stellar anchors, computed entirely from the public ledger — not from asking the anchor.
 
-**Live: [landfall-ib.vercel.app](https://landfall-ib.vercel.app)** · [Methodology](docs/methodology.md) · [Contributing](CONTRIBUTING.md)
+Every existing anchor monitor *interrogates* — pings an endpoint, validates a `stellar.toml`, records the answer the anchor chose to give. Landfall *observes* — it reads what anchor accounts actually did on-chain under SEP-24, and turns that into liveness, settlement volume, counterparty concentration, and refund rate. A TOML file can be edited in ten seconds. Two years of settlement history cannot.
 
-> **Applying to the Drips Stellar Wave Program.** Issues are labelled by
+**Live: [landfall-ib.vercel.app](https://landfall-ib.vercel.app)**
+
+> **Submitted to the Drips Stellar Wave Program.** Issues are labelled by
 > complexity — `trivial-100`, `medium-150`, `high-200` — and tagged
-> `Stellar Wave`. New contributors should start with `good first issue`.
-> **Wait to be assigned before you start coding**; an unassigned issue is not
+> `Stellar Wave`. New contributors should start with `good first issue`, and
+> **wait to be assigned before writing code** — an unassigned issue is not
 > yours. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
----
+## Table of contents
 
-## Current finding
+- [Why this exists](#why-this-exists)
+- [Current finding](#current-finding)
+- [Tech stack](#tech-stack)
+- [Getting started](#getting-started)
+- [Environment variables](#environment-variables)
+- [Documentation](#documentation)
+- [Honesty rules](#honesty-rules)
+- [Contributing](#contributing)
+- [Contributors](#contributors)
+- [License](#license)
 
-From the scan of 12 August 2026, across 13 anchor accounts on 5 home domains:
+## Why this exists
 
-> **6 of 13 anchor accounts have processed no on-chain settlement in over 30 days.**
-> Every account with payment history at one anchor is dark.
+Someone sending money home through a Stellar anchor cannot tell whether that anchor is actually operating. Neither can the wallet that offered it to them. The anchor's own status endpoint says it is fine, because status endpoints say what the anchor decides they say.
 
-Verified against stellar.expert. Every figure ships with its transaction hashes.
+This is answerable because of how Stellar itself works, not despite it:
 
----
+- **SEP-1** resolves a home domain to the accounts an anchor claims to operate — permissionlessly, with no cooperation required.
+- **SEP-24** puts one leg of every deposit and withdrawal on the public ledger, so settlement behaviour is already there, retroactively, for every anchor — a prober starts collecting the day you switch it on, Landfall computed years of history on its first run.
+- **CAP-67** (Protocol 23) turns per-account paging into one unified event stream, and makes mint/burn distinguishable from transfer instead of inferred.
+- **SEP-38** firm quotes give slippage — quoted amount versus landed amount — a defined baseline, which nothing in the ecosystem publishes today.
+- **Soroban** publishes a digest of each dataset on-chain (deployed to testnet), so a contract can route on the same data a wallet reads from the API, and anyone can re-derive the digest and check it agrees.
 
-## The difference
+Move any of this to a chain without those primitives and there is nothing left — it is not a generic app that happens to settle on Stellar.
 
-Existing anchor monitors **interrogate** anchors — ping an endpoint, validate a TOML, read a quote, and record the answer the anchor chose to give.
-
-Landfall **observes** them — it reads the public ledger and measures what the anchor actually did.
-
-You can fake a TOML file in ten seconds. You cannot fake two years of on-chain settlement history.
-
----
-
-## Why the ledger is enough
-
-Under SEP-24, both flows leave on-chain traces:
-
-| Flow | On-chain leg | Off-chain leg |
-|---|---|---|
-| **Deposit** (fiat → asset) | Anchor sends the asset to the user's account | User pays fiat in |
-| **Withdrawal** (asset → fiat) | User sends the asset to the anchor's account | Anchor pays fiat out |
-
-So the ledger already contains, for every anchor, retroactively, without anyone's permission:
-
-- **Liveness that cannot be faked** — an account with no activity for three days is not operating, whatever its status endpoint says
-- **Deposit fulfilment** — the anchor's outbound payments, amounts and timing
-- **Withdrawal intake** — volume flowing in, per asset
-- **Refund rate** — value returned to senders. The distress signal no anchor advertises
-- **Concentration** — how much of the flow is one counterparty
-
-This is **retroactive**. A prober starts collecting the day you switch it on. Landfall computes years of history on the first run. That is the cold-start problem solved, which is what normally kills reputation products.
-
----
-
-## How Landfall uses Stellar
-
-Landfall is not a generic app that happens to settle on Stellar. Its core
-mechanism depends on properties only this network provides, and it would not
-port to another chain without being redesigned.
-
-### SEP-1 — anchor discovery
-
-Anchors publish a `stellar.toml` declaring the accounts they operate. That is
-the entry point: a home domain resolves to on-chain accounts, permissionlessly,
-with no cooperation from the anchor. `packages/indexer/src/toml.ts`.
-
-### SEP-24 — why the ledger is enough
-
-Under SEP-24 one leg of every deposit and withdrawal is written to the ledger:
-
-| Flow | On-chain | Off-chain |
-|---|---|---|
-| Deposit (fiat → asset) | anchor sends the asset to the user | user pays fiat in |
-| Withdrawal (asset → fiat) | user sends the asset to the anchor | anchor pays fiat out |
-
-So settlement behaviour is already public, retroactively, for every anchor.
-No permission needed and no opt-out available.
-
-### CAP-67 — the unified event stream
-
-Protocol 23 makes classic operations emit the same events Soroban contracts do
-— `transfer`, `mint`, `burn`, `clawback` — with standardised topics and an
-`i128` amount, and backfills them for past ledgers.
-
-For this project that is not a convenience:
-
-- **One stream instead of N cursors.** Follow the ledger once rather than
-  paging every anchor account separately.
-- **Mint and burn are distinguishable from transfer.** A payment involving the
-  issuer is a different event from a user-to-user payment, and the protocol now
-  says so rather than leaving us to infer it.
-
-The `ledger_events` table is shaped directly on CAP-67's topics. The REST path
-remains as a fallback and for pre-Protocol-23 networks; `payments.source`
-records which path each row came from.
-
-### SEP-38 — the slippage baseline
-
-Firm quotes with an expiry give slippage a defined baseline: the gap between
-the amount quoted and the amount that landed. That metric does not exist in the
-ecosystem today. It needs the fiat leg, which is why Layer 2 is attestation.
-
-### Soroban — publishing the record on-chain
-
-**Live on testnet:**
-[`CA2IYHFKTKSJWR5IICY6HFD55BJEGE7OMKISWMLMPFSHLESZYO3VICAG`](https://stellar.expert/explorer/testnet/contract/CA2IYHFKTKSJWR5IICY6HFD55BJEGE7OMKISWMLMPFSHLESZYO3VICAG)
-— initialised in
-[this transaction](https://stellar.expert/explorer/testnet/tx/705435b9a826d2258b4a7f1fc73ff15c1865df13fd5bf89cdcffa15abdb9cc53),
-admin `GA7YI536V4BC7CL43DRMZ2UU7N4T3VZZSY7FVOY6Q4JUPBVZYHN43QMT`.
-Deployed with `scripts/deploy-contract.ps1`; 15,641 bytes optimised.
-
-Not on mainnet, and the indexer does not publish to it yet. It is a deployed
-contract you can call, not a running oracle.
-
-
-`packages/contracts/landfall-oracle` publishes a **digest** of each dataset plus
-a per-account liveness state, so other contracts can route on the same data a
-wallet reads from the API.
-
-It stores a digest rather than the dataset because anyone can re-derive the
-digest from the published data and check the two agree. An oracle that asks you
-to trust it has missed the point of being an oracle.
-
-Events use `#[contractevent]`, so topics and payload shapes are part of the
-contract spec and an indexer generates its decoder instead of guessing:
-
-| Topic | Fires when |
-|---|---|
-| `publish` | a new dataset digest, epoch as a topic |
-| `score` | every score write |
-| `dark` | **only** on the transition into dormancy |
-
-`dark` fires on the transition, not the state — a consumer wants waking when an
-anchor goes quiet, not on every scan confirming it still is.
-
-The contract deliberately emits **no CAP-67 asset events**. CAP-67 standardises
-`transfer`/`mint`/`burn` for value movement; a scoring update moves no value,
-and faking those topics would pollute the exact stream this project consumes.
-
-### What is built, and what is not
+**What is built, and what is not:**
 
 | | Status |
 |---|---|
@@ -150,35 +54,55 @@ and faking those topics would pollute the exact stream this project consumes.
 | Liveness, volume, concentration, returns | shipping |
 | Postgres persistence + read API | shipping |
 | Transactions dashboard | shipping |
-| Hosted deployment (Supabase, prod compose) | shipping |
+| Hosted deployment (Supabase, prod compose, Vercel) | shipping |
 | Soroban oracle | **deployed to testnet**, 16 tests, not on mainnet |
 | CAP-67 event ingestion | schema ready, ingestion **not written** |
 | SEP-38 slippage / attestations | **designed, not built** |
 | `@landfall/sdk`, MCP server | **designed, not built** |
 
-We would rather list this honestly than let a roadmap read as a changelog.
+We would rather list this honestly than let a roadmap read as a changelog. Full detail in [docs/gaps.md](docs/gaps.md) and [docs/roadmap.md](docs/roadmap.md).
 
----
+## Current finding
 
-## Quick start
+From the scan of 12 August 2026, across 13 anchor accounts on 5 home domains:
+
+> **6 of 13 anchor accounts have processed no on-chain settlement in over 30 days.**
+> Every account with payment history at one anchor is dark.
+
+Verified against stellar.expert. Every figure ships with its transaction hashes — see [What it reports](#what-it-reports) below and the `/dashboard` on the live site.
+
+## Tech stack
+
+| Layer | Technology |
+|---|---|
+| Indexer | TypeScript, Node.js 20+, `tsx`, `node:test` (zero-dep SEP-1/TOML parser) |
+| API | TypeScript, Node.js, read-only HTTP over `pg` |
+| Web | Static HTML/CSS/JS, GSAP for the scan-loader animation |
+| Oracle | Rust, Soroban SDK — deployed to testnet |
+| Database | PostgreSQL (Supabase-hosted, or local via Docker) |
+| Deployment | Vercel (site + API proxy), Docker Compose (self-host), GitHub Actions (CI + daily scan) |
+
+## Getting started
 
 **Whole stack, one command.** Requires Docker.
 
 ```bash
+git clone https://github.com/ibochivincent-lang/landfall.git
+cd landfall
 cp .env.example .env
 docker compose up
 ```
 
-Brings up a local Stellar Quickstart node, Postgres with the schema applied,
-the indexer, and the API — no account anywhere, no mainnet, no credentials.
-Site on :8080, API on :8787, Horizon on :8000.
+Brings up a local Stellar Quickstart node, Postgres with the schema applied, the indexer, and the API — no account anywhere, no mainnet, no credentials. Site on `:8080`, API on `:8787`, Horizon on `:8000`.
 
 **Just the indexer.** Requires Node 20+, no Docker, no database.
 
 ```bash
 npm install
 npm run discover     # resolve anchor domains to on-chain accounts
-npm run scan         # index payment history and print the finding
+npm run scan          # index payment history and print the finding
+npm test              # 35 tests, no network required
+npm run typecheck
 ```
 
 Layout:
@@ -191,61 +115,9 @@ packages/api         read-only HTTP API
 packages/web         the public site and dashboard
 ```
 
-See [docs/architecture.md](docs/architecture.md).
+Scan flags, deployment steps (Supabase, prod compose, Vercel, oracle), and the transactions dashboard are covered in [docs/architecture.md](docs/architecture.md) and [docs/deployment.md](docs/deployment.md).
 
-### Transactions dashboard
-
-`/dashboard` lists every indexed payment, per anchor, with the transaction hash
-linked to a block explorer so any figure on the front page can be traced to the
-rows it came from. Dark anchors sort first, because they are the reason anyone
-opens the page.
-
-It is live-only. Unlike the landing page it ships no offline snapshot: a stale
-list of "every transaction" would mislead in a way a stale headline figure does
-not, so with no API reachable it says so and shows nothing.
-
-### Deploying it
-
-[docs/deployment.md](docs/deployment.md) covers the whole path — Supabase for
-Postgres (including the row-level-security lockdown that stops the public
-`anon` key from deleting the dataset), the production compose file, Vercel with
-a same-origin API proxy, and deploying the oracle.
-
-```bash
-./scripts/migrate.sh                                   # apply the schema
-npm run scan -- --persist --horizon https://horizon.stellar.org
-docker compose -f docker-compose.prod.yml up -d --build
-./scripts/deploy-contract.sh testnet                   # oracle; -Preflight on Windows
-```
-
-Windows equivalents are `.\scripts\migrate.ps1` and
-`.\scripts\deploy-contract.ps1 -Network testnet`.
-
-Scan writes full results, including both transaction hashes for every matched
-refund pair, to `out/scan-<timestamp>.json` so any claim can be checked
-against the ledger.
-
-### Flags
-
-```
---domains a.com,b.com     override the seed list in data/anchors.json
---horizon <url>           default https://horizon.stellar.org
---max-records <n>         per-account record cap (default 2000)
---since <iso>             ignore records older than this
---min-inbound <n>         minimum inbound payments to be ranked (default 25)
---concurrency <n>         parallel requests (default 4)
---out <dir>               output directory (default ./out)
-```
-
-### Example
-
-```bash
-npm run scan -- --since 2026-01-01T00:00:00Z --max-records 5000 --min-inbound 50
-```
-
----
-
-## What it reports
+### What it reports
 
 ```
 DOMAIN                     ACCOUNT      IN      OUT     REFUNDS   RATE      LAST SEEN
@@ -253,52 +125,70 @@ DOMAIN                     ACCOUNT      IN      OUT     REFUNDS   RATE      LAST
 example-anchor.com         GABC…WXYZ    1204    1190    47        3.90%     2.1h
 ```
 
-Followed by a headline finding — the aggregate refund rate across every account
-with enough inbound traffic to support the claim.
+Followed by a headline finding — the aggregate refund rate across every account with enough inbound traffic to support the claim.
 
----
+## Environment variables
+
+Copy `.env.example` to `.env` and adjust. Nothing in the example file is a secret — the local stack is deliberately credential-free so a contributor can start without asking anyone for anything.
+
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `DATABASE_URL` | For `--persist` | `postgres://landfall:landfall@localhost:5432/landfall` | Postgres connection string. |
+| `HORIZON_URL` | No | `http://localhost:8000` | Horizon server. Point at `https://horizon.stellar.org` to scan mainnet anchors. |
+| `SOROBAN_RPC_URL` | No | `http://localhost:8001` | Soroban RPC endpoint, for oracle interaction. |
+| `SCAN_INTERVAL_SECONDS` | No | `900` | How often the indexer loop re-scans. |
+| `DUST_THRESHOLD` | No | `0.01` | Minimum payment amount counted, to filter dust. |
+| `MAX_RECORDS` | No | `10000` | Per-account record cap for a scan. |
+| `PORT` | No | `8787` | API listen port. |
+| `CORS_ORIGIN` | No | `*` | API CORS origin. |
+| `ORACLE_CONTRACT_ID` | Only to publish on-chain | — | Deployed Soroban oracle contract id. |
+| `ORACLE_ADMIN_SECRET` | Only to publish on-chain | — | Admin key for the oracle contract. Never commit this. |
+
+## Documentation
+
+| Document | What it covers |
+|---|---|
+| [docs/architecture.md](docs/architecture.md) | Package layout, the request/scan flow, and where each piece runs. |
+| [docs/methodology.md](docs/methodology.md) | Exactly how each published metric is computed, and where the method is weak. |
+| [docs/gaps.md](docs/gaps.md) | Honest inventory of what isn't built yet, ordered by how much each gap could hurt. |
+| [docs/roadmap.md](docs/roadmap.md) | Milestones mapped to the Stellar Community Fund Build Award's three tranches. |
+| [docs/deployment.md](docs/deployment.md) | Full deploy path: Supabase, production compose, Vercel, the oracle. |
+| [docs/backlog.md](docs/backlog.md) | Summary of the scoped, complexity-tagged issues filed on the tracker. |
+| [docs/checklist.md](docs/checklist.md) | Current status snapshot against the Stellar Wave / SCF checklist. |
+| [docs/scf-submission.md](docs/scf-submission.md) | Interest-form answers and the full Build Award draft. |
+| [SECURITY.md](SECURITY.md) | Disclosure policy. |
+| [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | Includes a project-specific clause on discussing named anchors factually. |
 
 ## Honesty rules
 
-These are constraints on the code, not aspirations:
+Constraints on the code, not aspirations:
 
 1. **No number on the site that the code cannot prove.** Every published figure traces to indexed ledger records.
-2. **Failures are visible.** A domain that will not resolve prints as `FAIL`. It is never silently dropped, because a missing anchor is itself a finding.
+2. **Failures are visible.** A domain that will not resolve prints as `FAIL` — never silently dropped, because a missing anchor is itself a finding.
 3. **Thin data is suppressed, not ranked.** A refund rate computed over three payments is noise dressed as a statistic. Accounts below `--min-inbound` are excluded from the headline.
-4. **Heuristics are labelled.** Refund detection is a heuristic. It says so, everywhere it appears. See [docs/methodology.md](docs/methodology.md).
-5. **Degradation is stale, not broken.** There is no external probe to fail. If indexing stops, it resumes from the last cursor. The honest status is "N ledgers behind."
-
----
-
-## Status
-
-Layer 1 (ledger truth) is implemented. Layers 2 and 3 are designed, not built:
-
-- **Layer 1 — ledger truth.** Indexer, metrics, refund detection. ✅ working
-- **Layer 2 — attested outcomes.** Signed settlement receipts covering the fiat leg, so slippage between quoted and landed amounts becomes measurable. Designed.
-- **Layer 3 — distribution.** `pickAnchor()` SDK for wallets, public API, MCP server for payment agents, Soroban oracle publishing signed score digests. Designed.
-
-See [docs/roadmap.md](docs/roadmap.md).
-
----
+4. **Heuristics are labelled**, everywhere they surface. Refund detection is a heuristic and says so. See [docs/methodology.md](docs/methodology.md).
+5. **Degradation is stale, not broken.** There is no external probe to fail. If indexing stops, it resumes from the last cursor.
 
 ## Contributing
 
-Issues are scoped and labelled by complexity. Start with `good first issue`.
-See [CONTRIBUTING.md](CONTRIBUTING.md), [DEVELOPMENT.md](DEVELOPMENT.md) and
-[docs/backlog.md](docs/backlog.md).
+Issues are scoped and labelled by complexity. Start with `good first issue`; larger tickets are tagged `help wanted`.
 
-## Tests
+See [CONTRIBUTING.md](CONTRIBUTING.md), [DEVELOPMENT.md](DEVELOPMENT.md), and [docs/backlog.md](docs/backlog.md) for the full backlog. All contributors are expected to follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ```bash
-npm test                # indexer: 37 tests, no network required
-npm run contracts:test  # oracle: 16 tests
-npm run typecheck
+npm run contracts:test   # oracle: 16 Rust tests
 ```
 
-The suite includes a mock Horizon server, so the pagination, normalisation and
-metrics path is verified end to end without touching the network.
+## Contributors
 
-## Licence
+Thanks to everyone who has shipped code, docs, or infrastructure for Landfall.
 
-MIT
+| | |
+|---|---|
+| **Ibochi Vincent** | Lead — indexer, contract, project owner |
+| **Mamavee001** | Contributor |
+| Your name here | [Open a PR →](CONTRIBUTING.md) |
+
+## License
+
+MIT — see [LICENSE](LICENSE).
