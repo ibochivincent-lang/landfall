@@ -1,5 +1,5 @@
 {
-  "asOf": "2026-08-16T23:18:59.873Z",
+  "asOf": "2026-08-17T01:12:44.403Z",
   "staleHours": 0,
   "returnRateCaveat": "A return is the honest failure mode. An anchor that accepts value, fails to settle and keeps it produces no return event and scores 0. A low rate is the absence of one kind of evidence, not evidence of good conduct.",
   "accounts": [
@@ -12,7 +12,7 @@
       "outbound": 1,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 133.19,
+      "hoursSinceActivity": 135.08,
       "topCounterpartyShare": 0.9182
     },
     {
@@ -24,7 +24,7 @@
       "outbound": 20,
       "returns": 1,
       "returnRate": 0.1667,
-      "hoursSinceActivity": 929.76,
+      "hoursSinceActivity": 931.65,
       "topCounterpartyShare": 0.8898
     },
     {
@@ -36,7 +36,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1864.35,
+      "hoursSinceActivity": 1866.24,
       "topCounterpartyShare": null
     },
     {
@@ -48,7 +48,7 @@
       "outbound": 2,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1472.69,
+      "hoursSinceActivity": 1474.58,
       "topCounterpartyShare": null
     },
     {
@@ -60,7 +60,7 @@
       "outbound": 31,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 137.7,
+      "hoursSinceActivity": 139.6,
       "topCounterpartyShare": 0.9991
     },
     {
@@ -72,7 +72,7 @@
       "outbound": 932,
       "returns": 10,
       "returnRate": 0.0116,
-      "hoursSinceActivity": 137.38,
+      "hoursSinceActivity": 139.28,
       "topCounterpartyShare": 0.529
     },
     {
@@ -84,7 +84,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 133.19,
+      "hoursSinceActivity": 135.08,
       "topCounterpartyShare": 0.9401
     },
     {
@@ -96,7 +96,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 1501.27,
+      "hoursSinceActivity": 1503.16,
       "topCounterpartyShare": 0.9999
     },
     {
@@ -104,12 +104,12 @@
       "domain": "anclap.com",
       "name": "Grupo Anchor S.A.",
       "state": "live",
-      "inbound": 1260,
+      "inbound": 1261,
       "outbound": 671,
       "returns": 1,
       "returnRate": 0.0008,
-      "hoursSinceActivity": 11.17,
-      "topCounterpartyShare": 0.1036
+      "hoursSinceActivity": 1.03,
+      "topCounterpartyShare": 0.1035
     },
     {
       "account": "GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN",
@@ -120,7 +120,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 50.56,
+      "hoursSinceActivity": 52.46,
       "topCounterpartyShare": 0.9281
     },
     {
@@ -144,7 +144,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 930.59,
+      "hoursSinceActivity": 932.48,
       "topCounterpartyShare": 1
     },
     {
@@ -156,7 +156,7 @@
       "outbound": 444,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 927.7,
+      "hoursSinceActivity": 929.59,
       "topCounterpartyShare": 0.4281
     }
   ]
