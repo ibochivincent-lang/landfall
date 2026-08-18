@@ -1,56 +1,8 @@
 {
-  "asOf": "2026-08-18T10:27:00.774Z",
+  "asOf": "2026-08-18T11:24:14.117Z",
   "staleHours": 0,
   "returnRateCaveat": "A return is the honest failure mode. An anchor that accepts value, fails to settle and keeps it produces no return event and scores 0. A low rate is the absence of one kind of evidence, not evidence of good conduct.",
   "accounts": [
-    {
-      "account": "GAWODAROMJ33V5YDFY3NPYTHVYQG7MJXVJ2ND3AOGIHYRWINES6ACCPD",
-      "domain": "cowrie.exchange",
-      "name": "Cowrie Integrated Systems",
-      "state": "slow",
-      "inbound": 23,
-      "outbound": 1,
-      "returns": 0,
-      "returnRate": 0,
-      "hoursSinceActivity": 168.32,
-      "topCounterpartyShare": 0.9182
-    },
-    {
-      "account": "GBQZOJE2GWJU5VBT6NBLD2F3IOVOYUBDAXYUU32XMHDF4RMDOURWV3GT",
-      "domain": "cowrie.exchange",
-      "name": "Cowrie Integrated Systems",
-      "state": "dark",
-      "inbound": 6,
-      "outbound": 20,
-      "returns": 1,
-      "returnRate": 0.1667,
-      "hoursSinceActivity": 964.89,
-      "topCounterpartyShare": 0.8898
-    },
-    {
-      "account": "GDI5EK4HNMBHJJQGP3GUXQJIIOHU2CJO3LABPWD6WYSPJZP5NP67TMNN",
-      "domain": "cowrie.exchange",
-      "name": "Cowrie Integrated Systems",
-      "state": "dark",
-      "inbound": 0,
-      "outbound": 0,
-      "returns": 0,
-      "returnRate": null,
-      "hoursSinceActivity": 1899.48,
-      "topCounterpartyShare": null
-    },
-    {
-      "account": "GBSKKRM7RRDHC33O6KFNLUSPS3577F7GYSFFVBVV5J5PDWGY4XWERE3W",
-      "domain": "cowrie.exchange",
-      "name": "Cowrie Integrated Systems",
-      "state": "dark",
-      "inbound": 0,
-      "outbound": 2,
-      "returns": 0,
-      "returnRate": null,
-      "hoursSinceActivity": 1507.82,
-      "topCounterpartyShare": null
-    },
     {
       "account": "GAQRF3UGHBT6JYQZ7YSUYCIYWAF4T2SAA5237Q5LIQYJOHHFAWDXZ7NM",
       "domain": "mykobo.co",
@@ -60,7 +12,7 @@
       "outbound": 31,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 172.83,
+      "hoursSinceActivity": 173.79,
       "topCounterpartyShare": 0.9991
     },
     {
@@ -72,7 +24,7 @@
       "outbound": 932,
       "returns": 10,
       "returnRate": 0.0116,
-      "hoursSinceActivity": 172.51,
+      "hoursSinceActivity": 173.47,
       "topCounterpartyShare": 0.529
     },
     {
@@ -84,7 +36,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 168.32,
+      "hoursSinceActivity": 169.27,
       "topCounterpartyShare": 0.9401
     },
     {
@@ -96,7 +48,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 1536.4,
+      "hoursSinceActivity": 1537.35,
       "topCounterpartyShare": 0.9999
     },
     {
@@ -108,7 +60,7 @@
       "outbound": 672,
       "returns": 1,
       "returnRate": 0.0008,
-      "hoursSinceActivity": 0.97,
+      "hoursSinceActivity": 1.93,
       "topCounterpartyShare": 0.1032
     },
     {
@@ -120,7 +72,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 3.56,
+      "hoursSinceActivity": 4.52,
       "topCounterpartyShare": 0.9323
     },
     {
@@ -144,7 +96,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 965.72,
+      "hoursSinceActivity": 966.67,
       "topCounterpartyShare": 1
     },
     {
@@ -156,7 +108,7 @@
       "outbound": 444,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 962.83,
+      "hoursSinceActivity": 963.79,
       "topCounterpartyShare": 0.4281
     }
   ]
