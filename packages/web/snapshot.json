@@ -1,5 +1,5 @@
 {
-  "asOf": "2026-08-19T22:23:43.787Z",
+  "asOf": "2026-08-19T23:21:48.676Z",
   "staleHours": 0.01,
   "returnRateCaveat": "A return is the honest failure mode. An anchor that accepts value, fails to settle and keeps it produces no return event and scores 0. A low rate is the absence of one kind of evidence, not evidence of good conduct.",
   "accounts": [
@@ -12,7 +12,7 @@
       "outbound": 1,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 204.26,
+      "hoursSinceActivity": 205.23,
       "topCounterpartyShare": 0.9182
     },
     {
@@ -24,7 +24,7 @@
       "outbound": 20,
       "returns": 1,
       "returnRate": 0.1667,
-      "hoursSinceActivity": 1000.83,
+      "hoursSinceActivity": 1001.8,
       "topCounterpartyShare": 0.8898
     },
     {
@@ -36,7 +36,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1935.42,
+      "hoursSinceActivity": 1936.39,
       "topCounterpartyShare": null
     },
     {
@@ -48,7 +48,7 @@
       "outbound": 2,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1543.77,
+      "hoursSinceActivity": 1544.73,
       "topCounterpartyShare": null
     },
     {
@@ -60,7 +60,7 @@
       "outbound": 31,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 208.78,
+      "hoursSinceActivity": 209.75,
       "topCounterpartyShare": 0.9991
     },
     {
@@ -72,7 +72,7 @@
       "outbound": 932,
       "returns": 10,
       "returnRate": 0.0116,
-      "hoursSinceActivity": 208.46,
+      "hoursSinceActivity": 209.43,
       "topCounterpartyShare": 0.529
     },
     {
@@ -84,7 +84,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 204.26,
+      "hoursSinceActivity": 205.23,
       "topCounterpartyShare": 0.9401
     },
     {
@@ -96,7 +96,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 1572.34,
+      "hoursSinceActivity": 1573.31,
       "topCounterpartyShare": 0.9999
     },
     {
@@ -108,7 +108,7 @@
       "outbound": 673,
       "returns": 1,
       "returnRate": 0.0008,
-      "hoursSinceActivity": 22.81,
+      "hoursSinceActivity": 23.78,
       "topCounterpartyShare": 0.1032
     },
     {
@@ -120,7 +120,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 1.97,
+      "hoursSinceActivity": 2.94,
       "topCounterpartyShare": 0.9339
     },
     {
@@ -144,7 +144,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 1001.67,
+      "hoursSinceActivity": 1002.63,
       "topCounterpartyShare": 1
     },
     {
@@ -156,7 +156,7 @@
       "outbound": 444,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 0.12,
+      "hoursSinceActivity": 0,
       "topCounterpartyShare": 0.4175
     }
   ]
