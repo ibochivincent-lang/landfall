@@ -1,6 +1,6 @@
 {
-  "asOf": "2026-08-19T04:36:07.776Z",
-  "staleHours": 0,
+  "asOf": "2026-08-19T05:30:01.210Z",
+  "staleHours": 0.01,
   "returnRateCaveat": "A return is the honest failure mode. An anchor that accepts value, fails to settle and keeps it produces no return event and scores 0. A low rate is the absence of one kind of evidence, not evidence of good conduct.",
   "accounts": [
     {
@@ -12,7 +12,7 @@
       "outbound": 1,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 186.47,
+      "hoursSinceActivity": 187.37,
       "topCounterpartyShare": 0.9182
     },
     {
@@ -24,7 +24,7 @@
       "outbound": 20,
       "returns": 1,
       "returnRate": 0.1667,
-      "hoursSinceActivity": 983.04,
+      "hoursSinceActivity": 983.94,
       "topCounterpartyShare": 0.8898
     },
     {
@@ -36,7 +36,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1917.63,
+      "hoursSinceActivity": 1918.53,
       "topCounterpartyShare": null
     },
     {
@@ -48,8 +48,32 @@
       "outbound": 2,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1525.97,
+      "hoursSinceActivity": 1526.87,
       "topCounterpartyShare": null
+    },
+    {
+      "account": "GAQRF3UGHBT6JYQZ7YSUYCIYWAF4T2SAA5237Q5LIQYJOHHFAWDXZ7NM",
+      "domain": "mykobo.co",
+      "name": "MYKOBO",
+      "state": "slow",
+      "inbound": 4,
+      "outbound": 31,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 191.88,
+      "topCounterpartyShare": 0.9991
+    },
+    {
+      "account": "GCY37QZUH2P24CMCTGT2XNMRFSHVQF2DKL4N5VCY22TQ52DFUNEUTKBD",
+      "domain": "mykobo.co",
+      "name": "MYKOBO",
+      "state": "slow",
+      "inbound": 861,
+      "outbound": 932,
+      "returns": 10,
+      "returnRate": 0.0116,
+      "hoursSinceActivity": 191.56,
+      "topCounterpartyShare": 0.529
     },
     {
       "account": "GCYE7C77EB5AWAA25R5XMWNI2EDOKTTFTTPZKM2SR5DI4B4WFD52DARS",
@@ -60,7 +84,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 186.47,
+      "hoursSinceActivity": 187.37,
       "topCounterpartyShare": 0.9401
     },
     {
@@ -72,7 +96,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 1554.55,
+      "hoursSinceActivity": 1555.45,
       "topCounterpartyShare": 0.9999
     },
     {
@@ -84,7 +108,7 @@
       "outbound": 673,
       "returns": 1,
       "returnRate": 0.0008,
-      "hoursSinceActivity": 5.02,
+      "hoursSinceActivity": 5.91,
       "topCounterpartyShare": 0.1032
     },
     {
@@ -96,7 +120,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 8.65,
+      "hoursSinceActivity": 9.55,
       "topCounterpartyShare": 0.9331
     },
     {
@@ -120,7 +144,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 983.87,
+      "hoursSinceActivity": 984.77,
       "topCounterpartyShare": 1
     },
     {
@@ -132,7 +156,7 @@
       "outbound": 444,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 980.98,
+      "hoursSinceActivity": 981.88,
       "topCounterpartyShare": 0.4281
     }
   ]
