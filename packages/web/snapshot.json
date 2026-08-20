@@ -1,5 +1,5 @@
 {
-  "asOf": "2026-08-20T20:27:13.442Z",
+  "asOf": "2026-08-20T21:27:12.465Z",
   "staleHours": 0,
   "returnRateCaveat": "A return is the honest failure mode. An anchor that accepts value, fails to settle and keeps it produces no return event and scores 0. A low rate is the absence of one kind of evidence, not evidence of good conduct.",
   "accounts": [
@@ -12,7 +12,7 @@
       "outbound": 1,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 226.32,
+      "hoursSinceActivity": 227.32,
       "topCounterpartyShare": 0.9182
     },
     {
@@ -24,7 +24,7 @@
       "outbound": 20,
       "returns": 1,
       "returnRate": 0.1667,
-      "hoursSinceActivity": 1022.89,
+      "hoursSinceActivity": 1023.89,
       "topCounterpartyShare": 0.8898
     },
     {
@@ -36,7 +36,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1957.48,
+      "hoursSinceActivity": 1958.48,
       "topCounterpartyShare": null
     },
     {
@@ -48,7 +48,7 @@
       "outbound": 2,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1565.82,
+      "hoursSinceActivity": 1566.82,
       "topCounterpartyShare": null
     },
     {
@@ -60,7 +60,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 226.32,
+      "hoursSinceActivity": 227.32,
       "topCounterpartyShare": 0.9401
     },
     {
@@ -72,7 +72,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 1594.4,
+      "hoursSinceActivity": 1595.4,
       "topCounterpartyShare": 0.9999
     },
     {
@@ -84,7 +84,7 @@
       "outbound": 676,
       "returns": 1,
       "returnRate": 0.0008,
-      "hoursSinceActivity": 1.95,
+      "hoursSinceActivity": 2.95,
       "topCounterpartyShare": 0.103
     },
     {
@@ -92,12 +92,12 @@
       "domain": "stellar.moneygram.com",
       "name": "MoneyGram",
       "state": "live",
-      "inbound": 1963,
+      "inbound": 1965,
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 3.03,
-      "topCounterpartyShare": 0.9332
+      "hoursSinceActivity": 0.23,
+      "topCounterpartyShare": 0.9334
     },
     {
       "account": "GDKL5TOWWAVLJ2WRAUQS2QJEAGHEDJFXFEPQFB6LKW2WRB257BVLLMT6",
@@ -120,7 +120,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 1023.72,
+      "hoursSinceActivity": 1024.72,
       "topCounterpartyShare": 1
     },
     {
@@ -129,10 +129,10 @@
       "name": "nTokens Serviços Digitais Ltda",
       "state": "live",
       "inbound": 50,
-      "outbound": 466,
+      "outbound": 467,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 0.03,
+      "hoursSinceActivity": 0.8,
       "topCounterpartyShare": 0.4099
     }
   ]
