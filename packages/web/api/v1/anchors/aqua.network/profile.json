@@ -1,0 +1,121 @@
+{
+  "anchorId": "aqua.network",
+  "name": "Aquarius",
+  "asOf": "2026-09-05T15:48:32.076Z",
+  "verification": {
+    "resolved": true,
+    "checkedAt": "2026-09-05T15:48:32.076Z",
+    "source": "SEP-1 stellar.toml, resolved live; issuer attribution confirmed against each issuer account's own on-chain home_domain",
+    "accounts": [
+      {
+        "account": "GBNZILSTVQZ4R7IKQDGHYGY2QXL5QOFJYQMXPKWRRM5PAV7Y4M67AQUA",
+        "role": "declared"
+      },
+      {
+        "account": "GAXSGZ2JM3LNWOO4WRGADISNMWO4HQLG4QBGUZRKH5ZHL3EQBGX73ICE",
+        "role": "declared"
+      }
+    ]
+  },
+  "summary": {
+    "accounts": 2,
+    "live": 2,
+    "slow": 0,
+    "dark": 0,
+    "noActivity": 0,
+    "inbound": 260,
+    "outbound": 613
+  },
+  "accounts": [
+    {
+      "account": "GBNZILSTVQZ4R7IKQDGHYGY2QXL5QOFJYQMXPKWRRM5PAV7Y4M67AQUA",
+      "domain": "aqua.network",
+      "name": "Aquarius",
+      "state": "live",
+      "inbound": 260,
+      "outbound": 0,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 7.09,
+      "topCounterpartyShare": 0.2466
+    },
+    {
+      "account": "GAXSGZ2JM3LNWOO4WRGADISNMWO4HQLG4QBGUZRKH5ZHL3EQBGX73ICE",
+      "domain": "aqua.network",
+      "name": "Aquarius",
+      "state": "live",
+      "inbound": 0,
+      "outbound": 613,
+      "returns": 0,
+      "returnRate": null,
+      "hoursSinceActivity": 0.13,
+      "topCounterpartyShare": null
+    }
+  ],
+  "history": {
+    "GBNZILSTVQZ4R7IKQDGHYGY2QXL5QOFJYQMXPKWRRM5PAV7Y4M67AQUA": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "live",
+        "in": 257,
+        "out": 0,
+        "hours": 32.04
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "live",
+        "in": 259,
+        "out": 0,
+        "hours": 0.87
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "live",
+        "in": 260,
+        "out": 0,
+        "hours": 3.69
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "live",
+        "in": 260,
+        "out": 0,
+        "hours": 7.09
+      }
+    ],
+    "GAXSGZ2JM3LNWOO4WRGADISNMWO4HQLG4QBGUZRKH5ZHL3EQBGX73ICE": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "live",
+        "in": 0,
+        "out": 552,
+        "hours": 0.49
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "live",
+        "in": 0,
+        "out": 572,
+        "hours": 0.16
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "live",
+        "in": 0,
+        "out": 595,
+        "hours": 0.31
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "live",
+        "in": 0,
+        "out": 613,
+        "hours": 0.13
+      }
+    ]
+  },
+  "caveats": [
+    "A return is the honest failure mode. An anchor that accepts value, fails to settle and keeps it produces no return event and scores 0. A low rate is the absence of one kind of evidence, not evidence of good conduct.",
+    "Dark means no on-chain settlement in over 30 days. That is a fact about the ledger. Why an anchor is quiet is not something this project claims to know."
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "name": "landfall",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Ledger-derived settlement record for Stellar anchors.",
+  "license": "MIT",
+  "type": "module",
+  "workspaces": [
+    "packages/indexer",
+    "packages/api",
+    "packages/stp",
+    "packages/registry",
+    "packages/sdk",
+    "packages/adapters",
+    "packages/adapters/stellar",
+    "packages/adapters/evm-cctp",
+    "packages/adapters/tron",
+    "packages/adapters/solana",
+    "packages/anchoring"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "discover": "npm run discover -w @landfall/indexer",
+    "scan": "npm run scan -w @landfall/indexer",
+    "scan:cross-chain": "tsx scripts/cross-chain-scan.ts",
+    "anchors:discover": "tsx scripts/discover-anchors.ts",
+    "scan:verify": "tsx scripts/verify-scan.ts",
+    "scan:evidence": "tsx scripts/build-evidence.ts",
+    "api": "npm run dev -w @landfall/api",
+    "test": "npm run test -w @landfall/indexer && npm run test -w @landfall/stp && npm run test -w @landfall/anchoring && npm run test -w @landfall/registry && npm run test -w @landfall/adapter-stellar && npm run test -w @landfall/adapter-evm-cctp && npm run test -w @landfall/adapter-tron && npm run test -w @landfall/adapter-solana && npm run test -w @landfall/sdk",
+    "typecheck": "npm run typecheck -w @landfall/indexer && npm run typecheck -w @landfall/api && npm run typecheck -w @landfall/stp && npm run typecheck -w @landfall/anchoring && npm run typecheck -w @landfall/registry && npm run typecheck -w @landfall/adapters && npm run typecheck -w @landfall/adapter-stellar && npm run typecheck -w @landfall/adapter-evm-cctp && npm run typecheck -w @landfall/adapter-tron && npm run typecheck -w @landfall/adapter-solana && npm run typecheck -w @landfall/sdk",
+    "db:migrate": "bash scripts/migrate.sh",
+    "mcp": "node scripts/mcp/server.mjs",
+    "stack:up": "docker compose up -d",
+    "stack:down": "docker compose down",
+    "stack:logs": "docker compose logs -f",
+    "prod:up": "docker compose -f docker-compose.prod.yml up -d --build",
+    "prod:down": "docker compose -f docker-compose.prod.yml down",
+    "prod:logs": "docker compose -f docker-compose.prod.yml logs -f",
+    "contracts:deploy": "bash scripts/deploy-contract.sh",
+    "contracts:deploy:testnet": "bash scripts/deploy-contract.sh testnet",
+    "contracts:build": "cd packages/contracts && cargo build --target wasm32v1-none --release",
+    "contracts:test": "cd packages/contracts && cargo test",
+    "anchor": "tsx packages/anchoring/src/cli.ts",
+    "anchors:fees": "node scripts/fetch-anchor-fees.mjs",
+    "anchors:probe": "node scripts/probe-capabilities.mjs",
+    "anchors:routes": "node scripts/build-routes.mjs",
+    "anchors:drift": "node scripts/detect-toml-drift.mjs",
+    "anchors:corridors": "node scripts/build-corridors.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "graphql": "^17.0.2",
+    "openai": "^4.55.0",
+    "pg": "^8.13.1",
+    "zod": "^4.4.3"
+  },
+  "overrides": {
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

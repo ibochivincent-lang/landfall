@@ -1,0 +1,131 @@
+{
+  "anchorId": "clpx.finance",
+  "name": "CLPX S.A.",
+  "asOf": "2026-09-05T15:48:32.076Z",
+  "verification": {
+    "resolved": true,
+    "checkedAt": "2026-09-05T15:48:32.076Z",
+    "source": "SEP-1 stellar.toml, resolved live; issuer attribution confirmed against each issuer account's own on-chain home_domain",
+    "accounts": [
+      {
+        "account": "GDYSPBVZHPQTYMGSYNOHRZQNLB3ZWFVQ2F7EP7YBOLRGD42XIC3QUX5G",
+        "role": "declared"
+      }
+    ]
+  },
+  "summary": {
+    "accounts": 1,
+    "live": 0,
+    "slow": 0,
+    "dark": 1,
+    "noActivity": 0,
+    "inbound": 7,
+    "outbound": 0
+  },
+  "accounts": [
+    {
+      "account": "GDYSPBVZHPQTYMGSYNOHRZQNLB3ZWFVQ2F7EP7YBOLRGD42XIC3QUX5G",
+      "domain": "clpx.finance",
+      "name": "CLPX S.A.",
+      "state": "dark",
+      "inbound": 7,
+      "outbound": 0,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 1230.92,
+      "topCounterpartyShare": 0.9254
+    }
+  ],
+  "history": {
+    "GDYSPBVZHPQTYMGSYNOHRZQNLB3ZWFVQ2F7EP7YBOLRGD42XIC3QUX5G": [
+      {
+        "t": "2026-09-03T19:38:03.126Z",
+        "state": "dark",
+        "in": 7,
+        "out": 0,
+        "hours": 1186.74
+      },
+      {
+        "t": "2026-09-03T19:39:15.404Z",
+        "state": "dark",
+        "in": 7,
+        "out": 0,
+        "hours": 1186.76
+      },
+      {
+        "t": "2026-09-03T22:23:48.344Z",
+        "state": "dark",
+        "in": 7,
+        "out": 0,
+        "hours": 1189.51
+      },
+      {
+        "t": "2026-09-04T00:48:22.301Z",
+        "state": "dark",
+        "in": 7,
+        "out": 0,
+        "hours": 1191.92
+      },
+      {
+        "t": "2026-09-04T05:36:35.814Z",
+        "state": "dark",
+        "in": 7,
+        "out": 0,
+        "hours": 1196.72
+      },
+      {
+        "t": "2026-09-04T14:48:49.266Z",
+        "state": "dark",
+        "in": 7,
+        "out": 0,
+        "hours": 1205.92
+      },
+      {
+        "t": "2026-09-04T18:07:33.821Z",
+        "state": "dark",
+        "in": 7,
+        "out": 0,
+        "hours": 1209.24
+      },
+      {
+        "t": "2026-09-04T21:16:38.917Z",
+        "state": "dark",
+        "in": 7,
+        "out": 0,
+        "hours": 1212.39
+      },
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "dark",
+        "in": 7,
+        "out": 0,
+        "hours": 1218.27
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "dark",
+        "in": 7,
+        "out": 0,
+        "hours": 1223.2
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "dark",
+        "in": 7,
+        "out": 0,
+        "hours": 1227.52
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "dark",
+        "in": 7,
+        "out": 0,
+        "hours": 1230.92
+      }
+    ]
+  },
+  "caveats": [
+    "A return is the honest failure mode. An anchor that accepts value, fails to settle and keeps it produces no return event and scores 0. A low rate is the absence of one kind of evidence, not evidence of good conduct.",
+    "Dark means no on-chain settlement in over 30 days. That is a fact about the ledger. Why an anchor is quiet is not something this project claims to know."
+  ]
+}

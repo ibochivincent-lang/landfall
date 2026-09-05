@@ -1,0 +1,195 @@
+{
+  "generatedAt": "2026-09-05T15:53:07.805Z",
+  "note": "Which on-chain accounts each tracked anchor declares as its own, and how that was established. Attribution comes from the anchor's own SEP-1 stellar.toml — the permissionless standard the operator controls — and any account cited there only as a currency issuer is included solely when the issuer account's own home_domain confirms the claim. Every published scan is checked for an account claimed by two anchors before it can go out; see packages/indexer/src/invariants.ts.",
+  "anchors": [
+    {
+      "anchorId": "afreum.com",
+      "resolved": true,
+      "accounts": 6,
+      "profile": "/api/v1/anchors/afreum.com/profile.json",
+      "page": "/anchor/afreum.com"
+    },
+    {
+      "anchorId": "anclap.com",
+      "resolved": true,
+      "accounts": 3,
+      "profile": "/api/v1/anchors/anclap.com/profile.json",
+      "page": "/anchor/anclap.com"
+    },
+    {
+      "anchorId": "app.phoenix-hub.io",
+      "resolved": true,
+      "accounts": 1,
+      "profile": "/api/v1/anchors/app.phoenix-hub.io/profile.json",
+      "page": "/anchor/app.phoenix-hub.io"
+    },
+    {
+      "anchorId": "aps.money",
+      "resolved": true,
+      "accounts": 2,
+      "profile": "/api/v1/anchors/aps.money/profile.json",
+      "page": "/anchor/aps.money"
+    },
+    {
+      "anchorId": "aqua.network",
+      "resolved": true,
+      "accounts": 2,
+      "profile": "/api/v1/anchors/aqua.network/profile.json",
+      "page": "/anchor/aqua.network"
+    },
+    {
+      "anchorId": "audd.digital",
+      "resolved": true,
+      "accounts": 2,
+      "profile": "/api/v1/anchors/audd.digital/profile.json",
+      "page": "/anchor/audd.digital"
+    },
+    {
+      "anchorId": "bitbondsto.com",
+      "resolved": true,
+      "accounts": 2,
+      "profile": "/api/v1/anchors/bitbondsto.com/profile.json",
+      "page": "/anchor/bitbondsto.com"
+    },
+    {
+      "anchorId": "centre.io",
+      "resolved": true,
+      "accounts": 2,
+      "profile": "/api/v1/anchors/centre.io/profile.json",
+      "page": "/anchor/centre.io"
+    },
+    {
+      "anchorId": "clpx.finance",
+      "resolved": true,
+      "accounts": 1,
+      "profile": "/api/v1/anchors/clpx.finance/profile.json",
+      "page": "/anchor/clpx.finance"
+    },
+    {
+      "anchorId": "cowrie.exchange",
+      "resolved": true,
+      "accounts": 4,
+      "profile": "/api/v1/anchors/cowrie.exchange/profile.json",
+      "page": "/anchor/cowrie.exchange"
+    },
+    {
+      "anchorId": "dcm.systems",
+      "resolved": true,
+      "accounts": 1,
+      "profile": "/api/v1/anchors/dcm.systems/profile.json",
+      "page": "/anchor/dcm.systems"
+    },
+    {
+      "anchorId": "funtracker.site",
+      "resolved": true,
+      "accounts": 2,
+      "profile": "/api/v1/anchors/funtracker.site/profile.json",
+      "page": "/anchor/funtracker.site"
+    },
+    {
+      "anchorId": "gratz.io",
+      "resolved": true,
+      "accounts": 10,
+      "profile": "/api/v1/anchors/gratz.io/profile.json",
+      "page": "/anchor/gratz.io"
+    },
+    {
+      "anchorId": "ixinium.io",
+      "resolved": true,
+      "accounts": 8,
+      "profile": "/api/v1/anchors/ixinium.io/profile.json",
+      "page": "/anchor/ixinium.io"
+    },
+    {
+      "anchorId": "luxpayband.io",
+      "resolved": true,
+      "accounts": 5,
+      "profile": "/api/v1/anchors/luxpayband.io/profile.json",
+      "page": "/anchor/luxpayband.io"
+    },
+    {
+      "anchorId": "mgusd.moneygram.com",
+      "resolved": true,
+      "accounts": 4,
+      "profile": "/api/v1/anchors/mgusd.moneygram.com/profile.json",
+      "page": "/anchor/mgusd.moneygram.com"
+    },
+    {
+      "anchorId": "mobius.network",
+      "resolved": true,
+      "accounts": 2,
+      "profile": "/api/v1/anchors/mobius.network/profile.json",
+      "page": "/anchor/mobius.network"
+    },
+    {
+      "anchorId": "mykobo.co",
+      "resolved": true,
+      "accounts": 2,
+      "profile": "/api/v1/anchors/mykobo.co/profile.json",
+      "page": "/anchor/mykobo.co"
+    },
+    {
+      "anchorId": "nafuloo.com",
+      "resolved": true,
+      "accounts": 2,
+      "profile": "/api/v1/anchors/nafuloo.com/profile.json",
+      "page": "/anchor/nafuloo.com"
+    },
+    {
+      "anchorId": "ngnc.online",
+      "resolved": true,
+      "accounts": 2,
+      "profile": "/api/v1/anchors/ngnc.online/profile.json",
+      "page": "/anchor/ngnc.online"
+    },
+    {
+      "anchorId": "ntokens.com",
+      "resolved": true,
+      "accounts": 3,
+      "profile": "/api/v1/anchors/ntokens.com/profile.json",
+      "page": "/anchor/ntokens.com"
+    },
+    {
+      "anchorId": "pr.network",
+      "resolved": true,
+      "accounts": 5,
+      "profile": "/api/v1/anchors/pr.network/profile.json",
+      "page": "/anchor/pr.network"
+    },
+    {
+      "anchorId": "stablecoin.z.com",
+      "resolved": true,
+      "accounts": 1,
+      "profile": "/api/v1/anchors/stablecoin.z.com/profile.json",
+      "page": "/anchor/stablecoin.z.com"
+    },
+    {
+      "anchorId": "stellarport.io",
+      "resolved": true,
+      "accounts": 4,
+      "profile": "/api/v1/anchors/stellarport.io/profile.json",
+      "page": "/anchor/stellarport.io"
+    },
+    {
+      "anchorId": "ultracapital.xyz",
+      "resolved": true,
+      "accounts": 13,
+      "profile": "/api/v1/anchors/ultracapital.xyz/profile.json",
+      "page": "/anchor/ultracapital.xyz"
+    },
+    {
+      "anchorId": "vnx.io",
+      "resolved": true,
+      "accounts": 4,
+      "profile": "/api/v1/anchors/vnx.io/profile.json",
+      "page": "/anchor/vnx.io"
+    },
+    {
+      "anchorId": "zeam.money",
+      "resolved": true,
+      "accounts": 15,
+      "profile": "/api/v1/anchors/zeam.money/profile.json",
+      "page": "/anchor/zeam.money"
+    }
+  ]
+}

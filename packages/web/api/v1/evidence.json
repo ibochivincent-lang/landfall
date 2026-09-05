@@ -1,0 +1,674 @@
+{
+  "asOf": "2026-09-05T15:48:32.076Z",
+  "scanFile": "scan-2026-09-05T15-48-32-076Z.json",
+  "datasetRoot": "9ae307ebae20fa14096014488ee321de5e7d1eab8baa7c6eb1795ded39f7cc51",
+  "recordCount": 108,
+  "namespace": "landfall-settlement-v1",
+  "algorithm": "sha256-rfc6962",
+  "methodology": {
+    "id": "11a4c3a9bfd0c485",
+    "parameters": {
+      "maxRecords": 500,
+      "dustThreshold": "0.01",
+      "refundWindowHours": 720,
+      "refundTolerance": 0.02,
+      "livenessLiveMaxHours": 72,
+      "livenessDarkMinHours": 720,
+      "classification": "packages/indexer/src/report.ts classifyLiveness",
+      "leafNamespace": "landfall-settlement-v1"
+    }
+  },
+  "note": "A Merkle commitment to the exact per-account records the published figures derive from. Each account has an inclusion proof at /api/v1/evidence/<account>.json, so a consumer can recompute the leaf from the record they were served and confirm it lands on this root — the difference between trusting a score and checking one.",
+  "limits": "This root is published in the same document it authenticates, so on its own it demonstrates reproducibility and internal consistency — not tamper-evidence. Whoever serves this file could recompute both. It becomes evidence against its own publisher once committed to the Stellar ledger (MEMO_HASH is exactly 32 bytes; see packages/anchoring) or once a third party has retained a copy of it. Until then, treat it as a checksum you can verify, not a commitment you can enforce.",
+  "appendOnlyAudit": "Successive dataset roots can be checked for append-only behaviour with the consistency proofs in packages/anchoring. Note that this dataset is a per-scan snapshot rather than a growing log, so roots are expected to differ between scans; consistency applies to logs built to be append-only, not to independent snapshots.",
+  "accounts": [
+    {
+      "account": "GA37M2LDWCDWPCHIST3NHF7GTYX55MN7IKXI56LPQ2QRJGSZQV6HCVLI",
+      "domain": "zeam.money",
+      "index": 0,
+      "proof": "/api/v1/evidence/GA37M2LDWCDWPCHIST3NHF7GTYX55MN7IKXI56LPQ2QRJGSZQV6HCVLI.json"
+    },
+    {
+      "account": "GA3UK3JHOYYD3TAUH5C7NDOUDWBRF5FC4MECXFA2VRPEHIDQUOJIVOAJ",
+      "domain": "ultracapital.xyz",
+      "index": 1,
+      "proof": "/api/v1/evidence/GA3UK3JHOYYD3TAUH5C7NDOUDWBRF5FC4MECXFA2VRPEHIDQUOJIVOAJ.json"
+    },
+    {
+      "account": "GA4TDPNUCZPTOHB3TKUYMDCRVATXKEADH7ZEYEBWJKQKE2UBFCYNBPEN",
+      "domain": "anclap.com",
+      "index": 2,
+      "proof": "/api/v1/evidence/GA4TDPNUCZPTOHB3TKUYMDCRVATXKEADH7ZEYEBWJKQKE2UBFCYNBPEN.json"
+    },
+    {
+      "account": "GA5TCQVISVBFKLEVHEXPOTDUHZMDOF4TJM7NEJC3RE45OB2QZBK36442",
+      "domain": "vnx.io",
+      "index": 3,
+      "proof": "/api/v1/evidence/GA5TCQVISVBFKLEVHEXPOTDUHZMDOF4TJM7NEJC3RE45OB2QZBK36442.json"
+    },
+    {
+      "account": "GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN",
+      "domain": "centre.io",
+      "index": 4,
+      "proof": "/api/v1/evidence/GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN.json"
+    },
+    {
+      "account": "GA5ZXXHHXX766BEEB33WN7Y4SHKUX2ZIGNRVJTAJM3K7PZMBM7DEJCFL",
+      "domain": "zeam.money",
+      "index": 5,
+      "proof": "/api/v1/evidence/GA5ZXXHHXX766BEEB33WN7Y4SHKUX2ZIGNRVJTAJM3K7PZMBM7DEJCFL.json"
+    },
+    {
+      "account": "GA6HCMBLTZS5VYYBCATRBRZ3BZJMAFUDKYYF6AH6MVCMGWMRDNSWJPIH",
+      "domain": "mobius.network",
+      "index": 6,
+      "proof": "/api/v1/evidence/GA6HCMBLTZS5VYYBCATRBRZ3BZJMAFUDKYYF6AH6MVCMGWMRDNSWJPIH.json"
+    },
+    {
+      "account": "GAB4NHMAVPDCD7MRU7MRD6DV47KLGO24K7WR3VKITLKAPTFIBRRGGRNT",
+      "domain": "gratz.io",
+      "index": 7,
+      "proof": "/api/v1/evidence/GAB4NHMAVPDCD7MRU7MRD6DV47KLGO24K7WR3VKITLKAPTFIBRRGGRNT.json"
+    },
+    {
+      "account": "GADFXROGGR74V3MSWU2SUKCEUPQFZEIIF3IUHLRN3NKZ4JN2IPBMCODA",
+      "domain": "ultracapital.xyz",
+      "index": 8,
+      "proof": "/api/v1/evidence/GADFXROGGR74V3MSWU2SUKCEUPQFZEIIF3IUHLRN3NKZ4JN2IPBMCODA.json"
+    },
+    {
+      "account": "GAGCE4AKZ55YGF4OHIODN7M3HXKZLHUDZLTLWHCGSUNWUBO7LX7UKKQY",
+      "domain": "afreum.com",
+      "index": 9,
+      "proof": "/api/v1/evidence/GAGCE4AKZ55YGF4OHIODN7M3HXKZLHUDZLTLWHCGSUNWUBO7LX7UKKQY.json"
+    },
+    {
+      "account": "GAHQAIM35LLAJWBPGP5M2ZHQPZG3FKJS35N3WZ44EQ4NMQWCH25INJ4V",
+      "domain": "pr.network",
+      "index": 10,
+      "proof": "/api/v1/evidence/GAHQAIM35LLAJWBPGP5M2ZHQPZG3FKJS35N3WZ44EQ4NMQWCH25INJ4V.json"
+    },
+    {
+      "account": "GAIUGZZZSL47BKH27SUDZESZELFJDPE2UM52RACOSFJ7BIVBGKUEJSUZ",
+      "domain": "mgusd.moneygram.com",
+      "index": 11,
+      "proof": "/api/v1/evidence/GAIUGZZZSL47BKH27SUDZESZELFJDPE2UM52RACOSFJ7BIVBGKUEJSUZ.json"
+    },
+    {
+      "account": "GAIVVKIZV2WOTOI4FB6MS2CSOH2HST7MVRKO23L3JXLCKZ7GR4BCKPZX",
+      "domain": "zeam.money",
+      "index": 12,
+      "proof": "/api/v1/evidence/GAIVVKIZV2WOTOI4FB6MS2CSOH2HST7MVRKO23L3JXLCKZ7GR4BCKPZX.json"
+    },
+    {
+      "account": "GAJ7V3EMD3FRWAPBEJAP7EC4223XI5EACDZ46RFMY5DYOMCIMWEFR5II",
+      "domain": "gratz.io",
+      "index": 13,
+      "proof": "/api/v1/evidence/GAJ7V3EMD3FRWAPBEJAP7EC4223XI5EACDZ46RFMY5DYOMCIMWEFR5II.json"
+    },
+    {
+      "account": "GAKTLPC4ZV37SSCITQ5IS5AQ4WPF4CF4VZJQPPAROSGXMYOATF5U6XPR",
+      "domain": "zeam.money",
+      "index": 14,
+      "proof": "/api/v1/evidence/GAKTLPC4ZV37SSCITQ5IS5AQ4WPF4CF4VZJQPPAROSGXMYOATF5U6XPR.json"
+    },
+    {
+      "account": "GAM5BKSKTHYS6IE4OUHCISGI6YVH75XIMOCG4RB5TR74KZDJRSNKEURZ",
+      "domain": "zeam.money",
+      "index": 15,
+      "proof": "/api/v1/evidence/GAM5BKSKTHYS6IE4OUHCISGI6YVH75XIMOCG4RB5TR74KZDJRSNKEURZ.json"
+    },
+    {
+      "account": "GANESLOXBZWPLB5ZM2KFUTBGSBGISB7JTWFXO67G4TGQINWRMI6766GV",
+      "domain": "ultracapital.xyz",
+      "index": 16,
+      "proof": "/api/v1/evidence/GANESLOXBZWPLB5ZM2KFUTBGSBGISB7JTWFXO67G4TGQINWRMI6766GV.json"
+    },
+    {
+      "account": "GAP5YLVKIS5UCT4IPEZASWOHKFSGWCJMWZ3SSIMARADIANT4XBRKGON5",
+      "domain": "zeam.money",
+      "index": 17,
+      "proof": "/api/v1/evidence/GAP5YLVKIS5UCT4IPEZASWOHKFSGWCJMWZ3SSIMARADIANT4XBRKGON5.json"
+    },
+    {
+      "account": "GAQRF3UGHBT6JYQZ7YSUYCIYWAF4T2SAA5237Q5LIQYJOHHFAWDXZ7NM",
+      "domain": "mykobo.co",
+      "index": 18,
+      "proof": "/api/v1/evidence/GAQRF3UGHBT6JYQZ7YSUYCIYWAF4T2SAA5237Q5LIQYJOHHFAWDXZ7NM.json"
+    },
+    {
+      "account": "GARDJZ33FTTLVKGABXDS22SYNTP4VCLYARIEWKMZKYHX3RRLPMNR3HOT",
+      "domain": "anclap.com",
+      "index": 19,
+      "proof": "/api/v1/evidence/GARDJZ33FTTLVKGABXDS22SYNTP4VCLYARIEWKMZKYHX3RRLPMNR3HOT.json"
+    },
+    {
+      "account": "GARDNV3Q7YGT4AKSDF25LT32YSCCW4EV22Y2TV3I2PU2MMXJTEDL5T55",
+      "domain": "ultracapital.xyz",
+      "index": 20,
+      "proof": "/api/v1/evidence/GARDNV3Q7YGT4AKSDF25LT32YSCCW4EV22Y2TV3I2PU2MMXJTEDL5T55.json"
+    },
+    {
+      "account": "GAROH4EV3WVVTRQKEY43GZK3XSRBEYETRVZ7SVG5LHWOAANSMCTJBB3U",
+      "domain": "zeam.money",
+      "index": 21,
+      "proof": "/api/v1/evidence/GAROH4EV3WVVTRQKEY43GZK3XSRBEYETRVZ7SVG5LHWOAANSMCTJBB3U.json"
+    },
+    {
+      "account": "GASBV6W7GGED66MXEVC7YZHTWWYMSVYEY35USF2HJZBLABLYIFQGXZY6",
+      "domain": "ngnc.online",
+      "index": 22,
+      "proof": "/api/v1/evidence/GASBV6W7GGED66MXEVC7YZHTWWYMSVYEY35USF2HJZBLABLYIFQGXZY6.json"
+    },
+    {
+      "account": "GASQH4XYX2TR4KZE4VMUNELK4L5JPJQJEJZCMZHJ3L4ELPZGF6QGRLMD",
+      "domain": "mobius.network",
+      "index": 23,
+      "proof": "/api/v1/evidence/GASQH4XYX2TR4KZE4VMUNELK4L5JPJQJEJZCMZHJ3L4ELPZGF6QGRLMD.json"
+    },
+    {
+      "account": "GAT63G6FINKAES4473ZZZT3SYJVUIXKYBVFBQYQHEZF6EE3VY5AGBTCZ",
+      "domain": "zeam.money",
+      "index": 24,
+      "proof": "/api/v1/evidence/GAT63G6FINKAES4473ZZZT3SYJVUIXKYBVFBQYQHEZF6EE3VY5AGBTCZ.json"
+    },
+    {
+      "account": "GAU7MPFCR2VUXNEN474G5OY63EFVBU77F35OJDQ4WGG25XHT3VYWLIQD",
+      "domain": "gratz.io",
+      "index": 25,
+      "proof": "/api/v1/evidence/GAU7MPFCR2VUXNEN474G5OY63EFVBU77F35OJDQ4WGG25XHT3VYWLIQD.json"
+    },
+    {
+      "account": "GAVBS6SXMRD7C3IRN5K2SY5C2CAUFHBVOGWTQXADSBUHAFDDUKVTQWWY",
+      "domain": "ultracapital.xyz",
+      "index": 26,
+      "proof": "/api/v1/evidence/GAVBS6SXMRD7C3IRN5K2SY5C2CAUFHBVOGWTQXADSBUHAFDDUKVTQWWY.json"
+    },
+    {
+      "account": "GAWODAROMJ33V5YDFY3NPYTHVYQG7MJXVJ2ND3AOGIHYRWINES6ACCPD",
+      "domain": "cowrie.exchange",
+      "index": 27,
+      "proof": "/api/v1/evidence/GAWODAROMJ33V5YDFY3NPYTHVYQG7MJXVJ2ND3AOGIHYRWINES6ACCPD.json"
+    },
+    {
+      "account": "GAX5TXB5RYJNLBUR477PEXM4X75APK2PGMTN6KEFQSESGWFXEAKFSXJO",
+      "domain": "app.phoenix-hub.io",
+      "index": 28,
+      "proof": "/api/v1/evidence/GAX5TXB5RYJNLBUR477PEXM4X75APK2PGMTN6KEFQSESGWFXEAKFSXJO.json"
+    },
+    {
+      "account": "GAXQJANVLNXSLGXJZUHRXY2VD62E2JXK2ZFWUQZZNO7I2HESYIWLGRAT",
+      "domain": "gratz.io",
+      "index": 29,
+      "proof": "/api/v1/evidence/GAXQJANVLNXSLGXJZUHRXY2VD62E2JXK2ZFWUQZZNO7I2HESYIWLGRAT.json"
+    },
+    {
+      "account": "GAXSGZ2JM3LNWOO4WRGADISNMWO4HQLG4QBGUZRKH5ZHL3EQBGX73ICE",
+      "domain": "aqua.network",
+      "index": 30,
+      "proof": "/api/v1/evidence/GAXSGZ2JM3LNWOO4WRGADISNMWO4HQLG4QBGUZRKH5ZHL3EQBGX73ICE.json"
+    },
+    {
+      "account": "GAYTNWDWDIKMN7JXSSO4MXDLQTVJ4A7UZVW7XWECAPBUNXRMEA2SGX74",
+      "domain": "vnx.io",
+      "index": 31,
+      "proof": "/api/v1/evidence/GAYTNWDWDIKMN7JXSSO4MXDLQTVJ4A7UZVW7XWECAPBUNXRMEA2SGX74.json"
+    },
+    {
+      "account": "GAZPKDTEZ5UM3BF4E7FL7EMXRMLH76F2TNVXRLOF6SCVXOFWSPCEWFI5",
+      "domain": "pr.network",
+      "index": 32,
+      "proof": "/api/v1/evidence/GAZPKDTEZ5UM3BF4E7FL7EMXRMLH76F2TNVXRLOF6SCVXOFWSPCEWFI5.json"
+    },
+    {
+      "account": "GB6OFQHDM5PT75DU5PTRZBCJOUKR62IQKBZ7KAA5JWJKIE45V5KXBRSL",
+      "domain": "pr.network",
+      "index": 33,
+      "proof": "/api/v1/evidence/GB6OFQHDM5PT75DU5PTRZBCJOUKR62IQKBZ7KAA5JWJKIE45V5KXBRSL.json"
+    },
+    {
+      "account": "GB6WD37NWIIY34A6HNIUVGSA7XXAHG6G6QEWNL54H62Y6SU7ESNGBRDG",
+      "domain": "gratz.io",
+      "index": 34,
+      "proof": "/api/v1/evidence/GB6WD37NWIIY34A6HNIUVGSA7XXAHG6G6QEWNL54H62Y6SU7ESNGBRDG.json"
+    },
+    {
+      "account": "GB7OUO5NY5WQKXJJ7PFFZEJOKN4BA7IOEN3Z6SWAY26LGTREJJYZH2ZT",
+      "domain": "aps.money",
+      "index": 35,
+      "proof": "/api/v1/evidence/GB7OUO5NY5WQKXJJ7PFFZEJOKN4BA7IOEN3Z6SWAY26LGTREJJYZH2ZT.json"
+    },
+    {
+      "account": "GBDTAQDRSX3QOEAQQKYWRGOTFE5FHQTLIH5YAF2HGUY3PBKRXWDKBLHN",
+      "domain": "afreum.com",
+      "index": 36,
+      "proof": "/api/v1/evidence/GBDTAQDRSX3QOEAQQKYWRGOTFE5FHQTLIH5YAF2HGUY3PBKRXWDKBLHN.json"
+    },
+    {
+      "account": "GBEKGNPT3DC6HPSWUXSAQRU6GRIGXFQOY2DPK47MQA6MEGAZ755DTEAM",
+      "domain": "gratz.io",
+      "index": 37,
+      "proof": "/api/v1/evidence/GBEKGNPT3DC6HPSWUXSAQRU6GRIGXFQOY2DPK47MQA6MEGAZ755DTEAM.json"
+    },
+    {
+      "account": "GBFXOHVAS43OIWNIO7XLRJAHT3BICFEIKOJLZVXNT572MISM4CMGSOCC",
+      "domain": "ultracapital.xyz",
+      "index": 38,
+      "proof": "/api/v1/evidence/GBFXOHVAS43OIWNIO7XLRJAHT3BICFEIKOJLZVXNT572MISM4CMGSOCC.json"
+    },
+    {
+      "account": "GBFZPR7KNYNZEJXWBENA5TSDG4V7SHZV4S6Z4AWURAQ6PRNUYPYZZLLP",
+      "domain": "pr.network",
+      "index": 39,
+      "proof": "/api/v1/evidence/GBFZPR7KNYNZEJXWBENA5TSDG4V7SHZV4S6Z4AWURAQ6PRNUYPYZZLLP.json"
+    },
+    {
+      "account": "GBHA4FGPHX7KURMP7CZU7SQ2UOAGTAQ22SCHPK5P5XCQHZXCSVXQJFYB",
+      "domain": "nafuloo.com",
+      "index": 40,
+      "proof": "/api/v1/evidence/GBHA4FGPHX7KURMP7CZU7SQ2UOAGTAQ22SCHPK5P5XCQHZXCSVXQJFYB.json"
+    },
+    {
+      "account": "GBMBDOEUIOBTABN5SLP623NPEEBR4TKLXOTQ7JWOVZMKJZU74IXODER4",
+      "domain": "ixinium.io",
+      "index": 41,
+      "proof": "/api/v1/evidence/GBMBDOEUIOBTABN5SLP623NPEEBR4TKLXOTQ7JWOVZMKJZU74IXODER4.json"
+    },
+    {
+      "account": "GBN32NH6TMWE4ZD4G245CF3UVOQRXD4FK3FDCLZ4DE5642HWFKSLLRMB",
+      "domain": "aps.money",
+      "index": 42,
+      "proof": "/api/v1/evidence/GBN32NH6TMWE4ZD4G245CF3UVOQRXD4FK3FDCLZ4DE5642HWFKSLLRMB.json"
+    },
+    {
+      "account": "GBNZILSTVQZ4R7IKQDGHYGY2QXL5QOFJYQMXPKWRRM5PAV7Y4M67AQUA",
+      "domain": "aqua.network",
+      "index": 43,
+      "proof": "/api/v1/evidence/GBNZILSTVQZ4R7IKQDGHYGY2QXL5QOFJYQMXPKWRRM5PAV7Y4M67AQUA.json"
+    },
+    {
+      "account": "GBQU526F73OALRTDRUI4F2DXKJOHLW2PCS6G53SPRQVKAALM7TFCLAAO",
+      "domain": "ixinium.io",
+      "index": 44,
+      "proof": "/api/v1/evidence/GBQU526F73OALRTDRUI4F2DXKJOHLW2PCS6G53SPRQVKAALM7TFCLAAO.json"
+    },
+    {
+      "account": "GBQZOJE2GWJU5VBT6NBLD2F3IOVOYUBDAXYUU32XMHDF4RMDOURWV3GT",
+      "domain": "cowrie.exchange",
+      "index": 45,
+      "proof": "/api/v1/evidence/GBQZOJE2GWJU5VBT6NBLD2F3IOVOYUBDAXYUU32XMHDF4RMDOURWV3GT.json"
+    },
+    {
+      "account": "GBSKKRM7RRDHC33O6KFNLUSPS3577F7GYSFFVBVV5J5PDWGY4XWERE3W",
+      "domain": "cowrie.exchange",
+      "index": 46,
+      "proof": "/api/v1/evidence/GBSKKRM7RRDHC33O6KFNLUSPS3577F7GYSFFVBVV5J5PDWGY4XWERE3W.json"
+    },
+    {
+      "account": "GBSREZLYHRAKQXQM4OESVO7FFT2RGG3EQQRTXEPTRPS56UI3VAXBXMAP",
+      "domain": "gratz.io",
+      "index": 47,
+      "proof": "/api/v1/evidence/GBSREZLYHRAKQXQM4OESVO7FFT2RGG3EQQRTXEPTRPS56UI3VAXBXMAP.json"
+    },
+    {
+      "account": "GBUVRNH4RW4VLHP4C5MOF46RRIRZLAVHYGX45MVSTKA2F6TMR7E7L6NW",
+      "domain": "ultracapital.xyz",
+      "index": 48,
+      "proof": "/api/v1/evidence/GBUVRNH4RW4VLHP4C5MOF46RRIRZLAVHYGX45MVSTKA2F6TMR7E7L6NW.json"
+    },
+    {
+      "account": "GBUYUAI75XXWDZEKLY66CFYKQPET5JR4EENXZBUZ3YXZ7DS56Z4OKOFU",
+      "domain": "funtracker.site",
+      "index": 49,
+      "proof": "/api/v1/evidence/GBUYUAI75XXWDZEKLY66CFYKQPET5JR4EENXZBUZ3YXZ7DS56Z4OKOFU.json"
+    },
+    {
+      "account": "GBVB43NLVIP2USHXSKI7QQCZKZU2Z6U6A5PAHMIW7LLNVMQJTOX2BZI5",
+      "domain": "luxpayband.io",
+      "index": 50,
+      "proof": "/api/v1/evidence/GBVB43NLVIP2USHXSKI7QQCZKZU2Z6U6A5PAHMIW7LLNVMQJTOX2BZI5.json"
+    },
+    {
+      "account": "GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5",
+      "domain": "stellarport.io",
+      "index": 51,
+      "proof": "/api/v1/evidence/GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5.json"
+    },
+    {
+      "account": "GBVWQZITQY4PPGHJEOHDTKUPV56WQXQBTV2YMMUPYW7KEQI63LETZONE",
+      "domain": "gratz.io",
+      "index": 52,
+      "proof": "/api/v1/evidence/GBVWQZITQY4PPGHJEOHDTKUPV56WQXQBTV2YMMUPYW7KEQI63LETZONE.json"
+    },
+    {
+      "account": "GBX6YI45VU7WNAAKA3RBFDR3I3UKNFHTJPQ5F6KOOKSGYIAM4TRQN54W",
+      "domain": "afreum.com",
+      "index": 53,
+      "proof": "/api/v1/evidence/GBX6YI45VU7WNAAKA3RBFDR3I3UKNFHTJPQ5F6KOOKSGYIAM4TRQN54W.json"
+    },
+    {
+      "account": "GBYYKQYUY2XWVMM4VFCBJJVCCQC3QJ3BCLV4276DWHY4BQ7V5AB4U5VA",
+      "domain": "luxpayband.io",
+      "index": 54,
+      "proof": "/api/v1/evidence/GBYYKQYUY2XWVMM4VFCBJJVCCQC3QJ3BCLV4276DWHY4BQ7V5AB4U5VA.json"
+    },
+    {
+      "account": "GC3M7GD3HNLCXSWDSJO2YTJ4LMNGNUOFWX5SVRHY7PCYGV5GLLYQMALT",
+      "domain": "stellarport.io",
+      "index": 55,
+      "proof": "/api/v1/evidence/GC3M7GD3HNLCXSWDSJO2YTJ4LMNGNUOFWX5SVRHY7PCYGV5GLLYQMALT.json"
+    },
+    {
+      "account": "GC45JH537XZD4DY4WTV5PCUJL4KPOIE4WMGX5OP5KSPS2OLGRUOVVIGD",
+      "domain": "stellarport.io",
+      "index": 56,
+      "proof": "/api/v1/evidence/GC45JH537XZD4DY4WTV5PCUJL4KPOIE4WMGX5OP5KSPS2OLGRUOVVIGD.json"
+    },
+    {
+      "account": "GC4HS4CQCZULIOTGLLPGRAAMSBDLFRR6Y7HCUQG66LNQDISXKIXXADIM",
+      "domain": "ixinium.io",
+      "index": 57,
+      "proof": "/api/v1/evidence/GC4HS4CQCZULIOTGLLPGRAAMSBDLFRR6Y7HCUQG66LNQDISXKIXXADIM.json"
+    },
+    {
+      "account": "GC4O3BHXHQWSBFYSJP2HMAAHWDDHRJDM6X5CX7LK3C5O4ZX4E4MA54RQ",
+      "domain": "ixinium.io",
+      "index": 58,
+      "proof": "/api/v1/evidence/GC4O3BHXHQWSBFYSJP2HMAAHWDDHRJDM6X5CX7LK3C5O4ZX4E4MA54RQ.json"
+    },
+    {
+      "account": "GC4SAAHODFMZPNGLGAYC7RQ6GDD65DTSONZ6TCSYRCZQJDEN7HOIHVNS",
+      "domain": "mgusd.moneygram.com",
+      "index": 59,
+      "proof": "/api/v1/evidence/GC4SAAHODFMZPNGLGAYC7RQ6GDD65DTSONZ6TCSYRCZQJDEN7HOIHVNS.json"
+    },
+    {
+      "account": "GCBPMB2VK3POXU3QL2IPOUYKEDNZYRCYPFQGLLYVX6D2OLLRO7SWTTBO",
+      "domain": "ultracapital.xyz",
+      "index": 60,
+      "proof": "/api/v1/evidence/GCBPMB2VK3POXU3QL2IPOUYKEDNZYRCYPFQGLLYVX6D2OLLRO7SWTTBO.json"
+    },
+    {
+      "account": "GCGJOW22JXLVK3DC6YOSENXFEEMMFDNKWNWQYEKKUXSDG7VDIVKAPXPQ",
+      "domain": "zeam.money",
+      "index": 61,
+      "proof": "/api/v1/evidence/GCGJOW22JXLVK3DC6YOSENXFEEMMFDNKWNWQYEKKUXSDG7VDIVKAPXPQ.json"
+    },
+    {
+      "account": "GCJFH6HI5UPQVTUUOAS7JPOEPCQZCNGM63GWMBL6ULGUL4XUXRIXXIEQ",
+      "domain": "afreum.com",
+      "index": 62,
+      "proof": "/api/v1/evidence/GCJFH6HI5UPQVTUUOAS7JPOEPCQZCNGM63GWMBL6ULGUL4XUXRIXXIEQ.json"
+    },
+    {
+      "account": "GCJI3CP2NL6NWSCHM36XBQYCBHOTVVZWEXZALWON34KAYUGF6GEVNRTS",
+      "domain": "dcm.systems",
+      "index": 63,
+      "proof": "/api/v1/evidence/GCJI3CP2NL6NWSCHM36XBQYCBHOTVVZWEXZALWON34KAYUGF6GEVNRTS.json"
+    },
+    {
+      "account": "GCQLPBWOQ5PAJYEEQBE7GDSY7X3LCYKFEBKOCNF3OUA6F74ORK74HVSQ",
+      "domain": "ngnc.online",
+      "index": 64,
+      "proof": "/api/v1/evidence/GCQLPBWOQ5PAJYEEQBE7GDSY7X3LCYKFEBKOCNF3OUA6F74ORK74HVSQ.json"
+    },
+    {
+      "account": "GCQLUTKZ373IUGE7Z33JKH5VLRRRLH2LKTU3WEBAGH2MD6AWNYPHUU2Q",
+      "domain": "mgusd.moneygram.com",
+      "index": 65,
+      "proof": "/api/v1/evidence/GCQLUTKZ373IUGE7Z33JKH5VLRRRLH2LKTU3WEBAGH2MD6AWNYPHUU2Q.json"
+    },
+    {
+      "account": "GCRX6MPZ4YUGEPRS7Z427T3LMTQXVZ5T24C5IXT6JBKG77PR72S5P5TI",
+      "domain": "ixinium.io",
+      "index": 66,
+      "proof": "/api/v1/evidence/GCRX6MPZ4YUGEPRS7Z427T3LMTQXVZ5T24C5IXT6JBKG77PR72S5P5TI.json"
+    },
+    {
+      "account": "GCSECMDTZDHAUCTZJO4Z3BGAGDKKV77TBGPBWPOAJUE6Z5N5JEU4CY4R",
+      "domain": "ixinium.io",
+      "index": 67,
+      "proof": "/api/v1/evidence/GCSECMDTZDHAUCTZJO4Z3BGAGDKKV77TBGPBWPOAJUE6Z5N5JEU4CY4R.json"
+    },
+    {
+      "account": "GCTG4YT2ZTYRODK5JCXFJ6V7P6HMQ62L27PPG5UGK57VUFDJ7DFDGBPZ",
+      "domain": "zeam.money",
+      "index": 68,
+      "proof": "/api/v1/evidence/GCTG4YT2ZTYRODK5JCXFJ6V7P6HMQ62L27PPG5UGK57VUFDJ7DFDGBPZ.json"
+    },
+    {
+      "account": "GCUIIJ6J6KIOOYOICVFOEVH6XRY3WX4NUZDYGPUCJQZM6R3OFJE2QGY2",
+      "domain": "audd.digital",
+      "index": 69,
+      "proof": "/api/v1/evidence/GCUIIJ6J6KIOOYOICVFOEVH6XRY3WX4NUZDYGPUCJQZM6R3OFJE2QGY2.json"
+    },
+    {
+      "account": "GCUVU7CV2KR4IGQBKOPBABJW5KFZJETRHMJFORGSOYLP66UAXGLRMMDD",
+      "domain": "pr.network",
+      "index": 70,
+      "proof": "/api/v1/evidence/GCUVU7CV2KR4IGQBKOPBABJW5KFZJETRHMJFORGSOYLP66UAXGLRMMDD.json"
+    },
+    {
+      "account": "GCVVC4SL7G6SCK6AZAHE72RFHZWUFIMAWGAFSKR5VG46GQK6MAFIKX6P",
+      "domain": "ntokens.com",
+      "index": 71,
+      "proof": "/api/v1/evidence/GCVVC4SL7G6SCK6AZAHE72RFHZWUFIMAWGAFSKR5VG46GQK6MAFIKX6P.json"
+    },
+    {
+      "account": "GCXZTK7XDPG72MDEI655N2W4Q5MEW4MSSOFXTVR7XVBT3KZTMCRVCP42",
+      "domain": "zeam.money",
+      "index": 72,
+      "proof": "/api/v1/evidence/GCXZTK7XDPG72MDEI655N2W4Q5MEW4MSSOFXTVR7XVBT3KZTMCRVCP42.json"
+    },
+    {
+      "account": "GCY37QZUH2P24CMCTGT2XNMRFSHVQF2DKL4N5VCY22TQ52DFUNEUTKBD",
+      "domain": "mykobo.co",
+      "index": 73,
+      "proof": "/api/v1/evidence/GCY37QZUH2P24CMCTGT2XNMRFSHVQF2DKL4N5VCY22TQ52DFUNEUTKBD.json"
+    },
+    {
+      "account": "GCY7VH763TOMBGSCWAVBG3LRLYYY6Z6ZJFPHFQKKUWBXAKC376KDUUSY",
+      "domain": "nafuloo.com",
+      "index": 74,
+      "proof": "/api/v1/evidence/GCY7VH763TOMBGSCWAVBG3LRLYYY6Z6ZJFPHFQKKUWBXAKC376KDUUSY.json"
+    },
+    {
+      "account": "GCYE7C77EB5AWAA25R5XMWNI2EDOKTTFTTPZKM2SR5DI4B4WFD52DARS",
+      "domain": "anclap.com",
+      "index": 75,
+      "proof": "/api/v1/evidence/GCYE7C77EB5AWAA25R5XMWNI2EDOKTTFTTPZKM2SR5DI4B4WFD52DARS.json"
+    },
+    {
+      "account": "GCZLKDDJ5FMVUTKDKBCQ4QJ7PBM3LQKRNYHU5VDYYG3XOXFAMJWBF2DC",
+      "domain": "zeam.money",
+      "index": 76,
+      "proof": "/api/v1/evidence/GCZLKDDJ5FMVUTKDKBCQ4QJ7PBM3LQKRNYHU5VDYYG3XOXFAMJWBF2DC.json"
+    },
+    {
+      "account": "GD3MMNHD5U5H732GTLYO7DZVUNGPVP462KVNFO4HALNPP6C7ESQAGOLD",
+      "domain": "zeam.money",
+      "index": 77,
+      "proof": "/api/v1/evidence/GD3MMNHD5U5H732GTLYO7DZVUNGPVP462KVNFO4HALNPP6C7ESQAGOLD.json"
+    },
+    {
+      "account": "GD5J6HLF5666X4AZLTFTXLY46J5SW7EXRKBLEYPJP33S33MXZGV6CWFN",
+      "domain": "bitbondsto.com",
+      "index": 78,
+      "proof": "/api/v1/evidence/GD5J6HLF5666X4AZLTFTXLY46J5SW7EXRKBLEYPJP33S33MXZGV6CWFN.json"
+    },
+    {
+      "account": "GD7G6G56JHGQ3LY37ZYHALJRSAJYXWMYMKAF5G2GBXD5ETRPY4U5XS33",
+      "domain": "ultracapital.xyz",
+      "index": 79,
+      "proof": "/api/v1/evidence/GD7G6G56JHGQ3LY37ZYHALJRSAJYXWMYMKAF5G2GBXD5ETRPY4U5XS33.json"
+    },
+    {
+      "account": "GDARCVAHFMA7GCCULAPCRAV7VXSFFMNOP3X6ZONDJU4SCJULZ6IJ77QD",
+      "domain": "luxpayband.io",
+      "index": 80,
+      "proof": "/api/v1/evidence/GDARCVAHFMA7GCCULAPCRAV7VXSFFMNOP3X6ZONDJU4SCJULZ6IJ77QD.json"
+    },
+    {
+      "account": "GDC7X2MXTYSAKUUGAIQ7J7RPEIM7GXSAIWFYWWH4GLNFECQVJJLB2EEU",
+      "domain": "audd.digital",
+      "index": 81,
+      "proof": "/api/v1/evidence/GDC7X2MXTYSAKUUGAIQ7J7RPEIM7GXSAIWFYWWH4GLNFECQVJJLB2EEU.json"
+    },
+    {
+      "account": "GDD7ABRF7BCK76W33RXDQG5Q3WXVSQYVLGEMXSOWRGZ6Z3G3M2EM2TCP",
+      "domain": "stellarport.io",
+      "index": 82,
+      "proof": "/api/v1/evidence/GDD7ABRF7BCK76W33RXDQG5Q3WXVSQYVLGEMXSOWRGZ6Z3G3M2EM2TCP.json"
+    },
+    {
+      "account": "GDDGTHJFW66SQYV2GRWRNL3AFWEHLI2IO7LTY7X743U4TUFI7VLKKZFG",
+      "domain": "afreum.com",
+      "index": 83,
+      "proof": "/api/v1/evidence/GDDGTHJFW66SQYV2GRWRNL3AFWEHLI2IO7LTY7X743U4TUFI7VLKKZFG.json"
+    },
+    {
+      "account": "GDDNUTFMGY4FSFD2I2WZNWGRU2WLJEA2YEY5IGNXS6ZBCZYOVOXGCZHX",
+      "domain": "bitbondsto.com",
+      "index": 84,
+      "proof": "/api/v1/evidence/GDDNUTFMGY4FSFD2I2WZNWGRU2WLJEA2YEY5IGNXS6ZBCZYOVOXGCZHX.json"
+    },
+    {
+      "account": "GDEWOLMOPAVRTGNJVWOE6U6LHZVAWIJZVWM6PDLCFTUTJJEKSU32TO5W",
+      "domain": "centre.io",
+      "index": 85,
+      "proof": "/api/v1/evidence/GDEWOLMOPAVRTGNJVWOE6U6LHZVAWIJZVWM6PDLCFTUTJJEKSU32TO5W.json"
+    },
+    {
+      "account": "GDF6VOEGRWLOZ64PQQGKD2IYWA22RLT37GJKS2EJXZHT2VLAGWLC5TOB",
+      "domain": "stablecoin.z.com",
+      "index": 86,
+      "proof": "/api/v1/evidence/GDF6VOEGRWLOZ64PQQGKD2IYWA22RLT37GJKS2EJXZHT2VLAGWLC5TOB.json"
+    },
+    {
+      "account": "GDFHYYZNM5RQRTHL6DX3RTFFL6LZJOCI6MYMHHOIXB766RXG3NSVNWGF",
+      "domain": "ixinium.io",
+      "index": 87,
+      "proof": "/api/v1/evidence/GDFHYYZNM5RQRTHL6DX3RTFFL6LZJOCI6MYMHHOIXB766RXG3NSVNWGF.json"
+    },
+    {
+      "account": "GDGTVWSM4MGS4T7Z6W4RPWOCHE2I6RDFCIFZGS3DOA63LWQTRNZNTTFF",
+      "domain": "ultracapital.xyz",
+      "index": 88,
+      "proof": "/api/v1/evidence/GDGTVWSM4MGS4T7Z6W4RPWOCHE2I6RDFCIFZGS3DOA63LWQTRNZNTTFF.json"
+    },
+    {
+      "account": "GDI5EK4HNMBHJJQGP3GUXQJIIOHU2CJO3LABPWD6WYSPJZP5NP67TMNN",
+      "domain": "cowrie.exchange",
+      "index": 89,
+      "proof": "/api/v1/evidence/GDI5EK4HNMBHJJQGP3GUXQJIIOHU2CJO3LABPWD6WYSPJZP5NP67TMNN.json"
+    },
+    {
+      "account": "GDIU57QSVCGU7MTRC53RUWAADKIE75GFNG27C26URMU7CKHNXOQ5RDME",
+      "domain": "luxpayband.io",
+      "index": 90,
+      "proof": "/api/v1/evidence/GDIU57QSVCGU7MTRC53RUWAADKIE75GFNG27C26URMU7CKHNXOQ5RDME.json"
+    },
+    {
+      "account": "GDKL5TOWWAVLJ2WRAUQS2QJEAGHEDJFXFEPQFB6LKW2WRB257BVLLMT6",
+      "domain": "ntokens.com",
+      "index": 91,
+      "proof": "/api/v1/evidence/GDKL5TOWWAVLJ2WRAUQS2QJEAGHEDJFXFEPQFB6LKW2WRB257BVLLMT6.json"
+    },
+    {
+      "account": "GDLTEDSHH7EQQYSFLD5RRJVTTGEGGXDHMLWH6A5ATTMCE2AUDSK3FUND",
+      "domain": "gratz.io",
+      "index": 92,
+      "proof": "/api/v1/evidence/GDLTEDSHH7EQQYSFLD5RRJVTTGEGGXDHMLWH6A5ATTMCE2AUDSK3FUND.json"
+    },
+    {
+      "account": "GDMXLK6HCJ6TWR7TSBCAR2QDQ5GOMPKRRHLN5SES3CMHEKSHNIRAONBD",
+      "domain": "gratz.io",
+      "index": 93,
+      "proof": "/api/v1/evidence/GDMXLK6HCJ6TWR7TSBCAR2QDQ5GOMPKRRHLN5SES3CMHEKSHNIRAONBD.json"
+    },
+    {
+      "account": "GDNUVPUOMWOF2ML5FA5E4HQDX7EHV3VCJTLLTO563PUMZKMHJUJIJSYI",
+      "domain": "afreum.com",
+      "index": 94,
+      "proof": "/api/v1/evidence/GDNUVPUOMWOF2ML5FA5E4HQDX7EHV3VCJTLLTO563PUMZKMHJUJIJSYI.json"
+    },
+    {
+      "account": "GDPJALI4AZKUU2W426U5WKMAT6CN3AJRPIIRYR2YM54TL2GDWO5O2MZM",
+      "domain": "ultracapital.xyz",
+      "index": 95,
+      "proof": "/api/v1/evidence/GDPJALI4AZKUU2W426U5WKMAT6CN3AJRPIIRYR2YM54TL2GDWO5O2MZM.json"
+    },
+    {
+      "account": "GDRNVZRLMWGK6YITXIPEYNRTRYWRWVJN5SFXXQK4RPF5CXIDZGTBLFM7",
+      "domain": "ixinium.io",
+      "index": 96,
+      "proof": "/api/v1/evidence/GDRNVZRLMWGK6YITXIPEYNRTRYWRWVJN5SFXXQK4RPF5CXIDZGTBLFM7.json"
+    },
+    {
+      "account": "GDTEQF6YGCKLIBD37RJZE5GTL3ZY6CBQIKH7COAW654SYEBE6XJJOLOW",
+      "domain": "luxpayband.io",
+      "index": 97,
+      "proof": "/api/v1/evidence/GDTEQF6YGCKLIBD37RJZE5GTL3ZY6CBQIKH7COAW654SYEBE6XJJOLOW.json"
+    },
+    {
+      "account": "GDVKAVKZDKMLPEXXFXPVKARRO4BNFJXRRPKENEDERK5PBYIWCJ2GQOOF",
+      "domain": "ultracapital.xyz",
+      "index": 98,
+      "proof": "/api/v1/evidence/GDVKAVKZDKMLPEXXFXPVKARRO4BNFJXRRPKENEDERK5PBYIWCJ2GQOOF.json"
+    },
+    {
+      "account": "GDVKY2GU2DRXWTBEYJJWSFXIGBZV6AZNBVVSUHEPZI54LIS6BA7DVVSP",
+      "domain": "ntokens.com",
+      "index": 99,
+      "proof": "/api/v1/evidence/GDVKY2GU2DRXWTBEYJJWSFXIGBZV6AZNBVVSUHEPZI54LIS6BA7DVVSP.json"
+    },
+    {
+      "account": "GDW3CNKSP5AOTDQ2YCKNGC6L65CE4JDX3JS5BV427OB54HCF2J4PUEVG",
+      "domain": "funtracker.site",
+      "index": 100,
+      "proof": "/api/v1/evidence/GDW3CNKSP5AOTDQ2YCKNGC6L65CE4JDX3JS5BV427OB54HCF2J4PUEVG.json"
+    },
+    {
+      "account": "GDXLSLCOPPHTWOQXLLKSVN4VN3G67WD2ENU7UMVAROEYVJLSPSEWXIZN",
+      "domain": "vnx.io",
+      "index": 101,
+      "proof": "/api/v1/evidence/GDXLSLCOPPHTWOQXLLKSVN4VN3G67WD2ENU7UMVAROEYVJLSPSEWXIZN.json"
+    },
+    {
+      "account": "GDYC7FS3JIBLYIJGDARQXJKM5VQBVM4ZCBB7IMAJJ7BJ3ARQRTHCTIA3",
+      "domain": "mgusd.moneygram.com",
+      "index": 102,
+      "proof": "/api/v1/evidence/GDYC7FS3JIBLYIJGDARQXJKM5VQBVM4ZCBB7IMAJJ7BJ3ARQRTHCTIA3.json"
+    },
+    {
+      "account": "GDYKVJVWRTERUUOU6Z4ZN3LFMNOI7YGJNATNLPGF6R5YFYGMCRKXSEVA",
+      "domain": "vnx.io",
+      "index": 103,
+      "proof": "/api/v1/evidence/GDYKVJVWRTERUUOU6Z4ZN3LFMNOI7YGJNATNLPGF6R5YFYGMCRKXSEVA.json"
+    },
+    {
+      "account": "GDYQNEF2UWTK4L6HITMT53MZ6F5QWO3Q4UVE6SCGC4OMEQIZQQDERQFD",
+      "domain": "ultracapital.xyz",
+      "index": 104,
+      "proof": "/api/v1/evidence/GDYQNEF2UWTK4L6HITMT53MZ6F5QWO3Q4UVE6SCGC4OMEQIZQQDERQFD.json"
+    },
+    {
+      "account": "GDYSPBVZHPQTYMGSYNOHRZQNLB3ZWFVQ2F7EP7YBOLRGD42XIC3QUX5G",
+      "domain": "clpx.finance",
+      "index": 105,
+      "proof": "/api/v1/evidence/GDYSPBVZHPQTYMGSYNOHRZQNLB3ZWFVQ2F7EP7YBOLRGD42XIC3QUX5G.json"
+    },
+    {
+      "account": "GDZBAWPUGAJI4CQTO53O6Y33WEZ4IRVDBLDYUY6EKGICP7OK53OYZARZ",
+      "domain": "zeam.money",
+      "index": 106,
+      "proof": "/api/v1/evidence/GDZBAWPUGAJI4CQTO53O6Y33WEZ4IRVDBLDYUY6EKGICP7OK53OYZARZ.json"
+    },
+    {
+      "account": "GDZL62FHKSJCFLX4H5ANAJCQEKOTNSSCLQHHKSSDQSIP23JTUWQVHW7X",
+      "domain": "zeam.money",
+      "index": 107,
+      "proof": "/api/v1/evidence/GDZL62FHKSJCFLX4H5ANAJCQEKOTNSSCLQHHKSSDQSIP23JTUWQVHW7X.json"
+    }
+  ]
+}

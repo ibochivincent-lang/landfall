@@ -1,0 +1,300 @@
+{
+  "generatedAt": "2026-09-05T15:53:21.103Z",
+  "source": "each anchor's own SEP-24 /info endpoint, reached via its stellar.toml",
+  "note": "Withdrawal terms as the operator publishes them, not as we estimate them. `pricing` is \"published\" when the anchor states fee_fixed/fee_percent, \"dynamic\" when it says fees exist but are quoted per transaction, and the anchor is omitted entirely when /info could not be reached — which is not the same as free, and not the same as declining to say.",
+  "caveat": "These are the fees the anchor advertises. The binding number is the one quoted inside its own withdrawal flow, which may differ; nothing here is a quote.",
+  "counts": {
+    "asked": 32,
+    "answered": 7,
+    "published": 7,
+    "dynamic": 0
+  },
+  "anchors": {
+    "anclap.com": {
+      "domain": "anclap.com",
+      "status": "ok",
+      "endpoint": "https://api.anclap.com/transfer24",
+      "fetchedAt": "2026-09-05T15:53:09.279Z",
+      "withdraw": {
+        "ARS": {
+          "enabled": true,
+          "pricing": "published",
+          "feeFixed": 10,
+          "feePercent": 2,
+          "minAmount": 11,
+          "maxAmount": 500000
+        },
+        "PEN": {
+          "enabled": true,
+          "pricing": "published",
+          "feeFixed": 1,
+          "feePercent": 2,
+          "minAmount": 2,
+          "maxAmount": 3000
+        }
+      },
+      "pricing": "published"
+    },
+    "clpx.finance": {
+      "domain": "clpx.finance",
+      "status": "ok",
+      "endpoint": "https://kbtrading.org/sep24",
+      "fetchedAt": "2026-09-05T15:53:11.013Z",
+      "withdraw": {
+        "CLPX": {
+          "enabled": false
+        },
+        "BTCLN": {
+          "enabled": true,
+          "pricing": "published",
+          "feeFixed": 0,
+          "feePercent": 0,
+          "minAmount": 10000,
+          "maxAmount": 507059
+        }
+      },
+      "pricing": "published"
+    },
+    "finclusive.com": {
+      "domain": "finclusive.com",
+      "status": "ok",
+      "endpoint": "https://api.finclusive.com/stellar/transfer",
+      "fetchedAt": "2026-09-05T15:53:09.740Z",
+      "withdraw": {
+        "XLM": {
+          "enabled": true,
+          "pricing": "published",
+          "feeFixed": 0,
+          "feePercent": 0,
+          "minAmount": 1
+        },
+        "USDC": {
+          "enabled": true,
+          "pricing": "published",
+          "feeFixed": 0,
+          "feePercent": 0,
+          "minAmount": 1
+        }
+      },
+      "pricing": "published"
+    },
+    "ntokens.com": {
+      "domain": "ntokens.com",
+      "status": "ok",
+      "endpoint": "https://ntokens-box.bpventures.us/sep24",
+      "fetchedAt": "2026-09-05T15:53:10.111Z",
+      "withdraw": {
+        "BRL": {
+          "enabled": true,
+          "pricing": "published",
+          "feeFixed": 0,
+          "feePercent": 20,
+          "minAmount": 0.01,
+          "maxAmount": 4000
+        }
+      },
+      "pricing": "published"
+    },
+    "stellar.moneygram.com": {
+      "domain": "stellar.moneygram.com",
+      "status": "ok",
+      "endpoint": "https://stellar.moneygram.com/stellaradapterservice/sep24",
+      "fetchedAt": "2026-09-05T15:53:09.094Z",
+      "withdraw": {
+        "USDC": {
+          "enabled": true,
+          "pricing": "published",
+          "feeFixed": 0,
+          "feePercent": 0,
+          "minAmount": 1,
+          "maxAmount": 2500
+        }
+      },
+      "pricing": "published"
+    },
+    "ultracapital.xyz": {
+      "domain": "ultracapital.xyz",
+      "status": "ok",
+      "endpoint": "https://ultracapital.xyz/sep24",
+      "fetchedAt": "2026-09-05T15:53:12.050Z",
+      "withdraw": {
+        "yUSDC": {
+          "enabled": false
+        },
+        "yBTC": {
+          "enabled": false
+        },
+        "BTC": {
+          "enabled": false
+        },
+        "yXLM": {
+          "enabled": false
+        },
+        "ETH": {
+          "enabled": false
+        },
+        "yETH": {
+          "enabled": true,
+          "pricing": "published",
+          "feeFixed": 0.0001,
+          "feePercent": 0,
+          "minAmount": 0.005,
+          "maxAmount": 20
+        }
+      },
+      "pricing": "published"
+    },
+    "zeam.money": {
+      "domain": "zeam.money",
+      "status": "ok",
+      "endpoint": "https://anchor.zeam.money/sep24",
+      "fetchedAt": "2026-09-05T15:53:11.876Z",
+      "withdraw": {
+        "USDC": {
+          "enabled": true,
+          "pricing": "published",
+          "feeFixed": 1,
+          "feePercent": 0.5,
+          "minAmount": 1,
+          "maxAmount": 10000
+        },
+        "native": {
+          "enabled": true,
+          "pricing": "published",
+          "feeFixed": 1,
+          "feePercent": 0.5,
+          "minAmount": 1,
+          "maxAmount": 10000
+        }
+      },
+      "pricing": "published"
+    }
+  },
+  "unavailable": [
+    {
+      "domain": "afreum.com",
+      "status": "no-sep24",
+      "reason": "stellar.toml declares no TRANSFER_SERVER_SEP0024"
+    },
+    {
+      "domain": "app.phoenix-hub.io",
+      "status": "no-sep24",
+      "reason": "stellar.toml declares no TRANSFER_SERVER_SEP0024"
+    },
+    {
+      "domain": "aps.money",
+      "status": "no-sep24",
+      "reason": "stellar.toml declares no TRANSFER_SERVER_SEP0024"
+    },
+    {
+      "domain": "aqua.network",
+      "status": "no-sep24",
+      "reason": "stellar.toml declares no TRANSFER_SERVER_SEP0024"
+    },
+    {
+      "domain": "audd.digital",
+      "status": "no-sep24",
+      "reason": "stellar.toml declares no TRANSFER_SERVER_SEP0024"
+    },
+    {
+      "domain": "bitbondsto.com",
+      "status": "no-sep24",
+      "reason": "stellar.toml declares no TRANSFER_SERVER_SEP0024"
+    },
+    {
+      "domain": "centre.io",
+      "status": "no-sep24",
+      "reason": "stellar.toml declares no TRANSFER_SERVER_SEP0024"
+    },
+    {
+      "domain": "clickpesa.com",
+      "status": "unreachable",
+      "reason": "stellar.toml: HTTP 404"
+    },
+    {
+      "domain": "cowrie.exchange",
+      "status": "no-sep24",
+      "reason": "stellar.toml declares no TRANSFER_SERVER_SEP0024"
+    },
+    {
+      "domain": "dcm.systems",
+      "status": "no-sep24",
+      "reason": "stellar.toml declares no TRANSFER_SERVER_SEP0024"
+    },
+    {
+      "domain": "funtracker.site",
+      "status": "no-sep24",
+      "reason": "stellar.toml declares no TRANSFER_SERVER_SEP0024"
+    },
+    {
+      "domain": "gratz.io",
+      "status": "no-sep24",
+      "reason": "stellar.toml declares no TRANSFER_SERVER_SEP0024"
+    },
+    {
+      "domain": "ixinium.io",
+      "status": "no-sep24",
+      "reason": "stellar.toml declares no TRANSFER_SERVER_SEP0024"
+    },
+    {
+      "domain": "luxpayband.io",
+      "status": "no-sep24",
+      "reason": "stellar.toml declares no TRANSFER_SERVER_SEP0024"
+    },
+    {
+      "domain": "mgusd.moneygram.com",
+      "status": "no-sep24",
+      "reason": "stellar.toml declares no TRANSFER_SERVER_SEP0024"
+    },
+    {
+      "domain": "mobius.network",
+      "status": "no-sep24",
+      "reason": "stellar.toml declares no TRANSFER_SERVER_SEP0024"
+    },
+    {
+      "domain": "mykobo.co",
+      "status": "unreachable",
+      "reason": "/info: fetch failed"
+    },
+    {
+      "domain": "nafuloo.com",
+      "status": "no-sep24",
+      "reason": "stellar.toml declares no TRANSFER_SERVER_SEP0024"
+    },
+    {
+      "domain": "ngnc.online",
+      "status": "unreachable",
+      "reason": "/info: HTTP 403"
+    },
+    {
+      "domain": "pr.network",
+      "status": "no-sep24",
+      "reason": "stellar.toml declares no TRANSFER_SERVER_SEP0024"
+    },
+    {
+      "domain": "settle.network",
+      "status": "unreachable",
+      "reason": "stellar.toml: The operation was aborted due to timeout"
+    },
+    {
+      "domain": "stablecoin.z.com",
+      "status": "no-sep24",
+      "reason": "stellar.toml declares no TRANSFER_SERVER_SEP0024"
+    },
+    {
+      "domain": "stellarport.io",
+      "status": "no-sep24",
+      "reason": "stellar.toml declares no TRANSFER_SERVER_SEP0024"
+    },
+    {
+      "domain": "vibrantapp.com",
+      "status": "no-sep24",
+      "reason": "stellar.toml declares no TRANSFER_SERVER_SEP0024"
+    },
+    {
+      "domain": "vnx.io",
+      "status": "no-sep24",
+      "reason": "stellar.toml declares no TRANSFER_SERVER_SEP0024"
+    }
+  ]
+}

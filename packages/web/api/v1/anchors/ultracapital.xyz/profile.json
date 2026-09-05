@@ -1,0 +1,627 @@
+{
+  "anchorId": "ultracapital.xyz",
+  "name": "Ultra Capital LLC",
+  "asOf": "2026-09-05T15:48:32.076Z",
+  "verification": {
+    "resolved": true,
+    "checkedAt": "2026-09-05T15:48:32.076Z",
+    "source": "SEP-1 stellar.toml, resolved live; issuer attribution confirmed against each issuer account's own on-chain home_domain",
+    "accounts": [
+      {
+        "account": "GAVBS6SXMRD7C3IRN5K2SY5C2CAUFHBVOGWTQXADSBUHAFDDUKVTQWWY",
+        "role": "declared"
+      },
+      {
+        "account": "GCBPMB2VK3POXU3QL2IPOUYKEDNZYRCYPFQGLLYVX6D2OLLRO7SWTTBO",
+        "role": "declared"
+      },
+      {
+        "account": "GADFXROGGR74V3MSWU2SUKCEUPQFZEIIF3IUHLRN3NKZ4JN2IPBMCODA",
+        "role": "declared"
+      },
+      {
+        "account": "GD7G6G56JHGQ3LY37ZYHALJRSAJYXWMYMKAF5G2GBXD5ETRPY4U5XS33",
+        "role": "declared"
+      },
+      {
+        "account": "GA3UK3JHOYYD3TAUH5C7NDOUDWBRF5FC4MECXFA2VRPEHIDQUOJIVOAJ",
+        "role": "declared"
+      },
+      {
+        "account": "GDGTVWSM4MGS4T7Z6W4RPWOCHE2I6RDFCIFZGS3DOA63LWQTRNZNTTFF",
+        "role": "declared"
+      },
+      {
+        "account": "GDYQNEF2UWTK4L6HITMT53MZ6F5QWO3Q4UVE6SCGC4OMEQIZQQDERQFD",
+        "role": "declared"
+      },
+      {
+        "account": "GARDNV3Q7YGT4AKSDF25LT32YSCCW4EV22Y2TV3I2PU2MMXJTEDL5T55",
+        "role": "declared"
+      },
+      {
+        "account": "GBUVRNH4RW4VLHP4C5MOF46RRIRZLAVHYGX45MVSTKA2F6TMR7E7L6NW",
+        "role": "declared"
+      },
+      {
+        "account": "GDVKAVKZDKMLPEXXFXPVKARRO4BNFJXRRPKENEDERK5PBYIWCJ2GQOOF",
+        "role": "declared"
+      },
+      {
+        "account": "GANESLOXBZWPLB5ZM2KFUTBGSBGISB7JTWFXO67G4TGQINWRMI6766GV",
+        "role": "declared"
+      },
+      {
+        "account": "GBFXOHVAS43OIWNIO7XLRJAHT3BICFEIKOJLZVXNT572MISM4CMGSOCC",
+        "role": "declared"
+      },
+      {
+        "account": "GDPJALI4AZKUU2W426U5WKMAT6CN3AJRPIIRYR2YM54TL2GDWO5O2MZM",
+        "role": "declared"
+      }
+    ]
+  },
+  "summary": {
+    "accounts": 13,
+    "live": 1,
+    "slow": 9,
+    "dark": 3,
+    "noActivity": 0,
+    "inbound": 638,
+    "outbound": 847
+  },
+  "accounts": [
+    {
+      "account": "GAVBS6SXMRD7C3IRN5K2SY5C2CAUFHBVOGWTQXADSBUHAFDDUKVTQWWY",
+      "domain": "ultracapital.xyz",
+      "name": "Ultra Capital LLC",
+      "state": "slow",
+      "inbound": 1,
+      "outbound": 72,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 386.06,
+      "topCounterpartyShare": 1
+    },
+    {
+      "account": "GCBPMB2VK3POXU3QL2IPOUYKEDNZYRCYPFQGLLYVX6D2OLLRO7SWTTBO",
+      "domain": "ultracapital.xyz",
+      "name": "Ultra Capital LLC",
+      "state": "slow",
+      "inbound": 0,
+      "outbound": 3,
+      "returns": 0,
+      "returnRate": null,
+      "hoursSinceActivity": 354.17,
+      "topCounterpartyShare": null
+    },
+    {
+      "account": "GADFXROGGR74V3MSWU2SUKCEUPQFZEIIF3IUHLRN3NKZ4JN2IPBMCODA",
+      "domain": "ultracapital.xyz",
+      "name": "Ultra Capital LLC",
+      "state": "slow",
+      "inbound": 1,
+      "outbound": 203,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 97.97,
+      "topCounterpartyShare": 1
+    },
+    {
+      "account": "GD7G6G56JHGQ3LY37ZYHALJRSAJYXWMYMKAF5G2GBXD5ETRPY4U5XS33",
+      "domain": "ultracapital.xyz",
+      "name": "Ultra Capital LLC",
+      "state": "dark",
+      "inbound": 0,
+      "outbound": 17,
+      "returns": 0,
+      "returnRate": null,
+      "hoursSinceActivity": 1075.21,
+      "topCounterpartyShare": null
+    },
+    {
+      "account": "GA3UK3JHOYYD3TAUH5C7NDOUDWBRF5FC4MECXFA2VRPEHIDQUOJIVOAJ",
+      "domain": "ultracapital.xyz",
+      "name": "Ultra Capital LLC",
+      "state": "dark",
+      "inbound": 0,
+      "outbound": 0,
+      "returns": 0,
+      "returnRate": null,
+      "hoursSinceActivity": 1403,
+      "topCounterpartyShare": null
+    },
+    {
+      "account": "GDGTVWSM4MGS4T7Z6W4RPWOCHE2I6RDFCIFZGS3DOA63LWQTRNZNTTFF",
+      "domain": "ultracapital.xyz",
+      "name": "Ultra Capital LLC",
+      "state": "slow",
+      "inbound": 29,
+      "outbound": 9,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 74.14,
+      "topCounterpartyShare": 1
+    },
+    {
+      "account": "GDYQNEF2UWTK4L6HITMT53MZ6F5QWO3Q4UVE6SCGC4OMEQIZQQDERQFD",
+      "domain": "ultracapital.xyz",
+      "name": "Ultra Capital LLC",
+      "state": "dark",
+      "inbound": 8,
+      "outbound": 1,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 1161.24,
+      "topCounterpartyShare": 1
+    },
+    {
+      "account": "GARDNV3Q7YGT4AKSDF25LT32YSCCW4EV22Y2TV3I2PU2MMXJTEDL5T55",
+      "domain": "ultracapital.xyz",
+      "name": "Ultra Capital LLC",
+      "state": "slow",
+      "inbound": 135,
+      "outbound": 3,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 360.27,
+      "topCounterpartyShare": 0.9997
+    },
+    {
+      "account": "GBUVRNH4RW4VLHP4C5MOF46RRIRZLAVHYGX45MVSTKA2F6TMR7E7L6NW",
+      "domain": "ultracapital.xyz",
+      "name": "Ultra Capital LLC",
+      "state": "slow",
+      "inbound": 8,
+      "outbound": 0,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 670.96,
+      "topCounterpartyShare": 1
+    },
+    {
+      "account": "GDVKAVKZDKMLPEXXFXPVKARRO4BNFJXRRPKENEDERK5PBYIWCJ2GQOOF",
+      "domain": "ultracapital.xyz",
+      "name": "Ultra Capital LLC",
+      "state": "slow",
+      "inbound": 407,
+      "outbound": 48,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 148.89,
+      "topCounterpartyShare": 0.3604
+    },
+    {
+      "account": "GANESLOXBZWPLB5ZM2KFUTBGSBGISB7JTWFXO67G4TGQINWRMI6766GV",
+      "domain": "ultracapital.xyz",
+      "name": "Ultra Capital LLC",
+      "state": "live",
+      "inbound": 5,
+      "outbound": 488,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 0.02,
+      "topCounterpartyShare": 0.92
+    },
+    {
+      "account": "GBFXOHVAS43OIWNIO7XLRJAHT3BICFEIKOJLZVXNT572MISM4CMGSOCC",
+      "domain": "ultracapital.xyz",
+      "name": "Ultra Capital LLC",
+      "state": "slow",
+      "inbound": 35,
+      "outbound": 1,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 170.37,
+      "topCounterpartyShare": 0.9295
+    },
+    {
+      "account": "GDPJALI4AZKUU2W426U5WKMAT6CN3AJRPIIRYR2YM54TL2GDWO5O2MZM",
+      "domain": "ultracapital.xyz",
+      "name": "Ultra Capital LLC",
+      "state": "slow",
+      "inbound": 9,
+      "outbound": 2,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 75.58,
+      "topCounterpartyShare": 0.529
+    }
+  ],
+  "history": {
+    "GAVBS6SXMRD7C3IRN5K2SY5C2CAUFHBVOGWTQXADSBUHAFDDUKVTQWWY": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "slow",
+        "in": 1,
+        "out": 72,
+        "hours": 373.41
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "slow",
+        "in": 1,
+        "out": 72,
+        "hours": 378.34
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "slow",
+        "in": 1,
+        "out": 72,
+        "hours": 382.66
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "slow",
+        "in": 1,
+        "out": 72,
+        "hours": 386.06
+      }
+    ],
+    "GCBPMB2VK3POXU3QL2IPOUYKEDNZYRCYPFQGLLYVX6D2OLLRO7SWTTBO": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "slow",
+        "in": 0,
+        "out": 3,
+        "hours": 341.52
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "slow",
+        "in": 0,
+        "out": 3,
+        "hours": 346.45
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "slow",
+        "in": 0,
+        "out": 3,
+        "hours": 350.78
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "slow",
+        "in": 0,
+        "out": 3,
+        "hours": 354.17
+      }
+    ],
+    "GADFXROGGR74V3MSWU2SUKCEUPQFZEIIF3IUHLRN3NKZ4JN2IPBMCODA": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "slow",
+        "in": 1,
+        "out": 203,
+        "hours": 85.32
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "slow",
+        "in": 1,
+        "out": 203,
+        "hours": 90.25
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "slow",
+        "in": 1,
+        "out": 203,
+        "hours": 94.58
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "slow",
+        "in": 1,
+        "out": 203,
+        "hours": 97.97
+      }
+    ],
+    "GD7G6G56JHGQ3LY37ZYHALJRSAJYXWMYMKAF5G2GBXD5ETRPY4U5XS33": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "dark",
+        "in": 0,
+        "out": 17,
+        "hours": 1062.56
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "dark",
+        "in": 0,
+        "out": 17,
+        "hours": 1067.49
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "dark",
+        "in": 0,
+        "out": 17,
+        "hours": 1071.81
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "dark",
+        "in": 0,
+        "out": 17,
+        "hours": 1075.21
+      }
+    ],
+    "GA3UK3JHOYYD3TAUH5C7NDOUDWBRF5FC4MECXFA2VRPEHIDQUOJIVOAJ": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "dark",
+        "in": 0,
+        "out": 0,
+        "hours": 1390.35
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "dark",
+        "in": 0,
+        "out": 0,
+        "hours": 1395.28
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "dark",
+        "in": 0,
+        "out": 0,
+        "hours": 1399.6
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "dark",
+        "in": 0,
+        "out": 0,
+        "hours": 1403
+      }
+    ],
+    "GDGTVWSM4MGS4T7Z6W4RPWOCHE2I6RDFCIFZGS3DOA63LWQTRNZNTTFF": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "live",
+        "in": 29,
+        "out": 9,
+        "hours": 61.49
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "live",
+        "in": 29,
+        "out": 9,
+        "hours": 66.42
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "live",
+        "in": 29,
+        "out": 9,
+        "hours": 70.75
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "slow",
+        "in": 29,
+        "out": 9,
+        "hours": 74.14
+      }
+    ],
+    "GDYQNEF2UWTK4L6HITMT53MZ6F5QWO3Q4UVE6SCGC4OMEQIZQQDERQFD": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "dark",
+        "in": 8,
+        "out": 1,
+        "hours": 1148.6
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "dark",
+        "in": 8,
+        "out": 1,
+        "hours": 1153.52
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "dark",
+        "in": 8,
+        "out": 1,
+        "hours": 1157.85
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "dark",
+        "in": 8,
+        "out": 1,
+        "hours": 1161.24
+      }
+    ],
+    "GARDNV3Q7YGT4AKSDF25LT32YSCCW4EV22Y2TV3I2PU2MMXJTEDL5T55": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "slow",
+        "in": 135,
+        "out": 3,
+        "hours": 347.62
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "slow",
+        "in": 135,
+        "out": 3,
+        "hours": 352.55
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "slow",
+        "in": 135,
+        "out": 3,
+        "hours": 356.88
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "slow",
+        "in": 135,
+        "out": 3,
+        "hours": 360.27
+      }
+    ],
+    "GBUVRNH4RW4VLHP4C5MOF46RRIRZLAVHYGX45MVSTKA2F6TMR7E7L6NW": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "slow",
+        "in": 8,
+        "out": 0,
+        "hours": 658.31
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "slow",
+        "in": 8,
+        "out": 0,
+        "hours": 663.24
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "slow",
+        "in": 8,
+        "out": 0,
+        "hours": 667.56
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "slow",
+        "in": 8,
+        "out": 0,
+        "hours": 670.96
+      }
+    ],
+    "GDVKAVKZDKMLPEXXFXPVKARRO4BNFJXRRPKENEDERK5PBYIWCJ2GQOOF": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "slow",
+        "in": 407,
+        "out": 48,
+        "hours": 136.25
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "slow",
+        "in": 407,
+        "out": 48,
+        "hours": 141.17
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "slow",
+        "in": 407,
+        "out": 48,
+        "hours": 145.5
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "slow",
+        "in": 407,
+        "out": 48,
+        "hours": 148.89
+      }
+    ],
+    "GANESLOXBZWPLB5ZM2KFUTBGSBGISB7JTWFXO67G4TGQINWRMI6766GV": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "live",
+        "in": 5,
+        "out": 123,
+        "hours": 5.41
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "live",
+        "in": 5,
+        "out": 220,
+        "hours": 2.69
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "live",
+        "in": 5,
+        "out": 340,
+        "hours": 0
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "live",
+        "in": 5,
+        "out": 488,
+        "hours": 0.02
+      }
+    ],
+    "GBFXOHVAS43OIWNIO7XLRJAHT3BICFEIKOJLZVXNT572MISM4CMGSOCC": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "slow",
+        "in": 35,
+        "out": 1,
+        "hours": 157.72
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "slow",
+        "in": 35,
+        "out": 1,
+        "hours": 162.65
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "slow",
+        "in": 35,
+        "out": 1,
+        "hours": 166.97
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "slow",
+        "in": 35,
+        "out": 1,
+        "hours": 170.37
+      }
+    ],
+    "GDPJALI4AZKUU2W426U5WKMAT6CN3AJRPIIRYR2YM54TL2GDWO5O2MZM": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "live",
+        "in": 9,
+        "out": 2,
+        "hours": 62.94
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "live",
+        "in": 9,
+        "out": 2,
+        "hours": 67.86
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "slow",
+        "in": 9,
+        "out": 2,
+        "hours": 72.19
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "slow",
+        "in": 9,
+        "out": 2,
+        "hours": 75.58
+      }
+    ]
+  },
+  "caveats": [
+    "A return is the honest failure mode. An anchor that accepts value, fails to settle and keeps it produces no return event and scores 0. A low rate is the absence of one kind of evidence, not evidence of good conduct.",
+    "Dark means no on-chain settlement in over 30 days. That is a fact about the ledger. Why an anchor is quiet is not something this project claims to know."
+  ]
+}

@@ -1,0 +1,213 @@
+{
+  "anchorId": "mgusd.moneygram.com",
+  "name": "MoneyGram Payment Systems, Inc.",
+  "asOf": "2026-09-05T15:48:32.076Z",
+  "verification": {
+    "resolved": true,
+    "checkedAt": "2026-09-05T15:48:32.076Z",
+    "source": "SEP-1 stellar.toml, resolved live; issuer attribution confirmed against each issuer account's own on-chain home_domain",
+    "accounts": [
+      {
+        "account": "GCQLUTKZ373IUGE7Z33JKH5VLRRRLH2LKTU3WEBAGH2MD6AWNYPHUU2Q",
+        "role": "declared"
+      },
+      {
+        "account": "GDYC7FS3JIBLYIJGDARQXJKM5VQBVM4ZCBB7IMAJJ7BJ3ARQRTHCTIA3",
+        "role": "declared"
+      },
+      {
+        "account": "GC4SAAHODFMZPNGLGAYC7RQ6GDD65DTSONZ6TCSYRCZQJDEN7HOIHVNS",
+        "role": "declared"
+      },
+      {
+        "account": "GAIUGZZZSL47BKH27SUDZESZELFJDPE2UM52RACOSFJ7BIVBGKUEJSUZ",
+        "role": "declared"
+      }
+    ]
+  },
+  "summary": {
+    "accounts": 4,
+    "live": 0,
+    "slow": 0,
+    "dark": 4,
+    "noActivity": 0,
+    "inbound": 14,
+    "outbound": 3
+  },
+  "accounts": [
+    {
+      "account": "GCQLUTKZ373IUGE7Z33JKH5VLRRRLH2LKTU3WEBAGH2MD6AWNYPHUU2Q",
+      "domain": "mgusd.moneygram.com",
+      "name": "MoneyGram Payment Systems, Inc.",
+      "state": "dark",
+      "inbound": 6,
+      "outbound": 1,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 2346.09,
+      "topCounterpartyShare": 0.6301
+    },
+    {
+      "account": "GDYC7FS3JIBLYIJGDARQXJKM5VQBVM4ZCBB7IMAJJ7BJ3ARQRTHCTIA3",
+      "domain": "mgusd.moneygram.com",
+      "name": "MoneyGram Payment Systems, Inc.",
+      "state": "dark",
+      "inbound": 5,
+      "outbound": 2,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 2394.43,
+      "topCounterpartyShare": 0.9174
+    },
+    {
+      "account": "GC4SAAHODFMZPNGLGAYC7RQ6GDD65DTSONZ6TCSYRCZQJDEN7HOIHVNS",
+      "domain": "mgusd.moneygram.com",
+      "name": "MoneyGram Payment Systems, Inc.",
+      "state": "dark",
+      "inbound": 2,
+      "outbound": 0,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 7495.76,
+      "topCounterpartyShare": 0.8333
+    },
+    {
+      "account": "GAIUGZZZSL47BKH27SUDZESZELFJDPE2UM52RACOSFJ7BIVBGKUEJSUZ",
+      "domain": "mgusd.moneygram.com",
+      "name": "MoneyGram Payment Systems, Inc.",
+      "state": "dark",
+      "inbound": 1,
+      "outbound": 0,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 1404.4,
+      "topCounterpartyShare": 1
+    }
+  ],
+  "history": {
+    "GCQLUTKZ373IUGE7Z33JKH5VLRRRLH2LKTU3WEBAGH2MD6AWNYPHUU2Q": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "dark",
+        "in": 6,
+        "out": 1,
+        "hours": 2333.44
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "dark",
+        "in": 6,
+        "out": 1,
+        "hours": 2338.37
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "dark",
+        "in": 6,
+        "out": 1,
+        "hours": 2342.69
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "dark",
+        "in": 6,
+        "out": 1,
+        "hours": 2346.09
+      }
+    ],
+    "GDYC7FS3JIBLYIJGDARQXJKM5VQBVM4ZCBB7IMAJJ7BJ3ARQRTHCTIA3": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "dark",
+        "in": 5,
+        "out": 2,
+        "hours": 2381.78
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "dark",
+        "in": 5,
+        "out": 2,
+        "hours": 2386.71
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "dark",
+        "in": 5,
+        "out": 2,
+        "hours": 2391.03
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "dark",
+        "in": 5,
+        "out": 2,
+        "hours": 2394.43
+      }
+    ],
+    "GC4SAAHODFMZPNGLGAYC7RQ6GDD65DTSONZ6TCSYRCZQJDEN7HOIHVNS": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "dark",
+        "in": 2,
+        "out": 0,
+        "hours": 7483.11
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "dark",
+        "in": 2,
+        "out": 0,
+        "hours": 7488.04
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "dark",
+        "in": 2,
+        "out": 0,
+        "hours": 7492.37
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "dark",
+        "in": 2,
+        "out": 0,
+        "hours": 7495.76
+      }
+    ],
+    "GAIUGZZZSL47BKH27SUDZESZELFJDPE2UM52RACOSFJ7BIVBGKUEJSUZ": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "dark",
+        "in": 1,
+        "out": 0,
+        "hours": 1391.75
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "dark",
+        "in": 1,
+        "out": 0,
+        "hours": 1396.68
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "dark",
+        "in": 1,
+        "out": 0,
+        "hours": 1401.01
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "dark",
+        "in": 1,
+        "out": 0,
+        "hours": 1404.4
+      }
+    ]
+  },
+  "caveats": [
+    "A return is the honest failure mode. An anchor that accepts value, fails to settle and keeps it produces no return event and scores 0. A low rate is the absence of one kind of evidence, not evidence of good conduct.",
+    "Dark means no on-chain settlement in over 30 days. That is a fact about the ledger. Why an anchor is quiet is not something this project claims to know."
+  ]
+}

@@ -1,0 +1,243 @@
+name: Hourly Ledger Scan
+
+on:
+  # Run every hour
+  schedule:
+    - cron: '0 * * * *'
+
+  # Also allow a manual trigger from the GitHub Actions UI
+  workflow_dispatch:
+    inputs:
+      since:
+        description: 'Scan from date (ISO 8601, e.g. 2026-01-01). Leave blank for default.'
+        required: false
+        default: ''
+
+concurrency:
+  group: scan
+  cancel-in-progress: false   # never cancel a running scan — let it finish
+
+permissions:
+  contents: write
+
+jobs:
+  scan:
+    name: Scan → Persist → Update API JSON
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      # ── 1. Checkout ───────────────────────────────────────────────────────────
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          # Need push access, so use the built-in token
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # ── 2. Node setup ─────────────────────────────────────────────────────────
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # ── 3. Install dependencies ───────────────────────────────────────────────
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      # ── 4. Run the scan ───────────────────────────────────────────────────────
+      # --persist writes to Supabase when DATABASE_URL is set.
+      # Without it the scan still runs and writes JSON to ./out — that's enough
+      # for the static API update step below.
+      - name: Run ledger scan
+        continue-on-error: true   # persist failure must not skip the JSON update
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          FLAGS="--horizon https://horizon.stellar.org --max-records 500 --concurrency 6 --dust 0.01 --out out"
+
+          # Only add --since if provided via manual trigger
+          if [ -n "${{ github.event.inputs.since }}" ]; then
+            FLAGS="$FLAGS --since ${{ github.event.inputs.since }}"
+          fi
+
+          # Only persist to Supabase when DATABASE_URL is configured
+          if [ -n "$DATABASE_URL" ]; then
+            echo "DATABASE_URL found — will persist to Supabase"
+            FLAGS="$FLAGS --persist"
+          else
+            echo "No DATABASE_URL — running scan only (static JSON will be updated)"
+          fi
+
+          npx tsx packages/indexer/src/cli.ts scan $FLAGS
+
+      # ── 4b. Verify the scan before anything is published ──────────────────────
+      # Checks the new scan against the currently published anchors.json for
+      # incoherent claims — one on-chain account attributed to two anchors,
+      # counts moving implausibly, rows belonging to nobody.
+      #
+      # This exists because the site once credited Circle's shared USDC issuer
+      # to a named anchor, invisibly, for an unknown length of time. A reader
+      # cannot tell a misattributed figure from a measured one, so the only
+      # safe response is to withhold the update. The scan output stays on disk
+      # and in the run's logs either way — blocked means unpublished, not lost.
+      #
+      # continue-on-error, but NOT permissive: every step that writes published
+      # data is gated on `steps.verify.outcome == 'success'` below, so a failed
+      # check still stops the data cold. The job continues purely so the commit
+      # step can publish the audit artifact this step writes — a safety check
+      # whose only trace is a red CI badge is one nobody outside this repo can
+      # audit, and withholding an update is itself a claim about the data.
+      #
+      # See packages/indexer/src/invariants.ts for what each check asserts and
+      # why some findings only warn.
+      - name: Verify scan invariants
+        id: verify
+        continue-on-error: true
+        run: npx tsx scripts/verify-scan.ts
+
+      # ── 5. Convert scan output → static API JSON ──────────────────────────────
+      # This runs regardless of whether --persist succeeded, so the static JSON
+      # is always updated from the latest scan file on disk.
+      - name: Convert scan → API JSON
+        if: steps.verify.outcome == 'success'
+        run: node scripts/scan-to-api.mjs
+
+      # ── 5a. Per-anchor pages, profiles and the network time series ────────────
+      # Gives every tracked anchor a permanent URL and a machine-readable record,
+      # and appends this scan to the history artifact. Cheap (sub-second) because
+      # each profile carries its own series forward — the git backfill behind
+      # --seed-from-git is a one-off, already run.
+      #
+      # continue-on-error for the same reason as the cross-chain step: these
+      # are derived presentation artifacts, and the ledger scan above is the
+      # thing that must reach the commit below. A page generator that throws
+      # must not hold the settlement data hostage — the previous pages stay in
+      # place and go visibly stale, which is the honest failure.
+      - name: Build anchor profiles and pages
+        if: steps.verify.outcome == 'success'
+        continue-on-error: true
+        run: node scripts/build-anchor-profiles.mjs
+
+      # ── 5b. Commit the dataset the published figures came from ────────────────
+      # Merkle-roots the exact per-account records behind every published number
+      # and emits an inclusion proof per account, so a consumer can recompute a
+      # leaf from the response they were served and check it reaches the root —
+      # "check the score" rather than "trust the score".
+      #
+      # continue-on-error for the same reason as the steps around it: this is a
+      # derived artifact, and the ledger scan is what must reach the commit.
+      - name: Build evidence commitments
+        if: steps.verify.outcome == 'success'
+        continue-on-error: true
+        run: npx tsx scripts/build-evidence.ts
+
+      # ── 5b2. Refresh each anchor's own published fees ────────────────────────
+      # Asks every tracked anchor's SEP-24 /info for its current withdrawal
+      # terms. Replaces a hardcoded table that had drifted badly — Anclap
+      # publishes 2% where the table said 0.5%, nTokens 20% where it said 0.4%.
+      - name: Refresh anchor fees
+        continue-on-error: true
+        run: node scripts/fetch-anchor-fees.mjs
+
+      # ── 5b3. Declared capability vs observed capability ──────────────────────
+      # Probes every SEP endpoint each anchor declares and records whether it
+      # answered. Directories publish the claim; nothing checks it. Then joins
+      # that with declared currencies and ledger liveness into a routing index
+      # a wallet can query in one request.
+      - name: Probe anchor capabilities
+        continue-on-error: true
+        run: node scripts/probe-capabilities.mjs
+
+      - name: Build routing index
+        continue-on-error: true
+        run: node scripts/build-routes.mjs
+
+      # ── 5b4. SEP-1 configuration drift ───────────────────────────────────────
+      # A stellar.toml is mutable and unsigned, and wallets follow it by design.
+      # This keeps a snapshot per anchor and reports when declared accounts,
+      # endpoints or currency issuers change — with a Horizon lookup on any
+      # newly declared account, so an established account and one created
+      # yesterday can be told apart. Runs regardless of the scan gate: drift is
+      # about the declaration, not about the ledger figures.
+      - name: Detect SEP-1 configuration drift
+        continue-on-error: true
+        run: node scripts/detect-toml-drift.mjs
+
+      # ── 5b5. Per-asset corridor health ───────────────────────────────────────
+      # The scan already computes byAsset totals and the API rolled them up into
+      # one verdict per anchor, hiding anchors busy in one asset and dark in
+      # another. This surfaces what was already measured.
+      - name: Build corridor matrix
+        if: steps.verify.outcome == 'success'
+        continue-on-error: true
+        run: node scripts/build-corridors.mjs
+
+      # ── 5c. Cross-chain scan → tier-labelled artifact ─────────────────────────
+      # Runs the ChainAdapter layer (docs/architecture/MULTICHAIN.md) over every
+      # tracked anchor and writes packages/web/api/v1/cross-chain.json, which
+      # cross-chain.html reads. Depends on step 5's anchors.json for the anchor
+      # list, so it runs after it.
+      #
+      # continue-on-error: a Horizon hiccup here must not block the ledger-scan
+      # JSON commit below. When it fails the previous artifact stays in place and
+      # the page's freshness stamp shows it going stale, which is the honest
+      # outcome — better than committing a half-written scan.
+      - name: Run cross-chain scan
+        continue-on-error: true
+        env:
+          HORIZON_URL: https://horizon.stellar.org
+          # Set STP_SIGNING_KEY (base64 PKCS8 Ed25519) to publish signed
+          # attestations. Without it they ship with a reproducible digest and
+          # signed: false — see scripts/cross-chain-scan.ts.
+          STP_SIGNING_KEY: ${{ secrets.STP_SIGNING_KEY }}
+          STP_SIGNER_ID: ${{ secrets.STP_SIGNER_ID }}
+        run: npx tsx scripts/cross-chain-scan.ts
+
+      # ── 6. Dispatch dark-transition webhooks ───────────────────────────────────
+      # No-ops cleanly (exit 0, clear log line) until DATABASE_URL is set and
+      # there are two finished scans to diff — see scripts/dispatch-webhooks.mjs.
+      - name: Dispatch dark-transition webhooks
+        continue-on-error: true   # a delivery failure must not block the JSON commit
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: node scripts/dispatch-webhooks.mjs
+
+      # ── 7. Publish scan digest to the Soroban oracle ───────────────────────────
+      # No-ops cleanly until ORACLE_CONTRACT_ID/ORACLE_ADMIN_SECRET are set —
+      # see scripts/publish-oracle.mjs and docs/gaps.md.
+      - name: Publish scan digest to oracle
+        continue-on-error: true
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          ORACLE_CONTRACT_ID: ${{ secrets.ORACLE_CONTRACT_ID }}
+          ORACLE_ADMIN_SECRET: ${{ secrets.ORACLE_ADMIN_SECRET }}
+          SOROBAN_RPC_URL: ${{ secrets.SOROBAN_RPC_URL }}
+        run: |
+          if [ -n "$ORACLE_CONTRACT_ID" ] && [ -n "$ORACLE_ADMIN_SECRET" ]; then
+            command -v stellar >/dev/null 2>&1 || cargo install --locked stellar-cli
+          fi
+          node scripts/publish-oracle.mjs
+
+      # ── 8. Commit updated JSON back to main ───────────────────────────────────
+      # always(): a blocked scan still has an audit artifact and a drift record
+      # worth publishing, and those are exactly the runs where the public record
+      # matters most.
+      - name: Commit and push updated API snapshot
+        if: always()
+        run: |
+          # Committed under the repository owner's identity so the contributor
+          # list stays a single name. The commit message says "hourly ledger
+          # scan" and the run that produced it is linked from the Actions tab,
+          # so nothing here is passed off as hand-written work.
+          git config user.name  "ibochivincent-lang"
+          git config user.email "290086463+ibochivincent-lang@users.noreply.github.com"
+          git add packages/web/api/v1/anchors.json packages/web/snapshot.json packages/web/api/v1/cross-chain.json \
+                  packages/web/api/v1/history.json packages/web/api/v1/verify.json \
+                  packages/web/api/v1/anchors packages/web/api/v1/evidence packages/web/api/v1/evidence.json packages/web/api/v1/anchor-fees.json packages/web/api/v1/capabilities.json packages/web/api/v1/routes.json \
+                  packages/web/api/v1/scan-verification.json packages/web/api/v1/toml-drift.json \
+                  packages/web/api/v1/corridors.json \
+                  packages/web/anchor packages/web/index.html
+          # Only commit if there are actual changes
+          git diff --staged --quiet || git commit -m "chore: hourly ledger scan $(date -u +%Y-%m-%d-%H00)"
+          git push

@@ -1,0 +1,16 @@
+name: Documentation
+description: Something is missing, wrong, or unclear in the docs
+title: "[DOCS] "
+labels: ["type:docs"]
+body:
+  - type: input
+    id: where
+    attributes:
+      label: Which document
+      placeholder: "README.md, docs/methodology.md, ..."
+    validations: { required: true }
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is wrong or missing
+    validations: { required: true }

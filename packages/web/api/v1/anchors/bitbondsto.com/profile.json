@@ -1,0 +1,121 @@
+{
+  "anchorId": "bitbondsto.com",
+  "name": "Bitbond Finance GmbH",
+  "asOf": "2026-09-05T15:48:32.076Z",
+  "verification": {
+    "resolved": true,
+    "checkedAt": "2026-09-05T15:48:32.076Z",
+    "source": "SEP-1 stellar.toml, resolved live; issuer attribution confirmed against each issuer account's own on-chain home_domain",
+    "accounts": [
+      {
+        "account": "GD5J6HLF5666X4AZLTFTXLY46J5SW7EXRKBLEYPJP33S33MXZGV6CWFN",
+        "role": "declared"
+      },
+      {
+        "account": "GDDNUTFMGY4FSFD2I2WZNWGRU2WLJEA2YEY5IGNXS6ZBCZYOVOXGCZHX",
+        "role": "declared"
+      }
+    ]
+  },
+  "summary": {
+    "accounts": 2,
+    "live": 0,
+    "slow": 1,
+    "dark": 1,
+    "noActivity": 0,
+    "inbound": 0,
+    "outbound": 0
+  },
+  "accounts": [
+    {
+      "account": "GD5J6HLF5666X4AZLTFTXLY46J5SW7EXRKBLEYPJP33S33MXZGV6CWFN",
+      "domain": "bitbondsto.com",
+      "name": "Bitbond Finance GmbH",
+      "state": "slow",
+      "inbound": 0,
+      "outbound": 0,
+      "returns": 0,
+      "returnRate": null,
+      "hoursSinceActivity": 74.67,
+      "topCounterpartyShare": null
+    },
+    {
+      "account": "GDDNUTFMGY4FSFD2I2WZNWGRU2WLJEA2YEY5IGNXS6ZBCZYOVOXGCZHX",
+      "domain": "bitbondsto.com",
+      "name": "Bitbond Finance GmbH",
+      "state": "dark",
+      "inbound": 0,
+      "outbound": 0,
+      "returns": 0,
+      "returnRate": null,
+      "hoursSinceActivity": 1400.01,
+      "topCounterpartyShare": null
+    }
+  ],
+  "history": {
+    "GD5J6HLF5666X4AZLTFTXLY46J5SW7EXRKBLEYPJP33S33MXZGV6CWFN": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "live",
+        "in": 0,
+        "out": 0,
+        "hours": 62.02
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "live",
+        "in": 0,
+        "out": 0,
+        "hours": 66.95
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "live",
+        "in": 0,
+        "out": 0,
+        "hours": 71.27
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "slow",
+        "in": 0,
+        "out": 0,
+        "hours": 74.67
+      }
+    ],
+    "GDDNUTFMGY4FSFD2I2WZNWGRU2WLJEA2YEY5IGNXS6ZBCZYOVOXGCZHX": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "dark",
+        "in": 0,
+        "out": 0,
+        "hours": 1387.37
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "dark",
+        "in": 0,
+        "out": 0,
+        "hours": 1392.29
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "dark",
+        "in": 0,
+        "out": 0,
+        "hours": 1396.62
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "dark",
+        "in": 0,
+        "out": 0,
+        "hours": 1400.01
+      }
+    ]
+  },
+  "caveats": [
+    "A return is the honest failure mode. An anchor that accepts value, fails to settle and keeps it produces no return event and scores 0. A low rate is the absence of one kind of evidence, not evidence of good conduct.",
+    "Dark means no on-chain settlement in over 30 days. That is a fact about the ledger. Why an anchor is quiet is not something this project claims to know."
+  ]
+}

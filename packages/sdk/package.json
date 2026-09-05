@@ -1,0 +1,15 @@
+{
+  "name": "@landfall/sdk",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "Cross-chain scan orchestration: runs every ChainAdapter for one anchor, turns events into STP attestations, and reports the tier mix. See docs/architecture/MULTICHAIN.md.",
+  "scripts": {
+    "test": "tsx --test test/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^4.4.3"
+  }
+}

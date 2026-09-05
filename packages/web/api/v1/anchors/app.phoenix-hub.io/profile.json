@@ -1,0 +1,75 @@
+{
+  "anchorId": "app.phoenix-hub.io",
+  "name": "Phoenix Protocol Group",
+  "asOf": "2026-09-05T15:48:32.076Z",
+  "verification": {
+    "resolved": true,
+    "checkedAt": "2026-09-05T15:48:32.076Z",
+    "source": "SEP-1 stellar.toml, resolved live; issuer attribution confirmed against each issuer account's own on-chain home_domain",
+    "accounts": [
+      {
+        "account": "GAX5TXB5RYJNLBUR477PEXM4X75APK2PGMTN6KEFQSESGWFXEAKFSXJO",
+        "role": "declared"
+      }
+    ]
+  },
+  "summary": {
+    "accounts": 1,
+    "live": 1,
+    "slow": 0,
+    "dark": 0,
+    "noActivity": 0,
+    "inbound": 1,
+    "outbound": 0
+  },
+  "accounts": [
+    {
+      "account": "GAX5TXB5RYJNLBUR477PEXM4X75APK2PGMTN6KEFQSESGWFXEAKFSXJO",
+      "domain": "app.phoenix-hub.io",
+      "name": "Phoenix Protocol Group",
+      "state": "live",
+      "inbound": 1,
+      "outbound": 0,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 35.22,
+      "topCounterpartyShare": 1
+    }
+  ],
+  "history": {
+    "GAX5TXB5RYJNLBUR477PEXM4X75APK2PGMTN6KEFQSESGWFXEAKFSXJO": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "live",
+        "in": 1,
+        "out": 0,
+        "hours": 22.57
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "live",
+        "in": 1,
+        "out": 0,
+        "hours": 27.5
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "live",
+        "in": 1,
+        "out": 0,
+        "hours": 31.82
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "live",
+        "in": 1,
+        "out": 0,
+        "hours": 35.22
+      }
+    ]
+  },
+  "caveats": [
+    "A return is the honest failure mode. An anchor that accepts value, fails to settle and keeps it produces no return event and scores 0. A low rate is the absence of one kind of evidence, not evidence of good conduct.",
+    "Dark means no on-chain settlement in over 30 days. That is a fact about the ledger. Why an anchor is quiet is not something this project claims to know."
+  ]
+}

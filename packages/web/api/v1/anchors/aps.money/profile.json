@@ -1,0 +1,121 @@
+{
+  "anchorId": "aps.money",
+  "name": "Advanced Payment Solutions Ltd.",
+  "asOf": "2026-09-05T15:48:32.076Z",
+  "verification": {
+    "resolved": true,
+    "checkedAt": "2026-09-05T15:48:32.076Z",
+    "source": "SEP-1 stellar.toml, resolved live; issuer attribution confirmed against each issuer account's own on-chain home_domain",
+    "accounts": [
+      {
+        "account": "GB7OUO5NY5WQKXJJ7PFFZEJOKN4BA7IOEN3Z6SWAY26LGTREJJYZH2ZT",
+        "role": "declared"
+      },
+      {
+        "account": "GBN32NH6TMWE4ZD4G245CF3UVOQRXD4FK3FDCLZ4DE5642HWFKSLLRMB",
+        "role": "declared"
+      }
+    ]
+  },
+  "summary": {
+    "accounts": 2,
+    "live": 2,
+    "slow": 0,
+    "dark": 0,
+    "noActivity": 0,
+    "inbound": 655,
+    "outbound": 2744
+  },
+  "accounts": [
+    {
+      "account": "GB7OUO5NY5WQKXJJ7PFFZEJOKN4BA7IOEN3Z6SWAY26LGTREJJYZH2ZT",
+      "domain": "aps.money",
+      "name": "Advanced Payment Solutions Ltd.",
+      "state": "live",
+      "inbound": 2,
+      "outbound": 421,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 25.27,
+      "topCounterpartyShare": 1
+    },
+    {
+      "account": "GBN32NH6TMWE4ZD4G245CF3UVOQRXD4FK3FDCLZ4DE5642HWFKSLLRMB",
+      "domain": "aps.money",
+      "name": "Advanced Payment Solutions Ltd.",
+      "state": "live",
+      "inbound": 653,
+      "outbound": 2323,
+      "returns": 84,
+      "returnRate": 0.1286,
+      "hoursSinceActivity": 0,
+      "topCounterpartyShare": 0.9594
+    }
+  ],
+  "history": {
+    "GB7OUO5NY5WQKXJJ7PFFZEJOKN4BA7IOEN3Z6SWAY26LGTREJJYZH2ZT": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "live",
+        "in": 2,
+        "out": 421,
+        "hours": 12.62
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "live",
+        "in": 2,
+        "out": 421,
+        "hours": 17.55
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "live",
+        "in": 2,
+        "out": 421,
+        "hours": 21.87
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "live",
+        "in": 2,
+        "out": 421,
+        "hours": 25.27
+      }
+    ],
+    "GBN32NH6TMWE4ZD4G245CF3UVOQRXD4FK3FDCLZ4DE5642HWFKSLLRMB": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "live",
+        "in": 346,
+        "out": 1156,
+        "hours": 0
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "live",
+        "in": 454,
+        "out": 1543,
+        "hours": 0
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "live",
+        "in": 558,
+        "out": 1929,
+        "hours": 0.01
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "live",
+        "in": 653,
+        "out": 2323,
+        "hours": 0
+      }
+    ]
+  },
+  "caveats": [
+    "A return is the honest failure mode. An anchor that accepts value, fails to settle and keeps it produces no return event and scores 0. A low rate is the absence of one kind of evidence, not evidence of good conduct.",
+    "Dark means no on-chain settlement in over 30 days. That is a fact about the ledger. Why an anchor is quiet is not something this project claims to know."
+  ]
+}

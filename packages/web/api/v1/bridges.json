@@ -1,0 +1,100 @@
+{
+  "version": 1,
+  "note": "Cross-chain paths in and out of Stellar, and what each one asks you to trust. Stellar has no consensus-layer interoperability standard — no IBC, no XCM, no canonical rollup bridge — so every path here rests on a third party of some kind. That is the reason this project's evidence tiers exist: on a chain with native interop, 'it bridged' carries its own proof, and on Stellar it does not, so the honest unit of information is not whether value moved but what you were trusting while it did. maxTier is the strongest claim Landfall can make about a settlement observed on that path, and is capped by what the path itself publishes, not by how much of it has been built here.",
+  "maintenance": "Incidents are recorded with a public source and only when independently reported. This file is not a safety rating and must never be presented as one — an absence of incidents means no incident has been reported, which is not the same as a path being safe.",
+  "paths": [
+    {
+      "id": "cctp",
+      "name": "Circle CCTP",
+      "mechanism": "burn-and-mint",
+      "assets": ["USDC"],
+      "maxTier": "ATTESTED",
+      "trusts": "Circle's attestation service, which signs the burn message that authorises the mint.",
+      "howItWorks": "USDC is destroyed on the source chain, Circle's attestation service signs the burn, and native USDC is minted on the destination. No wrapped asset, no pooled collateral, and no bridge contract holding funds in the middle.",
+      "whyNotProven": "The link between the burn and the mint is a signature from one company, not a ledger proof. It is independently verifiable and hard to forge, which is why it is ATTESTED rather than DERIVED — but a reader is still trusting Circle to have signed honestly and to keep signing.",
+      "landfallCanVerify": true,
+      "verificationMethod": "The burn log and its Iris attestation are both fetchable, so an event can be re-checked without asking Landfall to be believed. See packages/adapters/evm-cctp.",
+      "liveOnStellar": "2026-05",
+      "connectedChains": 23,
+      "incidents": [],
+      "sources": [
+        { "label": "CCTP on Stellar", "url": "https://www.crossmint.com/announcement/cctp-stellar" },
+        { "label": "Circle CCTP developer docs", "url": "https://developers.circle.com/cctp" }
+      ]
+    },
+    {
+      "id": "allbridge-core",
+      "name": "Allbridge Core",
+      "mechanism": "liquidity pool + messaging",
+      "assets": ["USDC", "USDT"],
+      "maxTier": "DERIVED",
+      "trusts": "Pool solvency on both sides, plus the messaging layer that relays value between them.",
+      "howItWorks": "A pool is deployed per asset per chain. Tokens enter the pool on the source chain, the messaging protocol carries the value across, and the destination pool pays out native stablecoins.",
+      "whyNotProven": "Nothing is burned and nothing is proven — the destination payout comes from a pool, so the transfer is only as good as that pool's solvency and the messaging layer's integrity. Neither publishes a verifiable per-transfer artifact.",
+      "landfallCanVerify": false,
+      "verificationMethod": "No signed per-transfer artifact is published, so a transfer can be observed on each side but the two legs cannot be cryptographically bound to each other.",
+      "incidents": [
+        {
+          "date": "2026-08",
+          "summary": "Attacker drained roughly $190,000 in an operation that took nearly a month to execute.",
+          "source": "https://slowmist.medium.com/a-cross-chain-attack-spanning-one-month-analysis-of-the-allbridge-hack-32a6183bce08"
+        }
+      ],
+      "sources": [
+        { "label": "Allbridge Core launches a bridge to Stellar", "url": "https://allbridge.medium.com/allbridge-core-launches-a-bridge-to-stellar-14156f59e925" }
+      ]
+    },
+    {
+      "id": "soroban-bridge",
+      "name": "Soroban contract bridges",
+      "mechanism": "application-layer smart contract",
+      "assets": ["various"],
+      "maxTier": "DERIVED",
+      "trusts": "The correctness of one deployed contract, and whoever holds its admin keys.",
+      "howItWorks": "Anyone can deploy a bridge on Soroban permissionlessly — this is the answer to the common claim that Stellar has no permissionless wrapping. It does. What it does not have is a shared standard, so each bridge is its own trust assumption with its own bugs.",
+      "whyNotProven": "A contract is only as sound as its audit and its key management. Security review of one Stellar-Ethereum bridge contract returned three high-risk findings, including one that would have let an adversary redirect funds and another that could have bricked the bridge outright.",
+      "landfallCanVerify": false,
+      "verificationMethod": "No common artifact across implementations — each bridge would need its own adapter, and a bespoke adapter per contract is not a standard.",
+      "incidents": [
+        {
+          "date": "2024",
+          "summary": "Audit of a Soroban bridge contract found 3 high-risk and 6 medium-risk issues, including arbitrary modification of the commission collector address and a storage-exhaustion denial of service.",
+          "source": "https://www.coinspect.com/blog/soroban-source-code-audit-tricorn/"
+        }
+      ],
+      "sources": [
+        { "label": "Soroban", "url": "https://stellar.org/soroban" }
+      ]
+    },
+    {
+      "id": "intents",
+      "name": "Intent / solver networks",
+      "mechanism": "competitive solver fill",
+      "assets": ["XLM", "USDC", "and other listed assets"],
+      "maxTier": "DERIVED",
+      "trusts": "The solver that fills the order, for as long as it takes them to fill it.",
+      "howItWorks": "The user states a desired outcome and competing solvers fill it from their own inventory. The user never touches a bridge contract — they send to a solver-controlled deposit address, and the solver carries the cross-chain risk themselves.",
+      "whyNotProven": "Fast and usually cheap, but the counterparty is a solver rather than a protocol, and the two legs are separate transactions on separate chains with nothing but a memo tying them together.",
+      "landfallCanVerify": false,
+      "verificationMethod": "The deposit and the payout are independently visible, and the correlation between them is an identifier issued by the solver network rather than a proof.",
+      "incidents": [],
+      "sources": [
+        { "label": "NEAR Intents", "url": "https://near-intents.org" }
+      ]
+    },
+    {
+      "id": "cex",
+      "name": "Centralised exchange transfer",
+      "mechanism": "custodial deposit and withdrawal",
+      "assets": ["various"],
+      "maxTier": "DERIVED",
+      "trusts": "The exchange, completely, for the whole duration.",
+      "howItWorks": "Deposit on one chain, withdraw on another. Almost certainly the highest-volume cross-chain path in practice, and the least examined.",
+      "whyNotProven": "On-chain this is not a bridge at all — it is two unrelated transactions with a custodian in between. There is nothing linking them that an observer can check.",
+      "landfallCanVerify": false,
+      "verificationMethod": "None. The connection between the two legs exists only in the exchange's internal ledger.",
+      "incidents": [],
+      "sources": []
+    }
+  ]
+}

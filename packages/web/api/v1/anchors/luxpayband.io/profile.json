@@ -1,0 +1,259 @@
+{
+  "anchorId": "luxpayband.io",
+  "name": "LUX Payband, LLC",
+  "asOf": "2026-09-05T15:48:32.076Z",
+  "verification": {
+    "resolved": true,
+    "checkedAt": "2026-09-05T15:48:32.076Z",
+    "source": "SEP-1 stellar.toml, resolved live; issuer attribution confirmed against each issuer account's own on-chain home_domain",
+    "accounts": [
+      {
+        "account": "GBVB43NLVIP2USHXSKI7QQCZKZU2Z6U6A5PAHMIW7LLNVMQJTOX2BZI5",
+        "role": "declared"
+      },
+      {
+        "account": "GDTEQF6YGCKLIBD37RJZE5GTL3ZY6CBQIKH7COAW654SYEBE6XJJOLOW",
+        "role": "declared"
+      },
+      {
+        "account": "GDARCVAHFMA7GCCULAPCRAV7VXSFFMNOP3X6ZONDJU4SCJULZ6IJ77QD",
+        "role": "declared"
+      },
+      {
+        "account": "GBYYKQYUY2XWVMM4VFCBJJVCCQC3QJ3BCLV4276DWHY4BQ7V5AB4U5VA",
+        "role": "declared"
+      },
+      {
+        "account": "GDIU57QSVCGU7MTRC53RUWAADKIE75GFNG27C26URMU7CKHNXOQ5RDME",
+        "role": "declared"
+      }
+    ]
+  },
+  "summary": {
+    "accounts": 5,
+    "live": 2,
+    "slow": 0,
+    "dark": 3,
+    "noActivity": 0,
+    "inbound": 16,
+    "outbound": 1
+  },
+  "accounts": [
+    {
+      "account": "GBVB43NLVIP2USHXSKI7QQCZKZU2Z6U6A5PAHMIW7LLNVMQJTOX2BZI5",
+      "domain": "luxpayband.io",
+      "name": "LUX Payband, LLC",
+      "state": "live",
+      "inbound": 6,
+      "outbound": 0,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 6.6,
+      "topCounterpartyShare": 0.584
+    },
+    {
+      "account": "GDTEQF6YGCKLIBD37RJZE5GTL3ZY6CBQIKH7COAW654SYEBE6XJJOLOW",
+      "domain": "luxpayband.io",
+      "name": "LUX Payband, LLC",
+      "state": "dark",
+      "inbound": 0,
+      "outbound": 1,
+      "returns": 0,
+      "returnRate": null,
+      "hoursSinceActivity": 1381.57,
+      "topCounterpartyShare": null
+    },
+    {
+      "account": "GDARCVAHFMA7GCCULAPCRAV7VXSFFMNOP3X6ZONDJU4SCJULZ6IJ77QD",
+      "domain": "luxpayband.io",
+      "name": "LUX Payband, LLC",
+      "state": "dark",
+      "inbound": 0,
+      "outbound": 0,
+      "returns": 0,
+      "returnRate": null,
+      "hoursSinceActivity": 1403.15,
+      "topCounterpartyShare": null
+    },
+    {
+      "account": "GBYYKQYUY2XWVMM4VFCBJJVCCQC3QJ3BCLV4276DWHY4BQ7V5AB4U5VA",
+      "domain": "luxpayband.io",
+      "name": "LUX Payband, LLC",
+      "state": "dark",
+      "inbound": 0,
+      "outbound": 0,
+      "returns": 0,
+      "returnRate": null,
+      "hoursSinceActivity": 1403.82,
+      "topCounterpartyShare": null
+    },
+    {
+      "account": "GDIU57QSVCGU7MTRC53RUWAADKIE75GFNG27C26URMU7CKHNXOQ5RDME",
+      "domain": "luxpayband.io",
+      "name": "LUX Payband, LLC",
+      "state": "live",
+      "inbound": 10,
+      "outbound": 0,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 0.79,
+      "topCounterpartyShare": 1
+    }
+  ],
+  "history": {
+    "GBVB43NLVIP2USHXSKI7QQCZKZU2Z6U6A5PAHMIW7LLNVMQJTOX2BZI5": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "slow",
+        "in": 6,
+        "out": 0,
+        "hours": 161.34
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "slow",
+        "in": 6,
+        "out": 0,
+        "hours": 166.27
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "live",
+        "in": 6,
+        "out": 0,
+        "hours": 3.2
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "live",
+        "in": 6,
+        "out": 0,
+        "hours": 6.6
+      }
+    ],
+    "GDTEQF6YGCKLIBD37RJZE5GTL3ZY6CBQIKH7COAW654SYEBE6XJJOLOW": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "dark",
+        "in": 0,
+        "out": 1,
+        "hours": 1368.93
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "dark",
+        "in": 0,
+        "out": 1,
+        "hours": 1373.85
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "dark",
+        "in": 0,
+        "out": 1,
+        "hours": 1378.18
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "dark",
+        "in": 0,
+        "out": 1,
+        "hours": 1381.57
+      }
+    ],
+    "GDARCVAHFMA7GCCULAPCRAV7VXSFFMNOP3X6ZONDJU4SCJULZ6IJ77QD": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "dark",
+        "in": 0,
+        "out": 0,
+        "hours": 1390.5
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "dark",
+        "in": 0,
+        "out": 0,
+        "hours": 1395.43
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "dark",
+        "in": 0,
+        "out": 0,
+        "hours": 1399.76
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "dark",
+        "in": 0,
+        "out": 0,
+        "hours": 1403.15
+      }
+    ],
+    "GBYYKQYUY2XWVMM4VFCBJJVCCQC3QJ3BCLV4276DWHY4BQ7V5AB4U5VA": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "dark",
+        "in": 0,
+        "out": 0,
+        "hours": 1391.17
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "dark",
+        "in": 0,
+        "out": 0,
+        "hours": 1396.1
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "dark",
+        "in": 0,
+        "out": 0,
+        "hours": 1400.42
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "dark",
+        "in": 0,
+        "out": 0,
+        "hours": 1403.82
+      }
+    ],
+    "GDIU57QSVCGU7MTRC53RUWAADKIE75GFNG27C26URMU7CKHNXOQ5RDME": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "live",
+        "in": 9,
+        "out": 0,
+        "hours": 0.13
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "live",
+        "in": 9,
+        "out": 0,
+        "hours": 0.07
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "live",
+        "in": 10,
+        "out": 0,
+        "hours": 0.39
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "live",
+        "in": 10,
+        "out": 0,
+        "hours": 0.79
+      }
+    ]
+  },
+  "caveats": [
+    "A return is the honest failure mode. An anchor that accepts value, fails to settle and keeps it produces no return event and scores 0. A low rate is the absence of one kind of evidence, not evidence of good conduct.",
+    "Dark means no on-chain settlement in over 30 days. That is a fact about the ledger. Why an anchor is quiet is not something this project claims to know."
+  ]
+}

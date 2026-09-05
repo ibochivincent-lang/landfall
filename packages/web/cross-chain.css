@@ -1,0 +1,283 @@
+/* ---------------------------------------------------------------------------
+   cross-chain.css — the evidence-tier view.
+
+   Reuses dashboard.css for page chrome (topnav, wrap, dash-*, stat, freshness).
+   Everything here is specific to showing settlement evidence next to the tier
+   that backs it, which is the one rendering rule MULTICHAIN.md §4 insists on.
+
+   The tier palette is deliberately not three equal colours. PROVEN reads
+   strongest, DERIVED reads weakest, because they are not equally strong
+   claims and a viewer skimming the page should absorb that before they
+   read a single word.
+--------------------------------------------------------------------------- */
+
+:root {
+  --tier-proven:      #0b9c91;
+  --tier-proven-bg:   rgba(11,156,145,.10);
+  --tier-attested:    #b3801a;
+  --tier-attested-bg: rgba(179,128,26,.10);
+  --tier-derived:     #6b7d84;
+  --tier-derived-bg:  rgba(107,125,132,.10);
+}
+
+/* ── tier chips ─────────────────────────────────────────────────────────── */
+
+.tier {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .06em;
+  padding: 3px 8px;
+  border-radius: 5px;
+  border: 1px solid currentColor;
+  white-space: nowrap;
+}
+.tier--proven   { color: var(--tier-proven);   background: var(--tier-proven-bg); }
+.tier--attested { color: var(--tier-attested); background: var(--tier-attested-bg); }
+.tier--derived  { color: var(--tier-derived);  background: var(--tier-derived-bg); }
+
+/* The stat tiles are dark; the mid-tone chip colours don't carry on them, so
+   the same three tiers get lighter variants there. Same relative ordering —
+   PROVEN still reads strongest — just lifted for contrast. */
+.stat .tier--proven   { color: #4fd6c8; background: rgba(79,214,200,.14); }
+.stat .tier--attested { color: #f0c064; background: rgba(240,192,100,.14); }
+.stat .tier--derived  { color: #a9bcc2; background: rgba(169,188,194,.14); }
+
+/* ── attester banner ────────────────────────────────────────────────────── */
+
+.attester {
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--tier-attested);
+  border-radius: 10px;
+  background: #fff;
+  padding: 16px 20px;
+  margin: 0 0 28px;
+}
+.attester__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+.attester__state {
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 11px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: var(--mint);
+  color: var(--ink2);
+}
+.attester p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.65; }
+
+/* ── tier ladder legend ─────────────────────────────────────────────────── */
+
+.ladder {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+  margin: 0 0 32px;
+}
+.ladder__step {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  padding: 16px 18px;
+}
+.ladder__step p { margin: 10px 0 0; font-size: 12.5px; color: var(--muted); line-height: 1.6; }
+
+/* ── anchor cards ───────────────────────────────────────────────────────── */
+
+.xc-anchor {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  padding: 22px 24px;
+  margin: 0 0 18px;
+}
+.xc-anchor__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+.xc-anchor__id {
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -.4px;
+  margin: 0;
+}
+.xc-anchor__mix {
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 12px;
+  color: var(--muted);
+}
+.xc-anchor__note {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 0 0 16px;
+  line-height: 1.6;
+}
+
+/* ── chain rows ─────────────────────────────────────────────────────────── */
+
+.chain-row {
+  display: grid;
+  grid-template-columns: 132px 108px 84px 1fr;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+}
+.chain-row:first-of-type { border-top: 0; }
+.chain-row__name { font-weight: 700; }
+.chain-row__count {
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-weight: 500;
+  text-align: right;
+}
+.chain-row__note { color: var(--muted); font-size: 12px; line-height: 1.5; }
+
+.state {
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 10.5px;
+  letter-spacing: .06em;
+  padding: 2px 7px;
+  border-radius: 4px;
+  text-align: center;
+  white-space: nowrap;
+}
+.state--observed   { background: rgba(11,156,145,.12);  color: #077a72; }
+.state--empty      { background: var(--mint);            color: var(--muted); }
+.state--unresolved { background: rgba(107,125,132,.12);  color: var(--tier-derived); }
+.state--failed     { background: rgba(229,93,80,.12);    color: #c0392b; }
+
+/* ── per-asset volume table ─────────────────────────────────────────────── */
+
+.assets {
+  margin: 16px 0 0;
+  border-top: 1px dashed var(--line);
+  padding-top: 14px;
+}
+.assets__head {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.asset-row {
+  display: grid;
+  grid-template-columns: 92px 74px 1fr;
+  gap: 12px;
+  padding: 5px 0;
+  font-size: 13px;
+  align-items: baseline;
+}
+.asset-row__code { font-weight: 700; }
+.asset-row__count, .asset-row__vol {
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 12.5px;
+}
+.asset-row__count { color: var(--muted); }
+
+/* ── attestation viewer ─────────────────────────────────────────────────── */
+
+.attn { margin: 18px 0 0; }
+.attn > summary {
+  cursor: pointer;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--teal);
+  padding: 6px 0;
+}
+.attn > summary:hover { text-decoration: underline; }
+.attn__body { padding: 6px 0 0; }
+.attn__meta {
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--muted);
+  margin: 0 0 8px;
+  word-break: break-all;
+}
+.attn pre {
+  background: var(--ink);
+  color: #d8ece7;
+  border-radius: 9px;
+  padding: 14px 16px;
+  overflow-x: auto;
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 11.5px;
+  line-height: 1.65;
+  margin: 0 0 10px;
+}
+.attn__verify { font-size: 12px; margin: 0 0 18px; }
+.attn__verify a { color: var(--teal); font-weight: 700; }
+
+@media (max-width: 720px) {
+  .chain-row { grid-template-columns: 1fr auto; row-gap: 4px; }
+  .chain-row__note { grid-column: 1 / -1; }
+  .chain-row__count { text-align: left; }
+  .asset-row { grid-template-columns: 1fr auto; }
+  .asset-row__vol { grid-column: 1 / -1; }
+}
+
+/* ── Bridge trust registry ───────────────────────────────────────────────────
+   Describes what each cross-chain path asks you to trust. Visually distinct
+   from the scan tables above because it is reference material, not a
+   measurement — conflating the two is exactly the mistake the page argues
+   against. */
+.trust-table { display: flex; flex-direction: column; gap: 12px; }
+
+.trust-row {
+  background: #fff;
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  padding: 18px 20px;
+}
+
+.trust-row__head {
+  display: flex; align-items: center; gap: 10px;
+  flex-wrap: wrap; margin-bottom: 10px;
+}
+.trust-row__name { font-size: 15px; font-weight: 800; }
+.trust-row__mech {
+  font-size: 11px; font-weight: 700; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.4px;
+}
+.trust-row__flag {
+  font-size: 10.5px; font-weight: 800; padding: 2px 8px; border-radius: 99px;
+  text-transform: uppercase; letter-spacing: 0.3px;
+}
+.trust-row__flag.is-verifiable { background: #dcfce7; color: #166534; }
+
+.trust-row__trusts {
+  font-size: 13.5px; font-weight: 700; color: var(--ink);
+  margin: 0 0 8px;
+}
+.trust-row__how,
+.trust-row__why {
+  font-size: 12.5px; line-height: 1.6; color: var(--muted); margin: 0 0 8px;
+}
+
+.trust-row__incident {
+  background: #fef2f2; border: 1px solid #fecaca; color: #991b1b;
+  border-radius: 8px; padding: 9px 12px; margin: 8px 0 0;
+  font-size: 12px; line-height: 1.55;
+}
+.trust-row__incident a { color: #991b1b; font-weight: 700; }
+
+.trust-row__sources {
+  font-size: 11.5px; color: var(--muted);
+  margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--line);
+}
+.trust-row__sources a { color: #0b9c91; font-weight: 600; text-decoration: none; }
+.trust-row__sources a:hover { text-decoration: underline; }

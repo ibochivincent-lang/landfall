@@ -1,0 +1,61 @@
+{
+  "anchorId": "dcm.systems",
+  "name": "Transparent Network",
+  "asOf": "2026-09-05T15:48:32.076Z",
+  "verification": {
+    "resolved": true,
+    "checkedAt": "2026-09-05T15:48:32.076Z",
+    "source": "SEP-1 stellar.toml, resolved live; issuer attribution confirmed against each issuer account's own on-chain home_domain",
+    "accounts": [
+      {
+        "account": "GCJI3CP2NL6NWSCHM36XBQYCBHOTVVZWEXZALWON34KAYUGF6GEVNRTS",
+        "role": "declared"
+      }
+    ]
+  },
+  "summary": {
+    "accounts": 1,
+    "live": 0,
+    "slow": 0,
+    "dark": 1,
+    "noActivity": 0,
+    "inbound": 97,
+    "outbound": 1
+  },
+  "accounts": [
+    {
+      "account": "GCJI3CP2NL6NWSCHM36XBQYCBHOTVVZWEXZALWON34KAYUGF6GEVNRTS",
+      "domain": "dcm.systems",
+      "name": "Transparent Network",
+      "state": "dark",
+      "inbound": 97,
+      "outbound": 1,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 1201.21,
+      "topCounterpartyShare": 1
+    }
+  ],
+  "history": {
+    "GCJI3CP2NL6NWSCHM36XBQYCBHOTVVZWEXZALWON34KAYUGF6GEVNRTS": [
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "dark",
+        "in": 97,
+        "out": 1,
+        "hours": 1197.82
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "dark",
+        "in": 97,
+        "out": 1,
+        "hours": 1201.21
+      }
+    ]
+  },
+  "caveats": [
+    "A return is the honest failure mode. An anchor that accepts value, fails to settle and keeps it produces no return event and scores 0. A low rate is the absence of one kind of evidence, not evidence of good conduct.",
+    "Dark means no on-chain settlement in over 30 days. That is a fact about the ledger. Why an anchor is quiet is not something this project claims to know."
+  ]
+}

@@ -1,0 +1,121 @@
+{
+  "anchorId": "funtracker.site",
+  "name": "funtracker.site",
+  "asOf": "2026-09-05T15:48:32.076Z",
+  "verification": {
+    "resolved": true,
+    "checkedAt": "2026-09-05T15:48:32.076Z",
+    "source": "SEP-1 stellar.toml, resolved live; issuer attribution confirmed against each issuer account's own on-chain home_domain",
+    "accounts": [
+      {
+        "account": "GBUYUAI75XXWDZEKLY66CFYKQPET5JR4EENXZBUZ3YXZ7DS56Z4OKOFU",
+        "role": "declared"
+      },
+      {
+        "account": "GDW3CNKSP5AOTDQ2YCKNGC6L65CE4JDX3JS5BV427OB54HCF2J4PUEVG",
+        "role": "declared"
+      }
+    ]
+  },
+  "summary": {
+    "accounts": 2,
+    "live": 0,
+    "slow": 1,
+    "dark": 1,
+    "noActivity": 0,
+    "inbound": 2,
+    "outbound": 8
+  },
+  "accounts": [
+    {
+      "account": "GBUYUAI75XXWDZEKLY66CFYKQPET5JR4EENXZBUZ3YXZ7DS56Z4OKOFU",
+      "domain": "funtracker.site",
+      "name": "funtracker.site",
+      "state": "dark",
+      "inbound": 2,
+      "outbound": 0,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 1154.04,
+      "topCounterpartyShare": 1
+    },
+    {
+      "account": "GDW3CNKSP5AOTDQ2YCKNGC6L65CE4JDX3JS5BV427OB54HCF2J4PUEVG",
+      "domain": "funtracker.site",
+      "name": "funtracker.site",
+      "state": "slow",
+      "inbound": 0,
+      "outbound": 8,
+      "returns": 0,
+      "returnRate": null,
+      "hoursSinceActivity": 605.68,
+      "topCounterpartyShare": null
+    }
+  ],
+  "history": {
+    "GBUYUAI75XXWDZEKLY66CFYKQPET5JR4EENXZBUZ3YXZ7DS56Z4OKOFU": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "dark",
+        "in": 2,
+        "out": 0,
+        "hours": 1141.39
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "dark",
+        "in": 2,
+        "out": 0,
+        "hours": 1146.32
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "dark",
+        "in": 2,
+        "out": 0,
+        "hours": 1150.64
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "dark",
+        "in": 2,
+        "out": 0,
+        "hours": 1154.04
+      }
+    ],
+    "GDW3CNKSP5AOTDQ2YCKNGC6L65CE4JDX3JS5BV427OB54HCF2J4PUEVG": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "slow",
+        "in": 0,
+        "out": 8,
+        "hours": 593.03
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "slow",
+        "in": 0,
+        "out": 8,
+        "hours": 597.96
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "slow",
+        "in": 0,
+        "out": 8,
+        "hours": 602.28
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "slow",
+        "in": 0,
+        "out": 8,
+        "hours": 605.68
+      }
+    ]
+  },
+  "caveats": [
+    "A return is the honest failure mode. An anchor that accepts value, fails to settle and keeps it produces no return event and scores 0. A low rate is the absence of one kind of evidence, not evidence of good conduct.",
+    "Dark means no on-chain settlement in over 30 days. That is a fact about the ledger. Why an anchor is quiet is not something this project claims to know."
+  ]
+}

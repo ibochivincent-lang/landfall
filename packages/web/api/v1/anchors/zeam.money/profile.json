@@ -1,0 +1,719 @@
+{
+  "anchorId": "zeam.money",
+  "name": "ZEAM LIMITED",
+  "asOf": "2026-09-05T15:48:32.076Z",
+  "verification": {
+    "resolved": true,
+    "checkedAt": "2026-09-05T15:48:32.076Z",
+    "source": "SEP-1 stellar.toml, resolved live; issuer attribution confirmed against each issuer account's own on-chain home_domain",
+    "accounts": [
+      {
+        "account": "GAKTLPC4ZV37SSCITQ5IS5AQ4WPF4CF4VZJQPPAROSGXMYOATF5U6XPR",
+        "role": "declared"
+      },
+      {
+        "account": "GCZLKDDJ5FMVUTKDKBCQ4QJ7PBM3LQKRNYHU5VDYYG3XOXFAMJWBF2DC",
+        "role": "declared"
+      },
+      {
+        "account": "GA5ZXXHHXX766BEEB33WN7Y4SHKUX2ZIGNRVJTAJM3K7PZMBM7DEJCFL",
+        "role": "declared"
+      },
+      {
+        "account": "GAROH4EV3WVVTRQKEY43GZK3XSRBEYETRVZ7SVG5LHWOAANSMCTJBB3U",
+        "role": "declared"
+      },
+      {
+        "account": "GD3MMNHD5U5H732GTLYO7DZVUNGPVP462KVNFO4HALNPP6C7ESQAGOLD",
+        "role": "declared"
+      },
+      {
+        "account": "GAIVVKIZV2WOTOI4FB6MS2CSOH2HST7MVRKO23L3JXLCKZ7GR4BCKPZX",
+        "role": "declared"
+      },
+      {
+        "account": "GCXZTK7XDPG72MDEI655N2W4Q5MEW4MSSOFXTVR7XVBT3KZTMCRVCP42",
+        "role": "declared"
+      },
+      {
+        "account": "GDZL62FHKSJCFLX4H5ANAJCQEKOTNSSCLQHHKSSDQSIP23JTUWQVHW7X",
+        "role": "declared"
+      },
+      {
+        "account": "GCGJOW22JXLVK3DC6YOSENXFEEMMFDNKWNWQYEKKUXSDG7VDIVKAPXPQ",
+        "role": "declared"
+      },
+      {
+        "account": "GA37M2LDWCDWPCHIST3NHF7GTYX55MN7IKXI56LPQ2QRJGSZQV6HCVLI",
+        "role": "declared"
+      },
+      {
+        "account": "GAT63G6FINKAES4473ZZZT3SYJVUIXKYBVFBQYQHEZF6EE3VY5AGBTCZ",
+        "role": "declared"
+      },
+      {
+        "account": "GAM5BKSKTHYS6IE4OUHCISGI6YVH75XIMOCG4RB5TR74KZDJRSNKEURZ",
+        "role": "declared"
+      },
+      {
+        "account": "GDZBAWPUGAJI4CQTO53O6Y33WEZ4IRVDBLDYUY6EKGICP7OK53OYZARZ",
+        "role": "declared"
+      },
+      {
+        "account": "GCTG4YT2ZTYRODK5JCXFJ6V7P6HMQ62L27PPG5UGK57VUFDJ7DFDGBPZ",
+        "role": "declared"
+      },
+      {
+        "account": "GAP5YLVKIS5UCT4IPEZASWOHKFSGWCJMWZ3SSIMARADIANT4XBRKGON5",
+        "role": "declared"
+      }
+    ]
+  },
+  "summary": {
+    "accounts": 15,
+    "live": 3,
+    "slow": 0,
+    "dark": 12,
+    "noActivity": 0,
+    "inbound": 143,
+    "outbound": 137
+  },
+  "accounts": [
+    {
+      "account": "GAKTLPC4ZV37SSCITQ5IS5AQ4WPF4CF4VZJQPPAROSGXMYOATF5U6XPR",
+      "domain": "zeam.money",
+      "name": "ZEAM LIMITED",
+      "state": "dark",
+      "inbound": 2,
+      "outbound": 11,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 1779.48,
+      "topCounterpartyShare": 1
+    },
+    {
+      "account": "GCZLKDDJ5FMVUTKDKBCQ4QJ7PBM3LQKRNYHU5VDYYG3XOXFAMJWBF2DC",
+      "domain": "zeam.money",
+      "name": "ZEAM LIMITED",
+      "state": "dark",
+      "inbound": 12,
+      "outbound": 12,
+      "returns": 1,
+      "returnRate": 0.0833,
+      "hoursSinceActivity": 1779.44,
+      "topCounterpartyShare": 0.9345
+    },
+    {
+      "account": "GA5ZXXHHXX766BEEB33WN7Y4SHKUX2ZIGNRVJTAJM3K7PZMBM7DEJCFL",
+      "domain": "zeam.money",
+      "name": "ZEAM LIMITED",
+      "state": "live",
+      "inbound": 58,
+      "outbound": 62,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 29.39,
+      "topCounterpartyShare": 0.4988
+    },
+    {
+      "account": "GAROH4EV3WVVTRQKEY43GZK3XSRBEYETRVZ7SVG5LHWOAANSMCTJBB3U",
+      "domain": "zeam.money",
+      "name": "ZEAM LIMITED",
+      "state": "live",
+      "inbound": 38,
+      "outbound": 20,
+      "returns": 1,
+      "returnRate": 0.0263,
+      "hoursSinceActivity": 29.4,
+      "topCounterpartyShare": 1
+    },
+    {
+      "account": "GD3MMNHD5U5H732GTLYO7DZVUNGPVP462KVNFO4HALNPP6C7ESQAGOLD",
+      "domain": "zeam.money",
+      "name": "ZEAM LIMITED",
+      "state": "dark",
+      "inbound": 0,
+      "outbound": 2,
+      "returns": 0,
+      "returnRate": null,
+      "hoursSinceActivity": 8979.19,
+      "topCounterpartyShare": null
+    },
+    {
+      "account": "GAIVVKIZV2WOTOI4FB6MS2CSOH2HST7MVRKO23L3JXLCKZ7GR4BCKPZX",
+      "domain": "zeam.money",
+      "name": "ZEAM LIMITED",
+      "state": "dark",
+      "inbound": 2,
+      "outbound": 2,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 8368.44,
+      "topCounterpartyShare": 1
+    },
+    {
+      "account": "GCXZTK7XDPG72MDEI655N2W4Q5MEW4MSSOFXTVR7XVBT3KZTMCRVCP42",
+      "domain": "zeam.money",
+      "name": "ZEAM LIMITED",
+      "state": "dark",
+      "inbound": 11,
+      "outbound": 3,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 3557.94,
+      "topCounterpartyShare": 0.5002
+    },
+    {
+      "account": "GDZL62FHKSJCFLX4H5ANAJCQEKOTNSSCLQHHKSSDQSIP23JTUWQVHW7X",
+      "domain": "zeam.money",
+      "name": "ZEAM LIMITED",
+      "state": "dark",
+      "inbound": 2,
+      "outbound": 0,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 4225.19,
+      "topCounterpartyShare": 1
+    },
+    {
+      "account": "GCGJOW22JXLVK3DC6YOSENXFEEMMFDNKWNWQYEKKUXSDG7VDIVKAPXPQ",
+      "domain": "zeam.money",
+      "name": "ZEAM LIMITED",
+      "state": "dark",
+      "inbound": 2,
+      "outbound": 0,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 4225.2,
+      "topCounterpartyShare": 1
+    },
+    {
+      "account": "GA37M2LDWCDWPCHIST3NHF7GTYX55MN7IKXI56LPQ2QRJGSZQV6HCVLI",
+      "domain": "zeam.money",
+      "name": "ZEAM LIMITED",
+      "state": "dark",
+      "inbound": 2,
+      "outbound": 0,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 4225.21,
+      "topCounterpartyShare": 1
+    },
+    {
+      "account": "GAT63G6FINKAES4473ZZZT3SYJVUIXKYBVFBQYQHEZF6EE3VY5AGBTCZ",
+      "domain": "zeam.money",
+      "name": "ZEAM LIMITED",
+      "state": "dark",
+      "inbound": 3,
+      "outbound": 5,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 2384.48,
+      "topCounterpartyShare": 0.6
+    },
+    {
+      "account": "GAM5BKSKTHYS6IE4OUHCISGI6YVH75XIMOCG4RB5TR74KZDJRSNKEURZ",
+      "domain": "zeam.money",
+      "name": "ZEAM LIMITED",
+      "state": "dark",
+      "inbound": 6,
+      "outbound": 11,
+      "returns": 1,
+      "returnRate": 0.1667,
+      "hoursSinceActivity": 1374.78,
+      "topCounterpartyShare": 0.9998
+    },
+    {
+      "account": "GDZBAWPUGAJI4CQTO53O6Y33WEZ4IRVDBLDYUY6EKGICP7OK53OYZARZ",
+      "domain": "zeam.money",
+      "name": "ZEAM LIMITED",
+      "state": "dark",
+      "inbound": 2,
+      "outbound": 3,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 9773.59,
+      "topCounterpartyShare": 0.9524
+    },
+    {
+      "account": "GCTG4YT2ZTYRODK5JCXFJ6V7P6HMQ62L27PPG5UGK57VUFDJ7DFDGBPZ",
+      "domain": "zeam.money",
+      "name": "ZEAM LIMITED",
+      "state": "live",
+      "inbound": 2,
+      "outbound": 5,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 49.63,
+      "topCounterpartyShare": 0.9998
+    },
+    {
+      "account": "GAP5YLVKIS5UCT4IPEZASWOHKFSGWCJMWZ3SSIMARADIANT4XBRKGON5",
+      "domain": "zeam.money",
+      "name": "ZEAM LIMITED",
+      "state": "dark",
+      "inbound": 1,
+      "outbound": 1,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 4999.76,
+      "topCounterpartyShare": 1
+    }
+  ],
+  "history": {
+    "GAKTLPC4ZV37SSCITQ5IS5AQ4WPF4CF4VZJQPPAROSGXMYOATF5U6XPR": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "dark",
+        "in": 2,
+        "out": 11,
+        "hours": 1766.83
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "dark",
+        "in": 2,
+        "out": 11,
+        "hours": 1771.76
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "dark",
+        "in": 2,
+        "out": 11,
+        "hours": 1776.08
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "dark",
+        "in": 2,
+        "out": 11,
+        "hours": 1779.48
+      }
+    ],
+    "GCZLKDDJ5FMVUTKDKBCQ4QJ7PBM3LQKRNYHU5VDYYG3XOXFAMJWBF2DC": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "dark",
+        "in": 12,
+        "out": 12,
+        "hours": 1766.79
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "dark",
+        "in": 12,
+        "out": 12,
+        "hours": 1771.72
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "dark",
+        "in": 12,
+        "out": 12,
+        "hours": 1776.05
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "dark",
+        "in": 12,
+        "out": 12,
+        "hours": 1779.44
+      }
+    ],
+    "GA5ZXXHHXX766BEEB33WN7Y4SHKUX2ZIGNRVJTAJM3K7PZMBM7DEJCFL": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "live",
+        "in": 58,
+        "out": 62,
+        "hours": 16.74
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "live",
+        "in": 58,
+        "out": 62,
+        "hours": 21.67
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "live",
+        "in": 58,
+        "out": 62,
+        "hours": 25.99
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "live",
+        "in": 58,
+        "out": 62,
+        "hours": 29.39
+      }
+    ],
+    "GAROH4EV3WVVTRQKEY43GZK3XSRBEYETRVZ7SVG5LHWOAANSMCTJBB3U": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "live",
+        "in": 38,
+        "out": 20,
+        "hours": 16.75
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "live",
+        "in": 38,
+        "out": 20,
+        "hours": 21.68
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "live",
+        "in": 38,
+        "out": 20,
+        "hours": 26.01
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "live",
+        "in": 38,
+        "out": 20,
+        "hours": 29.4
+      }
+    ],
+    "GD3MMNHD5U5H732GTLYO7DZVUNGPVP462KVNFO4HALNPP6C7ESQAGOLD": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "dark",
+        "in": 0,
+        "out": 2,
+        "hours": 8966.54
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "dark",
+        "in": 0,
+        "out": 2,
+        "hours": 8971.47
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "dark",
+        "in": 0,
+        "out": 2,
+        "hours": 8975.79
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "dark",
+        "in": 0,
+        "out": 2,
+        "hours": 8979.19
+      }
+    ],
+    "GAIVVKIZV2WOTOI4FB6MS2CSOH2HST7MVRKO23L3JXLCKZ7GR4BCKPZX": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "dark",
+        "in": 2,
+        "out": 2,
+        "hours": 8355.79
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "dark",
+        "in": 2,
+        "out": 2,
+        "hours": 8360.72
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "dark",
+        "in": 2,
+        "out": 2,
+        "hours": 8365.04
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "dark",
+        "in": 2,
+        "out": 2,
+        "hours": 8368.44
+      }
+    ],
+    "GCXZTK7XDPG72MDEI655N2W4Q5MEW4MSSOFXTVR7XVBT3KZTMCRVCP42": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "dark",
+        "in": 11,
+        "out": 3,
+        "hours": 3545.29
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "dark",
+        "in": 11,
+        "out": 3,
+        "hours": 3550.22
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "dark",
+        "in": 11,
+        "out": 3,
+        "hours": 3554.54
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "dark",
+        "in": 11,
+        "out": 3,
+        "hours": 3557.94
+      }
+    ],
+    "GDZL62FHKSJCFLX4H5ANAJCQEKOTNSSCLQHHKSSDQSIP23JTUWQVHW7X": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "dark",
+        "in": 2,
+        "out": 0,
+        "hours": 4212.55
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "dark",
+        "in": 2,
+        "out": 0,
+        "hours": 4217.47
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "dark",
+        "in": 2,
+        "out": 0,
+        "hours": 4221.8
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "dark",
+        "in": 2,
+        "out": 0,
+        "hours": 4225.19
+      }
+    ],
+    "GCGJOW22JXLVK3DC6YOSENXFEEMMFDNKWNWQYEKKUXSDG7VDIVKAPXPQ": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "dark",
+        "in": 2,
+        "out": 0,
+        "hours": 4212.55
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "dark",
+        "in": 2,
+        "out": 0,
+        "hours": 4217.48
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "dark",
+        "in": 2,
+        "out": 0,
+        "hours": 4221.8
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "dark",
+        "in": 2,
+        "out": 0,
+        "hours": 4225.2
+      }
+    ],
+    "GA37M2LDWCDWPCHIST3NHF7GTYX55MN7IKXI56LPQ2QRJGSZQV6HCVLI": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "dark",
+        "in": 2,
+        "out": 0,
+        "hours": 4212.56
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "dark",
+        "in": 2,
+        "out": 0,
+        "hours": 4217.49
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "dark",
+        "in": 2,
+        "out": 0,
+        "hours": 4221.81
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "dark",
+        "in": 2,
+        "out": 0,
+        "hours": 4225.21
+      }
+    ],
+    "GAT63G6FINKAES4473ZZZT3SYJVUIXKYBVFBQYQHEZF6EE3VY5AGBTCZ": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "dark",
+        "in": 3,
+        "out": 5,
+        "hours": 2371.83
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "dark",
+        "in": 3,
+        "out": 5,
+        "hours": 2376.76
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "dark",
+        "in": 3,
+        "out": 5,
+        "hours": 2381.08
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "dark",
+        "in": 3,
+        "out": 5,
+        "hours": 2384.48
+      }
+    ],
+    "GAM5BKSKTHYS6IE4OUHCISGI6YVH75XIMOCG4RB5TR74KZDJRSNKEURZ": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "dark",
+        "in": 6,
+        "out": 11,
+        "hours": 1362.13
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "dark",
+        "in": 6,
+        "out": 11,
+        "hours": 1367.06
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "dark",
+        "in": 6,
+        "out": 11,
+        "hours": 1371.38
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "dark",
+        "in": 6,
+        "out": 11,
+        "hours": 1374.78
+      }
+    ],
+    "GDZBAWPUGAJI4CQTO53O6Y33WEZ4IRVDBLDYUY6EKGICP7OK53OYZARZ": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "dark",
+        "in": 2,
+        "out": 3,
+        "hours": 9760.94
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "dark",
+        "in": 2,
+        "out": 3,
+        "hours": 9765.87
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "dark",
+        "in": 2,
+        "out": 3,
+        "hours": 9770.2
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "dark",
+        "in": 2,
+        "out": 3,
+        "hours": 9773.59
+      }
+    ],
+    "GCTG4YT2ZTYRODK5JCXFJ6V7P6HMQ62L27PPG5UGK57VUFDJ7DFDGBPZ": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "live",
+        "in": 2,
+        "out": 5,
+        "hours": 36.98
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "live",
+        "in": 2,
+        "out": 5,
+        "hours": 41.91
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "live",
+        "in": 2,
+        "out": 5,
+        "hours": 46.23
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "live",
+        "in": 2,
+        "out": 5,
+        "hours": 49.63
+      }
+    ],
+    "GAP5YLVKIS5UCT4IPEZASWOHKFSGWCJMWZ3SSIMARADIANT4XBRKGON5": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "dark",
+        "in": 1,
+        "out": 1,
+        "hours": 4987.11
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "dark",
+        "in": 1,
+        "out": 1,
+        "hours": 4992.04
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "dark",
+        "in": 1,
+        "out": 1,
+        "hours": 4996.36
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "dark",
+        "in": 1,
+        "out": 1,
+        "hours": 4999.76
+      }
+    ]
+  },
+  "caveats": [
+    "A return is the honest failure mode. An anchor that accepts value, fails to settle and keeps it produces no return event and scores 0. A low rate is the absence of one kind of evidence, not evidence of good conduct.",
+    "Dark means no on-chain settlement in over 30 days. That is a fact about the ledger. Why an anchor is quiet is not something this project claims to know."
+  ]
+}

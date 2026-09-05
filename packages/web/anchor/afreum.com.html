@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Afreum DAO — settlement record | Landfall</title>
+<meta name="description" content="Independent, ledger-derived settlement record for afreum.com: 6 declared Stellar account(s), 0 settling, 2 dark. Every figure traces to a transaction hash.">
+<link rel="canonical" href="https://landfall-ib.vercel.app/anchor/afreum.com">
+<meta property="og:title" content="Afreum DAO — settlement record">
+<meta property="og:description" content="0 of 6 accounts settling. Read from the public Stellar ledger, not self-reported.">
+<meta property="og:type" content="website">
+<link rel="stylesheet" href="../dashboard.css">
+<link rel="stylesheet" href="../anchor.css">
+</head>
+<body class="dash-body">
+
+<header class="topnav">
+  <div class="wrap topnav__in">
+    <a href="../index.html" class="topnav__logo">landfall<span>.stellar</span></a>
+    <nav class="topnav__links">
+      <a href="../dashboard.html">Dashboard</a>
+      <a href="../cross-chain.html">Cross-chain</a>
+      <a href="../compare.html">Route Scout</a>
+      <a href="../docs.html">API</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap anchor-wrap">
+  <a class="backlink" href="../dashboard.html">← All anchors</a>
+
+  <h1 class="anchor-title">Afreum DAO</h1>
+  <p class="anchor-domain mono">afreum.com</p>
+
+  <div class="anchor-summary">
+    <div class="sum"><b>6</b><span>declared accounts</span></div>
+    <div class="sum"><b>0</b><span>settling now</span></div>
+    <div class="sum"><b class="is-dark">2</b><span>dark &gt; 30 days</span></div>
+    <div class="sum"><b>683</b><span>inbound indexed</span></div>
+    <div class="sum"><b>0</b><span>outbound indexed</span></div>
+  </div>
+
+  <section class="anchor-block">
+    <h2>Identity — verified, not assumed</h2>
+    <p>
+      These accounts are the ones <code>afreum.com</code> declares as its own in its
+      <a href="https://afreum.com/.well-known/stellar.toml" target="_blank" rel="noopener">SEP-1 <code>stellar.toml</code></a>,
+      resolved live at scan time. An account cited there as a currency <em>issuer</em> is only
+      attributed to this anchor when the issuer account's own on-chain <code>home_domain</code>
+      confirms it — a cited issuer is frequently a third party's, and reading one as the citing
+      domain's own is how a shared stablecoin issuer once got credited to a single business here.
+    </p>
+    <ul class="verify-list"><li class="mono">GBX6YI45VU…RQN54W — <strong>declared</strong></li><li class="mono">GDNUVPUOMW…JIJSYI — <strong>declared</strong></li><li class="mono">GBDTAQDRSX…DKBLHN — <strong>declared</strong></li><li class="mono">GCJFH6HI5U…IXXIEQ — <strong>declared</strong></li><li class="mono">GDDGTHJFW6…LKKZFG — <strong>declared</strong></li><li class="mono">GAGCE4AKZ5…7UKKQY — <strong>declared</strong></li></ul>
+    <p class="muted small">SEP-1 resolved successfully at 2026-09-05T15:48:32.076Z.</p>
+  </section>
+
+  <section class="anchor-block">
+    <h2>Settlement record</h2>
+    <table class="anchor-table">
+      <thead><tr><th>Account</th><th>State</th><th class="num">In</th><th class="num">Out</th><th class="num">Last seen</th><th class="num">History</th></tr></thead>
+      <tbody>
+      <tr>
+        <td class="mono"><a href="https://stellar.expert/explorer/public/account/GBX6YI45VU7WNAAKA3RBFDR3I3UKNFHTJPQ5F6KOOKSGYIAM4TRQN54W" target="_blank" rel="noopener">GBX6YI45…RQN54W</a></td>
+        <td><span class="state state--slow">slow</span></td>
+        <td class="num">339</td>
+        <td class="num">0</td>
+        <td class="num">4.0d</td>
+        <td class="num">4 obs</td>
+      </tr>
+      <tr>
+        <td class="mono"><a href="https://stellar.expert/explorer/public/account/GDNUVPUOMWOF2ML5FA5E4HQDX7EHV3VCJTLLTO563PUMZKMHJUJIJSYI" target="_blank" rel="noopener">GDNUVPUO…JIJSYI</a></td>
+        <td><span class="state state--slow">slow</span></td>
+        <td class="num">96</td>
+        <td class="num">0</td>
+        <td class="num">10.0d</td>
+        <td class="num">4 obs</td>
+      </tr>
+      <tr>
+        <td class="mono"><a href="https://stellar.expert/explorer/public/account/GBDTAQDRSX3QOEAQQKYWRGOTFE5FHQTLIH5YAF2HGUY3PBKRXWDKBLHN" target="_blank" rel="noopener">GBDTAQDR…DKBLHN</a></td>
+        <td><span class="state state--slow">slow</span></td>
+        <td class="num">7</td>
+        <td class="num">0</td>
+        <td class="num">19.8d</td>
+        <td class="num">4 obs</td>
+      </tr>
+      <tr>
+        <td class="mono"><a href="https://stellar.expert/explorer/public/account/GCJFH6HI5UPQVTUUOAS7JPOEPCQZCNGM63GWMBL6ULGUL4XUXRIXXIEQ" target="_blank" rel="noopener">GCJFH6HI…IXXIEQ</a></td>
+        <td><span class="state state--slow">slow</span></td>
+        <td class="num">241</td>
+        <td class="num">0</td>
+        <td class="num">3.5d</td>
+        <td class="num">4 obs</td>
+      </tr>
+      <tr>
+        <td class="mono"><a href="https://stellar.expert/explorer/public/account/GDDGTHJFW66SQYV2GRWRNL3AFWEHLI2IO7LTY7X743U4TUFI7VLKKZFG" target="_blank" rel="noopener">GDDGTHJF…LKKZFG</a></td>
+        <td><span class="state state--dark">dark</span></td>
+        <td class="num">0</td>
+        <td class="num">0</td>
+        <td class="num">59.2d</td>
+        <td class="num">4 obs</td>
+      </tr>
+      <tr>
+        <td class="mono"><a href="https://stellar.expert/explorer/public/account/GAGCE4AKZ55YGF4OHIODN7M3HXKZLHUDZLTLWHCGSUNWUBO7LX7UKKQY" target="_blank" rel="noopener">GAGCE4AK…7UKKQY</a></td>
+        <td><span class="state state--dark">dark</span></td>
+        <td class="num">0</td>
+        <td class="num">0</td>
+        <td class="num">348.6d</td>
+        <td class="num">4 obs</td>
+      </tr></tbody>
+    </table>
+    <p class="muted small">
+      Liveness is read directly from the ledger and cannot be self-reported: an anchor can keep a
+      status page green indefinitely, but it cannot fake on-chain silence.
+      Dark means no settlement in over 30 days — a fact about the ledger, not a claim about why.
+    </p>
+  </section>
+
+  
+  <section class="anchor-block">
+    <h2>Capabilities — declared vs observed</h2>
+    <p class="muted">This anchor's <code>stellar.toml</code> declares no SEP transfer endpoints, so there is nothing to probe. It issues assets but does not advertise a deposit or withdrawal service.</p>
+  </section>
+
+  <section class="anchor-block">
+    <h2>Machine-readable</h2>
+    <p>Everything on this page, including the observation history, as one document:</p>
+    <p><a class="api-link mono" href="../api/v1/anchors/afreum.com/profile.json">/api/v1/anchors/afreum.com/profile.json</a></p>
+  </section>
+
+  <p class="muted small asof">Scan of 2026-09-05T15:48:32.076Z · verified against stellar.expert · <a href="../docs.html">methodology</a></p>
+</main>
+
+<footer class="dash-footer">
+  <div class="wrap dash-foot-in">
+    <span>Settlement reliability derived from the public Stellar ledger — no anchor self-reporting</span>
+    <span>© 2026 Landfall · MIT</span>
+  </div>
+</footer>
+</body>
+</html>

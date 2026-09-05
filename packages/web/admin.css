@@ -1,0 +1,62 @@
+/* Landfall admin board — layers on top of dashboard.css's tokens/components. */
+
+.admin-login { display: flex; justify-content: center; padding: 48px 0; }
+.admin-login__card { max-width: 420px; width: 100%; padding: 32px; }
+.admin-login__form { display: flex; flex-direction: column; gap: 14px; margin-top: 18px; }
+.admin-login__form label { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--muted); }
+.admin-login__form input {
+  font: inherit; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px;
+  background: var(--paper); color: var(--ink);
+}
+.admin-login__form input:focus { outline: 2px solid var(--teal); outline-offset: 1px; }
+.admin-login__form button { margin-top: 6px; }
+
+.admin-error {
+  color: var(--coral); font-size: 13px; background: rgba(229,93,80,.08);
+  border: 1px solid rgba(229,93,80,.3); border-radius: 8px; padding: 8px 10px; margin: 0;
+}
+
+.admin-tabs { display: flex; gap: 6px; margin: 20px 0 18px; border-bottom: 1px solid var(--line); }
+.admin-tab {
+  font: inherit; font-weight: 600; font-size: 14px; padding: 10px 16px; border: none;
+  background: none; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent;
+}
+.admin-tab:hover { color: var(--ink); }
+.admin-tab.is-on { color: var(--teal); border-bottom-color: var(--teal); }
+
+.admin-panel { display: flex; flex-direction: column; gap: 18px; }
+
+.admin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+.admin-stat {
+  border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px;
+  display: flex; flex-direction: column; gap: 4px; background: var(--paper);
+}
+.admin-stat__label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.admin-stat__value { font-family: 'DM Mono', monospace; font-size: 20px; color: var(--ink); }
+.admin-stat--error { color: var(--coral); grid-column: 1 / -1; }
+
+.admin-h2 { font-size: 16px; margin: 0 0 6px; }
+
+.admin-badge {
+  display: inline-block; font-size: 12px; font-weight: 600; padding: 2px 8px;
+  border-radius: 999px; font-family: 'DM Mono', monospace;
+}
+.admin-badge--ok   { background: rgba(11,156,145,.12); color: var(--teal); }
+.admin-badge--warn { background: rgba(229,93,80,.12);  color: var(--coral); }
+
+.admin-empty-row { text-align: center; color: var(--muted); padding: 18px 0 !important; }
+
+.admin-inline-form { display: flex; gap: 10px; flex-wrap: wrap; margin: 10px 0; }
+.admin-inline-form input {
+  font: inherit; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px;
+  background: var(--paper); color: var(--ink); min-width: 220px; flex: 1;
+}
+.admin-inline-form input:focus { outline: 2px solid var(--teal); outline-offset: 1px; }
+
+.admin-row-actions { display: flex; gap: 6px; white-space: nowrap; }
+.admin-row-actions .dash-btn { padding: 4px 10px; font-size: 12px; }
+
+/* Keeps the payment browser's "When" column on one line - without this it
+   wraps to 3-4 lines per row, which combined with the wide asset/memo
+   columns made every row absurdly tall. */
+.admin-nowrap { white-space: nowrap; }

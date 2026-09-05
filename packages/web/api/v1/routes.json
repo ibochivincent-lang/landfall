@@ -1,0 +1,1559 @@
+{
+  "generatedAt": "2026-09-05T15:53:33.664Z",
+  "note": "Which anchors can move value into a given local currency, and which of them are demonstrably working. Joins three things that previously had to be joined by the caller: the currencies an anchor declares, whether its SEP endpoints answered when probed, and whether it has settled anything on the ledger lately.",
+  "ranking": "Ordered by evidence, not by a score. Endpoints answering and a recent settlement ranks above endpoints answering and a long silence, which ranks above a declared corridor with a dead API. Every route carries the evidence inline so a consumer that disagrees can impose its own order.",
+  "vocabulary": {
+    "observed-working": "Endpoints answered when probed AND the anchor settled on-chain within 72 hours.",
+    "observed-degraded": "Something is stale or unproven — read the ledger and api fields to see which.",
+    "api-down": "The anchor declares this corridor but none of its declared SEP endpoints answered."
+  },
+  "limits": "These are observations, not endorsements. Nothing here says an anchor is solvent, licensed, honest, or safe to use — only that its endpoints answered a probe and its accounts moved value on a public ledger. A single failed probe can be geo-blocking or a deploy rather than an outage. EUR and XOF carry no country because they span many, and assigning one would be worse than none.",
+  "corridorCount": 21,
+  "corridors": [
+    {
+      "currency": "USD",
+      "country": {
+        "code": "US",
+        "name": "United States"
+      },
+      "routes": [
+        {
+          "anchor": "ultracapital.xyz",
+          "name": "Ultra Capital LLC",
+          "asset": "YUSDC",
+          "api": {
+            "declared": 3,
+            "working": 3,
+            "workingSeps": [
+              "SEP-6",
+              "SEP-24",
+              "SEP-10"
+            ],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:25.310Z"
+          },
+          "ledger": {
+            "state": "settling",
+            "hoursSinceActivity": 0,
+            "accounts": 13
+          },
+          "fees": {
+            "pricing": "quoted-per-transaction"
+          },
+          "status": "observed-working"
+        },
+        {
+          "anchor": "zeam.money",
+          "name": "ZEAM LIMITED",
+          "asset": "USDZ",
+          "api": {
+            "declared": 4,
+            "working": 4,
+            "workingSeps": [
+              "SEP-24",
+              "SEP-31",
+              "SEP-38",
+              "SEP-10"
+            ],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:24.964Z"
+          },
+          "ledger": {
+            "state": "settling",
+            "hoursSinceActivity": 29.4,
+            "accounts": 15
+          },
+          "fees": {
+            "pricing": "published",
+            "feePercent": 0.5,
+            "feeFixed": 1
+          },
+          "status": "observed-working"
+        },
+        {
+          "anchor": "cowrie.exchange",
+          "name": "Cowrie Integrated Systems",
+          "asset": "USDC",
+          "api": {
+            "declared": 3,
+            "working": 3,
+            "workingSeps": [
+              "SEP-6",
+              "SEP-31",
+              "SEP-10"
+            ],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:23.067Z"
+          },
+          "ledger": {
+            "state": "slow",
+            "hoursSinceActivity": 297.5,
+            "accounts": 4
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-degraded"
+        },
+        {
+          "anchor": "finclusive.com",
+          "name": "FinClusive Capital, Inc.",
+          "asset": "USDC",
+          "api": {
+            "declared": 4,
+            "working": 4,
+            "workingSeps": [
+              "SEP-6",
+              "SEP-24",
+              "SEP-31",
+              "SEP-10"
+            ],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:22.089Z"
+          },
+          "ledger": {
+            "state": "untracked",
+            "hoursSinceActivity": null,
+            "accounts": 0
+          },
+          "fees": {
+            "pricing": "published",
+            "feePercent": 0,
+            "feeFixed": 0
+          },
+          "status": "observed-degraded"
+        },
+        {
+          "anchor": "stellar.moneygram.com",
+          "name": "MoneyGram",
+          "asset": "USDC",
+          "api": {
+            "declared": 2,
+            "working": 1,
+            "workingSeps": [
+              "SEP-24"
+            ],
+            "failingSeps": [
+              "SEP-10"
+            ],
+            "checkedAt": "2026-09-05T15:53:21.597Z"
+          },
+          "ledger": {
+            "state": "untracked",
+            "hoursSinceActivity": null,
+            "accounts": 0
+          },
+          "fees": {
+            "pricing": "published",
+            "feePercent": 0,
+            "feeFixed": 0
+          },
+          "status": "observed-degraded"
+        },
+        {
+          "anchor": "aps.money",
+          "name": "Advanced Payment Solutions Ltd.",
+          "asset": "APSUSDM",
+          "api": {
+            "declared": 0,
+            "working": 0,
+            "workingSeps": [],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:22.402Z"
+          },
+          "ledger": {
+            "state": "settling",
+            "hoursSinceActivity": 0,
+            "accounts": 2
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-degraded"
+        },
+        {
+          "anchor": "centre.io",
+          "name": "Centre Consortium LLC",
+          "asset": "USDC",
+          "api": {
+            "declared": 0,
+            "working": 0,
+            "workingSeps": [],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:23.104Z"
+          },
+          "ledger": {
+            "state": "settling",
+            "hoursSinceActivity": 0.7,
+            "accounts": 2
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-degraded"
+        },
+        {
+          "anchor": "luxpayband.io",
+          "name": "LUX Payband, LLC",
+          "asset": "USDP",
+          "api": {
+            "declared": 0,
+            "working": 0,
+            "workingSeps": [],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:23.508Z"
+          },
+          "ledger": {
+            "state": "settling",
+            "hoursSinceActivity": 0.8,
+            "accounts": 5
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-degraded"
+        },
+        {
+          "anchor": "stablecoin.z.com",
+          "name": "GMO-Z.com Trust Company, Inc.",
+          "asset": "ZUSD",
+          "api": {
+            "declared": 0,
+            "working": 0,
+            "workingSeps": [],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:24.138Z"
+          },
+          "ledger": {
+            "state": "settling",
+            "hoursSinceActivity": 69.2,
+            "accounts": 1
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-degraded"
+        },
+        {
+          "anchor": "afreum.com",
+          "name": "Afreum DAO",
+          "asset": "AUSD",
+          "api": {
+            "declared": 0,
+            "working": 0,
+            "workingSeps": [],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:22.204Z"
+          },
+          "ledger": {
+            "state": "slow",
+            "hoursSinceActivity": 83.2,
+            "accounts": 6
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-degraded"
+        },
+        {
+          "anchor": "funtracker.site",
+          "name": "funtracker.site",
+          "asset": "USD",
+          "api": {
+            "declared": 0,
+            "working": 0,
+            "workingSeps": [],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:23.628Z"
+          },
+          "ledger": {
+            "state": "slow",
+            "hoursSinceActivity": 605.7,
+            "accounts": 2
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-degraded"
+        },
+        {
+          "anchor": "mgusd.moneygram.com",
+          "name": "MoneyGram Payment Systems, Inc.",
+          "asset": "MGUSD",
+          "api": {
+            "declared": 0,
+            "working": 0,
+            "workingSeps": [],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:23.703Z"
+          },
+          "ledger": {
+            "state": "dark",
+            "hoursSinceActivity": 1404.4,
+            "accounts": 4
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-degraded"
+        }
+      ],
+      "counts": {
+        "total": 12,
+        "observedWorking": 2,
+        "degraded": 10,
+        "apiDown": 0
+      }
+    },
+    {
+      "currency": "NGN",
+      "country": {
+        "code": "NG",
+        "name": "Nigeria"
+      },
+      "routes": [
+        {
+          "anchor": "cowrie.exchange",
+          "name": "Cowrie Integrated Systems",
+          "asset": "NGNT",
+          "api": {
+            "declared": 3,
+            "working": 3,
+            "workingSeps": [
+              "SEP-6",
+              "SEP-31",
+              "SEP-10"
+            ],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:23.067Z"
+          },
+          "ledger": {
+            "state": "slow",
+            "hoursSinceActivity": 297.5,
+            "accounts": 4
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-degraded"
+        },
+        {
+          "anchor": "afreum.com",
+          "name": "Afreum DAO",
+          "asset": "ANGN",
+          "api": {
+            "declared": 0,
+            "working": 0,
+            "workingSeps": [],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:22.204Z"
+          },
+          "ledger": {
+            "state": "slow",
+            "hoursSinceActivity": 83.2,
+            "accounts": 6
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-degraded"
+        },
+        {
+          "anchor": "ngnc.online",
+          "name": "LINK.IO LTD.",
+          "asset": "NGNC",
+          "api": {
+            "declared": 2,
+            "working": 0,
+            "workingSeps": [],
+            "failingSeps": [
+              "SEP-24",
+              "SEP-10"
+            ],
+            "checkedAt": "2026-09-05T15:53:23.802Z"
+          },
+          "ledger": {
+            "state": "settling",
+            "hoursSinceActivity": 10.5,
+            "accounts": 2
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "api-down"
+        }
+      ],
+      "counts": {
+        "total": 3,
+        "observedWorking": 0,
+        "degraded": 2,
+        "apiDown": 1
+      }
+    },
+    {
+      "currency": "BRL",
+      "country": {
+        "code": "BR",
+        "name": "Brazil"
+      },
+      "routes": [
+        {
+          "anchor": "ntokens.com",
+          "name": "nTokens Serviços Digitais Ltda",
+          "asset": "BRL",
+          "api": {
+            "declared": 4,
+            "working": 4,
+            "workingSeps": [
+              "SEP-6",
+              "SEP-24",
+              "SEP-31",
+              "SEP-10"
+            ],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:23.473Z"
+          },
+          "ledger": {
+            "state": "slow",
+            "hoursSinceActivity": 285.4,
+            "accounts": 3
+          },
+          "fees": {
+            "pricing": "published",
+            "feePercent": 20,
+            "feeFixed": 0
+          },
+          "status": "observed-degraded"
+        },
+        {
+          "anchor": "aps.money",
+          "name": "Advanced Payment Solutions Ltd.",
+          "asset": "APSBRLM",
+          "api": {
+            "declared": 0,
+            "working": 0,
+            "workingSeps": [],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:22.402Z"
+          },
+          "ledger": {
+            "state": "settling",
+            "hoursSinceActivity": 0,
+            "accounts": 2
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-degraded"
+        },
+        {
+          "anchor": "afreum.com",
+          "name": "Afreum DAO",
+          "asset": "ABRL",
+          "api": {
+            "declared": 0,
+            "working": 0,
+            "workingSeps": [],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:22.204Z"
+          },
+          "ledger": {
+            "state": "slow",
+            "hoursSinceActivity": 83.2,
+            "accounts": 6
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-degraded"
+        }
+      ],
+      "counts": {
+        "total": 3,
+        "observedWorking": 0,
+        "degraded": 3,
+        "apiDown": 0
+      }
+    },
+    {
+      "currency": "CLP",
+      "country": {
+        "code": "CL",
+        "name": "Chile"
+      },
+      "routes": [
+        {
+          "anchor": "clpx.finance",
+          "name": "CLPX S.A.",
+          "asset": "CLPX",
+          "api": {
+            "declared": 4,
+            "working": 4,
+            "workingSeps": [
+              "SEP-6",
+              "SEP-24",
+              "SEP-31",
+              "SEP-10"
+            ],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:23.872Z"
+          },
+          "ledger": {
+            "state": "dark",
+            "hoursSinceActivity": 1230.9,
+            "accounts": 1
+          },
+          "fees": {
+            "pricing": "quoted-per-transaction"
+          },
+          "status": "observed-degraded"
+        },
+        {
+          "anchor": "aps.money",
+          "name": "Advanced Payment Solutions Ltd.",
+          "asset": "APSCLPM",
+          "api": {
+            "declared": 0,
+            "working": 0,
+            "workingSeps": [],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:22.402Z"
+          },
+          "ledger": {
+            "state": "settling",
+            "hoursSinceActivity": 0,
+            "accounts": 2
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-degraded"
+        },
+        {
+          "anchor": "afreum.com",
+          "name": "Afreum DAO",
+          "asset": "ACLP",
+          "api": {
+            "declared": 0,
+            "working": 0,
+            "workingSeps": [],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:22.204Z"
+          },
+          "ledger": {
+            "state": "slow",
+            "hoursSinceActivity": 83.2,
+            "accounts": 6
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-degraded"
+        }
+      ],
+      "counts": {
+        "total": 3,
+        "observedWorking": 0,
+        "degraded": 3,
+        "apiDown": 0
+      }
+    },
+    {
+      "currency": "PEN",
+      "country": {
+        "code": "PE",
+        "name": "Peru"
+      },
+      "routes": [
+        {
+          "anchor": "anclap.com",
+          "name": "Grupo Anchor S.A.",
+          "asset": "PEN",
+          "api": {
+            "declared": 3,
+            "working": 3,
+            "workingSeps": [
+              "SEP-6",
+              "SEP-24",
+              "SEP-10"
+            ],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:22.007Z"
+          },
+          "ledger": {
+            "state": "settling",
+            "hoursSinceActivity": 27.4,
+            "accounts": 3
+          },
+          "fees": {
+            "pricing": "published",
+            "feePercent": 2,
+            "feeFixed": 1
+          },
+          "status": "observed-working"
+        },
+        {
+          "anchor": "aps.money",
+          "name": "Advanced Payment Solutions Ltd.",
+          "asset": "APSPENM",
+          "api": {
+            "declared": 0,
+            "working": 0,
+            "workingSeps": [],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:22.402Z"
+          },
+          "ledger": {
+            "state": "settling",
+            "hoursSinceActivity": 0,
+            "accounts": 2
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-degraded"
+        },
+        {
+          "anchor": "afreum.com",
+          "name": "Afreum DAO",
+          "asset": "APEN",
+          "api": {
+            "declared": 0,
+            "working": 0,
+            "workingSeps": [],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:22.204Z"
+          },
+          "ledger": {
+            "state": "slow",
+            "hoursSinceActivity": 83.2,
+            "accounts": 6
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-degraded"
+        }
+      ],
+      "counts": {
+        "total": 3,
+        "observedWorking": 1,
+        "degraded": 2,
+        "apiDown": 0
+      }
+    },
+    {
+      "currency": "INR",
+      "country": {
+        "code": "IN",
+        "name": "India"
+      },
+      "routes": [
+        {
+          "anchor": "aps.money",
+          "name": "Advanced Payment Solutions Ltd.",
+          "asset": "APSINRM",
+          "api": {
+            "declared": 0,
+            "working": 0,
+            "workingSeps": [],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:22.402Z"
+          },
+          "ledger": {
+            "state": "settling",
+            "hoursSinceActivity": 0,
+            "accounts": 2
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-degraded"
+        },
+        {
+          "anchor": "afreum.com",
+          "name": "Afreum DAO",
+          "asset": "AINR",
+          "api": {
+            "declared": 0,
+            "working": 0,
+            "workingSeps": [],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:22.204Z"
+          },
+          "ledger": {
+            "state": "slow",
+            "hoursSinceActivity": 83.2,
+            "accounts": 6
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-degraded"
+        },
+        {
+          "anchor": "funtracker.site",
+          "name": "funtracker.site",
+          "asset": "INR",
+          "api": {
+            "declared": 0,
+            "working": 0,
+            "workingSeps": [],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:23.628Z"
+          },
+          "ledger": {
+            "state": "slow",
+            "hoursSinceActivity": 605.7,
+            "accounts": 2
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-degraded"
+        }
+      ],
+      "counts": {
+        "total": 3,
+        "observedWorking": 0,
+        "degraded": 3,
+        "apiDown": 0
+      }
+    },
+    {
+      "currency": "AUD",
+      "country": {
+        "code": "AU",
+        "name": "Australia"
+      },
+      "routes": [
+        {
+          "anchor": "audd.digital",
+          "name": "AUDC PTY LTD",
+          "asset": "AUDD",
+          "api": {
+            "declared": 0,
+            "working": 0,
+            "workingSeps": [],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:24.696Z"
+          },
+          "ledger": {
+            "state": "settling",
+            "hoursSinceActivity": 25.9,
+            "accounts": 2
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-degraded"
+        },
+        {
+          "anchor": "afreum.com",
+          "name": "Afreum DAO",
+          "asset": "AAUD",
+          "api": {
+            "declared": 0,
+            "working": 0,
+            "workingSeps": [],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:22.204Z"
+          },
+          "ledger": {
+            "state": "slow",
+            "hoursSinceActivity": 83.2,
+            "accounts": 6
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-degraded"
+        },
+        {
+          "anchor": "pr.network",
+          "name": "PR.network LLC",
+          "asset": "AUDI",
+          "api": {
+            "declared": 0,
+            "working": 0,
+            "workingSeps": [],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:24.124Z"
+          },
+          "ledger": {
+            "state": "slow",
+            "hoursSinceActivity": 605.7,
+            "accounts": 5
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-degraded"
+        }
+      ],
+      "counts": {
+        "total": 3,
+        "observedWorking": 0,
+        "degraded": 3,
+        "apiDown": 0
+      }
+    },
+    {
+      "currency": "UAH",
+      "country": {
+        "code": "UA",
+        "name": "Ukraine"
+      },
+      "routes": [
+        {
+          "anchor": "aps.money",
+          "name": "Advanced Payment Solutions Ltd.",
+          "asset": "APSUAHM",
+          "api": {
+            "declared": 0,
+            "working": 0,
+            "workingSeps": [],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:22.402Z"
+          },
+          "ledger": {
+            "state": "settling",
+            "hoursSinceActivity": 0,
+            "accounts": 2
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-degraded"
+        },
+        {
+          "anchor": "afreum.com",
+          "name": "Afreum DAO",
+          "asset": "AUAH",
+          "api": {
+            "declared": 0,
+            "working": 0,
+            "workingSeps": [],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:22.204Z"
+          },
+          "ledger": {
+            "state": "slow",
+            "hoursSinceActivity": 83.2,
+            "accounts": 6
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-degraded"
+        },
+        {
+          "anchor": "dcm.systems",
+          "name": "Transparent Network",
+          "asset": "UAH",
+          "api": {
+            "declared": 0,
+            "working": 0,
+            "workingSeps": [],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:24.673Z"
+          },
+          "ledger": {
+            "state": "dark",
+            "hoursSinceActivity": 1201.2,
+            "accounts": 1
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-degraded"
+        }
+      ],
+      "counts": {
+        "total": 3,
+        "observedWorking": 0,
+        "degraded": 3,
+        "apiDown": 0
+      }
+    },
+    {
+      "currency": "KES",
+      "country": {
+        "code": "KE",
+        "name": "Kenya"
+      },
+      "routes": [
+        {
+          "anchor": "afreum.com",
+          "name": "Afreum DAO",
+          "asset": "AKES",
+          "api": {
+            "declared": 0,
+            "working": 0,
+            "workingSeps": [],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:22.204Z"
+          },
+          "ledger": {
+            "state": "slow",
+            "hoursSinceActivity": 83.2,
+            "accounts": 6
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-degraded"
+        },
+        {
+          "anchor": "ngnc.online",
+          "name": "LINK.IO LTD.",
+          "asset": "KESC",
+          "api": {
+            "declared": 2,
+            "working": 0,
+            "workingSeps": [],
+            "failingSeps": [
+              "SEP-24",
+              "SEP-10"
+            ],
+            "checkedAt": "2026-09-05T15:53:23.802Z"
+          },
+          "ledger": {
+            "state": "settling",
+            "hoursSinceActivity": 10.5,
+            "accounts": 2
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "api-down"
+        }
+      ],
+      "counts": {
+        "total": 2,
+        "observedWorking": 0,
+        "degraded": 1,
+        "apiDown": 1
+      }
+    },
+    {
+      "currency": "GHS",
+      "country": {
+        "code": "GH",
+        "name": "Ghana"
+      },
+      "routes": [
+        {
+          "anchor": "afreum.com",
+          "name": "Afreum DAO",
+          "asset": "AGHS",
+          "api": {
+            "declared": 0,
+            "working": 0,
+            "workingSeps": [],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:22.204Z"
+          },
+          "ledger": {
+            "state": "slow",
+            "hoursSinceActivity": 83.2,
+            "accounts": 6
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-degraded"
+        },
+        {
+          "anchor": "ngnc.online",
+          "name": "LINK.IO LTD.",
+          "asset": "GHSC",
+          "api": {
+            "declared": 2,
+            "working": 0,
+            "workingSeps": [],
+            "failingSeps": [
+              "SEP-24",
+              "SEP-10"
+            ],
+            "checkedAt": "2026-09-05T15:53:23.802Z"
+          },
+          "ledger": {
+            "state": "settling",
+            "hoursSinceActivity": 10.5,
+            "accounts": 2
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "api-down"
+        }
+      ],
+      "counts": {
+        "total": 2,
+        "observedWorking": 0,
+        "degraded": 1,
+        "apiDown": 1
+      }
+    },
+    {
+      "currency": "ZAR",
+      "country": {
+        "code": "ZA",
+        "name": "South Africa"
+      },
+      "routes": [
+        {
+          "anchor": "zeam.money",
+          "name": "ZEAM LIMITED",
+          "asset": "ZARZ",
+          "api": {
+            "declared": 4,
+            "working": 4,
+            "workingSeps": [
+              "SEP-24",
+              "SEP-31",
+              "SEP-38",
+              "SEP-10"
+            ],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:24.964Z"
+          },
+          "ledger": {
+            "state": "settling",
+            "hoursSinceActivity": 29.4,
+            "accounts": 15
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-working"
+        },
+        {
+          "anchor": "afreum.com",
+          "name": "Afreum DAO",
+          "asset": "AZAR",
+          "api": {
+            "declared": 0,
+            "working": 0,
+            "workingSeps": [],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:22.204Z"
+          },
+          "ledger": {
+            "state": "slow",
+            "hoursSinceActivity": 83.2,
+            "accounts": 6
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-degraded"
+        }
+      ],
+      "counts": {
+        "total": 2,
+        "observedWorking": 1,
+        "degraded": 1,
+        "apiDown": 0
+      }
+    },
+    {
+      "currency": "ARS",
+      "country": {
+        "code": "AR",
+        "name": "Argentina"
+      },
+      "routes": [
+        {
+          "anchor": "anclap.com",
+          "name": "Grupo Anchor S.A.",
+          "asset": "ARS",
+          "api": {
+            "declared": 3,
+            "working": 3,
+            "workingSeps": [
+              "SEP-6",
+              "SEP-24",
+              "SEP-10"
+            ],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:22.007Z"
+          },
+          "ledger": {
+            "state": "settling",
+            "hoursSinceActivity": 27.4,
+            "accounts": 3
+          },
+          "fees": {
+            "pricing": "published",
+            "feePercent": 2,
+            "feeFixed": 10
+          },
+          "status": "observed-working"
+        },
+        {
+          "anchor": "afreum.com",
+          "name": "Afreum DAO",
+          "asset": "AARS",
+          "api": {
+            "declared": 0,
+            "working": 0,
+            "workingSeps": [],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:22.204Z"
+          },
+          "ledger": {
+            "state": "slow",
+            "hoursSinceActivity": 83.2,
+            "accounts": 6
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-degraded"
+        }
+      ],
+      "counts": {
+        "total": 2,
+        "observedWorking": 1,
+        "degraded": 1,
+        "apiDown": 0
+      }
+    },
+    {
+      "currency": "IDR",
+      "country": {
+        "code": "ID",
+        "name": "Indonesia"
+      },
+      "routes": [
+        {
+          "anchor": "aps.money",
+          "name": "Advanced Payment Solutions Ltd.",
+          "asset": "APSIDRM",
+          "api": {
+            "declared": 0,
+            "working": 0,
+            "workingSeps": [],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:22.402Z"
+          },
+          "ledger": {
+            "state": "settling",
+            "hoursSinceActivity": 0,
+            "accounts": 2
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-degraded"
+        },
+        {
+          "anchor": "afreum.com",
+          "name": "Afreum DAO",
+          "asset": "AIDR",
+          "api": {
+            "declared": 0,
+            "working": 0,
+            "workingSeps": [],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:22.204Z"
+          },
+          "ledger": {
+            "state": "slow",
+            "hoursSinceActivity": 83.2,
+            "accounts": 6
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-degraded"
+        }
+      ],
+      "counts": {
+        "total": 2,
+        "observedWorking": 0,
+        "degraded": 2,
+        "apiDown": 0
+      }
+    },
+    {
+      "currency": "MYR",
+      "country": {
+        "code": "MY",
+        "name": "Malaysia"
+      },
+      "routes": [
+        {
+          "anchor": "aps.money",
+          "name": "Advanced Payment Solutions Ltd.",
+          "asset": "APSMYRM",
+          "api": {
+            "declared": 0,
+            "working": 0,
+            "workingSeps": [],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:22.402Z"
+          },
+          "ledger": {
+            "state": "settling",
+            "hoursSinceActivity": 0,
+            "accounts": 2
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-degraded"
+        },
+        {
+          "anchor": "afreum.com",
+          "name": "Afreum DAO",
+          "asset": "AMYR",
+          "api": {
+            "declared": 0,
+            "working": 0,
+            "workingSeps": [],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:22.204Z"
+          },
+          "ledger": {
+            "state": "slow",
+            "hoursSinceActivity": 83.2,
+            "accounts": 6
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-degraded"
+        }
+      ],
+      "counts": {
+        "total": 2,
+        "observedWorking": 0,
+        "degraded": 2,
+        "apiDown": 0
+      }
+    },
+    {
+      "currency": "KZT",
+      "country": {
+        "code": "KZ",
+        "name": "Kazakhstan"
+      },
+      "routes": [
+        {
+          "anchor": "aps.money",
+          "name": "Advanced Payment Solutions Ltd.",
+          "asset": "APSKZTM",
+          "api": {
+            "declared": 0,
+            "working": 0,
+            "workingSeps": [],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:22.402Z"
+          },
+          "ledger": {
+            "state": "settling",
+            "hoursSinceActivity": 0,
+            "accounts": 2
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-degraded"
+        },
+        {
+          "anchor": "afreum.com",
+          "name": "Afreum DAO",
+          "asset": "AKZT",
+          "api": {
+            "declared": 0,
+            "working": 0,
+            "workingSeps": [],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:22.204Z"
+          },
+          "ledger": {
+            "state": "slow",
+            "hoursSinceActivity": 83.2,
+            "accounts": 6
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-degraded"
+        }
+      ],
+      "counts": {
+        "total": 2,
+        "observedWorking": 0,
+        "degraded": 2,
+        "apiDown": 0
+      }
+    },
+    {
+      "currency": "NZD",
+      "country": {
+        "code": "NZ",
+        "name": "New Zealand"
+      },
+      "routes": [
+        {
+          "anchor": "audd.digital",
+          "name": "AUDC PTY LTD",
+          "asset": "NZDSC",
+          "api": {
+            "declared": 0,
+            "working": 0,
+            "workingSeps": [],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:24.696Z"
+          },
+          "ledger": {
+            "state": "settling",
+            "hoursSinceActivity": 25.9,
+            "accounts": 2
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-degraded"
+        },
+        {
+          "anchor": "afreum.com",
+          "name": "Afreum DAO",
+          "asset": "ANZD",
+          "api": {
+            "declared": 0,
+            "working": 0,
+            "workingSeps": [],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:22.204Z"
+          },
+          "ledger": {
+            "state": "slow",
+            "hoursSinceActivity": 83.2,
+            "accounts": 6
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-degraded"
+        }
+      ],
+      "counts": {
+        "total": 2,
+        "observedWorking": 0,
+        "degraded": 2,
+        "apiDown": 0
+      }
+    },
+    {
+      "currency": "GBP",
+      "country": {
+        "code": "GB",
+        "name": "United Kingdom"
+      },
+      "routes": [
+        {
+          "anchor": "zeam.money",
+          "name": "ZEAM LIMITED",
+          "asset": "GBPZ",
+          "api": {
+            "declared": 4,
+            "working": 4,
+            "workingSeps": [
+              "SEP-24",
+              "SEP-31",
+              "SEP-38",
+              "SEP-10"
+            ],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:24.964Z"
+          },
+          "ledger": {
+            "state": "settling",
+            "hoursSinceActivity": 29.4,
+            "accounts": 15
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-working"
+        },
+        {
+          "anchor": "afreum.com",
+          "name": "Afreum DAO",
+          "asset": "AGBP",
+          "api": {
+            "declared": 0,
+            "working": 0,
+            "workingSeps": [],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:22.204Z"
+          },
+          "ledger": {
+            "state": "slow",
+            "hoursSinceActivity": 83.2,
+            "accounts": 6
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-degraded"
+        }
+      ],
+      "counts": {
+        "total": 2,
+        "observedWorking": 1,
+        "degraded": 1,
+        "apiDown": 0
+      }
+    },
+    {
+      "currency": "MXN",
+      "country": {
+        "code": "MX",
+        "name": "Mexico"
+      },
+      "routes": [
+        {
+          "anchor": "afreum.com",
+          "name": "Afreum DAO",
+          "asset": "AMXN",
+          "api": {
+            "declared": 0,
+            "working": 0,
+            "workingSeps": [],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:22.204Z"
+          },
+          "ledger": {
+            "state": "slow",
+            "hoursSinceActivity": 83.2,
+            "accounts": 6
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-degraded"
+        }
+      ],
+      "counts": {
+        "total": 1,
+        "observedWorking": 0,
+        "degraded": 1,
+        "apiDown": 0
+      }
+    },
+    {
+      "currency": "DZD",
+      "country": {
+        "code": "DZ",
+        "name": "Algeria"
+      },
+      "routes": [
+        {
+          "anchor": "afreum.com",
+          "name": "Afreum DAO",
+          "asset": "ADZD",
+          "api": {
+            "declared": 0,
+            "working": 0,
+            "workingSeps": [],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:22.204Z"
+          },
+          "ledger": {
+            "state": "slow",
+            "hoursSinceActivity": 83.2,
+            "accounts": 6
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-degraded"
+        }
+      ],
+      "counts": {
+        "total": 1,
+        "observedWorking": 0,
+        "degraded": 1,
+        "apiDown": 0
+      }
+    },
+    {
+      "currency": "AOA",
+      "country": {
+        "code": "AO",
+        "name": "Angola"
+      },
+      "routes": [
+        {
+          "anchor": "afreum.com",
+          "name": "Afreum DAO",
+          "asset": "AAOA",
+          "api": {
+            "declared": 0,
+            "working": 0,
+            "workingSeps": [],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:22.204Z"
+          },
+          "ledger": {
+            "state": "slow",
+            "hoursSinceActivity": 83.2,
+            "accounts": 6
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-degraded"
+        }
+      ],
+      "counts": {
+        "total": 1,
+        "observedWorking": 0,
+        "degraded": 1,
+        "apiDown": 0
+      }
+    },
+    {
+      "currency": "JPY",
+      "country": {
+        "code": "JP",
+        "name": "Japan"
+      },
+      "routes": [
+        {
+          "anchor": "afreum.com",
+          "name": "Afreum DAO",
+          "asset": "AJPY",
+          "api": {
+            "declared": 0,
+            "working": 0,
+            "workingSeps": [],
+            "failingSeps": [],
+            "checkedAt": "2026-09-05T15:53:22.204Z"
+          },
+          "ledger": {
+            "state": "slow",
+            "hoursSinceActivity": 83.2,
+            "accounts": 6
+          },
+          "fees": {
+            "pricing": "unknown"
+          },
+          "status": "observed-degraded"
+        }
+      ],
+      "counts": {
+        "total": 1,
+        "observedWorking": 0,
+        "degraded": 1,
+        "apiDown": 0
+      }
+    }
+  ]
+}

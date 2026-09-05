@@ -1,0 +1,2105 @@
+{
+  "generatedAt": "2026-09-05T15:53:33.606Z",
+  "note": "Declared capability versus observed capability. A stellar.toml entry is a claim that an anchor supports a SEP; this records whether that endpoint actually answered when asked. Directories publish the claim and nothing checks it, which is the gap this measures.",
+  "method": "One unauthenticated GET per declared endpoint, to the public /info path each SEP defines. SEP-10 is judged on answering a bare challenge request at all, since HTTP 400 is the correct response there and scoring it as failure would punish correct behaviour. Nothing is written and no transaction is created.",
+  "limits": "A failed probe means this endpoint did not answer correctly from one vantage point at one moment. It does not mean the anchor is broken, dishonest or unsafe — geo-blocking, rate limiting, a deploy in progress, or auth on a path the SEP says should be open all look identical from here. One probe is an observation, not a verdict. Repeated failures across runs are worth more than any single one, and this file records a single run.",
+  "totals": {
+    "anchors": 32,
+    "reachable": 30,
+    "declaredCapabilities": 42,
+    "observedWorking": 27,
+    "observedFailing": 8
+  },
+  "gapsFound": [
+    {
+      "domain": "mykobo.co",
+      "failing": [
+        {
+          "sep": "SEP-6",
+          "endpoint": "https://stellar.mykobo.co/sep6",
+          "note": "fetch failed"
+        },
+        {
+          "sep": "SEP-24",
+          "endpoint": "https://stellar.mykobo.co/sep24",
+          "note": "fetch failed"
+        },
+        {
+          "sep": "SEP-31",
+          "endpoint": "https://stellar.mykobo.co/sep31",
+          "note": "fetch failed"
+        },
+        {
+          "sep": "SEP-10",
+          "endpoint": "https://stellar.mykobo.co/auth",
+          "note": "fetch failed"
+        }
+      ]
+    },
+    {
+      "domain": "ngnc.online",
+      "failing": [
+        {
+          "sep": "SEP-24",
+          "endpoint": "https://anchor.ngnc.online/sep24",
+          "note": "Returned HTTP 403."
+        },
+        {
+          "sep": "SEP-10",
+          "endpoint": "https://anchor.ngnc.online/auth",
+          "note": "Returned HTTP 403."
+        }
+      ]
+    },
+    {
+      "domain": "stellar.moneygram.com",
+      "failing": [
+        {
+          "sep": "SEP-10",
+          "endpoint": "https://stellar.moneygram.com/stellaradapterservice/auth",
+          "note": "Returned HTTP 500."
+        }
+      ]
+    },
+    {
+      "domain": "stellarport.io",
+      "failing": [
+        {
+          "sep": "SEP-6",
+          "endpoint": "https://a3s.api.stellarport.io/v3/GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5",
+          "note": "fetch failed"
+        }
+      ]
+    }
+  ],
+  "anchors": [
+    {
+      "domain": "afreum.com",
+      "orgName": "Afreum DAO",
+      "reachable": true,
+      "declaredCurrencies": [
+        "AFR",
+        "AFRX",
+        "AEUR",
+        "AALL",
+        "ADZD",
+        "AUSD",
+        "AAOA",
+        "AXCD",
+        "AARS",
+        "AAMD",
+        "AAWG",
+        "AAUD",
+        "AAZN",
+        "ABSD",
+        "ABHD",
+        "ABDT",
+        "ABBD",
+        "ABYN",
+        "ABZD",
+        "AXOF",
+        "ABMD",
+        "ABTN",
+        "ABOB",
+        "ABAM",
+        "ABWP",
+        "ANOK",
+        "ABRL",
+        "ABND",
+        "ABGN",
+        "ABIF",
+        "AKHR",
+        "AXAF",
+        "ACAD",
+        "ACVE",
+        "AKYD",
+        "ACLP",
+        "ACNY",
+        "ACOP",
+        "AKMF",
+        "ANZD",
+        "ACRC",
+        "AHRK",
+        "ACUP",
+        "AANG",
+        "ACZK",
+        "ADKK",
+        "ADJF",
+        "ADOP",
+        "AEGP",
+        "AETB",
+        "AFKP",
+        "AFJD",
+        "AXPF",
+        "AGMD",
+        "AGEL",
+        "AGHS",
+        "AGIP",
+        "AGTQ",
+        "AGBP",
+        "AGNF",
+        "AGYD",
+        "AHTG",
+        "AHNL",
+        "AHKD",
+        "AHUF",
+        "AISK",
+        "AINR",
+        "AIDR",
+        "AILS",
+        "AJMD",
+        "AJPY",
+        "AJOD",
+        "AKZT",
+        "AKES",
+        "AKWD",
+        "AKGS",
+        "ALAK",
+        "ALSL",
+        "ALRD",
+        "ACHF",
+        "AMOP",
+        "AMGA",
+        "AMWK",
+        "AMYR",
+        "AMVR",
+        "AMRU",
+        "AMUR",
+        "AMXN",
+        "AMDL",
+        "AMNT",
+        "AMAD",
+        "AMZN",
+        "AMMK",
+        "ANAD",
+        "ANPR",
+        "ANIO",
+        "ANGN",
+        "AMKD",
+        "AOMR",
+        "APKR",
+        "APGK",
+        "APYG",
+        "APEN",
+        "APHP",
+        "APLN",
+        "AQAR",
+        "ARON",
+        "ARUB",
+        "ARWF",
+        "ASHP",
+        "AWST",
+        "ASTN",
+        "ASAR",
+        "ARSD",
+        "ASCR",
+        "ASLL",
+        "ASGD",
+        "ASBD",
+        "AZAR",
+        "AKRW",
+        "ALKR",
+        "ASRD",
+        "ASZL",
+        "ASEK",
+        "ATWD",
+        "ATJS",
+        "ATZS",
+        "ATHB",
+        "ATOP",
+        "ATTD",
+        "ATND",
+        "ATRY",
+        "ATMT",
+        "AUGX",
+        "AUAH",
+        "AAED",
+        "AUYU",
+        "AUZS",
+        "AVUV",
+        "AVES",
+        "AVND",
+        "AZMW",
+        "AZWL",
+        "AAFN",
+        "AIQD",
+        "AIRR",
+        "AKPW",
+        "ALBP",
+        "APAB",
+        "ASVC",
+        "ASYP",
+        "AYER",
+        "ASOS",
+        "ACDF",
+        "ASSP",
+        "ASDG",
+        "ALYD",
+        "AERN"
+      ],
+      "tomlLatencyMs": 110,
+      "checkedAt": "2026-09-05T15:53:22.204Z",
+      "counts": {
+        "declared": 0,
+        "observedWorking": 0,
+        "observedFailing": 0,
+        "notProbed": 0
+      },
+      "capabilities": {
+        "SEP-6": {
+          "name": "Programmatic deposit & withdrawal",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-24": {
+          "name": "Hosted deposit & withdrawal",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-31": {
+          "name": "Cross-border payments",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-38": {
+          "name": "Firm quotes",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-12": {
+          "name": "KYC",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-10": {
+          "name": "Web authentication",
+          "declared": false,
+          "observed": "n/a"
+        }
+      }
+    },
+    {
+      "domain": "anclap.com",
+      "orgName": "Grupo Anchor S.A.",
+      "reachable": true,
+      "declaredCurrencies": [
+        "PEN",
+        "ARS"
+      ],
+      "tomlLatencyMs": 239,
+      "checkedAt": "2026-09-05T15:53:22.007Z",
+      "counts": {
+        "declared": 4,
+        "observedWorking": 3,
+        "observedFailing": 0,
+        "notProbed": 1
+      },
+      "capabilities": {
+        "SEP-6": {
+          "name": "Programmatic deposit & withdrawal",
+          "declared": true,
+          "endpoint": "https://api.anclap.com/transfer6",
+          "observed": "yes",
+          "latencyMs": 228,
+          "httpStatus": 200,
+          "assets": {
+            "deposit": [
+              "ARS",
+              "PEN"
+            ],
+            "withdraw": [
+              "ARS",
+              "PEN"
+            ]
+          },
+          "note": "2 depositable, 2 withdrawable asset(s)."
+        },
+        "SEP-24": {
+          "name": "Hosted deposit & withdrawal",
+          "declared": true,
+          "endpoint": "https://api.anclap.com/transfer24",
+          "observed": "yes",
+          "latencyMs": 244,
+          "httpStatus": 200,
+          "assets": {
+            "deposit": [
+              "ARS",
+              "PEN"
+            ],
+            "withdraw": [
+              "ARS",
+              "PEN"
+            ]
+          },
+          "note": "2 depositable, 2 withdrawable asset(s)."
+        },
+        "SEP-31": {
+          "name": "Cross-border payments",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-38": {
+          "name": "Firm quotes",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-12": {
+          "name": "KYC",
+          "declared": true,
+          "endpoint": "https://api.anclap.com/kycserver12",
+          "observed": "not-probed",
+          "note": "No public capability document is defined for this SEP."
+        },
+        "SEP-10": {
+          "name": "Web authentication",
+          "declared": true,
+          "endpoint": "https://api.anclap.com/auth",
+          "observed": "yes",
+          "latencyMs": 73,
+          "httpStatus": 400,
+          "note": "Answered a bare challenge request, which is the expected behaviour."
+        }
+      }
+    },
+    {
+      "domain": "app.phoenix-hub.io",
+      "orgName": "Phoenix Protocol Group",
+      "reachable": true,
+      "declaredCurrencies": [
+        "PHO"
+      ],
+      "tomlLatencyMs": 162,
+      "checkedAt": "2026-09-05T15:53:22.366Z",
+      "counts": {
+        "declared": 0,
+        "observedWorking": 0,
+        "observedFailing": 0,
+        "notProbed": 0
+      },
+      "capabilities": {
+        "SEP-6": {
+          "name": "Programmatic deposit & withdrawal",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-24": {
+          "name": "Hosted deposit & withdrawal",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-31": {
+          "name": "Cross-border payments",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-38": {
+          "name": "Firm quotes",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-12": {
+          "name": "KYC",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-10": {
+          "name": "Web authentication",
+          "declared": false,
+          "observed": "n/a"
+        }
+      }
+    },
+    {
+      "domain": "aps.money",
+      "orgName": "Advanced Payment Solutions Ltd.",
+      "reachable": true,
+      "declaredCurrencies": [
+        "APSBRLM",
+        "APSCLPM",
+        "APSEURM",
+        "APSIDRM",
+        "APSINRM",
+        "APSKZTM",
+        "APSMYRM",
+        "APSPENM",
+        "APSRUBM",
+        "APSTHBM",
+        "APSUAHM",
+        "APSUSDM",
+        "APSVNDM"
+      ],
+      "tomlLatencyMs": 35,
+      "checkedAt": "2026-09-05T15:53:22.402Z",
+      "counts": {
+        "declared": 0,
+        "observedWorking": 0,
+        "observedFailing": 0,
+        "notProbed": 0
+      },
+      "capabilities": {
+        "SEP-6": {
+          "name": "Programmatic deposit & withdrawal",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-24": {
+          "name": "Hosted deposit & withdrawal",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-31": {
+          "name": "Cross-border payments",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-38": {
+          "name": "Firm quotes",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-12": {
+          "name": "KYC",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-10": {
+          "name": "Web authentication",
+          "declared": false,
+          "observed": "n/a"
+        }
+      }
+    },
+    {
+      "domain": "aqua.network",
+      "orgName": "Aquarius",
+      "reachable": true,
+      "declaredCurrencies": [
+        "AQUA",
+        "ICE",
+        "DICE",
+        "GOVERNICE",
+        "UPVOTEICE",
+        "DOWNVOTEICE",
+        "GDICE"
+      ],
+      "tomlLatencyMs": 49,
+      "checkedAt": "2026-09-05T15:53:22.452Z",
+      "counts": {
+        "declared": 0,
+        "observedWorking": 0,
+        "observedFailing": 0,
+        "notProbed": 0
+      },
+      "capabilities": {
+        "SEP-6": {
+          "name": "Programmatic deposit & withdrawal",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-24": {
+          "name": "Hosted deposit & withdrawal",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-31": {
+          "name": "Cross-border payments",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-38": {
+          "name": "Firm quotes",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-12": {
+          "name": "KYC",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-10": {
+          "name": "Web authentication",
+          "declared": false,
+          "observed": "n/a"
+        }
+      }
+    },
+    {
+      "domain": "audd.digital",
+      "orgName": "AUDC PTY LTD",
+      "reachable": true,
+      "declaredCurrencies": [
+        "AUDD",
+        "NZDSC"
+      ],
+      "tomlLatencyMs": 572,
+      "checkedAt": "2026-09-05T15:53:24.696Z",
+      "counts": {
+        "declared": 0,
+        "observedWorking": 0,
+        "observedFailing": 0,
+        "notProbed": 0
+      },
+      "capabilities": {
+        "SEP-6": {
+          "name": "Programmatic deposit & withdrawal",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-24": {
+          "name": "Hosted deposit & withdrawal",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-31": {
+          "name": "Cross-border payments",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-38": {
+          "name": "Firm quotes",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-12": {
+          "name": "KYC",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-10": {
+          "name": "Web authentication",
+          "declared": false,
+          "observed": "n/a"
+        }
+      }
+    },
+    {
+      "domain": "bitbondsto.com",
+      "orgName": "Bitbond Finance GmbH",
+      "reachable": true,
+      "declaredCurrencies": [
+        "BB1"
+      ],
+      "tomlLatencyMs": 711,
+      "checkedAt": "2026-09-05T15:53:23.164Z",
+      "counts": {
+        "declared": 0,
+        "observedWorking": 0,
+        "observedFailing": 0,
+        "notProbed": 0
+      },
+      "capabilities": {
+        "SEP-6": {
+          "name": "Programmatic deposit & withdrawal",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-24": {
+          "name": "Hosted deposit & withdrawal",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-31": {
+          "name": "Cross-border payments",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-38": {
+          "name": "Firm quotes",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-12": {
+          "name": "KYC",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-10": {
+          "name": "Web authentication",
+          "declared": false,
+          "observed": "n/a"
+        }
+      }
+    },
+    {
+      "domain": "centre.io",
+      "orgName": "Centre Consortium LLC",
+      "reachable": true,
+      "declaredCurrencies": [
+        "USDC"
+      ],
+      "tomlLatencyMs": 37,
+      "checkedAt": "2026-09-05T15:53:23.104Z",
+      "counts": {
+        "declared": 0,
+        "observedWorking": 0,
+        "observedFailing": 0,
+        "notProbed": 0
+      },
+      "capabilities": {
+        "SEP-6": {
+          "name": "Programmatic deposit & withdrawal",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-24": {
+          "name": "Hosted deposit & withdrawal",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-31": {
+          "name": "Cross-border payments",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-38": {
+          "name": "Firm quotes",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-12": {
+          "name": "KYC",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-10": {
+          "name": "Web authentication",
+          "declared": false,
+          "observed": "n/a"
+        }
+      }
+    },
+    {
+      "domain": "clickpesa.com",
+      "reachable": false,
+      "note": "stellar.toml did not resolve: HTTP 404. Nothing further could be checked.",
+      "capabilities": {}
+    },
+    {
+      "domain": "clpx.finance",
+      "orgName": "CLPX S.A.",
+      "reachable": true,
+      "declaredCurrencies": [
+        "CLPX"
+      ],
+      "tomlLatencyMs": 675,
+      "checkedAt": "2026-09-05T15:53:23.872Z",
+      "counts": {
+        "declared": 5,
+        "observedWorking": 4,
+        "observedFailing": 0,
+        "notProbed": 1
+      },
+      "capabilities": {
+        "SEP-6": {
+          "name": "Programmatic deposit & withdrawal",
+          "declared": true,
+          "endpoint": "https://kbtrading.org/sep6",
+          "observed": "yes",
+          "latencyMs": 471,
+          "httpStatus": 200,
+          "assets": {
+            "deposit": [
+              "CLPX",
+              "BTCLN"
+            ],
+            "withdraw": [
+              "CLPX",
+              "BTCLN"
+            ]
+          },
+          "note": "2 depositable, 2 withdrawable asset(s)."
+        },
+        "SEP-24": {
+          "name": "Hosted deposit & withdrawal",
+          "declared": true,
+          "endpoint": "https://kbtrading.org/sep24",
+          "observed": "yes",
+          "latencyMs": 274,
+          "httpStatus": 200,
+          "assets": {
+            "deposit": [
+              "CLPX",
+              "BTCLN"
+            ],
+            "withdraw": [
+              "CLPX",
+              "BTCLN"
+            ]
+          },
+          "note": "2 depositable, 2 withdrawable asset(s)."
+        },
+        "SEP-31": {
+          "name": "Cross-border payments",
+          "declared": true,
+          "endpoint": "https://kbtrading.org/sep31",
+          "observed": "yes",
+          "latencyMs": 239,
+          "httpStatus": 200,
+          "assets": {
+            "send": [
+              "CLPX"
+            ]
+          },
+          "note": "1 corridor asset(s) advertised."
+        },
+        "SEP-38": {
+          "name": "Firm quotes",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-12": {
+          "name": "KYC",
+          "declared": true,
+          "endpoint": "https://kbtrading.org/kyc",
+          "observed": "not-probed",
+          "note": "No public capability document is defined for this SEP."
+        },
+        "SEP-10": {
+          "name": "Web authentication",
+          "declared": true,
+          "endpoint": "https://kbtrading.org/auth",
+          "observed": "yes",
+          "latencyMs": 205,
+          "httpStatus": 400,
+          "note": "Answered a bare challenge request, which is the expected behaviour."
+        }
+      }
+    },
+    {
+      "domain": "cowrie.exchange",
+      "orgName": "Cowrie Integrated Systems",
+      "reachable": true,
+      "declaredCurrencies": [
+        "NGNT"
+      ],
+      "tomlLatencyMs": 665,
+      "checkedAt": "2026-09-05T15:53:23.067Z",
+      "counts": {
+        "declared": 4,
+        "observedWorking": 3,
+        "observedFailing": 0,
+        "notProbed": 1
+      },
+      "capabilities": {
+        "SEP-6": {
+          "name": "Programmatic deposit & withdrawal",
+          "declared": true,
+          "endpoint": "https://api.cowrie.exchange/transfer",
+          "observed": "yes",
+          "latencyMs": 581,
+          "httpStatus": 200,
+          "assets": {
+            "deposit": [
+              "NGNT"
+            ],
+            "withdraw": [
+              "NGNT"
+            ]
+          },
+          "note": "1 depositable, 1 withdrawable asset(s)."
+        },
+        "SEP-24": {
+          "name": "Hosted deposit & withdrawal",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-31": {
+          "name": "Cross-border payments",
+          "declared": true,
+          "endpoint": "https://api.cowrie.exchange/sep31/direct",
+          "observed": "yes",
+          "latencyMs": 583,
+          "httpStatus": 200,
+          "assets": {
+            "send": [
+              "NGNT",
+              "USDC"
+            ]
+          },
+          "note": "2 corridor asset(s) advertised."
+        },
+        "SEP-38": {
+          "name": "Firm quotes",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-12": {
+          "name": "KYC",
+          "declared": true,
+          "endpoint": "https://api.cowrie.exchange/kyc",
+          "observed": "not-probed",
+          "note": "No public capability document is defined for this SEP."
+        },
+        "SEP-10": {
+          "name": "Web authentication",
+          "declared": true,
+          "endpoint": "https://api.cowrie.exchange/web_auth",
+          "observed": "yes",
+          "latencyMs": 74,
+          "httpStatus": 400,
+          "note": "Answered a bare challenge request, which is the expected behaviour."
+        }
+      }
+    },
+    {
+      "domain": "dcm.systems",
+      "orgName": "Transparent Network",
+      "reachable": true,
+      "declaredCurrencies": [
+        "UAH"
+      ],
+      "tomlLatencyMs": 535,
+      "checkedAt": "2026-09-05T15:53:24.673Z",
+      "counts": {
+        "declared": 0,
+        "observedWorking": 0,
+        "observedFailing": 0,
+        "notProbed": 0
+      },
+      "capabilities": {
+        "SEP-6": {
+          "name": "Programmatic deposit & withdrawal",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-24": {
+          "name": "Hosted deposit & withdrawal",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-31": {
+          "name": "Cross-border payments",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-38": {
+          "name": "Firm quotes",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-12": {
+          "name": "KYC",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-10": {
+          "name": "Web authentication",
+          "declared": false,
+          "observed": "n/a"
+        }
+      }
+    },
+    {
+      "domain": "finclusive.com",
+      "orgName": "FinClusive Capital, Inc.",
+      "reachable": true,
+      "declaredCurrencies": [
+        "XLM",
+        "USDC"
+      ],
+      "tomlLatencyMs": 122,
+      "checkedAt": "2026-09-05T15:53:22.089Z",
+      "counts": {
+        "declared": 5,
+        "observedWorking": 4,
+        "observedFailing": 0,
+        "notProbed": 1
+      },
+      "capabilities": {
+        "SEP-6": {
+          "name": "Programmatic deposit & withdrawal",
+          "declared": true,
+          "endpoint": "https://api.finclusive.com/stellar/transfer",
+          "observed": "yes",
+          "latencyMs": 175,
+          "httpStatus": 200,
+          "assets": {
+            "deposit": [
+              "XLM",
+              "USDC"
+            ],
+            "withdraw": [
+              "XLM",
+              "USDC"
+            ]
+          },
+          "note": "2 depositable, 2 withdrawable asset(s)."
+        },
+        "SEP-24": {
+          "name": "Hosted deposit & withdrawal",
+          "declared": true,
+          "endpoint": "https://api.finclusive.com/stellar/transfer",
+          "observed": "yes",
+          "latencyMs": 43,
+          "httpStatus": 200,
+          "assets": {
+            "deposit": [
+              "XLM",
+              "USDC"
+            ],
+            "withdraw": [
+              "XLM",
+              "USDC"
+            ]
+          },
+          "note": "2 depositable, 2 withdrawable asset(s)."
+        },
+        "SEP-31": {
+          "name": "Cross-border payments",
+          "declared": true,
+          "endpoint": "https://api.finclusive.com/stellar/directpayment",
+          "observed": "yes",
+          "latencyMs": 52,
+          "httpStatus": 200,
+          "assets": {
+            "send": [
+              "XLM",
+              "USDC"
+            ]
+          },
+          "note": "2 corridor asset(s) advertised."
+        },
+        "SEP-38": {
+          "name": "Firm quotes",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-12": {
+          "name": "KYC",
+          "declared": true,
+          "endpoint": "https://api.finclusive.com/stellar",
+          "observed": "not-probed",
+          "note": "No public capability document is defined for this SEP."
+        },
+        "SEP-10": {
+          "name": "Web authentication",
+          "declared": true,
+          "endpoint": "https://api.finclusive.com/stellar/authentication",
+          "observed": "yes",
+          "latencyMs": 60,
+          "httpStatus": 400,
+          "note": "Answered a bare challenge request, which is the expected behaviour."
+        }
+      }
+    },
+    {
+      "domain": "funtracker.site",
+      "orgName": null,
+      "reachable": true,
+      "declaredCurrencies": [
+        "USD",
+        "BTC",
+        "THB",
+        "MBTC",
+        "FUNT",
+        "BEER",
+        "INR"
+      ],
+      "tomlLatencyMs": 524,
+      "checkedAt": "2026-09-05T15:53:23.628Z",
+      "counts": {
+        "declared": 0,
+        "observedWorking": 0,
+        "observedFailing": 0,
+        "notProbed": 0
+      },
+      "capabilities": {
+        "SEP-6": {
+          "name": "Programmatic deposit & withdrawal",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-24": {
+          "name": "Hosted deposit & withdrawal",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-31": {
+          "name": "Cross-border payments",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-38": {
+          "name": "Firm quotes",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-12": {
+          "name": "KYC",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-10": {
+          "name": "Web authentication",
+          "declared": false,
+          "observed": "n/a"
+        }
+      }
+    },
+    {
+      "domain": "gratz.io",
+      "orgName": "Gratz",
+      "reachable": true,
+      "declaredCurrencies": [
+        "GRAT"
+      ],
+      "tomlLatencyMs": 22,
+      "checkedAt": "2026-09-05T15:53:23.187Z",
+      "counts": {
+        "declared": 0,
+        "observedWorking": 0,
+        "observedFailing": 0,
+        "notProbed": 0
+      },
+      "capabilities": {
+        "SEP-6": {
+          "name": "Programmatic deposit & withdrawal",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-24": {
+          "name": "Hosted deposit & withdrawal",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-31": {
+          "name": "Cross-border payments",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-38": {
+          "name": "Firm quotes",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-12": {
+          "name": "KYC",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-10": {
+          "name": "Web authentication",
+          "declared": false,
+          "observed": "n/a"
+        }
+      }
+    },
+    {
+      "domain": "ixinium.io",
+      "orgName": "Baltic Representative Office",
+      "reachable": true,
+      "declaredCurrencies": [
+        "XXA",
+        "IXAT"
+      ],
+      "tomlLatencyMs": 506,
+      "checkedAt": "2026-09-05T15:53:23.693Z",
+      "counts": {
+        "declared": 0,
+        "observedWorking": 0,
+        "observedFailing": 0,
+        "notProbed": 0
+      },
+      "capabilities": {
+        "SEP-6": {
+          "name": "Programmatic deposit & withdrawal",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-24": {
+          "name": "Hosted deposit & withdrawal",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-31": {
+          "name": "Cross-border payments",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-38": {
+          "name": "Firm quotes",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-12": {
+          "name": "KYC",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-10": {
+          "name": "Web authentication",
+          "declared": false,
+          "observed": "n/a"
+        }
+      }
+    },
+    {
+      "domain": "luxpayband.io",
+      "orgName": "LUX Payband, LLC",
+      "reachable": true,
+      "declaredCurrencies": [
+        "PYBC",
+        "USDP",
+        "POINTS",
+        "FOOD",
+        "DRINKS",
+        "TICKETS"
+      ],
+      "tomlLatencyMs": 35,
+      "checkedAt": "2026-09-05T15:53:23.508Z",
+      "counts": {
+        "declared": 0,
+        "observedWorking": 0,
+        "observedFailing": 0,
+        "notProbed": 0
+      },
+      "capabilities": {
+        "SEP-6": {
+          "name": "Programmatic deposit & withdrawal",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-24": {
+          "name": "Hosted deposit & withdrawal",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-31": {
+          "name": "Cross-border payments",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-38": {
+          "name": "Firm quotes",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-12": {
+          "name": "KYC",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-10": {
+          "name": "Web authentication",
+          "declared": false,
+          "observed": "n/a"
+        }
+      }
+    },
+    {
+      "domain": "mgusd.moneygram.com",
+      "orgName": "MoneyGram Payment Systems, Inc.",
+      "reachable": true,
+      "declaredCurrencies": [
+        "MGUSD"
+      ],
+      "tomlLatencyMs": 195,
+      "checkedAt": "2026-09-05T15:53:23.703Z",
+      "counts": {
+        "declared": 0,
+        "observedWorking": 0,
+        "observedFailing": 0,
+        "notProbed": 0
+      },
+      "capabilities": {
+        "SEP-6": {
+          "name": "Programmatic deposit & withdrawal",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-24": {
+          "name": "Hosted deposit & withdrawal",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-31": {
+          "name": "Cross-border payments",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-38": {
+          "name": "Firm quotes",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-12": {
+          "name": "KYC",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-10": {
+          "name": "Web authentication",
+          "declared": false,
+          "observed": "n/a"
+        }
+      }
+    },
+    {
+      "domain": "mobius.network",
+      "orgName": "Mochi, Inc.",
+      "reachable": true,
+      "declaredCurrencies": [
+        "MOBI"
+      ],
+      "tomlLatencyMs": 128,
+      "checkedAt": "2026-09-05T15:53:23.756Z",
+      "counts": {
+        "declared": 0,
+        "observedWorking": 0,
+        "observedFailing": 0,
+        "notProbed": 0
+      },
+      "capabilities": {
+        "SEP-6": {
+          "name": "Programmatic deposit & withdrawal",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-24": {
+          "name": "Hosted deposit & withdrawal",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-31": {
+          "name": "Cross-border payments",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-38": {
+          "name": "Firm quotes",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-12": {
+          "name": "KYC",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-10": {
+          "name": "Web authentication",
+          "declared": false,
+          "observed": "n/a"
+        }
+      }
+    },
+    {
+      "domain": "mykobo.co",
+      "orgName": "MYKOBO",
+      "reachable": true,
+      "declaredCurrencies": [
+        "EURC"
+      ],
+      "tomlLatencyMs": 80,
+      "checkedAt": "2026-09-05T15:53:21.379Z",
+      "counts": {
+        "declared": 5,
+        "observedWorking": 0,
+        "observedFailing": 4,
+        "notProbed": 1
+      },
+      "capabilities": {
+        "SEP-6": {
+          "name": "Programmatic deposit & withdrawal",
+          "declared": true,
+          "endpoint": "https://stellar.mykobo.co/sep6",
+          "observed": "no",
+          "latencyMs": 27,
+          "note": "fetch failed"
+        },
+        "SEP-24": {
+          "name": "Hosted deposit & withdrawal",
+          "declared": true,
+          "endpoint": "https://stellar.mykobo.co/sep24",
+          "observed": "no",
+          "latencyMs": 8,
+          "note": "fetch failed"
+        },
+        "SEP-31": {
+          "name": "Cross-border payments",
+          "declared": true,
+          "endpoint": "https://stellar.mykobo.co/sep31",
+          "observed": "no",
+          "latencyMs": 19,
+          "note": "fetch failed"
+        },
+        "SEP-38": {
+          "name": "Firm quotes",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-12": {
+          "name": "KYC",
+          "declared": true,
+          "endpoint": "https://stellar.mykobo.co/kyc",
+          "observed": "not-probed",
+          "note": "No public capability document is defined for this SEP."
+        },
+        "SEP-10": {
+          "name": "Web authentication",
+          "declared": true,
+          "endpoint": "https://stellar.mykobo.co/auth",
+          "observed": "no",
+          "latencyMs": 23,
+          "note": "fetch failed"
+        }
+      }
+    },
+    {
+      "domain": "nafuloo.com",
+      "orgName": "No one person or group owns or controls Nafuloo, and anyone can participate.",
+      "reachable": true,
+      "declaredCurrencies": [
+        "NAFU",
+        "NFIUM"
+      ],
+      "tomlLatencyMs": 87,
+      "checkedAt": "2026-09-05T15:53:23.781Z",
+      "counts": {
+        "declared": 0,
+        "observedWorking": 0,
+        "observedFailing": 0,
+        "notProbed": 0
+      },
+      "capabilities": {
+        "SEP-6": {
+          "name": "Programmatic deposit & withdrawal",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-24": {
+          "name": "Hosted deposit & withdrawal",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-31": {
+          "name": "Cross-border payments",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-38": {
+          "name": "Firm quotes",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-12": {
+          "name": "KYC",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-10": {
+          "name": "Web authentication",
+          "declared": false,
+          "observed": "n/a"
+        }
+      }
+    },
+    {
+      "domain": "ngnc.online",
+      "orgName": "LINK.IO LTD.",
+      "reachable": true,
+      "declaredCurrencies": [
+        "NGNC",
+        "GHSC",
+        "KESC"
+      ],
+      "tomlLatencyMs": 43,
+      "checkedAt": "2026-09-05T15:53:23.802Z",
+      "counts": {
+        "declared": 2,
+        "observedWorking": 0,
+        "observedFailing": 2,
+        "notProbed": 0
+      },
+      "capabilities": {
+        "SEP-6": {
+          "name": "Programmatic deposit & withdrawal",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-24": {
+          "name": "Hosted deposit & withdrawal",
+          "declared": true,
+          "endpoint": "https://anchor.ngnc.online/sep24",
+          "observed": "no",
+          "latencyMs": 24,
+          "httpStatus": 403,
+          "note": "Returned HTTP 403."
+        },
+        "SEP-31": {
+          "name": "Cross-border payments",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-38": {
+          "name": "Firm quotes",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-12": {
+          "name": "KYC",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-10": {
+          "name": "Web authentication",
+          "declared": true,
+          "endpoint": "https://anchor.ngnc.online/auth",
+          "observed": "no",
+          "latencyMs": 32,
+          "httpStatus": 403,
+          "note": "Returned HTTP 403."
+        }
+      }
+    },
+    {
+      "domain": "ntokens.com",
+      "orgName": "nTokens Serviços Digitais Ltda",
+      "reachable": true,
+      "declaredCurrencies": [
+        "BRL"
+      ],
+      "tomlLatencyMs": 579,
+      "checkedAt": "2026-09-05T15:53:23.473Z",
+      "counts": {
+        "declared": 5,
+        "observedWorking": 4,
+        "observedFailing": 0,
+        "notProbed": 1
+      },
+      "capabilities": {
+        "SEP-6": {
+          "name": "Programmatic deposit & withdrawal",
+          "declared": true,
+          "endpoint": "https://ntokens-box.bpventures.us/sep6",
+          "observed": "yes",
+          "latencyMs": 594,
+          "httpStatus": 200,
+          "assets": {
+            "deposit": [
+              "BRL"
+            ],
+            "withdraw": [
+              "BRL"
+            ]
+          },
+          "note": "1 depositable, 1 withdrawable asset(s)."
+        },
+        "SEP-24": {
+          "name": "Hosted deposit & withdrawal",
+          "declared": true,
+          "endpoint": "https://ntokens-box.bpventures.us/sep24",
+          "observed": "yes",
+          "latencyMs": 303,
+          "httpStatus": 200,
+          "assets": {
+            "deposit": [
+              "BRL"
+            ],
+            "withdraw": [
+              "BRL"
+            ]
+          },
+          "note": "1 depositable, 1 withdrawable asset(s)."
+        },
+        "SEP-31": {
+          "name": "Cross-border payments",
+          "declared": true,
+          "endpoint": "https://ntokens-box.bpventures.us/sep31",
+          "observed": "yes",
+          "latencyMs": 247,
+          "httpStatus": 200,
+          "assets": {
+            "send": [
+              "BRL"
+            ]
+          },
+          "note": "1 corridor asset(s) advertised."
+        },
+        "SEP-38": {
+          "name": "Firm quotes",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-12": {
+          "name": "KYC",
+          "declared": true,
+          "endpoint": "https://ntokens-box.bpventures.us/kyc",
+          "observed": "not-probed",
+          "note": "No public capability document is defined for this SEP."
+        },
+        "SEP-10": {
+          "name": "Web authentication",
+          "declared": true,
+          "endpoint": "https://ntokens-box.bpventures.us/auth",
+          "observed": "yes",
+          "latencyMs": 155,
+          "httpStatus": 400,
+          "note": "Answered a bare challenge request, which is the expected behaviour."
+        }
+      }
+    },
+    {
+      "domain": "pr.network",
+      "orgName": "PR.network LLC",
+      "reachable": true,
+      "declaredCurrencies": [
+        "XPR",
+        "BLANKCARD",
+        "BLANKVOTE",
+        "GHOSTVOTE",
+        "PRPOINTS",
+        "BMARLEY",
+        "EMUSK",
+        "EINSTEIN",
+        "MZUCKERBERG",
+        "TOMHANKS",
+        "MAZDA",
+        "CBALE",
+        "VPUTIN",
+        "KKARDASHIAN",
+        "BEYONCE",
+        "IBM",
+        "HEINEKEN",
+        "STEVEJOBS",
+        "UBER",
+        "VISAINC",
+        "KYLIEJENNER",
+        "SELENAGOMEZ",
+        "PHILTON",
+        "REDBULL",
+        "ZLATAN",
+        "AUSTRALIA",
+        "CRYPTOPIA",
+        "YOBIT",
+        "DOGECOIN",
+        "LITECOIN",
+        "WIKILEAKS",
+        "DOMINOSPIZZA",
+        "LDVINCI",
+        "OPERA",
+        "TMOBILE",
+        "BITCONNECT",
+        "DONALDTRUMP",
+        "YOUTUBE",
+        "POROSHENKO",
+        "ANILORAK",
+        "PRNETWORK",
+        "RAPHAEL",
+        "MICKJAGGER",
+        "FCBARCELONA",
+        "AUDI",
+        "CRONALDO",
+        "COCACOLA",
+        "JAYZ",
+        "CISCO",
+        "MCDONALDS",
+        "KKWEST",
+        "GOOGLEINC",
+        "NASA",
+        "CHASE",
+        "APPLEINC",
+        "EMINEM",
+        "MFREEMAN",
+        "JOHNNYDEPP",
+        "REALMADRIT",
+        "MESSI",
+        "RONPAUL",
+        "TESLAMOTORS",
+        "GEORGESOROS",
+        "SPOTIFY"
+      ],
+      "tomlLatencyMs": 364,
+      "checkedAt": "2026-09-05T15:53:24.124Z",
+      "counts": {
+        "declared": 0,
+        "observedWorking": 0,
+        "observedFailing": 0,
+        "notProbed": 0
+      },
+      "capabilities": {
+        "SEP-6": {
+          "name": "Programmatic deposit & withdrawal",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-24": {
+          "name": "Hosted deposit & withdrawal",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-31": {
+          "name": "Cross-border payments",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-38": {
+          "name": "Firm quotes",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-12": {
+          "name": "KYC",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-10": {
+          "name": "Web authentication",
+          "declared": false,
+          "observed": "n/a"
+        }
+      }
+    },
+    {
+      "domain": "settle.network",
+      "reachable": false,
+      "note": "stellar.toml did not resolve: The operation was aborted due to timeout. Nothing further could be checked.",
+      "capabilities": {}
+    },
+    {
+      "domain": "stablecoin.z.com",
+      "orgName": "GMO-Z.com Trust Company, Inc.",
+      "reachable": true,
+      "declaredCurrencies": [
+        "GYEN",
+        "ZUSD"
+      ],
+      "tomlLatencyMs": 89,
+      "checkedAt": "2026-09-05T15:53:24.138Z",
+      "counts": {
+        "declared": 0,
+        "observedWorking": 0,
+        "observedFailing": 0,
+        "notProbed": 0
+      },
+      "capabilities": {
+        "SEP-6": {
+          "name": "Programmatic deposit & withdrawal",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-24": {
+          "name": "Hosted deposit & withdrawal",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-31": {
+          "name": "Cross-border payments",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-38": {
+          "name": "Firm quotes",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-12": {
+          "name": "KYC",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-10": {
+          "name": "Web authentication",
+          "declared": false,
+          "observed": "n/a"
+        }
+      }
+    },
+    {
+      "domain": "stellar.moneygram.com",
+      "orgName": "MoneyGram",
+      "reachable": true,
+      "declaredCurrencies": [
+        "USDC"
+      ],
+      "tomlLatencyMs": 128,
+      "checkedAt": "2026-09-05T15:53:21.597Z",
+      "counts": {
+        "declared": 2,
+        "observedWorking": 1,
+        "observedFailing": 1,
+        "notProbed": 0
+      },
+      "capabilities": {
+        "SEP-6": {
+          "name": "Programmatic deposit & withdrawal",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-24": {
+          "name": "Hosted deposit & withdrawal",
+          "declared": true,
+          "endpoint": "https://stellar.moneygram.com/stellaradapterservice/sep24",
+          "observed": "yes",
+          "latencyMs": 68,
+          "httpStatus": 200,
+          "assets": {
+            "deposit": [
+              "USDC"
+            ],
+            "withdraw": [
+              "USDC"
+            ]
+          },
+          "note": "1 depositable, 1 withdrawable asset(s)."
+        },
+        "SEP-31": {
+          "name": "Cross-border payments",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-38": {
+          "name": "Firm quotes",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-12": {
+          "name": "KYC",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-10": {
+          "name": "Web authentication",
+          "declared": true,
+          "endpoint": "https://stellar.moneygram.com/stellaradapterservice/auth",
+          "observed": "no",
+          "latencyMs": 176,
+          "httpStatus": 500,
+          "note": "Returned HTTP 500."
+        }
+      }
+    },
+    {
+      "domain": "stellarport.io",
+      "orgName": "Stellarport",
+      "reachable": true,
+      "declaredCurrencies": [
+        "BTC",
+        "ETH",
+        "XRP",
+        "LTC"
+      ],
+      "tomlLatencyMs": 19,
+      "checkedAt": "2026-09-05T15:53:23.880Z",
+      "counts": {
+        "declared": 2,
+        "observedWorking": 1,
+        "observedFailing": 1,
+        "notProbed": 0
+      },
+      "capabilities": {
+        "SEP-6": {
+          "name": "Programmatic deposit & withdrawal",
+          "declared": true,
+          "endpoint": "https://a3s.api.stellarport.io/v3/GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5",
+          "observed": "no",
+          "latencyMs": 37,
+          "note": "fetch failed"
+        },
+        "SEP-24": {
+          "name": "Hosted deposit & withdrawal",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-31": {
+          "name": "Cross-border payments",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-38": {
+          "name": "Firm quotes",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-12": {
+          "name": "KYC",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-10": {
+          "name": "Web authentication",
+          "declared": true,
+          "endpoint": "https://api.stellarport.io/Authentication",
+          "observed": "yes",
+          "latencyMs": 43,
+          "httpStatus": 400,
+          "note": "Answered a bare challenge request, which is the expected behaviour."
+        }
+      }
+    },
+    {
+      "domain": "ultracapital.xyz",
+      "orgName": "Ultra Capital LLC",
+      "reachable": true,
+      "declaredCurrencies": [
+        "YUSDC",
+        "YXLM",
+        "YETH",
+        "YBTC",
+        "ETH",
+        "BTC"
+      ],
+      "tomlLatencyMs": 702,
+      "checkedAt": "2026-09-05T15:53:25.310Z",
+      "counts": {
+        "declared": 3,
+        "observedWorking": 3,
+        "observedFailing": 0,
+        "notProbed": 0
+      },
+      "capabilities": {
+        "SEP-6": {
+          "name": "Programmatic deposit & withdrawal",
+          "declared": true,
+          "endpoint": "https://ultracapital.xyz/sep6",
+          "observed": "yes",
+          "latencyMs": 221,
+          "httpStatus": 200,
+          "assets": {
+            "deposit": [
+              "BTC",
+              "ETH"
+            ],
+            "withdraw": [
+              "BTC",
+              "ETH"
+            ]
+          },
+          "note": "2 depositable, 2 withdrawable asset(s)."
+        },
+        "SEP-24": {
+          "name": "Hosted deposit & withdrawal",
+          "declared": true,
+          "endpoint": "https://ultracapital.xyz/sep24",
+          "observed": "yes",
+          "latencyMs": 507,
+          "httpStatus": 200,
+          "assets": {
+            "deposit": [
+              "yUSDC",
+              "yBTC",
+              "BTC",
+              "yXLM",
+              "ETH",
+              "yETH"
+            ],
+            "withdraw": [
+              "yUSDC",
+              "yBTC",
+              "BTC",
+              "yXLM",
+              "ETH",
+              "yETH"
+            ]
+          },
+          "note": "6 depositable, 6 withdrawable asset(s)."
+        },
+        "SEP-31": {
+          "name": "Cross-border payments",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-38": {
+          "name": "Firm quotes",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-12": {
+          "name": "KYC",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-10": {
+          "name": "Web authentication",
+          "declared": true,
+          "endpoint": "https://ultracapital.xyz/auth",
+          "observed": "yes",
+          "latencyMs": 77,
+          "httpStatus": 400,
+          "note": "Answered a bare challenge request, which is the expected behaviour."
+        }
+      }
+    },
+    {
+      "domain": "vibrantapp.com",
+      "orgName": null,
+      "reachable": true,
+      "declaredCurrencies": [],
+      "tomlLatencyMs": 409,
+      "checkedAt": "2026-09-05T15:53:21.632Z",
+      "counts": {
+        "declared": 0,
+        "observedWorking": 0,
+        "observedFailing": 0,
+        "notProbed": 0
+      },
+      "capabilities": {
+        "SEP-6": {
+          "name": "Programmatic deposit & withdrawal",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-24": {
+          "name": "Hosted deposit & withdrawal",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-31": {
+          "name": "Cross-border payments",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-38": {
+          "name": "Firm quotes",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-12": {
+          "name": "KYC",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-10": {
+          "name": "Web authentication",
+          "declared": false,
+          "observed": "n/a"
+        }
+      }
+    },
+    {
+      "domain": "vnx.io",
+      "orgName": "VNX Global Ltd.",
+      "reachable": true,
+      "declaredCurrencies": [
+        "VCHF"
+      ],
+      "tomlLatencyMs": 176,
+      "checkedAt": "2026-09-05T15:53:24.049Z",
+      "counts": {
+        "declared": 0,
+        "observedWorking": 0,
+        "observedFailing": 0,
+        "notProbed": 0
+      },
+      "capabilities": {
+        "SEP-6": {
+          "name": "Programmatic deposit & withdrawal",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-24": {
+          "name": "Hosted deposit & withdrawal",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-31": {
+          "name": "Cross-border payments",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-38": {
+          "name": "Firm quotes",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-12": {
+          "name": "KYC",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-10": {
+          "name": "Web authentication",
+          "declared": false,
+          "observed": "n/a"
+        }
+      }
+    },
+    {
+      "domain": "zeam.money",
+      "orgName": "ZEAM LIMITED",
+      "reachable": true,
+      "declaredCurrencies": [
+        "ZARZ",
+        "USDZ",
+        "XAUZ",
+        "BTCZ",
+        "EURZ",
+        "YZARZ",
+        "GBPZ",
+        "RCAPS"
+      ],
+      "tomlLatencyMs": 82,
+      "checkedAt": "2026-09-05T15:53:24.964Z",
+      "counts": {
+        "declared": 5,
+        "observedWorking": 4,
+        "observedFailing": 0,
+        "notProbed": 1
+      },
+      "capabilities": {
+        "SEP-6": {
+          "name": "Programmatic deposit & withdrawal",
+          "declared": false,
+          "observed": "n/a"
+        },
+        "SEP-24": {
+          "name": "Hosted deposit & withdrawal",
+          "declared": true,
+          "endpoint": "https://anchor.zeam.money/sep24",
+          "observed": "yes",
+          "latencyMs": 518,
+          "httpStatus": 200,
+          "assets": {
+            "deposit": [
+              "USDC",
+              "native"
+            ],
+            "withdraw": [
+              "USDC",
+              "native"
+            ]
+          },
+          "note": "2 depositable, 2 withdrawable asset(s)."
+        },
+        "SEP-31": {
+          "name": "Cross-border payments",
+          "declared": true,
+          "endpoint": "https://anchor.zeam.money/sep31",
+          "observed": "yes",
+          "latencyMs": 165,
+          "httpStatus": 200,
+          "assets": {
+            "send": [
+              "USDC"
+            ]
+          },
+          "note": "1 corridor asset(s) advertised."
+        },
+        "SEP-38": {
+          "name": "Firm quotes",
+          "declared": true,
+          "endpoint": "https://anchor.zeam.money/sep38",
+          "observed": "yes",
+          "latencyMs": 159,
+          "httpStatus": 200,
+          "note": "Quote server answered."
+        },
+        "SEP-12": {
+          "name": "KYC",
+          "declared": true,
+          "endpoint": "https://anchor.zeam.money/customer",
+          "observed": "not-probed",
+          "note": "No public capability document is defined for this SEP."
+        },
+        "SEP-10": {
+          "name": "Web authentication",
+          "declared": true,
+          "endpoint": "https://anchor.zeam.money/auth",
+          "observed": "yes",
+          "latencyMs": 160,
+          "httpStatus": 400,
+          "note": "Answered a bare challenge request, which is the expected behaviour."
+        }
+      }
+    }
+  ]
+}

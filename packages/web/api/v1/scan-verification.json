@@ -1,0 +1,17 @@
+{
+  "checkedAt": "2026-09-05T15:53:07.609Z",
+  "scanFile": "scan-2026-09-05T15-48-32-076Z.json",
+  "accountsChecked": 108,
+  "comparedAgainst": {
+    "publishedAccounts": 108
+  },
+  "outcome": "clean",
+  "published": true,
+  "counts": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "findings": [],
+  "note": "Published. Every invariant held.",
+  "checksApplied": "See packages/indexer/src/invariants.ts — one on-chain account claimed by two anchors, rows attributed to no anchor, duplicate rows that double-count, and payment counts moving implausibly in either direction between scans."
+}

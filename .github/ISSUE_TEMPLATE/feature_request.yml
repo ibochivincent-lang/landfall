@@ -1,0 +1,32 @@
+name: Feature request
+description: Propose a change or addition
+title: "[FEAT] "
+labels: ["type:feat"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What is hard or impossible today? Describe the problem, not the solution.
+    validations: { required: true }
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+    validations: { required: true }
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: How would we know it works
+      description: A concrete, checkable outcome — this becomes the acceptance criterion.
+    validations: { required: true }
+  - type: checkboxes
+    id: invariants
+    attributes:
+      label: Project invariants
+      description: See CONTRIBUTING.md. Tick what applies, or explain below if it conflicts.
+      options:
+        - label: Every number this produces traces to indexed ledger records
+        - label: Failures stay visible, never silently skipped
+        - label: Any heuristic is labelled as one
+        - label: No score component an anchor could fake in ten seconds

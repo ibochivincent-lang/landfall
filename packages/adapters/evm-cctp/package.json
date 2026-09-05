@@ -1,0 +1,15 @@
+{
+  "name": "@landfall/adapter-evm-cctp",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "EVM ChainAdapter for CCTP-settled USDC (Circle burn + Iris attestation). maxTier: ATTESTED.",
+  "scripts": {
+    "test": "tsx --test test/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@noble/hashes": "^2.4.0"
+  }
+}

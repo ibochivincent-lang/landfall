@@ -1,0 +1,213 @@
+{
+  "anchorId": "stellarport.io",
+  "name": "Stellarport",
+  "asOf": "2026-09-05T15:48:32.076Z",
+  "verification": {
+    "resolved": true,
+    "checkedAt": "2026-09-05T15:48:32.076Z",
+    "source": "SEP-1 stellar.toml, resolved live; issuer attribution confirmed against each issuer account's own on-chain home_domain",
+    "accounts": [
+      {
+        "account": "GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5",
+        "role": "declared"
+      },
+      {
+        "account": "GC3M7GD3HNLCXSWDSJO2YTJ4LMNGNUOFWX5SVRHY7PCYGV5GLLYQMALT",
+        "role": "declared"
+      },
+      {
+        "account": "GC45JH537XZD4DY4WTV5PCUJL4KPOIE4WMGX5OP5KSPS2OLGRUOVVIGD",
+        "role": "declared"
+      },
+      {
+        "account": "GDD7ABRF7BCK76W33RXDQG5Q3WXVSQYVLGEMXSOWRGZ6Z3G3M2EM2TCP",
+        "role": "declared"
+      }
+    ]
+  },
+  "summary": {
+    "accounts": 4,
+    "live": 0,
+    "slow": 1,
+    "dark": 3,
+    "noActivity": 0,
+    "inbound": 30,
+    "outbound": 0
+  },
+  "accounts": [
+    {
+      "account": "GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5",
+      "domain": "stellarport.io",
+      "name": "Stellarport",
+      "state": "slow",
+      "inbound": 30,
+      "outbound": 0,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 127.4,
+      "topCounterpartyShare": 0.9982
+    },
+    {
+      "account": "GC3M7GD3HNLCXSWDSJO2YTJ4LMNGNUOFWX5SVRHY7PCYGV5GLLYQMALT",
+      "domain": "stellarport.io",
+      "name": "Stellarport",
+      "state": "dark",
+      "inbound": 0,
+      "outbound": 0,
+      "returns": 0,
+      "returnRate": null,
+      "hoursSinceActivity": 1403.76,
+      "topCounterpartyShare": null
+    },
+    {
+      "account": "GC45JH537XZD4DY4WTV5PCUJL4KPOIE4WMGX5OP5KSPS2OLGRUOVVIGD",
+      "domain": "stellarport.io",
+      "name": "Stellarport",
+      "state": "dark",
+      "inbound": 0,
+      "outbound": 0,
+      "returns": 0,
+      "returnRate": null,
+      "hoursSinceActivity": 1400.14,
+      "topCounterpartyShare": null
+    },
+    {
+      "account": "GDD7ABRF7BCK76W33RXDQG5Q3WXVSQYVLGEMXSOWRGZ6Z3G3M2EM2TCP",
+      "domain": "stellarport.io",
+      "name": "Stellarport",
+      "state": "dark",
+      "inbound": 0,
+      "outbound": 0,
+      "returns": 0,
+      "returnRate": null,
+      "hoursSinceActivity": 1423.17,
+      "topCounterpartyShare": null
+    }
+  ],
+  "history": {
+    "GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "slow",
+        "in": 30,
+        "out": 0,
+        "hours": 114.76
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "slow",
+        "in": 30,
+        "out": 0,
+        "hours": 119.69
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "slow",
+        "in": 30,
+        "out": 0,
+        "hours": 124.01
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "slow",
+        "in": 30,
+        "out": 0,
+        "hours": 127.4
+      }
+    ],
+    "GC3M7GD3HNLCXSWDSJO2YTJ4LMNGNUOFWX5SVRHY7PCYGV5GLLYQMALT": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "dark",
+        "in": 0,
+        "out": 0,
+        "hours": 1391.11
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "dark",
+        "in": 0,
+        "out": 0,
+        "hours": 1396.04
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "dark",
+        "in": 0,
+        "out": 0,
+        "hours": 1400.37
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "dark",
+        "in": 0,
+        "out": 0,
+        "hours": 1403.76
+      }
+    ],
+    "GC45JH537XZD4DY4WTV5PCUJL4KPOIE4WMGX5OP5KSPS2OLGRUOVVIGD": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "dark",
+        "in": 0,
+        "out": 0,
+        "hours": 1387.49
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "dark",
+        "in": 0,
+        "out": 0,
+        "hours": 1392.42
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "dark",
+        "in": 0,
+        "out": 0,
+        "hours": 1396.75
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "dark",
+        "in": 0,
+        "out": 0,
+        "hours": 1400.14
+      }
+    ],
+    "GDD7ABRF7BCK76W33RXDQG5Q3WXVSQYVLGEMXSOWRGZ6Z3G3M2EM2TCP": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "dark",
+        "in": 0,
+        "out": 0,
+        "hours": 1410.52
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "dark",
+        "in": 0,
+        "out": 0,
+        "hours": 1415.45
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "dark",
+        "in": 0,
+        "out": 0,
+        "hours": 1419.77
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "dark",
+        "in": 0,
+        "out": 0,
+        "hours": 1423.17
+      }
+    ]
+  },
+  "caveats": [
+    "A return is the honest failure mode. An anchor that accepts value, fails to settle and keeps it produces no return event and scores 0. A low rate is the absence of one kind of evidence, not evidence of good conduct.",
+    "Dark means no on-chain settlement in over 30 days. That is a fact about the ledger. Why an anchor is quiet is not something this project claims to know."
+  ]
+}

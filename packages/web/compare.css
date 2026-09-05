@@ -1,0 +1,338 @@
+/* ── Route Scout — compare.css ──────────────────────────────────────────── */
+
+.scout-wrap { max-width: 1100px; margin: 36px auto 100px; padding: 0 20px; }
+
+/* ─── Control Card ─────────────────────────────────────────────────────── */
+.ctrl-card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 26px 28px 22px;
+  margin-bottom: 28px;
+}
+.ctrl-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.7fr 1.3fr auto;
+  gap: 16px;
+  align-items: flex-end;
+}
+@media (max-width: 860px) {
+  .ctrl-grid { grid-template-columns: 1fr 1fr; }
+  .ctrl-run  { grid-column: 1 / -1; }
+}
+@media (max-width: 480px) {
+  .ctrl-grid { grid-template-columns: 1fr; }
+}
+
+.ctrl-group { display: flex; flex-direction: column; gap: 7px; }
+.ctrl-label {
+  font-size: 11px; font-weight: 700; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.6px;
+}
+.ctrl-select, .ctrl-input {
+  width: 100%; padding: 11px 13px;
+  border: 1.5px solid var(--line); border-radius: 8px;
+  font-size: 15px; font-weight: 600; font-family: inherit;
+  background: #fff; color: var(--ink);
+  transition: border-color 0.18s;
+  box-sizing: border-box;
+}
+.ctrl-select:focus, .ctrl-input:focus {
+  outline: none; border-color: #0b9c91;
+}
+
+.amount-row { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+.preset {
+  background: #f1f5f9; border: 1px solid var(--line);
+  border-radius: 5px; padding: 4px 9px;
+  font-size: 11px; font-weight: 700; cursor: pointer;
+  color: var(--muted); transition: all 0.15s;
+  font-family: inherit;
+}
+.preset:hover, .preset.is-active {
+  background: #0b9c91; border-color: #0b9c91; color: #fff;
+}
+
+.run-btn {
+  background: #0b9c91; color: #fff; border: none;
+  border-radius: 8px; padding: 12px 22px;
+  font-size: 14px; font-weight: 800; cursor: pointer;
+  white-space: nowrap; transition: background 0.18s; width: 100%;
+  font-family: inherit;
+}
+.run-btn:hover  { background: #087d74; }
+.run-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* ─── Results header ────────────────────────────────────────────────────── */
+.results-hd {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 14px; gap: 12px; flex-wrap: wrap;
+}
+.results-hd h2 { font-size: 17px; font-weight: 800; margin: 0; }
+.results-meta  { font-size: 12px; color: var(--muted); }
+
+/* ─── Conflict-of-interest disclosure ─────────────────────────────────────── */
+.disclosure {
+  background: #f8fafc;
+  border: 1px solid var(--line);
+  border-left: 3px solid #0b9c91;
+  border-radius: 10px;
+  padding: 15px 18px;
+  margin-bottom: 26px;
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: var(--muted);
+}
+.disclosure strong { color: var(--ink); }
+.disclosure a { color: #0b9c91; font-weight: 600; }
+
+/* ─── Notice ─────────────────────────────────────────────────────────────── */
+.notice-banner {
+  background: #fef3c7; border: 1px solid #fde68a;
+  border-radius: 8px; padding: 10px 16px;
+  font-size: 13px; color: #92400e; margin-bottom: 20px;
+}
+
+/* ─── Status placeholder ────────────────────────────────────────────────── */
+.status-msg {
+  text-align: center; padding: 60px 20px;
+  color: var(--muted); font-size: 14px;
+}
+.status-icon { display: block; font-size: 36px; margin-bottom: 12px; }
+
+/* ─── Quote Cards ────────────────────────────────────────────────────────── */
+.quotes-list { display: flex; flex-direction: column; gap: 12px; }
+
+.quote-card {
+  background: #fff;
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+  padding: 22px 24px;
+  display: grid;
+  grid-template-columns: 1.8fr 1fr 1fr 1.1fr 130px;
+  align-items: center;
+  gap: 14px;
+  position: relative;
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+.quote-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.07); border-color: #94a3b8; }
+.quote-card.is-best   { border-color: #0b9c91; background: #f0fdf8; }
+.quote-card.is-risk   { border-color: #fca5a5; background: #fff8f8; }
+
+@media (max-width: 900px) {
+  .quote-card {
+    grid-template-columns: 1fr 1fr;
+    padding-top: 30px;
+  }
+  .quote-action { grid-column: 1 / -1; }
+}
+@media (max-width: 480px) {
+  .quote-card { grid-template-columns: 1fr; }
+}
+
+/* Ribbons */
+.ribbon {
+  position: absolute; top: -11px; left: 16px;
+  font-size: 10px; font-weight: 800; letter-spacing: 0.4px;
+  padding: 2px 10px; border-radius: 99px; text-transform: uppercase;
+}
+.ribbon-best { background: #0b9c91; color: #fff; }
+.ribbon-rel  { background: #2563eb; color: #fff; left: 130px; }
+.ribbon-risk { background: #ef4444; color: #fff; }
+
+/* Cell typography */
+.cell-lbl { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; margin-bottom: 4px; }
+.cell-val { font-size: 14px; font-weight: 700; color: var(--ink); }
+.cell-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+.anchor-name   { font-size: 16px; font-weight: 800; margin-bottom: 3px; }
+.anchor-domain { font-size: 12px; color: var(--muted); }
+.anchor-extra  { font-size: 11px; color: var(--muted); margin-top: 5px; }
+
+.payout-val {
+  font-size: 21px; font-weight: 800;
+  color: #0b9c91;
+  font-family: 'DM Mono', monospace;
+  display: block; margin-bottom: 10px;
+}
+.payout-val.is-risk { color: #dc2626; }
+
+/* Reliability pill */
+.rel-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 9px; border-radius: 99px;
+  font-size: 12px; font-weight: 800;
+  font-family: 'DM Mono', monospace;
+}
+.rel-a { background: #dcfce7; color: #166534; }
+.rel-b { background: #e0f2fe; color: #075985; }
+.rel-c { background: #fef3c7; color: #92400e; }
+.rel-d { background: #ffedd5; color: #9a3412; }
+.rel-f { background: #fee2e2; color: #991b1b; }
+.rel-u { background: #f1f5f9; color: #64748b; }
+
+/* Action button */
+.action-btn {
+  display: block; background: #061f2d; color: #fff;
+  border: none; border-radius: 7px;
+  padding: 11px 12px; font-size: 12px; font-weight: 800;
+  text-align: center; text-decoration: none; cursor: pointer;
+  transition: background 0.15s; width: 100%; box-sizing: border-box;
+  font-family: inherit;
+}
+.action-btn:hover { background: #0b9c91; }
+
+/* ─── Crypto Routes ──────────────────────────────────────────────────────── */
+.crypto-head { margin-top: 52px; padding-top: 28px; border-top: 1px solid var(--line); }
+.crypto-title { font-size: 22px; }
+.crypto-ctrl-grid { grid-template-columns: 1fr 1fr 1.3fr auto; }
+@media (max-width: 860px) { .crypto-ctrl-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 480px) { .crypto-ctrl-grid { grid-template-columns: 1fr; } }
+
+.crypto-card {
+  background: #fff;
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+  padding: 24px 26px;
+  display: grid;
+  grid-template-columns: 1.3fr 1fr 1fr 1fr;
+  gap: 18px;
+  align-items: center;
+}
+@media (max-width: 760px) { .crypto-card { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 480px) { .crypto-card { grid-template-columns: 1fr; } }
+
+.crypto-out {
+  font-size: 26px; font-weight: 800; color: #0b9c91;
+  font-family: 'DM Mono', monospace; display: block; margin-bottom: 4px;
+}
+.crypto-source {
+  font-size: 12px; color: var(--muted); margin-top: 10px; padding-top: 10px;
+  border-top: 1px dashed var(--line); grid-column: 1 / -1;
+}
+.crypto-source a { color: #0b9c91; font-weight: 700; text-decoration: none; }
+.crypto-source a:hover { text-decoration: underline; }
+
+.crypto-error {
+  background: #fef2f2; border: 1px solid #fecaca; color: #991b1b;
+  border-radius: 10px; padding: 16px 18px; font-size: 13px;
+}
+
+/* ─── Wallet execution panel ─────────────────────────────────────────────── */
+.wallet-panel { margin-top: 16px; }
+.wallet-panel__head h3 { font-size: 15px; font-weight: 800; margin: 0 0 6px; }
+.wallet-panel__head p { font-size: 12.5px; color: var(--muted); line-height: 1.5; margin: 0 0 18px; }
+.wallet-panel__head strong { color: #92400e; }
+
+.wallet-actions { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; align-items: center; }
+.wallet-btn { width: auto; flex: 1 1 180px; }
+.wallet-btn--connect { background: #061f2d; }
+.wallet-btn--connect:hover { background: #0b9c91; }
+.wallet-btn--disconnect { background: #f1f5f9; color: var(--ink); flex: 0 0 auto; }
+.wallet-btn--disconnect:hover { background: #e2e8f0; }
+
+.wallet-select {
+  flex: 0 1 160px; width: auto;
+  padding: 11px 13px; border: 1.5px solid var(--line); border-radius: 8px;
+  font-size: 14px; font-weight: 600; font-family: inherit;
+  background: #fff; color: var(--ink);
+}
+.wallet-select:focus { outline: none; border-color: #0b9c91; }
+
+#cryptoWalletStatus { margin-top: 10px; }
+#cryptoWalletStatus.is-error { color: #991b1b; }
+#cryptoWalletStatus.is-connected { color: #0b9c91; font-weight: 700; }
+
+/* Confirm-before-sign review box: a second, explicit look at exactly what is
+   about to be signed, on top of Freighter's own confirmation popup. */
+.confirm-box {
+  background: #f8fafc; border: 1.5px solid #0b9c91; border-radius: 12px;
+  padding: 18px 20px; margin-top: 16px;
+}
+.confirm-box__title { font-size: 13px; font-weight: 800; margin-bottom: 10px; }
+.confirm-box__row { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; padding: 5px 0; }
+.confirm-box__row span:first-child { color: var(--muted); }
+.confirm-box__row span:last-child { font-weight: 700; font-family: 'DM Mono', monospace; text-align: right; word-break: break-all; }
+.confirm-box__actions { display: flex; gap: 10px; margin-top: 16px; }
+.confirm-box__actions .run-btn { width: auto; flex: 1; }
+.confirm-box__cancel { background: #f1f5f9 !important; color: var(--ink) !important; }
+.confirm-box__cancel:hover { background: #e2e8f0 !important; }
+
+/* Execution progress steps */
+.exec-steps { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
+.exec-step { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); }
+.exec-step.is-active { color: var(--ink); font-weight: 700; }
+.exec-step.is-done { color: #0b9c91; }
+.exec-step.is-failed { color: #991b1b; }
+.exec-step__dot {
+  width: 8px; height: 8px; border-radius: 50%; background: var(--line); flex-shrink: 0;
+}
+.exec-step.is-active .exec-step__dot { background: #0b9c91; animation: exec-pulse 1s ease-in-out infinite; }
+.exec-step.is-done .exec-step__dot { background: #0b9c91; }
+.exec-step.is-failed .exec-step__dot { background: #ef4444; }
+@keyframes exec-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+
+.exec-success {
+  background: #f0fdf8; border: 1px solid #0b9c91; border-radius: 10px;
+  padding: 16px 18px; font-size: 13px; margin-top: 12px;
+}
+.exec-success a { color: #0b9c91; font-weight: 700; }
+
+/* Anchors that publish no rate card. Rendered as an explicit absence rather
+   than a zero or a dash, so "we don't know" cannot be misread as "nothing". */
+.cell-val--none {
+  color: var(--muted);
+  font-weight: 700;
+  font-style: italic;
+}
+.payout-val--none {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--muted);
+  font-family: inherit;
+  font-style: italic;
+}
+
+/* ─── End-to-end route (crypto → XLM → cash) ─────────────────────────────── */
+.e2e-card {
+  background: #fff; border: 1.5px solid var(--line); border-radius: 14px;
+  padding: 24px 26px;
+}
+
+.e2e-leg { display: flex; gap: 14px; padding: 14px 0; border-bottom: 1px dashed var(--line); }
+.e2e-leg:last-of-type { border-bottom: none; }
+.e2e-leg__n {
+  flex: 0 0 26px; height: 26px; border-radius: 50%;
+  background: #0b9c91; color: #fff;
+  font-size: 12px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+}
+.e2e-leg__body { flex: 1; min-width: 0; }
+.e2e-leg__head {
+  font-size: 16px; font-weight: 800; color: var(--ink);
+  font-family: 'DM Mono', monospace; margin-bottom: 4px;
+}
+.e2e-leg__sub { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+.e2e-anchor {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  padding: 9px 12px; margin-top: 8px;
+  background: #f8fafc; border: 1px solid var(--line); border-radius: 8px;
+  font-size: 13px;
+}
+.e2e-anchor.is-best { border-color: #0b9c91; background: #f0fdf8; }
+.e2e-anchor__out {
+  font-family: 'DM Mono', monospace; font-weight: 800; color: #0b9c91; white-space: nowrap;
+}
+.e2e-anchor__out--none { color: var(--muted); font-style: italic; font-weight: 700; }
+
+.e2e-leg-none {
+  background: #fef3c7; border: 1px solid #fde68a; color: #92400e;
+  border-radius: 8px; padding: 12px 14px; font-size: 12.5px; line-height: 1.6;
+  margin-top: 12px;
+}
+
+/* Where a fee figure came from. A number fetched from the anchor and a number
+   typed into our catalog deserve different confidence, so they look different. */
+.fee-src { font-size: 10.5px; margin-top: 4px; opacity: 0.85; }
+.fee-src.is-stale { color: #92400e; }

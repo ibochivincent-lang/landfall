@@ -1,0 +1,30 @@
+name: Bug report
+description: Something behaves incorrectly
+title: "[BUG] "
+labels: ["type:bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        If you think a *published figure* is wrong, use "Data dispute" instead —
+        that has a different resolution path.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did and what you expected instead.
+    validations: { required: true }
+  - type: textarea
+    id: repro
+    attributes:
+      label: How to reproduce
+      placeholder: |
+        1. npm run scan -- --since 2026-01-01T00:00:00Z
+        2. ...
+    validations: { required: true }
+  - type: textarea
+    id: env
+    attributes:
+      label: Environment
+      placeholder: "Node version, OS, Docker or standalone, commit SHA"
+    validations: { required: true }

@@ -1,0 +1,121 @@
+{
+  "anchorId": "ngnc.online",
+  "name": "LINK.IO LTD.",
+  "asOf": "2026-09-05T15:48:32.076Z",
+  "verification": {
+    "resolved": true,
+    "checkedAt": "2026-09-05T15:48:32.076Z",
+    "source": "SEP-1 stellar.toml, resolved live; issuer attribution confirmed against each issuer account's own on-chain home_domain",
+    "accounts": [
+      {
+        "account": "GASBV6W7GGED66MXEVC7YZHTWWYMSVYEY35USF2HJZBLABLYIFQGXZY6",
+        "role": "declared"
+      },
+      {
+        "account": "GCQLPBWOQ5PAJYEEQBE7GDSY7X3LCYKFEBKOCNF3OUA6F74ORK74HVSQ",
+        "role": "declared"
+      }
+    ]
+  },
+  "summary": {
+    "accounts": 2,
+    "live": 1,
+    "slow": 1,
+    "dark": 0,
+    "noActivity": 0,
+    "inbound": 112,
+    "outbound": 8
+  },
+  "accounts": [
+    {
+      "account": "GASBV6W7GGED66MXEVC7YZHTWWYMSVYEY35USF2HJZBLABLYIFQGXZY6",
+      "domain": "ngnc.online",
+      "name": "LINK.IO LTD.",
+      "state": "slow",
+      "inbound": 108,
+      "outbound": 8,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 427.88,
+      "topCounterpartyShare": 0.1982
+    },
+    {
+      "account": "GCQLPBWOQ5PAJYEEQBE7GDSY7X3LCYKFEBKOCNF3OUA6F74ORK74HVSQ",
+      "domain": "ngnc.online",
+      "name": "LINK.IO LTD.",
+      "state": "live",
+      "inbound": 4,
+      "outbound": 0,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 10.53,
+      "topCounterpartyShare": 1
+    }
+  ],
+  "history": {
+    "GASBV6W7GGED66MXEVC7YZHTWWYMSVYEY35USF2HJZBLABLYIFQGXZY6": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "slow",
+        "in": 108,
+        "out": 8,
+        "hours": 415.23
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "slow",
+        "in": 108,
+        "out": 8,
+        "hours": 420.16
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "slow",
+        "in": 108,
+        "out": 8,
+        "hours": 424.49
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "slow",
+        "in": 108,
+        "out": 8,
+        "hours": 427.88
+      }
+    ],
+    "GCQLPBWOQ5PAJYEEQBE7GDSY7X3LCYKFEBKOCNF3OUA6F74ORK74HVSQ": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "live",
+        "in": 4,
+        "out": 0,
+        "hours": 21.89
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "live",
+        "in": 4,
+        "out": 0,
+        "hours": 2.81
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "live",
+        "in": 4,
+        "out": 0,
+        "hours": 7.14
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "live",
+        "in": 4,
+        "out": 0,
+        "hours": 10.53
+      }
+    ]
+  },
+  "caveats": [
+    "A return is the honest failure mode. An anchor that accepts value, fails to settle and keeps it produces no return event and scores 0. A low rate is the absence of one kind of evidence, not evidence of good conduct.",
+    "Dark means no on-chain settlement in over 30 days. That is a fact about the ledger. Why an anchor is quiet is not something this project claims to know."
+  ]
+}

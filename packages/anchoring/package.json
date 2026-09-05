@@ -1,0 +1,15 @@
+{
+  "name": "@landfall/anchoring",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "Stellar Anchoring Standard: RFC 6962 Merkle commitments written to MEMO_HASH, with self-contained proof bundles verifiable against any Horizon instance. See SPEC.md.",
+  "scripts": {
+    "test": "tsx --test test/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@noble/hashes": "^2.4.0"
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "anchorId": "centre.io",
+  "name": "Centre Consortium LLC",
+  "asOf": "2026-09-05T15:48:32.076Z",
+  "verification": {
+    "resolved": true,
+    "checkedAt": "2026-09-05T15:48:32.076Z",
+    "source": "SEP-1 stellar.toml, resolved live; issuer attribution confirmed against each issuer account's own on-chain home_domain",
+    "accounts": [
+      {
+        "account": "GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN",
+        "role": "declared"
+      },
+      {
+        "account": "GDEWOLMOPAVRTGNJVWOE6U6LHZVAWIJZVWM6PDLCFTUTJJEKSU32TO5W",
+        "role": "declared"
+      }
+    ]
+  },
+  "summary": {
+    "accounts": 2,
+    "live": 2,
+    "slow": 0,
+    "dark": 0,
+    "noActivity": 0,
+    "inbound": 2333,
+    "outbound": 421
+  },
+  "accounts": [
+    {
+      "account": "GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN",
+      "domain": "centre.io",
+      "name": "Centre Consortium LLC",
+      "state": "live",
+      "inbound": 2316,
+      "outbound": 0,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 0.72,
+      "topCounterpartyShare": 0.9421
+    },
+    {
+      "account": "GDEWOLMOPAVRTGNJVWOE6U6LHZVAWIJZVWM6PDLCFTUTJJEKSU32TO5W",
+      "domain": "centre.io",
+      "name": "Centre Consortium LLC",
+      "state": "live",
+      "inbound": 17,
+      "outbound": 421,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 19.04,
+      "topCounterpartyShare": 1
+    }
+  ],
+  "history": {
+    "GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "live",
+        "in": 2315,
+        "out": 0,
+        "hours": 6.14
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "live",
+        "in": 2315,
+        "out": 0,
+        "hours": 11.07
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "live",
+        "in": 2315,
+        "out": 0,
+        "hours": 15.39
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "live",
+        "in": 2316,
+        "out": 0,
+        "hours": 0.72
+      }
+    ],
+    "GDEWOLMOPAVRTGNJVWOE6U6LHZVAWIJZVWM6PDLCFTUTJJEKSU32TO5W": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "live",
+        "in": 17,
+        "out": 421,
+        "hours": 6.39
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "live",
+        "in": 17,
+        "out": 421,
+        "hours": 11.32
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "live",
+        "in": 17,
+        "out": 421,
+        "hours": 15.64
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "live",
+        "in": 17,
+        "out": 421,
+        "hours": 19.04
+      }
+    ]
+  },
+  "caveats": [
+    "A return is the honest failure mode. An anchor that accepts value, fails to settle and keeps it produces no return event and scores 0. A low rate is the absence of one kind of evidence, not evidence of good conduct.",
+    "Dark means no on-chain settlement in over 30 days. That is a fact about the ledger. Why an anchor is quiet is not something this project claims to know."
+  ]
+}

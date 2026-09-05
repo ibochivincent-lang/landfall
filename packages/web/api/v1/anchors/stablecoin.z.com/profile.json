@@ -1,0 +1,61 @@
+{
+  "anchorId": "stablecoin.z.com",
+  "name": "GMO-Z.com Trust Company, Inc.",
+  "asOf": "2026-09-05T15:48:32.076Z",
+  "verification": {
+    "resolved": true,
+    "checkedAt": "2026-09-05T15:48:32.076Z",
+    "source": "SEP-1 stellar.toml, resolved live; issuer attribution confirmed against each issuer account's own on-chain home_domain",
+    "accounts": [
+      {
+        "account": "GDF6VOEGRWLOZ64PQQGKD2IYWA22RLT37GJKS2EJXZHT2VLAGWLC5TOB",
+        "role": "declared"
+      }
+    ]
+  },
+  "summary": {
+    "accounts": 1,
+    "live": 1,
+    "slow": 0,
+    "dark": 0,
+    "noActivity": 0,
+    "inbound": 15,
+    "outbound": 1
+  },
+  "accounts": [
+    {
+      "account": "GDF6VOEGRWLOZ64PQQGKD2IYWA22RLT37GJKS2EJXZHT2VLAGWLC5TOB",
+      "domain": "stablecoin.z.com",
+      "name": "GMO-Z.com Trust Company, Inc.",
+      "state": "live",
+      "inbound": 15,
+      "outbound": 1,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 69.16,
+      "topCounterpartyShare": 0.883
+    }
+  ],
+  "history": {
+    "GDF6VOEGRWLOZ64PQQGKD2IYWA22RLT37GJKS2EJXZHT2VLAGWLC5TOB": [
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "live",
+        "in": 15,
+        "out": 1,
+        "hours": 65.76
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "live",
+        "in": 15,
+        "out": 1,
+        "hours": 69.16
+      }
+    ]
+  },
+  "caveats": [
+    "A return is the honest failure mode. An anchor that accepts value, fails to settle and keeps it produces no return event and scores 0. A low rate is the absence of one kind of evidence, not evidence of good conduct.",
+    "Dark means no on-chain settlement in over 30 days. That is a fact about the ledger. Why an anchor is quiet is not something this project claims to know."
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "name": "@landfall/registry",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "Canonical anchor identity resolution (SEP-1) and the maintained cross-chain address registry. See docs/architecture/MULTICHAIN.md §5.",
+  "scripts": {
+    "test": "tsx --test test/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^4.4.3"
+  }
+}

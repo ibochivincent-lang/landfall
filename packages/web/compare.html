@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Route Scout — Landfall · Stellar</title>
+  <meta name="description" content="Compare live exchange rates, fees, and on-chain settlement reliability across Stellar anchors before routing an off-ramp.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="dashboard.css">
+  <link rel="stylesheet" href="compare.css">
+</head>
+<body class="dash-body">
+
+<header class="topnav" id="topnav">
+  <div class="wrap topnav__in">
+    <a href="index.html" class="topnav__logo" aria-label="Landfall home">
+      <svg viewBox="0 0 40 40" class="topnav__logo-mark" aria-hidden="true">
+        <path d="M20 3 35 29H5L20 3Z" fill="currentColor"/>
+        <path d="M20 12 28 26H12l8-14Z" fill="#eaf4ef"/>
+        <path d="M20 29v7" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <span>landfall<em>.stellar</em></span>
+    </a>
+    <nav class="topnav__pill" aria-label="Site navigation">
+      <a class="topnav__link" href="index.html">Overview</a>
+      <a class="topnav__link" href="dashboard.html">Transactions</a>
+      <a class="topnav__link" href="cross-chain.html">Cross-chain</a>
+      <a class="topnav__link is-active" href="compare.html" aria-current="page">Route Scout</a>
+      <a class="topnav__link" href="docs.html">API Docs</a>
+      <a class="topnav__link" href="portal.html">Developer Portal</a>
+    </nav>
+    <div class="topnav__actions">
+      <a class="dash-btn dash-btn--primary" href="portal.html">Get API Keys →</a>
+      <a class="dash-btn dash-btn--ghost" href="https://github.com/ibochivincent-lang/landfall" target="_blank" rel="noopener">GitHub ↗</a>
+    </div>
+  </div>
+</header>
+
+<main class="scout-wrap">
+
+  <div class="dash-head">
+    <div>
+      <h1 class="dash-title">Route Scout</h1>
+      <p class="dash-sub">
+        Compare every integrated Stellar anchor by payout, fees, speed, and
+        <strong>verified on-chain settlement reliability</strong> — before routing a payment.
+      </p>
+    </div>
+  </div>
+
+  <!-- Stated because it is true and because the reader should not have to
+       discover it: this page both grades anchors and, further down, quotes
+       and executes swaps. Those two roles can conflict. -->
+  <div class="disclosure">
+    <strong>Disclosure — where our interests sit.</strong>
+    Landfall grades anchors from the public ledger, and this same page also quotes and
+    executes crypto swaps through <a href="https://near-intents.org" target="_blank" rel="noopener">NEAR Intents</a>.
+    That is a conflict worth naming: a tool that both rates routes and carries traffic has
+    an interest in which route you pick. Concretely, today — reliability grades are computed
+    only from ledger activity and never from whether an anchor is a commercial partner;
+    Landfall takes no fee, referral, or rebate from any anchor listed here; the fee and rate
+    figures in the anchor table are each anchor's own published terms, not something we are
+    paid to present; and no anchor can pay to appear, rank higher, or be removed. Landfall
+    never holds your funds in either flow. If any of that changes, this notice changes with it.
+  </div>
+
+  <!-- Controls -->
+  <div class="ctrl-card">
+    <div class="ctrl-grid">
+
+      <div class="ctrl-group">
+        <label class="ctrl-label" for="fromAsset">You Send</label>
+        <select class="ctrl-select" id="fromAsset">
+          <option value="USDC" selected>USDC · USD Coin</option>
+          <option value="EURC">EURC · Euro Coin</option>
+          <option value="XLM">XLM · Stellar Lumens</option>
+        </select>
+      </div>
+
+      <div class="ctrl-group">
+        <label class="ctrl-label" for="toCurrency">Destination Corridor</label>
+        <select class="ctrl-select" id="toCurrency">
+          <option value="NGN" selected>🇳🇬 NGN — Nigeria</option>
+          <option value="KES">🇰🇪 KES — Kenya</option>
+          <option value="GHS">🇬🇭 GHS — Ghana</option>
+          <option value="MXN">🇲🇽 MXN — Mexico</option>
+          <option value="BRL">🇧🇷 BRL — Brazil (PIX)</option>
+          <option value="ARS">🇦🇷 ARS — Argentina</option>
+          <option value="PEN">🇵🇪 PEN — Peru</option>
+          <option value="EUR">🇪🇺 EUR — Eurozone</option>
+          <option value="USD">🇺🇸 USD — USA (Cash)</option>
+          <option value="ZAR">🇿🇦 ZAR — South Africa</option>
+          <option value="GBP">🇬🇧 GBP — United Kingdom</option>
+          <option value="INR">🇮🇳 INR — India</option>
+          <option value="IDR">🇮🇩 IDR — Indonesia</option>
+          <option value="MYR">🇲🇾 MYR — Malaysia</option>
+          <option value="CLP">🇨🇱 CLP — Chile</option>
+          <option value="KZT">🇰🇿 KZT — Kazakhstan</option>
+          <option value="DZD">🇩🇿 DZD — Algeria</option>
+          <option value="AOA">🇦🇴 AOA — Angola</option>
+          <option value="JPY">🇯🇵 JPY — Japan</option>
+          <option value="AUD">🇦🇺 AUD — Australia</option>
+          <option value="NZD">🇳🇿 NZD — New Zealand</option>
+          <option value="UAH">🇺🇦 UAH — Ukraine</option>
+        </select>
+      </div>
+
+      <div class="ctrl-group">
+        <label class="ctrl-label" for="sendAmount">Amount (USD)</label>
+        <input class="ctrl-input" type="number" id="sendAmount" value="100" min="1" step="5">
+        <div class="amount-row">
+          <button class="preset" data-amt="50">$50</button>
+          <button class="preset" data-amt="100">$100</button>
+          <button class="preset" data-amt="250">$250</button>
+          <button class="preset" data-amt="500">$500</button>
+          <button class="preset" data-amt="1000">$1,000</button>
+        </div>
+      </div>
+
+      <div class="ctrl-group ctrl-run">
+        <label class="ctrl-label" style="visibility:hidden">Action</label>
+        <button class="run-btn" id="runBtn">Scout Routes ⚡</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Results header -->
+  <div class="results-hd">
+    <h2 id="resultsTitle">Select a corridor and click Scout Routes</h2>
+    <span class="results-meta" id="resultsMeta"></span>
+  </div>
+
+  <div id="noticeBanner" class="notice-banner" hidden>
+    ⚠️ Live reliability data unavailable — settlement grades are estimates only.
+  </div>
+
+  <!-- Quote cards -->
+  <div class="quotes-list" id="quotesList">
+    <div class="status-msg">
+      <span class="status-icon">🛰️</span>
+      Pick a corridor and click <strong>Scout Routes</strong> to compare anchors.
+    </div>
+  </div>
+
+  <!-- ============ ROUTER: one control for swaps and full journeys ============ -->
+  <div class="dash-head crypto-head">
+    <div>
+      <h1 class="dash-title crypto-title">Move it</h1>
+      <p class="dash-sub">
+        One control for the whole journey. Pick what you are sending and where it should end up —
+        another chain, or cash in a local currency — and the route is worked out for you. Crypto legs
+        are live quotes from <a href="https://near-intents.org" target="_blank" rel="noopener">NEAR Intents</a>;
+        the cash leg goes through a Stellar anchor's own regulated flow. Connect a wallet once and it
+        stays connected across both. <strong>Landfall never holds your funds at any point in either leg.</strong>
+      </p>
+    </div>
+  </div>
+
+  <div class="ctrl-card">
+    <div class="ctrl-grid crypto-ctrl-grid">
+      <div class="ctrl-group">
+        <label class="ctrl-label" for="cryptoAmount" id="cryptoAmountLabel">You send</label>
+        <input class="ctrl-input" type="number" id="cryptoAmount" value="1000" min="0" step="any">
+      </div>
+      <div class="ctrl-group">
+        <label class="ctrl-label" for="routeFrom">From</label>
+        <select class="ctrl-select" id="routeFrom">
+          <option value="xlm" selected>✦ Stellar (XLM)</option>
+          <option value="btc">₿ Bitcoin (BTC)</option>
+          <option value="eth">Ξ Ethereum (ETH)</option>
+          <option value="sol">◎ Solana (SOL)</option>
+          <option value="bsc">BNB Smart Chain (BNB)</option>
+          <option value="usdt">₮ USDT (Ethereum)</option>
+          <option value="sui">◈ Sui (SUI)</option>
+          <option value="avax">▲ Avalanche (AVAX)</option>
+          <option value="pol">⬡ Polygon (POL)</option>
+          <option value="arb">Ξ ETH (Arbitrum)</option>
+          <option value="base">Ξ ETH (Base)</option>
+        </select>
+      </div>
+      <div class="ctrl-group">
+        <label class="ctrl-label" for="cryptoDest">To</label>
+        <select class="ctrl-select" id="cryptoDest">
+          <optgroup label="Another chain">
+            <option value="btc" selected>₿ Bitcoin (BTC)</option>
+            <option value="eth">Ξ Ethereum (ETH)</option>
+            <option value="sol">◎ Solana (SOL)</option>
+            <option value="bsc">BNB Smart Chain (BNB)</option>
+            <option value="usdt">₮ USDT (Ethereum)</option>
+            <option value="sui">◈ Sui (SUI)</option>
+            <option value="avax">▲ Avalanche (AVAX)</option>
+            <option value="pol">⬡ Polygon (POL)</option>
+            <option value="arb">Ξ ETH (Arbitrum)</option>
+            <option value="base">Ξ ETH (Base)</option>
+            <option value="xlm">✦ Stellar (XLM)</option>
+          </optgroup>
+          <optgroup label="Cash in your hands">
+            <option value="cash:NGN">🇳🇬 NGN — Nigeria</option>
+            <option value="cash:KES">🇰🇪 KES — Kenya</option>
+            <option value="cash:GHS">🇬🇭 GHS — Ghana</option>
+            <option value="cash:ZAR">🇿🇦 ZAR — South Africa</option>
+            <option value="cash:USD">🇺🇸 USD — United States</option>
+            <option value="cash:EUR">🇪🇺 EUR — Eurozone</option>
+            <option value="cash:GBP">🇬🇧 GBP — United Kingdom</option>
+            <option value="cash:JPY">🇯🇵 JPY — Japan</option>
+            <option value="cash:AUD">🇦🇺 AUD — Australia</option>
+            <option value="cash:NZD">🇳🇿 NZD — New Zealand</option>
+            <option value="cash:UAH">🇺🇦 UAH — Ukraine</option>
+            <option value="cash:BRL">🇧🇷 BRL — Brazil</option>
+            <option value="cash:ARS">🇦🇷 ARS — Argentina</option>
+            <option value="cash:CLP">🇨🇱 CLP — Chile</option>
+            <option value="cash:PEN">🇵🇪 PEN — Peru</option>
+            <option value="cash:MXN">🇲🇽 MXN — Mexico</option>
+            <option value="cash:INR">🇮🇳 INR — India</option>
+            <option value="cash:IDR">🇮🇩 IDR — Indonesia</option>
+            <option value="cash:MYR">🇲🇾 MYR — Malaysia</option>
+            <option value="cash:KZT">🇰🇿 KZT — Kazakhstan</option>
+            <option value="cash:DZD">🇩🇿 DZD — Algeria</option>
+            <option value="cash:AOA">🇦🇴 AOA — Angola</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="ctrl-group ctrl-run">
+        <label class="ctrl-label" style="visibility:hidden">Action</label>
+        <button class="run-btn" id="cryptoRunBtn">Find the route ⚡</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="cryptoResult">
+    <div class="status-msg">
+      <span class="status-icon">🔀</span>
+      Pick a destination chain and click <strong>Get Live Quote</strong>.
+    </div>
+  </div>
+
+  <!-- Non-custodial execution: appears once the current direction's origin
+       has a wired-up wallet (Stellar via Freighter/Lobstr, or an EVM chain
+       via MetaMask/Trust Wallet/any EIP-6963 wallet). Landfall builds the
+       transaction and hands it to that wallet to sign — Landfall's own code
+       never sees or holds the private key or the funds. -->
+  <div class="ctrl-card wallet-panel" id="cryptoExec" hidden>
+    <div class="wallet-panel__head">
+      <h3>Send it for real</h3>
+      <p>
+        Non-custodial — you sign with your own wallet (<a href="https://www.freighter.app/" target="_blank" rel="noopener">Freighter</a>
+        or <a href="https://lobstr.co/" target="_blank" rel="noopener">Lobstr</a> for a Stellar send; MetaMask,
+        Trust Wallet, or any other browser wallet that supports EIP-6963 for an EVM chain send) and Landfall never
+        holds your funds or your key. <strong>Experimental: double-check the destination address and amount before
+        signing — a sent transaction cannot be reversed.</strong>
+      </p>
+    </div>
+
+    <div class="ctrl-grid crypto-ctrl-grid">
+      <div class="ctrl-group" style="grid-column: 1 / -1">
+        <label class="ctrl-label" for="cryptoDestAddr" id="cryptoDestAddrLabel">Your destination address</label>
+        <input class="ctrl-input" type="text" id="cryptoDestAddr" placeholder="Paste the address that will receive the funds" autocomplete="off" spellcheck="false">
+        <div class="cell-sub" id="cryptoDestAddrHint"></div>
+      </div>
+    </div>
+
+    <div class="wallet-actions" id="cryptoWalletPicker">
+      <select class="ctrl-select wallet-select" id="cryptoWalletSelect" aria-label="Wallet">
+        <option value="freighter">Freighter</option>
+        <option value="lobstr">Lobstr</option>
+      </select>
+      <button class="run-btn wallet-btn wallet-btn--connect" id="cryptoConnectBtn" type="button">Connect Wallet</button>
+    </div>
+    <div class="wallet-actions" id="cryptoWalletConnected" hidden>
+      <button class="run-btn wallet-btn wallet-btn--disconnect" id="cryptoDisconnectBtn" type="button">Disconnect</button>
+    </div>
+    <div class="wallet-actions">
+      <button class="run-btn wallet-btn" id="cryptoSendBtn" type="button" disabled>Review &amp; Send</button>
+    </div>
+    <div class="cell-sub" id="cryptoWalletStatus"></div>
+
+    <div id="cryptoExecStatus"></div>
+  </div>
+
+
+</main>
+
+<footer class="dash-footer">
+  <div class="wrap dash-foot-in">
+    <span>Settlement reliability derived from the public Stellar ledger — no anchor self-reporting</span>
+    <span>© 2026 Landfall · MIT</span>
+  </div>
+</footer>
+
+<script src="compare.js"></script>
+<script src="crypto-routes.js"></script>
+</body>
+</html>

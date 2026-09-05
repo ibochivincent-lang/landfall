@@ -1,0 +1,100 @@
+# ===========================================================
+# Landfall — production stack.
+#
+#   docker compose -f docker-compose.prod.yml up -d --build
+#
+# Differences from docker-compose.yml, and why:
+#
+#   * No Stellar node. Production reads mainnet Horizon. Running a private
+#     network alongside real data is how you end up publishing figures from
+#     the wrong ledger.
+#   * No Postgres. The database is hosted — Supabase by default. A database in
+#     the same compose file as the thing that writes to it shares its blast
+#     radius, and this one holds the only copy of the scan history.
+#   * No source mount and no `npm ci` at boot. The image is built once and
+#     pinned. A container that installs dependencies on every restart is a
+#     container that can start behaving differently at 3am because a
+#     transitive dependency published a patch.
+#   * No web container. The site is static and belongs on a CDN; Vercel is
+#     already wired. `docker compose --profile web up` includes it anyway for
+#     hosts where running one more container is simpler than one more account.
+#
+# Everything here reads from .env. Copy .env.production.example and fill it in.
+# ===========================================================
+
+name: landfall-prod
+
+x-common: &common
+  build:
+    context: .
+    dockerfile: Dockerfile
+  image: landfall:latest
+  restart: unless-stopped
+  environment:
+    DATABASE_URL: ${DATABASE_URL:?DATABASE_URL is required — see .env.production.example}
+    PG_POOL_MAX: ${PG_POOL_MAX:-8}
+    HORIZON_URL: ${HORIZON_URL:-https://horizon.stellar.org}
+  logging:
+    driver: json-file
+    options: { max-size: "10m", max-file: "5" }
+
+services:
+  # ---------------------------------------------------------------- api
+  api:
+    <<: *common
+    container_name: landfall-api
+    environment:
+      DATABASE_URL: ${DATABASE_URL:?}
+      # Pooled connection, small pool. Supabase's transaction pooler is itself
+      # a pool; stacking a large client pool on top of it wastes the quota that
+      # the indexer needs to write.
+      PG_POOL_MAX: ${PG_POOL_MAX:-8}
+      PORT: 8787
+      # Lock this to your site's origin in production. '*' is the local
+      # default and is wrong the moment the API is on the internet.
+      CORS_ORIGIN: ${CORS_ORIGIN:?set CORS_ORIGIN to your site origin, e.g. https://landfall-ib.vercel.app}
+    ports:
+      - "${API_PORT:-8787}:8787"
+
+  # ---------------------------------------------------------------- indexer
+  # Scan, persist, sleep. The API stays up while this runs; a scan writes a new
+  # row set and only flips `latest_scan` when it finishes, so readers never see
+  # a half-written scan.
+  indexer:
+    <<: *common
+    container_name: landfall-indexer
+    environment:
+      DATABASE_URL: ${DATABASE_URL:?}
+      # The indexer writes in bursts and is the one thing that must not be
+      # starved of connections, but it is also single-threaded. Two is plenty.
+      PG_POOL_MAX: ${INDEXER_POOL_MAX:-2}
+      HORIZON_URL: ${HORIZON_URL:-https://horizon.stellar.org}
+      SCAN_INTERVAL_SECONDS: ${SCAN_INTERVAL_SECONDS:-3600}
+      DUST_THRESHOLD: ${DUST_THRESHOLD:-0.01}
+      MAX_RECORDS: ${MAX_RECORDS:-10000}
+    healthcheck:
+      disable: true          # it is a loop, not a server
+    command: >
+      sh -c 'while true; do
+               echo "--- scan $$(date -u +%FT%TZ) ---";
+               npm run scan -w @landfall/indexer -- \
+                 --persist \
+                 --horizon "$$HORIZON_URL" \
+                 --dust "$$DUST_THRESHOLD" \
+                 --max-records "$$MAX_RECORDS" \
+                 || echo "scan failed; the previous scan remains the published one";
+               sleep "$$SCAN_INTERVAL_SECONDS";
+             done'
+
+  # ---------------------------------------------------------------- web
+  # Opt-in: `docker compose -f docker-compose.prod.yml --profile web up -d`
+  web:
+    profiles: ["web"]
+    image: nginx:alpine
+    container_name: landfall-web
+    restart: unless-stopped
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    volumes:
+      - ./packages/web:/usr/share/nginx/html:ro
+      - ./deploy/nginx.conf:/etc/nginx/conf.d/default.conf:ro

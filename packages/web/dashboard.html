@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Landfall · Stellar — Anchor transactions</title>
+  <meta name="description" content="Every indexed transaction, per Stellar anchor, straight off the public ledger.">
+  <meta name="robots" content="index,follow">
+  <!-- Point at your API. Empty falls back to same-origin /api. -->
+  <meta name="landfall-api" content="">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body class="dash-body">
+
+<header class="topnav" id="topnav">
+  <div class="wrap topnav__in">
+    <a href="index.html" class="topnav__logo" aria-label="Landfall home">
+      <svg viewBox="0 0 40 40" class="topnav__logo-mark" aria-hidden="true">
+        <path d="M20 3 35 29H5L20 3Z" fill="currentColor"/>
+        <path d="M20 12 28 26H12l8-14Z" fill="#eaf4ef"/>
+        <path d="M20 29v7" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <span>landfall<em>.stellar</em></span>
+    </a>
+    <nav class="topnav__pill" aria-label="Dashboard navigation">
+      <a class="topnav__link" href="index.html">Overview</a>
+      <a class="topnav__link is-active" href="dashboard.html" aria-current="page">Transactions</a>
+      <a class="topnav__link" href="cross-chain.html">Cross-chain</a>
+      <a class="topnav__link" href="compare.html">Route Scout</a>
+      <a class="topnav__link" href="docs.html">API Docs</a>
+      <a class="topnav__link" href="portal.html">Developer Portal</a>
+    </nav>
+    <div class="topnav__actions">
+      <a class="dash-btn dash-btn--primary" href="portal.html">Portal / API Keys →</a>
+      <a class="dash-btn dash-btn--ghost" href="https://github.com/ibochivincent-lang/landfall" target="_blank" rel="noopener">GitHub ↗</a>
+    </div>
+  </div>
+</header>
+
+<main class="dash">
+  <div class="wrap">
+
+    <div class="dash-head">
+      <div>
+        <h1 class="dash-title">Anchor transactions</h1>
+        <p class="dash-sub">
+          Every payment we've indexed, per anchor, straight off the ledger.
+          Each row links to the transaction so you can verify it yourself.
+        </p>
+      </div>
+      <div class="freshness" id="freshness">Connecting…</div>
+    </div>
+
+    <!-- shown only when the API can't be reached -->
+    <div class="dash-empty" id="offline" hidden>
+      <p class="dash-empty__eyebrow">Live data unavailable</p>
+      <h2>The dashboard is waiting for its ledger connection.</h2>
+      <p>
+        This page reads live data from the Landfall API. Nothing is hardcoded here —
+        an offline transaction list would be worse than none, so it shows nothing
+        rather than something stale.
+      </p>
+      <p class="mono" id="offlineDetail"></p>
+      <p>
+        The landing page can still show its network snapshot. This detailed view
+        will populate as soon as the production API is connected.
+      </p>
+    </div>
+
+    <div id="live" hidden>
+      <!-- anchor picker -->
+      <div class="anchor-strip" id="anchorStrip"></div>
+      <div class="dash-stats" id="anchorStats"></div>
+      <a class="anchor-permalink" id="anchorPermalink" hidden></a>
+
+      <!-- filters -->
+      <div class="filters">
+        <div class="filter-group" role="group" aria-label="Direction filter">
+          <button class="chip is-on" data-dir="">All</button>
+          <button class="chip" data-dir="in">Inbound</button>
+          <button class="chip" data-dir="out">Outbound</button>
+        </div>
+        <label class="filter-select">
+          <span>Asset</span>
+          <select id="assetFilter"><option value="">All assets</option></select>
+        </label>
+        <label class="filter-select">
+          <span>Per page</span>
+          <select id="limitFilter">
+            <option>25</option><option selected>50</option><option>100</option><option>250</option>
+          </select>
+        </label>
+        <div class="filter-spacer"></div>
+        <button class="dash-btn dash-btn--ghost" id="exportBtn" title="Download transactions as CSV">Export CSV ↓</button>
+        <button class="dash-btn dash-btn--ghost" id="refreshBtn">Refresh</button>
+      </div>
+
+      <!-- transactions -->
+      <div class="panel tx-panel">
+        <div class="tx-scroll">
+          <table class="tx">
+            <thead>
+              <tr>
+                <th>When</th>
+                <th>Dir</th>
+                <th>Counterparty</th>
+                <th class="num">Amount</th>
+                <th>Asset</th>
+                <th>Memo</th>
+                <th>Tx</th>
+              </tr>
+            </thead>
+            <tbody id="txBody"></tbody>
+          </table>
+        </div>
+        <div class="tx-foot">
+          <span id="txCount" class="mono"></span>
+          <button class="dash-btn dash-btn--primary" id="moreBtn" hidden>Load more</button>
+        </div>
+      </div>
+
+      <p class="dash-note">
+        Amounts are exact to seven decimal places — stored as <code>NUMERIC(30,7)</code>
+        and computed in integer stroops, never floating point. Dust-flagged rows are
+        excluded from published metrics but still shown here, because hiding them
+        would make this list disagree with the ledger.
+      </p>
+
+      <!-- corridor flow matrix -->
+      <div class="panel corridor-panel" id="corridorPanel" hidden>
+        <div class="corridor-head">
+          <h2 class="corridor-title">Settlement corridors</h2>
+          <p class="corridor-sub">Cross-asset path payments indexed across all anchors — showing what value entered and what was delivered.</p>
+        </div>
+        <div class="tx-scroll">
+          <table class="tx" id="corridorTable">
+            <thead>
+              <tr>
+                <th>From asset</th>
+                <th>→</th>
+                <th>To asset</th>
+                <th class="num">Transactions</th>
+                <th class="num">Total delivered</th>
+                <th>Last seen</th>
+              </tr>
+            </thead>
+            <tbody id="corridorBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- developer / wallet integration panel -->
+      <div class="panel dev-panel" id="devPanel">
+        <div class="dev-head">
+          <div>
+            <h2 class="dev-title">Wallet & Developer Integration</h2>
+            <p class="dev-sub">Integrate Landfall's zero-trust settlement oracle into your Stellar wallet or application.</p>
+          </div>
+        </div>
+
+        <div class="dev-grid">
+          <div class="dev-card">
+            <h3>1. Pre-Flight Health Check</h3>
+            <p>Query before routing a SEP-24 / SEP-31 transfer to prevent user funds getting stuck.</p>
+            <div class="code-box">
+              <span class="code-method">GET</span> <code class="mono" id="healthCheckUrl">/api/v1/anchors/{domain}/health-check</code>
+            </div>
+            <pre class="code-block mono" id="healthCheckPreview">Loading health check sample…</pre>
+          </div>
+
+          <div class="dev-card">
+            <h3>2. Dynamic SVG Status Badge</h3>
+            <p>Embed an auto-updating reliability badge in your README or website.</p>
+            <div class="badge-preview-wrap">
+              <img id="liveBadgeImg" src="/api/v1/badges/cowrie.exchange.svg" alt="Status Badge" height="24">
+            </div>
+            <div class="code-box">
+              <code class="mono" id="badgeMarkdown">[![Landfall](https://landfall-ib.vercel.app/api/v1/badges/{domain}.svg)](https://landfall-ib.vercel.app/dashboard.html)</code>
+            </div>
+            <button class="dash-btn dash-btn--ghost btn-sm" id="copyBadgeBtn">Copy Markdown</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</main>
+
+<footer class="dash-footer">
+  <div class="wrap dash-foot-in">
+    <span>Data read from the public Stellar ledger · every figure traceable to a transaction hash</span>
+    <span>© 2026 Landfall · MIT</span>
+  </div>
+</footer>
+
+<script src="dashboard.js"></script>
+</body>
+</html>
+

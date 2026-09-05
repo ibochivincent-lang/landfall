@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Landfall · Stellar — Cross-chain settlement evidence</title>
+  <meta name="description" content="Settlement evidence per anchor across Stellar, EVM/CCTP, Tron and Solana — every number labelled with the tier of evidence behind it.">
+  <meta name="robots" content="index,follow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="dashboard.css">
+  <link rel="stylesheet" href="cross-chain.css">
+</head>
+<body class="dash-body">
+
+<header class="topnav" id="topnav">
+  <div class="wrap topnav__in">
+    <a href="index.html" class="topnav__logo" aria-label="Landfall home">
+      <svg viewBox="0 0 40 40" class="topnav__logo-mark" aria-hidden="true">
+        <path d="M20 3 35 29H5L20 3Z" fill="currentColor"/>
+        <path d="M20 12 28 26H12l8-14Z" fill="#eaf4ef"/>
+        <path d="M20 29v7" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <span>landfall<em>.stellar</em></span>
+    </a>
+    <nav class="topnav__pill" aria-label="Site navigation">
+      <a class="topnav__link" href="index.html">Overview</a>
+      <a class="topnav__link" href="dashboard.html">Transactions</a>
+      <a class="topnav__link is-active" href="cross-chain.html" aria-current="page">Cross-chain</a>
+      <a class="topnav__link" href="compare.html">Route Scout</a>
+      <a class="topnav__link" href="docs.html">API Docs</a>
+    </nav>
+    <div class="topnav__actions">
+      <a class="dash-btn dash-btn--primary" href="portal.html">Portal / API Keys →</a>
+      <a class="dash-btn dash-btn--ghost" href="https://github.com/ibochivincent-lang/landfall" target="_blank" rel="noopener">GitHub ↗</a>
+    </div>
+  </div>
+</header>
+
+<main class="dash">
+  <div class="wrap">
+
+    <div class="dash-head">
+      <div>
+        <h1 class="dash-title">Cross-chain settlement evidence</h1>
+        <p class="dash-sub">
+          One anchor identity, several chains, one schema — and an evidence tier attached to
+          every single figure. Stellar is the keystone: the only chain here where settlement is
+          <em>proven</em> from a replayable public ledger. Everything else is attested, derived,
+          or honestly marked as not yet covered.
+        </p>
+      </div>
+      <div class="freshness" id="freshness">Loading…</div>
+    </div>
+
+    <div class="dash-empty" id="offline" hidden>
+      <p class="dash-empty__eyebrow">Cross-chain artifact unavailable</p>
+      <h2>This page has nothing to show you yet.</h2>
+      <p>
+        It reads a generated cross-chain scan artifact. Nothing on this page is hardcoded, so
+        rather than render an empty shell with plausible-looking zeros in it, it shows nothing.
+      </p>
+      <p class="mono" id="offlineDetail"></p>
+    </div>
+
+    <div id="live" hidden>
+
+      <div class="attester" id="attester"></div>
+
+      <div class="dash-stats" id="totals"></div>
+      <p class="xc-anchor__note" id="windowNote"></p>
+
+      <h2 class="dash-title" style="font-size:22px;margin:36px 0 8px;">The honesty ladder</h2>
+      <p class="dash-sub" style="margin-bottom:20px;">
+        Three tiers, in descending strength. The rule that matters: a tier is never inflated, and
+        two tiers are never blended into one headline number without saying so.
+      </p>
+      <div class="ladder" id="ladder"></div>
+
+      <h2 class="dash-title" style="font-size:22px;margin:36px 0 8px;">What you are trusting on each path</h2>
+      <p class="dash-sub" style="margin-bottom:20px;">
+        Stellar has no consensus-layer interoperability standard — no IBC, no XCM, no canonical
+        rollup bridge. Every way in and out rests on a third party of some kind, and they are not
+        interchangeable. This is the reason the tiers above exist: on a chain with native interop
+        <em>it bridged</em> carries its own proof, and here it does not, so the honest unit of
+        information is not whether value moved but what you were trusting while it did.
+      </p>
+      <div class="trust-table" id="bridges"></div>
+      <p class="dash-sub" style="margin-top:14px;font-size:12px;">
+        Incidents are listed only where independently reported, with a source. An empty incident
+        list means nothing has been reported — which is not the same as a path being safe, and
+        this table must not be read as a safety rating.
+      </p>
+
+      <h2 class="dash-title" style="font-size:22px;margin:36px 0 8px;">Ranked by evidence</h2>
+      <p class="dash-sub" style="margin-bottom:16px;">
+        <code>pickAnchor()</code> sorts on PROVEN first, then ATTESTED, then DERIVED — so no
+        amount of custodial, derived evidence can ever outrank ledger-proven settlement. There is
+        deliberately no blended 0–100 score here; collapsing the tiers into one figure is exactly
+        what would let a guess pass for a measurement.
+      </p>
+      <div class="xc-anchor" id="ranked"></div>
+
+      <h2 class="dash-title" style="font-size:22px;margin:36px 0 8px;">Per anchor, per chain</h2>
+      <p class="dash-sub" style="margin-bottom:20px;">
+        Four states, kept distinct on purpose: <b>observed</b> (scanned, events found),
+        <b>empty</b> (scanned, nothing in the window), <b>unresolved</b> (no address curated for
+        this anchor on that chain — which is not the same claim as "it did nothing there"), and
+        <b>failed</b> (the scan broke, and says so rather than reporting a zero).
+      </p>
+      <div id="anchors"></div>
+
+      <p class="dash-sub" style="margin-top:32px;font-size:13px;">
+        How this is produced: <code>scripts/cross-chain-scan.ts</code> resolves each anchor's
+        identity from its SEP-1 <code>stellar.toml</code>, runs every configured
+        <code>ChainAdapter</code>, converts each settlement event into an STP attestation, and
+        writes <a href="api/v1/cross-chain.json">api/v1/cross-chain.json</a>. The schema and the
+        tier definitions live in
+        <a href="https://github.com/ibochivincent-lang/landfall/blob/main/docs/architecture/MULTICHAIN.md" target="_blank" rel="noopener">docs/architecture/MULTICHAIN.md</a>.
+      </p>
+
+    </div>
+  </div>
+</main>
+
+<script src="cross-chain.js"></script>
+</body>
+</html>

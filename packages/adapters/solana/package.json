@@ -1,0 +1,12 @@
+{
+  "name": "@landfall/adapter-solana",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "Solana ChainAdapter for SPL token transfers, gated on a bound off-chain fiat-leg proof. maxTier: DERIVED.",
+  "scripts": {
+    "test": "tsx --test test/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  }
+}

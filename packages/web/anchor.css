@@ -1,0 +1,90 @@
+/* ── Per-anchor record pages ─────────────────────────────────────────────────
+   Loaded alongside dashboard.css, which supplies the shell (topnav, footer,
+   colour variables). Only what a single-anchor page adds lives here. */
+
+.anchor-wrap { max-width: 900px; margin: 32px auto 96px; padding: 0 20px; }
+
+.backlink {
+  display: inline-block; margin-bottom: 22px;
+  font-size: 13px; font-weight: 700; color: var(--muted); text-decoration: none;
+}
+.backlink:hover { color: #0b9c91; }
+
+.anchor-title { font-size: 30px; font-weight: 800; margin: 0 0 4px; letter-spacing: -0.4px; }
+.anchor-domain { font-size: 13px; color: var(--muted); margin: 0 0 26px; }
+
+.mono { font-family: 'DM Mono', ui-monospace, SFMono-Regular, Menlo, monospace; }
+.muted { color: var(--muted); }
+.small { font-size: 12px; line-height: 1.6; }
+
+/* ── Summary strip ─────────────────────────────────────────────────────────── */
+.anchor-summary {
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px;
+  padding: 22px 24px; margin-bottom: 30px;
+  background: var(--paper); border: 1px solid var(--line); border-radius: 14px;
+}
+@media (max-width: 760px) { .anchor-summary { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 400px) { .anchor-summary { grid-template-columns: 1fr; } }
+
+.sum { display: flex; flex-direction: column; gap: 3px; }
+.sum b {
+  font-size: 24px; font-weight: 800; font-family: 'DM Mono', monospace; color: var(--ink);
+}
+.sum b.is-dark { color: #dc2626; }
+.sum span { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* ── Blocks ────────────────────────────────────────────────────────────────── */
+.anchor-block { margin-bottom: 34px; }
+.anchor-block h2 { font-size: 16px; font-weight: 800; margin: 0 0 10px; }
+.anchor-block p { font-size: 13.5px; line-height: 1.65; color: var(--ink); margin: 0 0 12px; }
+.anchor-block code {
+  font-family: 'DM Mono', monospace; font-size: 12.5px;
+  background: #f1f5f9; padding: 1px 5px; border-radius: 4px;
+}
+.anchor-block a { color: #0b9c91; font-weight: 600; }
+
+.verify-list { list-style: none; padding: 0; margin: 0 0 12px; }
+.verify-list li {
+  font-size: 12.5px; padding: 8px 12px; margin-bottom: 6px;
+  background: #f8fafc; border: 1px solid var(--line); border-radius: 7px;
+}
+
+/* ── Table ─────────────────────────────────────────────────────────────────── */
+.anchor-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.anchor-table th {
+  text-align: left; font-size: 10.5px; font-weight: 800; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.5px;
+  padding: 8px 10px; border-bottom: 1.5px solid var(--line);
+}
+.anchor-table td { padding: 11px 10px; border-bottom: 1px solid var(--line); }
+.anchor-table .num { text-align: right; font-family: 'DM Mono', monospace; }
+.anchor-table th.num { text-align: right; }
+.anchor-table a { color: #0b9c91; text-decoration: none; }
+.anchor-table a:hover { text-decoration: underline; }
+
+.state {
+  display: inline-block; padding: 2px 9px; border-radius: 99px;
+  font-size: 11px; font-weight: 800; text-transform: capitalize;
+}
+.state--live        { background: #dcfce7; color: #166534; }
+.state--slow        { background: #fef3c7; color: #92400e; }
+.state--dark        { background: #fee2e2; color: #991b1b; }
+.state--no_activity { background: #f1f5f9; color: #64748b; }
+
+.api-link {
+  display: inline-block; font-size: 12.5px;
+  background: #f1f5f9; border: 1px solid var(--line);
+  padding: 9px 13px; border-radius: 7px; text-decoration: none;
+}
+
+.asof { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--line); }
+
+/* Declared vs observed capability. Deliberately three states, not two: an
+   endpoint with no public capability document is not a failure. */
+.cap {
+  display: inline-block; padding: 2px 9px; border-radius: 99px;
+  font-size: 11px; font-weight: 800;
+}
+.cap--yes { background: #dcfce7; color: #166534; }
+.cap--no  { background: #fee2e2; color: #991b1b; }
+.cap--na  { background: #f1f5f9; color: #64748b; }

@@ -1,0 +1,76 @@
+{
+  "asOf": "2026-09-05T15:48:32.076Z",
+  "scanFile": "scan-2026-09-05T15-48-32-076Z.json",
+  "datasetRoot": "9ae307ebae20fa14096014488ee321de5e7d1eab8baa7c6eb1795ded39f7cc51",
+  "methodology": {
+    "id": "11a4c3a9bfd0c485",
+    "parameters": {
+      "maxRecords": 500,
+      "dustThreshold": "0.01",
+      "refundWindowHours": 720,
+      "refundTolerance": 0.02,
+      "livenessLiveMaxHours": 72,
+      "livenessDarkMinHours": 720,
+      "classification": "packages/indexer/src/report.ts classifyLiveness",
+      "leafNamespace": "landfall-settlement-v1"
+    }
+  },
+  "record": {
+    "account": "GBQZOJE2GWJU5VBT6NBLD2F3IOVOYUBDAXYUU32XMHDF4RMDOURWV3GT",
+    "domain": "cowrie.exchange",
+    "state": "dark",
+    "inbound": 6,
+    "outbound": 20,
+    "returns": 1,
+    "returnRate": 0.1667,
+    "hoursSinceActivity": 1402.25,
+    "sampled": 26,
+    "windowStart": "2025-07-19T15:13:55.000Z",
+    "windowEnd": "2026-06-16T14:12:35.000Z"
+  },
+  "proof": {
+    "index": 45,
+    "count": 108,
+    "path": [
+      {
+        "position": "left",
+        "hash": "8ce61158c4b552481ec276bd843f44b8183ad5a9c0e7a0b0ed73190bafdabf5a"
+      },
+      {
+        "position": "right",
+        "hash": "f8d41a1ca5e83e36a6df00a7f78161cba56d4b51d47ca90ebfc47cd4c009fabe"
+      },
+      {
+        "position": "left",
+        "hash": "8963da7ee8c3f4b8cd56e84d919164dbd7fd902065f6fc9bc810df176eee3694"
+      },
+      {
+        "position": "left",
+        "hash": "4cedcc03bb4ce525cc0415ad86a9989c5ff7aead1d42c082113eef873fd3fdff"
+      },
+      {
+        "position": "right",
+        "hash": "0d40f3f35177a078f9f84c560ee32d42c68f1e4173cc68f16e0a05abdeef2442"
+      },
+      {
+        "position": "left",
+        "hash": "c3c225c046cebf377ae1b49f47217f9ca22f5a08288307cb9136087ff7d9c999"
+      },
+      {
+        "position": "right",
+        "hash": "ab1012cc95863212526081fb0519f4b87d1ca64d3660e60d5e57f40cfd2fec06"
+      }
+    ],
+    "namespace": "landfall-settlement-v1",
+    "algorithm": "sha256-rfc6962"
+  },
+  "howToVerify": [
+    "1. Canonicalise `record` per RFC 8785 (sorted keys, no whitespace).",
+    "2. leaf = SHA-256(0x00 || 'landfall-settlement-v1' || 0x00 || canonical_bytes).",
+    "3. Walk `proof.path`: for each step, parent = SHA-256(0x01 || left || right), where the step's",
+    "   `position` says which side its hash sits on.",
+    "4. The result must equal `datasetRoot`.",
+    "Reference implementation: packages/anchoring (rootFromProof)."
+  ],
+  "limits": "This root is published in the same document it authenticates, so on its own it demonstrates reproducibility and internal consistency — not tamper-evidence. Whoever serves this file could recompute both. It becomes evidence against its own publisher once committed to the Stellar ledger (MEMO_HASH is exactly 32 bytes; see packages/anchoring) or once a third party has retained a copy of it. Until then, treat it as a checksum you can verify, not a commitment you can enforce."
+}

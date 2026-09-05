@@ -1,0 +1,213 @@
+{
+  "anchorId": "vnx.io",
+  "name": "VNX Global Ltd.",
+  "asOf": "2026-09-05T15:48:32.076Z",
+  "verification": {
+    "resolved": true,
+    "checkedAt": "2026-09-05T15:48:32.076Z",
+    "source": "SEP-1 stellar.toml, resolved live; issuer attribution confirmed against each issuer account's own on-chain home_domain",
+    "accounts": [
+      {
+        "account": "GDXLSLCOPPHTWOQXLLKSVN4VN3G67WD2ENU7UMVAROEYVJLSPSEWXIZN",
+        "role": "declared"
+      },
+      {
+        "account": "GAYTNWDWDIKMN7JXSSO4MXDLQTVJ4A7UZVW7XWECAPBUNXRMEA2SGX74",
+        "role": "declared"
+      },
+      {
+        "account": "GDYKVJVWRTERUUOU6Z4ZN3LFMNOI7YGJNATNLPGF6R5YFYGMCRKXSEVA",
+        "role": "declared"
+      },
+      {
+        "account": "GA5TCQVISVBFKLEVHEXPOTDUHZMDOF4TJM7NEJC3RE45OB2QZBK36442",
+        "role": "declared"
+      }
+    ]
+  },
+  "summary": {
+    "accounts": 4,
+    "live": 0,
+    "slow": 0,
+    "dark": 4,
+    "noActivity": 0,
+    "inbound": 70,
+    "outbound": 29
+  },
+  "accounts": [
+    {
+      "account": "GDXLSLCOPPHTWOQXLLKSVN4VN3G67WD2ENU7UMVAROEYVJLSPSEWXIZN",
+      "domain": "vnx.io",
+      "name": "VNX Global Ltd.",
+      "state": "dark",
+      "inbound": 56,
+      "outbound": 18,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 1301.96,
+      "topCounterpartyShare": 1
+    },
+    {
+      "account": "GAYTNWDWDIKMN7JXSSO4MXDLQTVJ4A7UZVW7XWECAPBUNXRMEA2SGX74",
+      "domain": "vnx.io",
+      "name": "VNX Global Ltd.",
+      "state": "dark",
+      "inbound": 11,
+      "outbound": 11,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 1750.84,
+      "topCounterpartyShare": 1
+    },
+    {
+      "account": "GDYKVJVWRTERUUOU6Z4ZN3LFMNOI7YGJNATNLPGF6R5YFYGMCRKXSEVA",
+      "domain": "vnx.io",
+      "name": "VNX Global Ltd.",
+      "state": "dark",
+      "inbound": 1,
+      "outbound": 0,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 2714.2,
+      "topCounterpartyShare": 1
+    },
+    {
+      "account": "GA5TCQVISVBFKLEVHEXPOTDUHZMDOF4TJM7NEJC3RE45OB2QZBK36442",
+      "domain": "vnx.io",
+      "name": "VNX Global Ltd.",
+      "state": "dark",
+      "inbound": 2,
+      "outbound": 0,
+      "returns": 0,
+      "returnRate": 0,
+      "hoursSinceActivity": 1109.71,
+      "topCounterpartyShare": 0.9963
+    }
+  ],
+  "history": {
+    "GDXLSLCOPPHTWOQXLLKSVN4VN3G67WD2ENU7UMVAROEYVJLSPSEWXIZN": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "dark",
+        "in": 56,
+        "out": 18,
+        "hours": 1289.31
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "dark",
+        "in": 56,
+        "out": 18,
+        "hours": 1294.24
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "dark",
+        "in": 56,
+        "out": 18,
+        "hours": 1298.56
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "dark",
+        "in": 56,
+        "out": 18,
+        "hours": 1301.96
+      }
+    ],
+    "GAYTNWDWDIKMN7JXSSO4MXDLQTVJ4A7UZVW7XWECAPBUNXRMEA2SGX74": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "dark",
+        "in": 11,
+        "out": 11,
+        "hours": 1738.19
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "dark",
+        "in": 11,
+        "out": 11,
+        "hours": 1743.12
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "dark",
+        "in": 11,
+        "out": 11,
+        "hours": 1747.44
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "dark",
+        "in": 11,
+        "out": 11,
+        "hours": 1750.84
+      }
+    ],
+    "GDYKVJVWRTERUUOU6Z4ZN3LFMNOI7YGJNATNLPGF6R5YFYGMCRKXSEVA": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "dark",
+        "in": 1,
+        "out": 0,
+        "hours": 2701.55
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "dark",
+        "in": 1,
+        "out": 0,
+        "hours": 2706.48
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "dark",
+        "in": 1,
+        "out": 0,
+        "hours": 2710.81
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "dark",
+        "in": 1,
+        "out": 0,
+        "hours": 2714.2
+      }
+    ],
+    "GA5TCQVISVBFKLEVHEXPOTDUHZMDOF4TJM7NEJC3RE45OB2QZBK36442": [
+      {
+        "t": "2026-09-05T03:09:33.499Z",
+        "state": "dark",
+        "in": 2,
+        "out": 0,
+        "hours": 1097.06
+      },
+      {
+        "t": "2026-09-05T08:05:19.744Z",
+        "state": "dark",
+        "in": 2,
+        "out": 0,
+        "hours": 1101.99
+      },
+      {
+        "t": "2026-09-05T12:24:44.641Z",
+        "state": "dark",
+        "in": 2,
+        "out": 0,
+        "hours": 1106.31
+      },
+      {
+        "t": "2026-09-05T15:48:32.076Z",
+        "state": "dark",
+        "in": 2,
+        "out": 0,
+        "hours": 1109.71
+      }
+    ]
+  },
+  "caveats": [
+    "A return is the honest failure mode. An anchor that accepts value, fails to settle and keeps it produces no return event and scores 0. A low rate is the absence of one kind of evidence, not evidence of good conduct.",
+    "Dark means no on-chain settlement in over 30 days. That is a fact about the ledger. Why an anchor is quiet is not something this project claims to know."
+  ]
+}

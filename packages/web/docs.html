@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Landfall · Stellar — Developer & Wallet API Documentation</title>
+  <meta name="description" content="Official documentation for Landfall's zero-trust Stellar anchor settlement and reliability API.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="dashboard.css">
+  <style>
+    .docs-wrap { max-width: 980px; margin: 40px auto; padding: 0 20px; }
+    .docs-section { background: var(--paper); border: 1px solid var(--line); border-radius: 16px; padding: 28px; margin-bottom: 28px; }
+    .docs-section h2 { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+    .docs-section p { color: var(--muted); line-height: 1.6; font-size: 14px; }
+    .endpoint-card { border: 1px solid var(--line); border-radius: 12px; padding: 20px; margin: 18px 0; background: #fff; }
+    .endpoint-title { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; flex-wrap: wrap; }
+    .badge-get { background: #0b9c91; color: #fff; font-size: 12px; font-weight: 800; padding: 4px 8px; border-radius: 6px; }
+    .endpoint-path { font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 700; color: var(--ink); word-break: break-all; }
+    .try-bar { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+    .try-input { flex: 1; min-width: 200px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 6px; font-family: 'DM Mono', monospace; font-size: 13px; }
+    .try-btn { background: #0b9c91; color: #fff; border: none; border-radius: 6px; padding: 8px 16px; font-weight: 700; cursor: pointer; font-size: 13px; }
+    .try-btn:hover { background: #087d74; }
+    .response-preview { background: #04121b; color: #eaf4ef; border-radius: 8px; padding: 14px; margin-top: 12px; font-size: 12px; max-height: 240px; overflow-y: auto; white-space: pre-wrap; word-break: break-all; }
+    .badge-preview-box { margin-top: 14px; padding: 16px; background: #f8fafc; border-radius: 8px; border: 1px dashed var(--line); text-align: center; }
+  </style>
+</head>
+<body class="dash-body">
+
+<header class="topnav" id="topnav">
+  <div class="wrap topnav__in">
+    <a href="index.html" class="topnav__logo" aria-label="Landfall home">
+      <svg viewBox="0 0 40 40" class="topnav__logo-mark" aria-hidden="true">
+        <path d="M20 3 35 29H5L20 3Z" fill="currentColor"/>
+        <path d="M20 12 28 26H12l8-14Z" fill="#eaf4ef"/>
+        <path d="M20 29v7" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <span>landfall<em>.stellar</em></span>
+    </a>
+    <nav class="topnav__pill" aria-label="Documentation navigation">
+      <a class="topnav__link" href="index.html">Overview</a>
+      <a class="topnav__link" href="dashboard.html">Transactions</a>
+      <a class="topnav__link" href="cross-chain.html">Cross-chain</a>
+      <a class="topnav__link" href="compare.html">Route Scout</a>
+      <a class="topnav__link is-active" href="docs.html" aria-current="page">API Docs</a>
+      <a class="topnav__link" href="portal.html">Developer Portal</a>
+    </nav>
+    <div class="topnav__actions">
+      <a class="dash-btn dash-btn--primary" href="portal.html">Portal / API Keys →</a>
+      <a class="dash-btn dash-btn--ghost" href="https://github.com/ibochivincent-lang/landfall" target="_blank" rel="noopener">GitHub ↗</a>
+    </div>
+  </div>
+</header>
+
+<main class="docs-wrap">
+  <div class="dash-head">
+    <div>
+      <h1 class="dash-title">Developer & Wallet API</h1>
+      <p class="dash-sub">Zero-trust, on-chain settlement oracle endpoints for Stellar wallets, routers, aggregators, and DeFi protocols.</p>
+    </div>
+  </div>
+
+  <!-- Section 1 -->
+  <section class="docs-section">
+    <h2>1. Pre-Flight Anchor Health Check</h2>
+    <p>
+      Stellar wallets (Vibrant, LOBSTR, Freighter) query this endpoint prior to executing SEP-24 deposits or SEP-31 cross-border remittances.
+      If <code>healthy</code> is false or grade is below C, wallets should warn users or route to an alternate anchor rail.
+    </p>
+
+    <div class="endpoint-card">
+      <div class="endpoint-title">
+        <span class="badge-get">GET</span>
+        <span class="endpoint-path">/api/v1/anchors/{domain}/health-check</span>
+      </div>
+      
+      <div class="try-bar">
+        <input type="text" id="healthDomainInput" class="try-input" value="cowrie.exchange" placeholder="Enter anchor domain (e.g. cowrie.exchange)">
+        <button class="try-btn" onclick="testHealthCheck()">Run Live Check ⚡</button>
+      </div>
+
+      <pre class="response-preview mono" id="healthCheckOut">// Click "Run Live Check" above to test against the live ledger</pre>
+    </div>
+  </section>
+
+  <!-- Section 2 -->
+  <section class="docs-section">
+    <h2>2. Dynamic SVG Status Badges</h2>
+    <p>Embed auto-updating reliability badges on anchor documentation, GitHub repositories, status pages, or ecosystem directories.</p>
+
+    <div class="endpoint-card">
+      <div class="endpoint-title">
+        <span class="badge-get">GET</span>
+        <span class="endpoint-path">/api/v1/badges/{domain}.svg</span>
+      </div>
+      
+      <div class="try-bar">
+        <input type="text" id="badgeDomainInput" class="try-input" value="cowrie.exchange" placeholder="Enter anchor domain">
+        <button class="try-btn" onclick="updateBadgePreview()">Render Badge 🏷️</button>
+      </div>
+
+      <div class="badge-preview-box">
+        <p style="font-size:12px; color:var(--muted); margin-bottom:8px;">Live Rendered SVG Badge:</p>
+        <img id="badgePreviewImg" src="/api/v1/badges/cowrie.exchange.svg" alt="Live Badge" style="height:28px;">
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 3 -->
+  <section class="docs-section">
+    <h2>3. Cross-Asset Corridors Matrix (SEP-38 & Path Payments)</h2>
+    <p>Query aggregated cross-border path payment flows, volume metrics, and source-to-destination asset liquidity pairs.</p>
+
+    <div class="endpoint-card">
+      <div class="endpoint-title">
+        <span class="badge-get">GET</span>
+        <span class="endpoint-path">/api/v1/corridors</span>
+      </div>
+      <button class="try-btn" style="margin-top:8px;" onclick="testCorridors()">Fetch Corridors Matrix ⚡</button>
+      <pre class="response-preview mono" id="corridorsOut">// Click above to fetch cross-asset corridors</pre>
+    </div>
+  </section>
+
+  <!-- Section 3b: cross-chain evidence -->
+  <section class="docs-section">
+    <h2>3b. Cross-Chain Settlement Evidence (STP)</h2>
+    <p>
+      Per-anchor settlement evidence across Stellar, EVM/CCTP, Tron and Solana, with an
+      <strong>evidence tier</strong> attached to every figure — <code>PROVEN</code> (read off the
+      Stellar ledger), <code>ATTESTED</code> (a signed cross-chain artifact such as a Circle CCTP
+      burn plus its Iris attestation), or <code>DERIVED</code> (a visible transfer bound to an
+      off-chain proof of a custodial fiat leg). Tiers are never inflated and never blended into a
+      single number. See
+      <a href="https://github.com/ibochivincent-lang/landfall/blob/main/docs/architecture/MULTICHAIN.md" target="_blank" rel="noopener">MULTICHAIN.md</a>
+      for the schema, and <a href="cross-chain.html">/cross-chain.html</a> for the rendered view.
+    </p>
+
+    <div class="endpoint-card">
+      <div class="endpoint-title">
+        <span class="badge-get">GET</span>
+        <span class="endpoint-path">/api/v1/cross-chain.json</span>
+      </div>
+      <p style="font-size:13px; color:var(--muted); margin-top:8px;">
+        Regenerated hourly by <code>scripts/cross-chain-scan.ts</code>. Each anchor carries its
+        tier mix, a per-chain state (<code>observed</code> / <code>empty</code> /
+        <code>unresolved</code> / <code>failed</code> — kept distinct, because "no address curated
+        for this anchor on Base" is not the same claim as "it settled nothing there"), per-asset
+        volumes, and sample STP attestations with a reproducible SHA-256 digest.
+      </p>
+    </div>
+  </section>
+
+  <!-- Section 3c: per-anchor record, history, attribution -->
+  <section class="docs-section">
+    <h2>3c. Anchor Records, History and Attribution</h2>
+    <p>
+      Three static artifacts, regenerated by the same hourly job and served without a database
+      in the path. Between them they answer the questions a due-diligence process actually asks:
+      <em>is this account really this business's</em>, <em>what has it done</em>, and
+      <em>what did it look like ninety days ago</em>.
+    </p>
+
+    <div class="endpoint-card">
+      <div class="endpoint-title">
+        <span class="badge-get">GET</span>
+        <span class="endpoint-path">/api/v1/anchors/{domain}/profile.json</span>
+      </div>
+      <p style="font-size:13px; color:var(--muted); margin-top:8px;">
+        One anchor's complete record: every declared account with its current state, how that
+        attribution was established, per-account observation history, and the caveats that apply.
+        Rendered for humans at <code>/anchor/{domain}</code>.
+      </p>
+    </div>
+
+    <div class="endpoint-card">
+      <div class="endpoint-title">
+        <span class="badge-get">GET</span>
+        <span class="endpoint-path">/api/v1/history.json</span>
+      </div>
+      <p style="font-size:13px; color:var(--muted); margin-top:8px;">
+        The network time series — one observation per hourly scan of how many tracked accounts
+        were settling, slow, dark, or without payment history. Points are appended, never
+        rewritten. A scan that failed verification leaves a <em>gap</em> rather than an
+        interpolated value, because a missing hour is honest and an invented one is not.
+      </p>
+    </div>
+
+    <div class="endpoint-card">
+      <div class="endpoint-title">
+        <span class="badge-get">GET</span>
+        <span class="endpoint-path">/api/v1/verify.json</span>
+      </div>
+      <p style="font-size:13px; color:var(--muted); margin-top:8px;">
+        Which on-chain accounts each anchor declares as its own, and on what basis. Attribution
+        comes from the anchor's own SEP-1 <code>stellar.toml</code>; an account cited there only
+        as a currency <em>issuer</em> is included solely when that issuer account's own on-chain
+        <code>home_domain</code> confirms the claim. Every scan is additionally checked for an
+        account claimed by two anchors before it can be published — a check added after a shared
+        stablecoin issuer was found credited to a single named business.
+      </p>
+    </div>
+  </section>
+
+  <!-- Section 3d: evidence commitments -->
+  <section class="docs-section">
+    <h2>3d. Evidence — check the figures instead of trusting them</h2>
+    <p>
+      Every scan commits the exact per-account records its published numbers derive from to a
+      Merkle root, and emits an inclusion proof per account. You can recompute a leaf from the
+      response you were served and confirm it reaches the root — so the question stops being
+      <em>"do you believe Landfall's score"</em> and becomes <em>"does the arithmetic hold"</em>.
+    </p>
+
+    <div class="endpoint-card">
+      <div class="endpoint-title">
+        <span class="badge-get">GET</span>
+        <span class="endpoint-path">/api/v1/evidence.json</span>
+      </div>
+      <p style="font-size:13px; color:var(--muted); margin-top:8px;">
+        The dataset root for the current scan, the record count, and the methodology id — a hash
+        over every parameter that changes the numbers without the ledger changing (record cap, dust
+        floor, refund window and tolerance, liveness thresholds). When that id moves, the method
+        moved, so you can tell <em>"the anchor changed"</em> from <em>"they changed how they measure"</em>.
+      </p>
+    </div>
+
+    <div class="endpoint-card">
+      <div class="endpoint-title">
+        <span class="badge-get">GET</span>
+        <span class="endpoint-path">/api/v1/evidence/{account}.json</span>
+      </div>
+      <p style="font-size:13px; color:var(--muted); margin-top:8px;">
+        One account's record, its index, and the sibling path proving it sits under the dataset
+        root. Verification is four steps and needs only SHA-256 — canonicalise the record per
+        RFC 8785, hash the leaf as <code>SHA-256(0x00 || namespace || 0x00 || bytes)</code>, walk the
+        path with <code>SHA-256(0x01 || left || right)</code>, compare to the root. The steps ship in
+        the response.
+      </p>
+    </div>
+
+    <p style="font-size:13px; line-height:1.7;">
+      <strong>What this proves, and what it does not.</strong> It proves the record you were served
+      is the one committed in that scan, and that the dataset is reproducible. It does
+      <strong>not</strong>, by itself, prove tamper-evidence: the root travels in the same document
+      it authenticates, so whoever serves that document could recompute both. A root becomes
+      evidence <em>against its own publisher</em> only once it is committed somewhere the publisher
+      cannot rewrite — the Stellar ledger, or a third party's retained copy. Every artifact says so
+      in those words, because publishing a root while implying more than it carries would be worse
+      than publishing none.
+    </p>
+  </section>
+
+  <!-- Section 3e: capability probes and routing -->
+  <section class="docs-section">
+    <h2>3e. Declared vs Observed Capability, and Routing</h2>
+    <p>
+      A <code>stellar.toml</code> saying <code>TRANSFER_SERVER_SEP0024 = "https://…"</code> is a
+      <em>claim</em> that an anchor supports hosted deposit and withdrawal. It is not a claim that the
+      endpoint answers. Directories publish the claim; wallets integrate against the claim; nothing in
+      the ecosystem checks it, and the claim can have been false for a year.
+    </p>
+
+    <div class="endpoint-card">
+      <div class="endpoint-title">
+        <span class="badge-get">GET</span>
+        <span class="endpoint-path">/api/v1/capabilities.json</span>
+      </div>
+      <p style="font-size:13px; color:var(--muted); margin-top:8px;">
+        Every SEP endpoint each tracked anchor declares, and whether it answered when asked — with
+        latency and the reason for any failure. One unauthenticated GET per declared endpoint, to the
+        public <code>/info</code> path each SEP defines. SEP-10 is judged on answering a bare challenge
+        request at all, since HTTP 400 is the correct response there and scoring it as a failure would
+        punish correct behaviour.
+      </p>
+    </div>
+
+    <div class="endpoint-card">
+      <div class="endpoint-title">
+        <span class="badge-get">GET</span>
+        <span class="endpoint-path">/api/v1/routes.json</span>
+      </div>
+      <p style="font-size:13px; color:var(--muted); margin-top:8px;">
+        The question a wallet actually has: <em>"my user is in Nigeria and wants naira — who can do that,
+        and which of them is working right now?"</em> Joins three things that previously had to be joined
+        by the caller: the currencies an anchor declares, whether its endpoints answered, and whether it
+        has settled on-chain lately. Routes are ordered by evidence — endpoints answering plus a recent
+        settlement outranks endpoints answering plus a long silence, which outranks a declared corridor
+        with a dead API. Each route carries that evidence inline, so a consumer who disagrees with the
+        ordering can impose its own.
+      </p>
+    </div>
+
+    <p style="font-size:13px; line-height:1.7;">
+      <strong>These are observations, not endorsements.</strong> Nothing here says an anchor is solvent,
+      licensed, honest, or safe to use — only that its endpoints answered a probe and its accounts moved
+      value on a public ledger. A failed probe means an endpoint did not answer correctly from one
+      vantage point at one moment; geo-blocking, rate limiting and a deploy in progress all look
+      identical from here. A single probe is an observation, not a verdict on an operator.
+    </p>
+  </section>
+
+  <!-- Section 3f: drift, corridors, audit trail -->
+  <section class="docs-section">
+    <h2>3f. Drift, Corridors and the Audit Trail</h2>
+
+    <div class="endpoint-card">
+      <div class="endpoint-title">
+        <span class="badge-get">GET</span>
+        <span class="endpoint-path">/api/v1/toml-drift.json</span>
+      </div>
+      <p style="font-size:13px; color:var(--muted); margin-top:8px;">
+        A <code>stellar.toml</code> is mutable and unsigned. An anchor can rotate its declared accounts,
+        repoint a transfer server, or change the issuer behind a currency code at any moment — and every
+        wallet reading SEP-1 will follow, because following is the point of the standard. Nothing else
+        records that it changed. This keeps a snapshot per anchor and reports the difference, with a
+        Horizon lookup on any newly declared account so an account with years of history and one created
+        yesterday can be told apart. A diff cannot distinguish a routine rotation from a hostile one and
+        never claims to; severity reflects what a change could cost someone who follows it.
+      </p>
+    </div>
+
+    <div class="endpoint-card">
+      <div class="endpoint-title">
+        <span class="badge-get">GET</span>
+        <span class="endpoint-path">/api/v1/corridors.json</span>
+      </div>
+      <p style="font-size:13px; color:var(--muted); margin-top:8px;">
+        Settlement per asset instead of per anchor. An anchor can be settling hourly in one currency and
+        dark in another, and a single per-anchor verdict hides it — zeam.money is currently settling in
+        ZARZ and GBPZ while USDZ, EURZ and USDC are dark. Counts, volumes and counterparty spread are
+        measured; per-asset liveness is <em>inferred</em> from the account carrying the asset, because the
+        scan timestamps activity per account rather than per asset, and every liveness object says so in
+        its <code>basis</code> field.
+      </p>
+    </div>
+
+    <div class="endpoint-card">
+      <div class="endpoint-title">
+        <span class="badge-get">GET</span>
+        <span class="endpoint-path">/api/v1/scan-verification.json</span>
+      </div>
+      <p style="font-size:13px; color:var(--muted); margin-top:8px;">
+        The result of every pre-publication check, written whether it passed or failed, naming the rule
+        that tripped and the accounts involved. Blocked runs matter most: the site keeps serving the
+        previous figures, so without this the only public evidence that anything happened is an hour of
+        unchanged numbers. Withholding an update is itself a claim about the data, and it should be as
+        inspectable as the data would have been.
+      </p>
+    </div>
+  </section>
+
+  <!-- Section 4: MCP Tool -->
+  <section class="docs-section">
+    <h2>4. AI Agent Integration (Model Context Protocol / MCP)</h2>
+    <p>Empower AI agents (Claude, Cursor, Antigravity) to reason about live Stellar settlement health using the official MCP server.</p>
+
+    <div class="endpoint-card">
+      <p><strong>Add Landfall to your Claude Desktop or Cursor configuration:</strong></p>
+      <pre class="response-preview mono">{
+  "mcpServers": {
+    "landfall": {
+      "command": "node",
+      "args": ["scripts/mcp/server.mjs"],
+      "env": {
+        "LANDFALL_API": "https://landfall-ib.vercel.app"
+      }
+    }
+  }
+}</pre>
+    </div>
+  </section>
+</main>
+
+<footer class="dash-footer">
+  <div class="wrap dash-foot-in">
+    <span>Data read directly from public Stellar ledger</span>
+    <span>© 2026 Landfall · MIT</span>
+  </div>
+</footer>
+
+<script>
+  function testHealthCheck() {
+    const domain = document.getElementById('healthDomainInput').value.trim() || 'cowrie.exchange';
+    const out = document.getElementById('healthCheckOut');
+    out.textContent = 'Querying live ledger...';
+    fetch('/api/v1/anchors/' + encodeURIComponent(domain) + '/health-check')
+      .then(res => res.json())
+      .then(data => { out.textContent = JSON.stringify(data, null, 2); })
+      .catch(err => { out.textContent = 'Error: ' + err.message; });
+  }
+
+  function updateBadgePreview() {
+    const domain = document.getElementById('badgeDomainInput').value.trim() || 'cowrie.exchange';
+    const img = document.getElementById('badgePreviewImg');
+    img.src = '/api/v1/badges/' + encodeURIComponent(domain) + '.svg?t=' + Date.now();
+  }
+
+  function testCorridors() {
+    const out = document.getElementById('corridorsOut');
+    out.textContent = 'Querying corridors...';
+    fetch('/api/v1/corridors')
+      .then(res => res.json())
+      .then(data => { out.textContent = JSON.stringify(data, null, 2); })
+      .catch(err => { out.textContent = 'Error: ' + err.message; });
+  }
+</script>
+
+</body>
+</html>
+

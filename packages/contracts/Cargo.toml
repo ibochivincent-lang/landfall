@@ -1,0 +1,21 @@
+[workspace]
+resolver = "2"
+members = ["landfall-oracle"]
+
+[workspace.dependencies]
+# 27.x deliberately. soroban-sdk 22.x pulls soroban-env-host 22.1.3, which
+# does not compile against ed25519-dalek 3.x — the CryptoRng trait bounds
+# changed and its test PRNG no longer satisfies them. Pinning dalek back does
+# not help, because env-host itself requires the 3.x line. Using a current SDK
+# is the actual fix.
+soroban-sdk = "27.0.6"
+
+[profile.release]
+opt-level = "z"
+overflow-checks = true
+debug = 0
+strip = "symbols"
+debug-assertions = false
+panic = "abort"
+codegen-units = 1
+lto = true

@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://landfall.dev/schema/stp-attestation-v1.json",
+  "title": "Landfall STP Attestation",
+  "description": "Settlement Truth Protocol attestation, v1. Source of truth for the runtime shape is packages/stp/src/schema.ts (zod) — keep this file in sync with that; it exists for non-TypeScript consumers and the anchors registry. See docs/architecture/MULTICHAIN.md §3.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "stp_version",
+    "anchor_id",
+    "chain",
+    "asset",
+    "direction",
+    "amount",
+    "onchain_ref",
+    "fiat_leg_ref",
+    "evidence_tier",
+    "evidence_detail",
+    "keystone_ref",
+    "observed_at",
+    "signer",
+    "sig"
+  ],
+  "properties": {
+    "stp_version": { "const": "1" },
+    "anchor_id": { "type": "string", "minLength": 1 },
+    "chain": { "type": "string", "minLength": 1 },
+    "asset": { "type": "string", "minLength": 1 },
+    "direction": {
+      "type": "string",
+      "enum": ["deposit", "withdrawal", "bridge_in", "bridge_out"]
+    },
+    "amount": {
+      "type": "string",
+      "description": "Decimal string, asset units. Never a float — precision loss is not acceptable here.",
+      "pattern": "^\\d+(\\.\\d+)?$"
+    },
+    "onchain_ref": { "type": "string", "minLength": 1 },
+    "fiat_leg_ref": { "type": ["string", "null"] },
+    "evidence_tier": {
+      "type": "string",
+      "description": "Mandatory and must match reality — never inflate a DERIVED event to read as PROVEN.",
+      "enum": ["PROVEN", "ATTESTED", "DERIVED"]
+    },
+    "evidence_detail": { "type": "string", "minLength": 1 },
+    "keystone_ref": {
+      "type": ["string", "null"],
+      "description": "Stellar tx hash this settlement roots to, when it touches the keystone chain."
+    },
+    "observed_at": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$"
+    },
+    "signer": { "type": "string", "minLength": 1 },
+    "sig": { "type": "string", "minLength": 1 }
+  }
+}
