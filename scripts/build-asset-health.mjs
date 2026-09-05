@@ -121,7 +121,7 @@ async function main() {
             note: 'Taken from the last activity of the account carrying this asset, not from the asset itself — the scan timestamps per account, not per asset.',
           },
         }))
-        .sort((a, b) => b.totalPayments - a.totalPayments);
+        .sort((a, b) => b.totalPayments - a.totalPayments || a.asset.localeCompare(b.asset));
 
       // The finding the whole file exists for: one anchor, different assets,
       // different health. Worth naming explicitly rather than leaving a reader
@@ -141,7 +141,7 @@ async function main() {
         corridors,
       };
     })
-    .sort((a, b) => b.corridorCount - a.corridorCount);
+    .sort((a, b) => b.corridorCount - a.corridorCount || a.anchor.localeCompare(b.anchor));
 
   // The same data pivoted the other way: one asset, every anchor moving it.
   const byAsset = new Map();
@@ -160,8 +160,8 @@ async function main() {
     }
   }
   const assets = [...byAsset.values()]
-    .map((a) => ({ ...a, anchors: a.anchors.sort((x, y) => y.totalPayments - x.totalPayments) }))
-    .sort((a, b) => b.totalPayments - a.totalPayments);
+    .map((a) => ({ ...a, anchors: a.anchors.sort((x, y) => y.totalPayments - x.totalPayments || x.anchor.localeCompare(y.anchor)) }))
+    .sort((a, b) => b.totalPayments - a.totalPayments || a.asset.localeCompare(b.asset));
 
   await writeFile(
     join(API, 'asset-health.json'),

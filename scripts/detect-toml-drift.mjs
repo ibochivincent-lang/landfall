@@ -308,7 +308,12 @@ async function main() {
         eventsThisRun: events.length,
         eventsRetained: history.length,
         events: history.slice().reverse(),
-        snapshots,
+        // Sorted by domain. Snapshots are filled by concurrent workers, so
+        // insertion order follows whichever domain answered first, which
+        // reordered the whole map every run and produced a 600-line diff for
+        // zero actual changes. Real drift has to be visible in the diff, so
+        // this output has to be deterministic.
+        snapshots: Object.fromEntries(Object.keys(snapshots).sort().map((d) => [d, snapshots[d]])),
       },
       null,
       2,
