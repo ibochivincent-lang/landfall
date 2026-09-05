@@ -1,17 +1,54 @@
 {
-  "checkedAt": "2026-09-05T15:53:07.609Z",
-  "scanFile": "scan-2026-09-05T15-48-32-076Z.json",
+  "checkedAt": "2026-09-05T17:49:08.607Z",
+  "scanFile": "scan-2026-09-05T17-49-07-967Z.json",
   "accountsChecked": 108,
   "comparedAgainst": {
     "publishedAccounts": 108
   },
-  "outcome": "clean",
-  "published": true,
+  "outcome": "blocked",
+  "published": false,
   "counts": {
-    "errors": 0,
+    "errors": 6,
     "warnings": 0
   },
-  "findings": [],
-  "note": "Published. Every invariant held.",
+  "findings": [
+    {
+      "severity": "error",
+      "code": "implausible-shrink",
+      "message": "mykobo.co account GCY37QZUH2P24CMCTGT2XNMRFSHVQF2DKL4N5VCY22TQ52DFUNEUTKBD fell from 1793 to 418 payments in one scan.",
+      "detail": "Published counts do not normally collapse — a drop this size means the scan lost records rather than that the ledger did, and publishing it would report an outage as an anchor going quiet. Most likely cause in this pipeline: the run had no DATABASE_URL, so it re-paged the most recent --max-records payments statelessly instead of accumulating via mergeWithHistory, and the published figures it is being compared against were built with that history. Expected when running locally; if it happens in CI, the database is unreachable and the scan is not publishable until it is back."
+    },
+    {
+      "severity": "error",
+      "code": "implausible-shrink",
+      "message": "anclap.com account GARDJZ33FTTLVKGABXDS22SYNTP4VCLYARIEWKMZKYHX3RRLPMNR3HOT fell from 1960 to 461 payments in one scan.",
+      "detail": "Published counts do not normally collapse — a drop this size means the scan lost records rather than that the ledger did, and publishing it would report an outage as an anchor going quiet. Most likely cause in this pipeline: the run had no DATABASE_URL, so it re-paged the most recent --max-records payments statelessly instead of accumulating via mergeWithHistory, and the published figures it is being compared against were built with that history. Expected when running locally; if it happens in CI, the database is unreachable and the scan is not publishable until it is back."
+    },
+    {
+      "severity": "error",
+      "code": "implausible-shrink",
+      "message": "ntokens.com account GDVKY2GU2DRXWTBEYJJWSFXIGBZV6AZNBVVSUHEPZI54LIS6BA7DVVSP fell from 532 to 40 payments in one scan.",
+      "detail": "Published counts do not normally collapse — a drop this size means the scan lost records rather than that the ledger did, and publishing it would report an outage as an anchor going quiet. Most likely cause in this pipeline: the run had no DATABASE_URL, so it re-paged the most recent --max-records payments statelessly instead of accumulating via mergeWithHistory, and the published figures it is being compared against were built with that history. Expected when running locally; if it happens in CI, the database is unreachable and the scan is not publishable until it is back."
+    },
+    {
+      "severity": "error",
+      "code": "implausible-shrink",
+      "message": "aps.money account GBN32NH6TMWE4ZD4G245CF3UVOQRXD4FK3FDCLZ4DE5642HWFKSLLRMB fell from 2976 to 500 payments in one scan.",
+      "detail": "Published counts do not normally collapse — a drop this size means the scan lost records rather than that the ledger did, and publishing it would report an outage as an anchor going quiet. Most likely cause in this pipeline: the run had no DATABASE_URL, so it re-paged the most recent --max-records payments statelessly instead of accumulating via mergeWithHistory, and the published figures it is being compared against were built with that history. Expected when running locally; if it happens in CI, the database is unreachable and the scan is not publishable until it is back."
+    },
+    {
+      "severity": "error",
+      "code": "implausible-shrink",
+      "message": "centre.io account GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN fell from 2316 to 497 payments in one scan.",
+      "detail": "Published counts do not normally collapse — a drop this size means the scan lost records rather than that the ledger did, and publishing it would report an outage as an anchor going quiet. Most likely cause in this pipeline: the run had no DATABASE_URL, so it re-paged the most recent --max-records payments statelessly instead of accumulating via mergeWithHistory, and the published figures it is being compared against were built with that history. Expected when running locally; if it happens in CI, the database is unreachable and the scan is not publishable until it is back."
+    },
+    {
+      "severity": "error",
+      "code": "implausible-shrink",
+      "message": "ultracapital.xyz account GANESLOXBZWPLB5ZM2KFUTBGSBGISB7JTWFXO67G4TGQINWRMI6766GV fell from 493 to 28 payments in one scan.",
+      "detail": "Published counts do not normally collapse — a drop this size means the scan lost records rather than that the ledger did, and publishing it would report an outage as an anchor going quiet. Most likely cause in this pipeline: the run had no DATABASE_URL, so it re-paged the most recent --max-records payments statelessly instead of accumulating via mergeWithHistory, and the published figures it is being compared against were built with that history. Expected when running locally; if it happens in CI, the database is unreachable and the scan is not publishable until it is back."
+    }
+  ],
+  "note": "This scan was NOT published. One or more invariants failed at error severity, and the site is still serving the previous scan's figures. Stale data is visible to a reader; an incoherent figure is not, so the update was withheld rather than shipped.",
   "checksApplied": "See packages/indexer/src/invariants.ts — one on-chain account claimed by two anchors, rows attributed to no anchor, duplicate rows that double-count, and payment counts moving implausibly in either direction between scans."
 }
