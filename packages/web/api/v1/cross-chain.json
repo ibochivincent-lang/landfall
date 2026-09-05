@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-05T19:42:50.822Z",
+  "generatedAt": "2026-09-05T21:47:59.289Z",
   "stpVersion": "1",
   "window": {
-    "since": "2026-08-06T19:42:40.844Z",
+    "since": "2026-08-06T21:47:40.246Z",
     "days": 30,
     "maxRecordsPerAccount": 200
   },
@@ -55,7 +55,7 @@
     }
   ],
   "totals": {
-    "PROVEN": 1794,
+    "PROVEN": 1788,
     "ATTESTED": 0,
     "DERIVED": 0
   },
@@ -123,12 +123,12 @@
     {
       "anchorId": "anclap.com",
       "evidence": {
-        "PROVEN": 50,
+        "PROVEN": 49,
         "ATTESTED": 0,
         "DERIVED": 0
       },
-      "tierMix": "PROVEN 50 · ATTESTED 0 · DERIVED 0",
-      "rationale": "Ranked on 50 ledger-proven settlement(s)."
+      "tierMix": "PROVEN 49 · ATTESTED 0 · DERIVED 0",
+      "rationale": "Ranked on 49 ledger-proven settlement(s)."
     },
     {
       "anchorId": "ixinium.io",
@@ -153,12 +153,12 @@
     {
       "anchorId": "afreum.com",
       "evidence": {
-        "PROVEN": 34,
+        "PROVEN": 29,
         "ATTESTED": 0,
         "DERIVED": 0
       },
-      "tierMix": "PROVEN 34 · ATTESTED 0 · DERIVED 0",
-      "rationale": "Ranked on 34 ledger-proven settlement(s)."
+      "tierMix": "PROVEN 29 · ATTESTED 0 · DERIVED 0",
+      "rationale": "Ranked on 29 ledger-proven settlement(s)."
     },
     {
       "anchorId": "audd.digital",
@@ -348,17 +348,17 @@
         "tiers": [
           {
             "tier": "PROVEN",
-            "events": 34,
+            "events": 29,
             "byAsset": [
               {
                 "asset": "AFR",
-                "count": 21,
-                "volume": "11725.0736861"
+                "count": 17,
+                "volume": "10044.0535678"
               },
               {
                 "asset": "AFRX",
-                "count": 3,
-                "volume": "0.0028255"
+                "count": 2,
+                "volume": "0.0004563"
               },
               {
                 "asset": "AEUR",
@@ -428,7 +428,7 @@
             "chain": "stellar",
             "maxTier": "PROVEN",
             "state": "observed",
-            "events": 34,
+            "events": 29,
             "sourcesScanned": 6,
             "sourcesFailed": 0
           },
@@ -496,8 +496,8 @@
             "note": "no solana address curated for this anchor in registry/anchors.registry.json"
           }
         ],
-        "totalEvents": 34,
-        "tierMix": "PROVEN 34 · ATTESTED 0 · DERIVED 0"
+        "totalEvents": 29,
+        "tierMix": "PROVEN 29 · ATTESTED 0 · DERIVED 0"
       },
       "failures": [],
       "sampleAttestations": [
@@ -573,12 +573,12 @@
         "tiers": [
           {
             "tier": "PROVEN",
-            "events": 50,
+            "events": 49,
             "byAsset": [
               {
                 "asset": "ARS",
-                "count": 49,
-                "volume": "11154282.3687438"
+                "count": 48,
+                "volume": "10976092.3687438"
               },
               {
                 "asset": "XLM",
@@ -603,7 +603,7 @@
             "chain": "stellar",
             "maxTier": "PROVEN",
             "state": "observed",
-            "events": 50,
+            "events": 49,
             "sourcesScanned": 3,
             "sourcesFailed": 0
           },
@@ -671,8 +671,8 @@
             "note": "no solana address curated for this anchor in registry/anchors.registry.json"
           }
         ],
-        "totalEvents": 50,
-        "tierMix": "PROVEN 50 · ATTESTED 0 · DERIVED 0"
+        "totalEvents": 49,
+        "tierMix": "PROVEN 49 · ATTESTED 0 · DERIVED 0"
       },
       "failures": [],
       "sampleAttestations": [
@@ -900,38 +900,38 @@
             "byAsset": [
               {
                 "asset": "APSEURM",
-                "count": 94,
-                "volume": "1374317.79"
+                "count": 131,
+                "volume": "1374669.4"
               },
               {
                 "asset": "APSUSDM",
-                "count": 78,
-                "volume": "814858.55"
+                "count": 59,
+                "volume": "813713.01"
               },
               {
                 "asset": "APSBPIUSD",
-                "count": 43,
-                "volume": "2015.7"
+                "count": 31,
+                "volume": "3144.28"
               },
               {
                 "asset": "APSBPOUSD",
-                "count": 21,
-                "volume": "5182.74"
+                "count": 15,
+                "volume": "1362.68"
               },
               {
                 "asset": "APSBPIEUR",
-                "count": 12,
-                "volume": "469.43"
+                "count": 13,
+                "volume": "299.55"
               },
               {
                 "asset": "APSSARM",
-                "count": 10,
-                "volume": "6712771.88"
+                "count": 8,
+                "volume": "6707335.17"
               },
               {
                 "asset": "APSBPIGBP",
-                "count": 1,
-                "volume": "23.7000000"
+                "count": 2,
+                "volume": "77.32"
               }
             ]
           },
@@ -1103,29 +1103,29 @@
                 "volume": "2800638.2471883"
               },
               {
+                "asset": "gdICE",
+                "count": 41,
+                "volume": "746952363.51299"
+              },
+              {
                 "asset": "upvoteICE",
-                "count": 42,
-                "volume": "36512853.2678621"
+                "count": 40,
+                "volume": "32501739.324151"
               },
               {
                 "asset": "governICE",
-                "count": 42,
-                "volume": "36512853.2678621"
+                "count": 40,
+                "volume": "32501739.324151"
               },
               {
                 "asset": "ICE",
-                "count": 41,
-                "volume": "36480774.2853571"
-              },
-              {
-                "asset": "gdICE",
-                "count": 39,
-                "volume": "735379968.8148256"
+                "count": 40,
+                "volume": "32501739.324151"
               },
               {
                 "asset": "dICE",
-                "count": 36,
-                "volume": "497649151.7580588"
+                "count": 39,
+                "volume": "507226744.3153014"
               }
             ]
           },
@@ -2654,7 +2654,7 @@
               {
                 "asset": "XTAR",
                 "count": 180,
-                "volume": "0.0215529"
+                "volume": "0.0215525"
               },
               {
                 "asset": "AQUA",
@@ -2807,16 +2807,16 @@
             "chain": "stellar",
             "asset": "XTAR",
             "direction": "deposit",
-            "amount": "0.0001641",
-            "onchain_ref": "9aa96253178bfafc3452796cc80cc9341f1df7f91bd4a4ec49a1371114e7afb1",
+            "amount": "0.0000753",
+            "onchain_ref": "6e6080f739a811267e4edd024ac317a9357852eb79c9aafcc950aacf2f6115f6",
             "fiat_leg_ref": null,
             "evidence_tier": "PROVEN",
             "evidence_detail": "stellar_ledger",
             "keystone_ref": null,
-            "observed_at": "2026-09-05T19:01:11Z",
+            "observed_at": "2026-09-05T21:01:01Z",
             "signer": "landfall-attester-dev"
           },
-          "digest": "55c2041046a1623dfa985aef99f928d0090988a3a195a98e769c66ae9c9ba8cb",
+          "digest": "0670d6ede87d46a9db5fcdafc02530696c6bb7fcb0f714a9bcebfdae64339dfc",
           "signed": false
         }
       ]
@@ -4359,24 +4359,24 @@
             "events": 256,
             "byAsset": [
               {
-                "asset": "yETH",
-                "count": 113,
-                "volume": "34.283075"
+                "asset": "yXLM",
+                "count": 224,
+                "volume": "533154.1395758"
               },
               {
                 "asset": "yUSDC",
-                "count": 105,
-                "volume": "75641.2164838"
-              },
-              {
-                "asset": "yXLM",
-                "count": 25,
-                "volume": "533141.9515873"
+                "count": 14,
+                "volume": "75641.0054574"
               },
               {
                 "asset": "XLM",
                 "count": 5,
                 "volume": "3.000426"
+              },
+              {
+                "asset": "yETH",
+                "count": 5,
+                "volume": "34.2823384"
               },
               {
                 "asset": "yBTC",

@@ -1,6 +1,6 @@
 {
-  "checkedAt": "2026-09-05T19:42:03.034Z",
-  "scanFile": "scan-2026-09-05T19-42-02-404Z.json",
+  "checkedAt": "2026-09-05T21:47:02.173Z",
+  "scanFile": "scan-2026-09-05T21-47-01-556Z.json",
   "accountsChecked": 108,
   "comparedAgainst": {
     "publishedAccounts": 108
@@ -45,7 +45,7 @@
     {
       "severity": "error",
       "code": "implausible-shrink",
-      "message": "ultracapital.xyz account GANESLOXBZWPLB5ZM2KFUTBGSBGISB7JTWFXO67G4TGQINWRMI6766GV fell from 493 to 28 payments in one scan.",
+      "message": "ultracapital.xyz account GANESLOXBZWPLB5ZM2KFUTBGSBGISB7JTWFXO67G4TGQINWRMI6766GV fell from 493 to 164 payments in one scan.",
       "detail": "Published counts do not normally collapse — a drop this size means the scan lost records rather than that the ledger did, and publishing it would report an outage as an anchor going quiet. Most likely cause in this pipeline: the run had no DATABASE_URL, so it re-paged the most recent --max-records payments statelessly instead of accumulating via mergeWithHistory, and the published figures it is being compared against were built with that history. Expected when running locally; if it happens in CI, the database is unreachable and the scan is not publishable until it is back."
     }
   ],
