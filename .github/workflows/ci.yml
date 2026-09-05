@@ -28,27 +28,47 @@ jobs:
 
       - run: npm ci
 
+      # Typecheck and tests run FIRST and unconditionally.
+      #
+      # They used to sit behind the database steps below, which meant a
+      # missing DATABASE_URL secret skipped them entirely — the run went red
+      # with no code signal at all, and "tests failing" and "secret absent"
+      # looked identical from the outside. The code checks need no database,
+      # so nothing should be able to stop them reporting.
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npm test
+
+      # ── Database steps ────────────────────────────────────────────────────
+      # The database is optional in this project: the scan runs without it and
+      # publishes static JSON either way. So an absent secret skips these with
+      # a note rather than failing, but a secret that IS set and does not work
+      # still fails the run — a broken database is worth knowing about, an
+      # unconfigured one is not the same thing and should not read as one.
       - name: Install PostgreSQL client
-        if: github.event_name == 'push' && matrix.node == '20'
+        if: github.event_name == 'push' && matrix.node == '20' && env.DATABASE_URL != ''
         run: |
           sudo apt-get update
           sudo apt-get install -y postgresql-client
 
       - name: Test database connection
-        if: github.event_name == 'push' && matrix.node == '20'
+        if: github.event_name == 'push' && matrix.node == '20' && env.DATABASE_URL != ''
         run: |
           psql "$DATABASE_URL" \
             -v ON_ERROR_STOP=1 \
             -c "SELECT 1 AS database_ok;"
 
       - name: Run database migrations
-        if: github.event_name == 'push' && matrix.node == '20'
+        if: github.event_name == 'push' && matrix.node == '20' && env.DATABASE_URL != ''
         run: |
           chmod +x scripts/migrate.sh
           ./scripts/migrate.sh
 
-      - name: Typecheck
-        run: npm run typecheck
-
-      - name: Test
-        run: npm test
+      - name: Note skipped database checks
+        if: github.event_name == 'push' && matrix.node == '20' && env.DATABASE_URL == ''
+        run: |
+          echo "DATABASE_URL is not set — connection and migration checks skipped."
+          echo "Typecheck and tests above are unaffected; they need no database."
+          echo "Set the secret in Settings → Secrets and variables → Actions to enable them."
