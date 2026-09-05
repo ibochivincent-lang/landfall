@@ -1,5 +1,5 @@
 /**
- * build-corridors.mjs
+ * build-asset-health.mjs
  *
  * Settlement health per asset, instead of per anchor.
  *
@@ -11,7 +11,7 @@
  *
  * This surfaces what was already measured.
  *
- *   node scripts/build-corridors.mjs  →  packages/web/api/v1/corridors.json
+ *   node scripts/build-asset-health.mjs  →  packages/web/api/v1/asset-health.json
  *
  * What it can and cannot say
  * --------------------------
@@ -164,7 +164,7 @@ async function main() {
     .sort((a, b) => b.totalPayments - a.totalPayments);
 
   await writeFile(
-    join(API, 'corridors.json'),
+    join(API, 'asset-health.json'),
     JSON.stringify(
       {
         generatedAt: new Date().toISOString(),
@@ -200,10 +200,10 @@ async function main() {
         a.corridors.map((c) => `${c.asset}:${c.liveness.state}`).join('  '),
     );
   }
-  console.log(`✓ ${join(API, 'corridors.json')}`);
+  console.log(`✓ ${join(API, 'asset-health.json')}`);
 }
 
 main().catch((err) => {
-  console.error('build-corridors failed:', err);
+  console.error('build-asset-health failed:', err);
   process.exit(1);
 });

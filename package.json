@@ -48,7 +48,7 @@
     "anchors:probe": "node scripts/probe-capabilities.mjs",
     "anchors:routes": "node scripts/build-routes.mjs",
     "anchors:drift": "node scripts/detect-toml-drift.mjs",
-    "anchors:corridors": "node scripts/build-corridors.mjs"
+    "anchors:asset-health": "node scripts/build-asset-health.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.30.0",

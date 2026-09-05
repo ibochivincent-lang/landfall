@@ -164,14 +164,14 @@ jobs:
         continue-on-error: true
         run: node scripts/detect-toml-drift.mjs
 
-      # ── 5b5. Per-asset corridor health ───────────────────────────────────────
+      # ── 5b5. Per-asset settlement health ─────────────────────────────────────
       # The scan already computes byAsset totals and the API rolled them up into
       # one verdict per anchor, hiding anchors busy in one asset and dark in
       # another. This surfaces what was already measured.
-      - name: Build corridor matrix
+      - name: Build per-asset settlement health
         if: steps.verify.outcome == 'success'
         continue-on-error: true
-        run: node scripts/build-corridors.mjs
+        run: node scripts/build-asset-health.mjs
 
       # ── 5c. Cross-chain scan → tier-labelled artifact ─────────────────────────
       # Runs the ChainAdapter layer (docs/architecture/MULTICHAIN.md) over every
@@ -236,7 +236,7 @@ jobs:
                   packages/web/api/v1/history.json packages/web/api/v1/verify.json \
                   packages/web/api/v1/anchors packages/web/api/v1/evidence packages/web/api/v1/evidence.json packages/web/api/v1/anchor-fees.json packages/web/api/v1/capabilities.json packages/web/api/v1/routes.json \
                   packages/web/api/v1/scan-verification.json packages/web/api/v1/toml-drift.json \
-                  packages/web/api/v1/corridors.json \
+                  packages/web/api/v1/asset-health.json \
                   packages/web/anchor packages/web/index.html
           # Only commit if there are actual changes
           git diff --staged --quiet || git commit -m "chore: hourly ledger scan $(date -u +%Y-%m-%d-%H00)"
