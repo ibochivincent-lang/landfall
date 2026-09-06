@@ -53,18 +53,23 @@ which the Soroban environment does not support. Needs Rust 1.84+."
 
 # A host C linker. Counter-intuitive but required: the output is wasm, yet
 # cargo compiles proc-macro crates and build scripts for the HOST, and those
-# need a native linker. Usually present here; the check costs nothing and the
-# failure it prevents ("linker `cc` not found", 194 crates in) looks like a
-# Rust problem and is not.
-command -v cc >/dev/null 2>&1 || command -v gcc >/dev/null 2>&1 || fail \
-"No C compiler on PATH (cc or gcc).
-
-Proc-macros and build scripts compile for this machine even though the
-contract targets wasm, and they need a native linker.
+# need a native linker.
+#
+# A WARNING, not a failure. This used to be a hard fail and it was wrong: on
+# Windows the linker ships inside the Rust toolchain rather than on PATH, so
+# `cc`/`gcc` are both absent on a machine where `cargo build` succeeds in
+# seventeen seconds. Blocking there is a false positive that stops a deploy
+# that would have worked. The build step below is the real test — it either
+# links or it doesn't — so this only front-loads a better error message for
+# the case where it genuinely is a missing toolchain.
+if ! command -v cc >/dev/null 2>&1 && ! command -v gcc >/dev/null 2>&1; then
+  printf '\n\033[33mNote: no cc/gcc on PATH.\033[0m Fine if your Rust toolchain bundles its own
+linker (Windows does). If the build below fails with "linker not found":
 
   Debian/Ubuntu   sudo apt-get install build-essential
   Fedora          sudo dnf install gcc
-  macOS           xcode-select --install"
+  macOS           xcode-select --install\n'
+fi
 
 case "$NETWORK" in
   local)   RPC="${SOROBAN_RPC_URL:-http://localhost:8001}"
@@ -159,10 +164,15 @@ stellar contract invoke \
 # `initialise` is guarded against a second call, so verifying it took is a real
 # check rather than a formality: a silent no-op here means the deploy reused an
 # existing instance.
+# get_epoch, not epoch. The contract has never exported `epoch`, so this
+# check silently reported "could not read epoch back" on every deploy it has
+# ever run — a verification step that verified nothing, hidden by its own
+# graceful fallback. Caught by running a testnet deploy and asking the
+# contract what functions it actually has.
 if EPOCH="$(stellar contract invoke \
   --id "$CONTRACT_ID" --source-account "$IDENTITY" \
   --rpc-url "$RPC" --network-passphrase "$PASSPHRASE" \
-  -- epoch 2>/dev/null)"; then
+  -- get_epoch 2>/dev/null)"; then
   printf '     epoch reads back as %s\n' "$EPOCH"
 else
   # Say the check did not run rather than printing a placeholder. The
