@@ -1,0 +1,119 @@
+{
+  "generatedAt": "2026-09-06T10:05:45.776Z",
+  "note": "Live indicative FX rates from each anchor's own SEP-38 quote server, sampled at $100 once an hour. Replaces the hardcoded rateSpread catalogue in packages/web/compare.js wherever an anchor runs SEP-38 and declares the asset pair — see docs.html and README for which anchors that is today.",
+  "caveat": "GET /price is indicative, not firm — an anchor can quote differently at execution time, and its price can vary with amount (fee tiers), so this is a $100 sample, not a guarantee. Anchors with no ANCHOR_QUOTE_SERVER, or whose /info does not list a corridor Route Scout shows, still fall back to the catalogue rateSpread — status distinguishes exactly why per anchor.",
+  "counts": {
+    "anchorsWithALiveQuote": 0,
+    "noSep38Server": 12,
+    "unreachable": 2
+  },
+  "anchors": {
+    "cowrie.exchange": {
+      "domain": "cowrie.exchange",
+      "status": "no-sep38",
+      "reason": "stellar.toml declares no ANCHOR_QUOTE_SERVER",
+      "corridors": {}
+    },
+    "stellar.moneygram.com": {
+      "domain": "stellar.moneygram.com",
+      "status": "no-sep38",
+      "reason": "stellar.toml declares no ANCHOR_QUOTE_SERVER",
+      "corridors": {}
+    },
+    "anclap.com": {
+      "domain": "anclap.com",
+      "status": "no-sep38",
+      "reason": "stellar.toml declares no ANCHOR_QUOTE_SERVER",
+      "corridors": {}
+    },
+    "mykobo.co": {
+      "domain": "mykobo.co",
+      "status": "no-sep38",
+      "reason": "stellar.toml declares no ANCHOR_QUOTE_SERVER",
+      "corridors": {}
+    },
+    "ntokens.com": {
+      "domain": "ntokens.com",
+      "status": "no-sep38",
+      "reason": "stellar.toml declares no ANCHOR_QUOTE_SERVER",
+      "corridors": {}
+    },
+    "clickpesa.com": {
+      "domain": "clickpesa.com",
+      "status": "unreachable",
+      "reason": "stellar.toml: HTTP 404",
+      "corridors": {}
+    },
+    "zeam.money": {
+      "domain": "zeam.money",
+      "status": "ok",
+      "endpoint": "https://anchor.zeam.money/sep38",
+      "corridors": {
+        "ZAR": {
+          "status": "unsupported-corridor",
+          "reason": "anchor's SEP-38 /info does not list ZAR"
+        },
+        "USD": {
+          "status": "unsupported-corridor",
+          "reason": "anchor's SEP-38 /info does not list USD"
+        },
+        "EUR": {
+          "status": "unsupported-corridor",
+          "reason": "anchor's SEP-38 /info does not list EUR"
+        },
+        "GBP": {
+          "status": "unsupported-corridor",
+          "reason": "anchor's SEP-38 /info does not list GBP"
+        }
+      }
+    },
+    "ngnc.online": {
+      "domain": "ngnc.online",
+      "status": "no-sep38",
+      "reason": "stellar.toml declares no ANCHOR_QUOTE_SERVER",
+      "corridors": {}
+    },
+    "aps.money": {
+      "domain": "aps.money",
+      "status": "no-sep38",
+      "reason": "stellar.toml declares no ANCHOR_QUOTE_SERVER",
+      "corridors": {}
+    },
+    "mgusd.moneygram.com": {
+      "domain": "mgusd.moneygram.com",
+      "status": "no-sep38",
+      "reason": "stellar.toml declares no ANCHOR_QUOTE_SERVER",
+      "corridors": {}
+    },
+    "afreum.com": {
+      "domain": "afreum.com",
+      "status": "no-sep38",
+      "reason": "stellar.toml declares no ANCHOR_QUOTE_SERVER",
+      "corridors": {}
+    },
+    "stablecoin.z.com": {
+      "domain": "stablecoin.z.com",
+      "status": "no-sep38",
+      "reason": "stellar.toml declares no ANCHOR_QUOTE_SERVER",
+      "corridors": {}
+    },
+    "audd.digital": {
+      "domain": "audd.digital",
+      "status": "unreachable",
+      "reason": "stellar.toml: fetch failed",
+      "corridors": {}
+    },
+    "dcm.systems": {
+      "domain": "dcm.systems",
+      "status": "no-sep38",
+      "reason": "stellar.toml declares no ANCHOR_QUOTE_SERVER",
+      "corridors": {}
+    },
+    "clpx.finance": {
+      "domain": "clpx.finance",
+      "status": "no-sep38",
+      "reason": "stellar.toml declares no ANCHOR_QUOTE_SERVER",
+      "corridors": {}
+    }
+  }
+}

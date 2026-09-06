@@ -267,6 +267,36 @@ function loadAnchorFees() {
     .catch(function() { feesMap = {}; });
 }
 
+/* Live FX rates, same treatment: scripts/fetch-anchor-quotes.mjs asks each
+   anchor's own SEP-38 quote server, hourly. rateSpread below is the number
+   this file used before that existed — never revisited, no anchor behind it.
+   quotedRateFor() prefers the live figure and says so; the constant is the
+   fallback for anchors that don't run SEP-38, not the default answer. */
+var quotesMap = null;
+
+function loadAnchorQuotes() {
+  return fetch('api/v1/anchor-quotes.json')
+    .then(function(res) { return res.ok ? res.json() : null; })
+    .then(function(body) { quotesMap = (body && body.anchors) || {}; })
+    .catch(function() { quotesMap = {}; });
+}
+
+/**
+ * A live SEP-38 price for this anchor/corridor, or null when none exists.
+ *
+ * Returns the anchor's own price directly — not adjusted, not blended with
+ * the catalog spread — because it is already the anchor's real quote for
+ * this corridor and adjusting it would just be reintroducing a guess next
+ * to a fact.
+ */
+function liveRateFor(anchor, corridor) {
+  var live = quotesMap && quotesMap[anchor.domain];
+  if (!live || !live.corridors) return null;
+  var c = live.corridors[corridor];
+  if (!c || c.status !== 'ok') return null;
+  return c;
+}
+
 /**
  * The withdrawal terms an anchor currently publishes for one corridor.
  *
@@ -402,7 +432,7 @@ function runScout() {
 
   /* If reliability hasn't loaded yet, fetch it first then re-run */
   if (reliabilityMap === null) {
-    Promise.all([loadReliability(), loadAnchorFees()]).then(function() { renderResults(from, to, amount, baseRate, sym, basis); });
+    Promise.all([loadReliability(), loadAnchorFees(), loadAnchorQuotes()]).then(function() { renderResults(from, to, amount, baseRate, sym, basis); });
   } else {
     renderResults(from, to, amount, baseRate, sym, basis);
   }
@@ -432,10 +462,19 @@ function renderResults(from, to, amount, baseRate, sym, basis) {
     var live = publishedTerms(a, to);
     var feeSource = live ? 'live' : (a.feesPublished === false ? null : 'catalog');
 
-    meta[a.domain] = { url: a.url, speed: a.speed, methods: a.methods, rel: rel };
+    // A live SEP-38 price is the anchor's own current quote, in absolute
+    // terms (e.g. 1,608 NGN per USDC) — not a spread multiplier like the
+    // catalog constant. Converting it to an equivalent rateSpread (price ÷
+    // mid-market) lets it flow through the same solver math unchanged,
+    // while rateSource records which kind of number it actually is.
+    var liveQuote = liveRateFor(a, to);
+    var rateSource = liveQuote ? 'live' : 'catalog';
+    var rateSpread = liveQuote ? (liveQuote.price / baseRate) : (a.rateSpread || 1);
+
+    meta[a.domain] = { url: a.url, speed: a.speed, methods: a.methods, rel: rel, rateSource: rateSource, liveQuote: liveQuote };
     return {
       domain: a.domain, name: a.name,
-      rateSpread: a.rateSpread || 1,
+      rateSpread: rateSpread,
       feePercent: live ? live.feePercent : a.feePercent,
       feeFixed: live ? live.feeFixed : a.feeFixed,
       feeSource: feeSource,
@@ -455,7 +494,7 @@ function renderResults(from, to, amount, baseRate, sym, basis) {
     return {
       name: sol.name, domain: sol.domain, url: m.url, speed: m.speed, methods: m.methods,
       from: from, to: to, rel: m.rel,
-      priced: sol.priced, feeSource: sol.feeSource,
+      priced: sol.priced, feeSource: sol.feeSource, rateSource: m.rateSource,
       rate: sol.rate, fee: sol.fee,
       feePercent: candidates.filter(function(c){return c.domain===sol.domain;})[0].feePercent,
       feeFixed: candidates.filter(function(c){return c.domain===sol.domain;})[0].feeFixed,
@@ -544,7 +583,10 @@ function renderCards(quotes, sym) {
           '<div class="cell-lbl">Exchange Rate</div>' +
           (q.priced
             ? '<div class="cell-val">' + sym + fmtNum(q.rate, '') + '</div>' +
-              '<div class="cell-sub">per 1 ' + esc(q.from) + '</div>'
+              '<div class="cell-sub">per 1 ' + esc(q.from) + '</div>' +
+              (q.rateSource === 'live'
+                ? '<div class="cell-sub fee-src">live SEP-38 quote</div>'
+                : '<div class="cell-sub fee-src is-stale">estimated spread — not confirmed with the anchor</div>')
             : '<div class="cell-val cell-val--none">Not published</div>' +
               '<div class="cell-sub">quoted at withdrawal</div>') +
         '</div>' +
@@ -615,7 +657,7 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   /* Initial load: pre-fetch reliability then scout */
-  Promise.all([loadReliability(), loadAnchorFees()]).then(function() { runScout(); });
+  Promise.all([loadReliability(), loadAnchorFees(), loadAnchorQuotes()]).then(function() { runScout(); });
 });
 
 function triggerScout() {

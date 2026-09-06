@@ -140,6 +140,16 @@ jobs:
         continue-on-error: true
         run: node scripts/fetch-anchor-fees.mjs
 
+      # ── 5b2b. Refresh each anchor's own live FX quote ────────────────────────
+      # Asks every tracked anchor's SEP-38 quote server for a live indicative
+      # price, the same fix as the fee step above for the other hardcoded
+      # number in compare.js: rateSpread. Most anchors don't run SEP-38 yet —
+      # the artifact says exactly which, and why — but the ones that do get
+      # priced from a live quote instead of a constant nobody has revisited.
+      - name: Refresh anchor FX quotes
+        continue-on-error: true
+        run: node scripts/fetch-anchor-quotes.mjs
+
       # ── 5b3. Declared capability vs observed capability ──────────────────────
       # Probes every SEP endpoint each anchor declares and records whether it
       # answered. Directories publish the claim; nothing checks it. Then joins
@@ -236,7 +246,7 @@ jobs:
                   packages/web/api/v1/history.json packages/web/api/v1/verify.json \
                   packages/web/api/v1/anchors packages/web/api/v1/evidence packages/web/api/v1/evidence.json packages/web/api/v1/anchor-fees.json packages/web/api/v1/capabilities.json packages/web/api/v1/routes.json \
                   packages/web/api/v1/scan-verification.json packages/web/api/v1/toml-drift.json \
-                  packages/web/api/v1/asset-health.json \
+                  packages/web/api/v1/asset-health.json packages/web/api/v1/anchor-quotes.json \
                   packages/web/anchor packages/web/index.html
           # Only commit if there are actual changes
           git diff --staged --quiet || git commit -m "chore: hourly ledger scan $(date -u +%Y-%m-%d-%H00)"

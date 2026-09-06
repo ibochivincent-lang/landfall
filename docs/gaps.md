@@ -284,6 +284,43 @@ The second is stronger. Landfall's whole claim is that it publishes only what
 the ledger proves, and a rate table is precisely the kind of anchor-supplied
 number the project exists to distrust.
 
+**Partly fixed, 6 September.** Fees were the first half fixed — see the "Also
+closed" entry below: `scripts/fetch-anchor-fees.mjs` now reads each anchor's
+own SEP-24 `/info`, live, and it found the hardcoded numbers were materially
+wrong (Anclap 2% where this table said 0.5%, nTokens 20% where it said 0.4%).
+
+The rate half is fixed the same way today: `scripts/fetch-anchor-quotes.mjs`
+asks each anchor's own SEP-38 quote server (`ANCHOR_QUOTE_SERVER` in its
+stellar.toml) for a live indicative price and Route Scout uses it when one
+exists, labelling the card "live SEP-38 quote" rather than presenting it
+identically to the guess. That is a real, honest result — not the same as
+"fixed" in the sense of the rates now being live:
+
+Of the 15 anchors Route Scout tracks, **zero** currently produce a usable
+quote. Twelve declare no `ANCHOR_QUOTE_SERVER` at all. One (zeam.money) runs a
+SEP-38 server, but its `/info` lists BRL — not the ZAR/USD/EUR/GBP corridors
+Route Scout shows for it — which looks like a shared reference or demo
+implementation rather than that anchor's actual rails. Two more are
+unreachable. `/api/v1/anchor-quotes.json` records the exact reason per anchor
+rather than collapsing all of this into one "unavailable".
+
+So the mechanism this section originally asked for now exists and is
+correct — the moment any tracked anchor turns on a real SEP-38 quote server
+for a corridor it actually serves, Route Scout starts pricing it live,
+automatically. But the rate column is, honestly, still the catalogue estimate
+for every anchor today, for a different reason than before: not because
+nobody checked, but because the ecosystem hasn't adopted the standard yet.
+Fix 1 above (label the column illustrative until this changes) is still the
+accurate framing of the current UI.
+
+Also removed: the `GET /api/v1/quotes/compare` route quoted above was a second,
+separate hardcoded catalogue — server-side, undocumented, unused by any page,
+and its numbers had already drifted further than compare.js's own (Anclap
+0.5% there against the 2% now known to be real). It served invented figures to
+anyone who found it with zero indication they weren't live. Deleted rather
+than fixed — nothing depended on it, and a second copy of this exact problem
+did not need a second fix, it needed to not exist.
+
 ---
 
 ## Also closed 14 August: password-reset delivery, rate limiting, webhooks, oracle publish

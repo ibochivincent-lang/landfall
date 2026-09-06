@@ -389,6 +389,35 @@
     </div>
   </section>
 
+  <!-- Section 3h: live FX quotes -->
+  <section class="docs-section">
+    <h2>3h. Live FX Quotes</h2>
+    <p style="font-size:13px; color:var(--muted); margin-bottom:16px;">
+      Route Scout's exchange-rate column used to come from a constant typed into the source once and
+      never revisited. This asks each anchor's own SEP-38 quote server for a live indicative price —
+      the same fix already applied to the fee column via SEP-24 <code>/info</code>. Sampled at $100
+      once an hour: an indicative quote can differ at execution time and can vary with amount, so this
+      is a representative sample, not a firm price.
+    </p>
+
+    <div class="endpoint-card">
+      <div class="endpoint-title">
+        <span class="badge-get">GET</span>
+        <span class="endpoint-path">/api/v1/anchor-quotes.json</span>
+      </div>
+      <p style="font-size:13px; color:var(--muted); margin-top:8px;">
+        Per anchor, per corridor: <code>ok</code> with the sampled price when the anchor runs SEP-38
+        and its own <code>/info</code> lists that corridor; otherwise <code>no-sep38</code>,
+        <code>unreachable</code>, <code>unsupported-corridor</code>, or <code>unsupported-asset</code>,
+        each with a reason. As of this writing, most tracked anchors fall into the first
+        category — SEP-38 adoption among them is genuinely close to zero, which this endpoint states
+        rather than papering over with the catalogue figure and no disclosure. Route Scout falls back
+        to the catalogue spread exactly where this reports anything other than <code>ok</code>, and
+        the card says which one it used.
+      </p>
+    </div>
+  </section>
+
   <!-- Section 4: MCP Tool -->
   <section class="docs-section">
     <h2>4. AI Agent Integration (Model Context Protocol / MCP)</h2>
