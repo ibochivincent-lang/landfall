@@ -1,6 +1,6 @@
 {
-  "asOf": "2026-09-05T15:48:32.076Z",
-  "staleHours": 0.08,
+  "asOf": "2026-09-06T11:36:32.692Z",
+  "staleHours": 0.07,
   "returnRateCaveat": "A return is the honest failure mode. An anchor that accepts value, fails to settle and keeps it produces no return event and scores 0. A low rate is the absence of one kind of evidence, not evidence of good conduct.",
   "accounts": [
     {
@@ -12,7 +12,7 @@
       "outbound": 1,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 297.54,
+      "hoursSinceActivity": 317.34,
       "topCounterpartyShare": 0.9176
     },
     {
@@ -24,7 +24,7 @@
       "outbound": 20,
       "returns": 1,
       "returnRate": 0.1667,
-      "hoursSinceActivity": 1402.25,
+      "hoursSinceActivity": 1422.05,
       "topCounterpartyShare": 0.8898
     },
     {
@@ -36,7 +36,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 2336.84,
+      "hoursSinceActivity": 2356.64,
       "topCounterpartyShare": null
     },
     {
@@ -48,7 +48,7 @@
       "outbound": 2,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1945.18,
+      "hoursSinceActivity": 1964.98,
       "topCounterpartyShare": null
     },
     {
@@ -60,7 +60,7 @@
       "outbound": 31,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 610.19,
+      "hoursSinceActivity": 629.99,
       "topCounterpartyShare": 0.9991
     },
     {
@@ -72,7 +72,7 @@
       "outbound": 932,
       "returns": 10,
       "returnRate": 0.0116,
-      "hoursSinceActivity": 609.87,
+      "hoursSinceActivity": 629.67,
       "topCounterpartyShare": 0.529
     },
     {
@@ -84,7 +84,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 605.68,
+      "hoursSinceActivity": 625.48,
       "topCounterpartyShare": 0.9401
     },
     {
@@ -96,7 +96,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 1973.76,
+      "hoursSinceActivity": 1993.56,
       "topCounterpartyShare": 0.9999
     },
     {
@@ -108,7 +108,7 @@
       "outbound": 691,
       "returns": 1,
       "returnRate": 0.0008,
-      "hoursSinceActivity": 27.39,
+      "hoursSinceActivity": 47.19,
       "topCounterpartyShare": 0.1023
     },
     {
@@ -132,7 +132,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 1403.08,
+      "hoursSinceActivity": 1422.88,
       "topCounterpartyShare": 1
     },
     {
@@ -144,7 +144,7 @@
       "outbound": 474,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 285.43,
+      "hoursSinceActivity": 305.23,
       "topCounterpartyShare": 0.3213
     },
     {
@@ -156,7 +156,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 1230.92,
+      "hoursSinceActivity": 1250.72,
       "topCounterpartyShare": 0.9254
     },
     {
@@ -168,7 +168,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 96.37,
+      "hoursSinceActivity": 116.17,
       "topCounterpartyShare": 0.4449
     },
     {
@@ -180,7 +180,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 238.99,
+      "hoursSinceActivity": 258.79,
       "topCounterpartyShare": 0.9565
     },
     {
@@ -192,7 +192,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 475.77,
+      "hoursSinceActivity": 495.57,
       "topCounterpartyShare": 0.8236
     },
     {
@@ -204,7 +204,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 83.19,
+      "hoursSinceActivity": 102.99,
       "topCounterpartyShare": 0.5508
     },
     {
@@ -216,7 +216,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1420.17,
+      "hoursSinceActivity": 1439.97,
       "topCounterpartyShare": null
     },
     {
@@ -228,7 +228,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 8366.99,
+      "hoursSinceActivity": 8386.79,
       "topCounterpartyShare": null
     },
     {
@@ -240,7 +240,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 35.22,
+      "hoursSinceActivity": 55.02,
       "topCounterpartyShare": 1
     },
     {
@@ -252,7 +252,7 @@
       "outbound": 421,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 25.27,
+      "hoursSinceActivity": 45.07,
       "topCounterpartyShare": 1
     },
     {
@@ -260,12 +260,12 @@
       "domain": "aps.money",
       "name": "Advanced Payment Solutions Ltd.",
       "state": "live",
-      "inbound": 653,
-      "outbound": 2323,
-      "returns": 84,
-      "returnRate": 0.1286,
+      "inbound": 755,
+      "outbound": 2711,
+      "returns": 100,
+      "returnRate": 0.1325,
       "hoursSinceActivity": 0,
-      "topCounterpartyShare": 0.9594
+      "topCounterpartyShare": 0.957
     },
     {
       "account": "GBNZILSTVQZ4R7IKQDGHYGY2QXL5QOFJYQMXPKWRRM5PAV7Y4M67AQUA",
@@ -276,7 +276,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 7.09,
+      "hoursSinceActivity": 26.89,
       "topCounterpartyShare": 0.2466
     },
     {
@@ -285,10 +285,10 @@
       "name": "Aquarius",
       "state": "live",
       "inbound": 0,
-      "outbound": 613,
+      "outbound": 746,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 0.13,
+      "hoursSinceActivity": 0.76,
       "topCounterpartyShare": null
     },
     {
@@ -300,7 +300,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 74.67,
+      "hoursSinceActivity": 94.47,
       "topCounterpartyShare": null
     },
     {
@@ -312,7 +312,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1400.01,
+      "hoursSinceActivity": 1419.81,
       "topCounterpartyShare": null
     },
     {
@@ -320,11 +320,11 @@
       "domain": "centre.io",
       "name": "Centre Consortium LLC",
       "state": "live",
-      "inbound": 2316,
+      "inbound": 2320,
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 0.72,
+      "hoursSinceActivity": 4.89,
       "topCounterpartyShare": 0.9421
     },
     {
@@ -333,10 +333,10 @@
       "name": "Centre Consortium LLC",
       "state": "live",
       "inbound": 17,
-      "outbound": 421,
+      "outbound": 422,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 19.04,
+      "hoursSinceActivity": 0.42,
       "topCounterpartyShare": 1
     },
     {
@@ -348,7 +348,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 1154.04,
+      "hoursSinceActivity": 1173.84,
       "topCounterpartyShare": 1
     },
     {
@@ -360,7 +360,7 @@
       "outbound": 8,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 605.68,
+      "hoursSinceActivity": 625.48,
       "topCounterpartyShare": null
     },
     {
@@ -372,7 +372,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 605.68,
+      "hoursSinceActivity": 625.48,
       "topCounterpartyShare": 0.7431
     },
     {
@@ -384,7 +384,7 @@
       "outbound": 7,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 2518.6,
+      "hoursSinceActivity": 2538.4,
       "topCounterpartyShare": null
     },
     {
@@ -396,7 +396,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 2966.61,
+      "hoursSinceActivity": 2986.41,
       "topCounterpartyShare": 1
     },
     {
@@ -408,7 +408,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 2966.57,
+      "hoursSinceActivity": 2986.37,
       "topCounterpartyShare": 1
     },
     {
@@ -420,7 +420,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 2690.47,
+      "hoursSinceActivity": 2710.27,
       "topCounterpartyShare": 1
     },
     {
@@ -432,7 +432,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 2966.25,
+      "hoursSinceActivity": 2986.05,
       "topCounterpartyShare": 1
     },
     {
@@ -444,7 +444,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 2966.55,
+      "hoursSinceActivity": 2986.35,
       "topCounterpartyShare": 1
     },
     {
@@ -456,7 +456,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 2966.22,
+      "hoursSinceActivity": 2986.02,
       "topCounterpartyShare": 1
     },
     {
@@ -468,7 +468,7 @@
       "outbound": 18,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 117.98,
+      "hoursSinceActivity": 137.78,
       "topCounterpartyShare": 1
     },
     {
@@ -480,19 +480,19 @@
       "outbound": 2,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 1402.21,
+      "hoursSinceActivity": 1422.01,
       "topCounterpartyShare": 1
     },
     {
       "account": "GC4HS4CQCZULIOTGLLPGRAAMSBDLFRR6Y7HCUQG66LNQDISXKIXXADIM",
       "domain": "ixinium.io",
       "name": "Baltic Representative Office",
-      "state": "slow",
+      "state": "live",
       "inbound": 73,
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 284.68,
+      "hoursSinceActivity": 13.46,
       "topCounterpartyShare": 0.5192
     },
     {
@@ -504,7 +504,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 2340.4,
+      "hoursSinceActivity": 2360.2,
       "topCounterpartyShare": null
     },
     {
@@ -516,7 +516,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1421.53,
+      "hoursSinceActivity": 1441.33,
       "topCounterpartyShare": null
     },
     {
@@ -528,7 +528,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1401.58,
+      "hoursSinceActivity": 1421.38,
       "topCounterpartyShare": null
     },
     {
@@ -540,7 +540,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1421.03,
+      "hoursSinceActivity": 1440.83,
       "topCounterpartyShare": null
     },
     {
@@ -552,7 +552,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 4.74,
+      "hoursSinceActivity": 0.55,
       "topCounterpartyShare": null
     },
     {
@@ -564,7 +564,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1422.4,
+      "hoursSinceActivity": 1442.2,
       "topCounterpartyShare": null
     },
     {
@@ -576,7 +576,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1403.16,
+      "hoursSinceActivity": 1422.96,
       "topCounterpartyShare": null
     },
     {
@@ -588,7 +588,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 6.6,
+      "hoursSinceActivity": 26.4,
       "topCounterpartyShare": 0.584
     },
     {
@@ -600,7 +600,7 @@
       "outbound": 1,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1381.57,
+      "hoursSinceActivity": 1401.37,
       "topCounterpartyShare": null
     },
     {
@@ -612,7 +612,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1403.15,
+      "hoursSinceActivity": 1422.95,
       "topCounterpartyShare": null
     },
     {
@@ -624,7 +624,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1403.82,
+      "hoursSinceActivity": 1423.62,
       "topCounterpartyShare": null
     },
     {
@@ -636,7 +636,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 0.79,
+      "hoursSinceActivity": 0.59,
       "topCounterpartyShare": 1
     },
     {
@@ -648,7 +648,7 @@
       "outbound": 1,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 2346.09,
+      "hoursSinceActivity": 2365.89,
       "topCounterpartyShare": 0.6301
     },
     {
@@ -660,7 +660,7 @@
       "outbound": 2,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 2394.43,
+      "hoursSinceActivity": 2414.23,
       "topCounterpartyShare": 0.9174
     },
     {
@@ -672,7 +672,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 7495.76,
+      "hoursSinceActivity": 7515.56,
       "topCounterpartyShare": 0.8333
     },
     {
@@ -684,7 +684,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 1404.4,
+      "hoursSinceActivity": 1424.2,
       "topCounterpartyShare": 1
     },
     {
@@ -696,7 +696,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 2338.29,
+      "hoursSinceActivity": 2358.09,
       "topCounterpartyShare": null
     },
     {
@@ -708,7 +708,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 73.14,
+      "hoursSinceActivity": 92.94,
       "topCounterpartyShare": 0.3847
     },
     {
@@ -720,7 +720,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 1194.38,
+      "hoursSinceActivity": 1214.18,
       "topCounterpartyShare": 0.9995
     },
     {
@@ -732,7 +732,7 @@
       "outbound": 1,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 5056.93,
+      "hoursSinceActivity": 5076.73,
       "topCounterpartyShare": null
     },
     {
@@ -744,7 +744,7 @@
       "outbound": 8,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 427.88,
+      "hoursSinceActivity": 447.68,
       "topCounterpartyShare": 0.1982
     },
     {
@@ -756,7 +756,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 10.53,
+      "hoursSinceActivity": 6.35,
       "topCounterpartyShare": 1
     },
     {
@@ -768,7 +768,7 @@
       "outbound": 321,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 605.68,
+      "hoursSinceActivity": 625.48,
       "topCounterpartyShare": 1
     },
     {
@@ -780,7 +780,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 2338.01,
+      "hoursSinceActivity": 2357.81,
       "topCounterpartyShare": null
     },
     {
@@ -792,7 +792,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 2338.01,
+      "hoursSinceActivity": 2357.81,
       "topCounterpartyShare": null
     },
     {
@@ -804,7 +804,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 2349.35,
+      "hoursSinceActivity": 2369.15,
       "topCounterpartyShare": null
     },
     {
@@ -816,7 +816,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 2338.01,
+      "hoursSinceActivity": 2357.81,
       "topCounterpartyShare": null
     },
     {
@@ -828,7 +828,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 127.4,
+      "hoursSinceActivity": 147.21,
       "topCounterpartyShare": 0.9982
     },
     {
@@ -840,7 +840,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1403.76,
+      "hoursSinceActivity": 1423.56,
       "topCounterpartyShare": null
     },
     {
@@ -852,7 +852,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1400.14,
+      "hoursSinceActivity": 1419.94,
       "topCounterpartyShare": null
     },
     {
@@ -864,7 +864,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1423.17,
+      "hoursSinceActivity": 1442.97,
       "topCounterpartyShare": null
     },
     {
@@ -876,7 +876,7 @@
       "outbound": 72,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 386.06,
+      "hoursSinceActivity": 405.86,
       "topCounterpartyShare": 1
     },
     {
@@ -888,7 +888,7 @@
       "outbound": 3,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 354.17,
+      "hoursSinceActivity": 373.97,
       "topCounterpartyShare": null
     },
     {
@@ -900,7 +900,7 @@
       "outbound": 203,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 97.97,
+      "hoursSinceActivity": 117.77,
       "topCounterpartyShare": 1
     },
     {
@@ -912,7 +912,7 @@
       "outbound": 17,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1075.21,
+      "hoursSinceActivity": 1095.01,
       "topCounterpartyShare": null
     },
     {
@@ -924,7 +924,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1403,
+      "hoursSinceActivity": 1422.8,
       "topCounterpartyShare": null
     },
     {
@@ -936,7 +936,7 @@
       "outbound": 9,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 74.14,
+      "hoursSinceActivity": 93.94,
       "topCounterpartyShare": 1
     },
     {
@@ -948,7 +948,7 @@
       "outbound": 1,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 1161.24,
+      "hoursSinceActivity": 1181.04,
       "topCounterpartyShare": 1
     },
     {
@@ -960,7 +960,7 @@
       "outbound": 3,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 360.27,
+      "hoursSinceActivity": 380.07,
       "topCounterpartyShare": 0.9997
     },
     {
@@ -972,7 +972,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 670.96,
+      "hoursSinceActivity": 690.76,
       "topCounterpartyShare": 1
     },
     {
@@ -984,7 +984,7 @@
       "outbound": 48,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 148.89,
+      "hoursSinceActivity": 168.69,
       "topCounterpartyShare": 0.3604
     },
     {
@@ -993,10 +993,10 @@
       "name": "Ultra Capital LLC",
       "state": "live",
       "inbound": 5,
-      "outbound": 488,
+      "outbound": 643,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 0.02,
+      "hoursSinceActivity": 0.44,
       "topCounterpartyShare": 0.92
     },
     {
@@ -1008,7 +1008,7 @@
       "outbound": 1,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 170.37,
+      "hoursSinceActivity": 190.17,
       "topCounterpartyShare": 0.9295
     },
     {
@@ -1020,7 +1020,7 @@
       "outbound": 2,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 75.58,
+      "hoursSinceActivity": 95.38,
       "topCounterpartyShare": 0.529
     },
     {
@@ -1032,7 +1032,7 @@
       "outbound": 18,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 1301.96,
+      "hoursSinceActivity": 1321.76,
       "topCounterpartyShare": 1
     },
     {
@@ -1044,7 +1044,7 @@
       "outbound": 11,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 1750.84,
+      "hoursSinceActivity": 1770.64,
       "topCounterpartyShare": 1
     },
     {
@@ -1056,7 +1056,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 2714.2,
+      "hoursSinceActivity": 2734,
       "topCounterpartyShare": 1
     },
     {
@@ -1068,7 +1068,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 1109.71,
+      "hoursSinceActivity": 1129.51,
       "topCounterpartyShare": 0.9963
     },
     {
@@ -1080,7 +1080,7 @@
       "outbound": 11,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 1779.48,
+      "hoursSinceActivity": 1799.28,
       "topCounterpartyShare": 1
     },
     {
@@ -1092,7 +1092,7 @@
       "outbound": 12,
       "returns": 1,
       "returnRate": 0.0833,
-      "hoursSinceActivity": 1779.44,
+      "hoursSinceActivity": 1799.24,
       "topCounterpartyShare": 0.9345
     },
     {
@@ -1104,7 +1104,7 @@
       "outbound": 62,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 29.39,
+      "hoursSinceActivity": 49.19,
       "topCounterpartyShare": 0.4988
     },
     {
@@ -1116,7 +1116,7 @@
       "outbound": 20,
       "returns": 1,
       "returnRate": 0.0263,
-      "hoursSinceActivity": 29.4,
+      "hoursSinceActivity": 49.2,
       "topCounterpartyShare": 1
     },
     {
@@ -1128,7 +1128,7 @@
       "outbound": 2,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 8979.19,
+      "hoursSinceActivity": 8998.99,
       "topCounterpartyShare": null
     },
     {
@@ -1140,7 +1140,7 @@
       "outbound": 2,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 8368.44,
+      "hoursSinceActivity": 8388.24,
       "topCounterpartyShare": 1
     },
     {
@@ -1152,7 +1152,7 @@
       "outbound": 3,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 3557.94,
+      "hoursSinceActivity": 3577.74,
       "topCounterpartyShare": 0.5002
     },
     {
@@ -1164,7 +1164,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 4225.19,
+      "hoursSinceActivity": 4244.99,
       "topCounterpartyShare": 1
     },
     {
@@ -1176,7 +1176,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 4225.2,
+      "hoursSinceActivity": 4245,
       "topCounterpartyShare": 1
     },
     {
@@ -1188,7 +1188,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 4225.21,
+      "hoursSinceActivity": 4245.01,
       "topCounterpartyShare": 1
     },
     {
@@ -1200,7 +1200,7 @@
       "outbound": 5,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 2384.48,
+      "hoursSinceActivity": 2404.28,
       "topCounterpartyShare": 0.6
     },
     {
@@ -1212,7 +1212,7 @@
       "outbound": 11,
       "returns": 1,
       "returnRate": 0.1667,
-      "hoursSinceActivity": 1374.78,
+      "hoursSinceActivity": 1394.58,
       "topCounterpartyShare": 0.9998
     },
     {
@@ -1224,7 +1224,7 @@
       "outbound": 3,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 9773.59,
+      "hoursSinceActivity": 9793.39,
       "topCounterpartyShare": 0.9524
     },
     {
@@ -1236,7 +1236,7 @@
       "outbound": 5,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 49.63,
+      "hoursSinceActivity": 69.43,
       "topCounterpartyShare": 0.9998
     },
     {
@@ -1248,19 +1248,19 @@
       "outbound": 1,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 4999.76,
+      "hoursSinceActivity": 5019.56,
       "topCounterpartyShare": 1
     },
     {
       "account": "GDF6VOEGRWLOZ64PQQGKD2IYWA22RLT37GJKS2EJXZHT2VLAGWLC5TOB",
       "domain": "stablecoin.z.com",
       "name": "GMO-Z.com Trust Company, Inc.",
-      "state": "live",
+      "state": "slow",
       "inbound": 15,
       "outbound": 1,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 69.16,
+      "hoursSinceActivity": 88.96,
       "topCounterpartyShare": 0.883
     },
     {
@@ -1272,7 +1272,7 @@
       "outbound": 3,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 25.95,
+      "hoursSinceActivity": 45.75,
       "topCounterpartyShare": 0.954
     },
     {
@@ -1284,7 +1284,7 @@
       "outbound": 2,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 2117.2,
+      "hoursSinceActivity": 2137,
       "topCounterpartyShare": 0.6667
     },
     {
@@ -1296,7 +1296,7 @@
       "outbound": 1,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 1201.21,
+      "hoursSinceActivity": 1221.01,
       "topCounterpartyShare": 1
     }
   ]

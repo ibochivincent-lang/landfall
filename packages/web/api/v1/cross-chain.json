@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-06T11:27:09.795Z",
+  "generatedAt": "2026-09-06T11:41:31.720Z",
   "stpVersion": "1",
   "window": {
-    "since": "2026-08-07T11:26:49.672Z",
+    "since": "2026-08-07T11:41:12.611Z",
     "days": 30,
     "maxRecordsPerAccount": 200
   },
@@ -55,7 +55,7 @@
     }
   ],
   "totals": {
-    "PROVEN": 1786,
+    "PROVEN": 1785,
     "ATTESTED": 0,
     "DERIVED": 0
   },
@@ -73,12 +73,12 @@
     {
       "anchorId": "aps.money",
       "evidence": {
-        "PROVEN": 258,
+        "PROVEN": 257,
         "ATTESTED": 0,
         "DERIVED": 0
       },
-      "tierMix": "PROVEN 258 · ATTESTED 0 · DERIVED 0",
-      "rationale": "Ranked on 258 ledger-proven settlement(s)."
+      "tierMix": "PROVEN 257 · ATTESTED 0 · DERIVED 0",
+      "rationale": "Ranked on 257 ledger-proven settlement(s)."
     },
     {
       "anchorId": "ultracapital.xyz",
@@ -896,32 +896,27 @@
         "tiers": [
           {
             "tier": "PROVEN",
-            "events": 258,
+            "events": 257,
             "byAsset": [
               {
                 "asset": "APSEURM",
-                "count": 91,
-                "volume": "1373938.12"
+                "count": 95,
+                "volume": "1374206.41"
               },
               {
                 "asset": "APSUSDM",
-                "count": 85,
-                "volume": "694530.88"
+                "count": 84,
+                "volume": "668203.5"
               },
               {
                 "asset": "APSBPIUSD",
-                "count": 43,
-                "volume": "14081.29"
+                "count": 41,
+                "volume": "4370.494"
               },
               {
                 "asset": "APSBPOUSD",
-                "count": 18,
-                "volume": "12348.02"
-              },
-              {
-                "asset": "APSBPIEUR",
-                "count": 13,
-                "volume": "588.12"
+                "count": 23,
+                "volume": "2650.57"
               },
               {
                 "asset": "APSSARM",
@@ -929,9 +924,9 @@
                 "volume": "6706192.49"
               },
               {
-                "asset": "APSBPIGBP",
-                "count": 1,
-                "volume": "20.7200000"
+                "asset": "APSBPIEUR",
+                "count": 7,
+                "volume": "324.94"
               }
             ]
           },
@@ -951,7 +946,7 @@
             "chain": "stellar",
             "maxTier": "PROVEN",
             "state": "observed",
-            "events": 258,
+            "events": 257,
             "sourcesScanned": 2,
             "sourcesFailed": 0
           },
@@ -1019,8 +1014,8 @@
             "note": "no solana address curated for this anchor in registry/anchors.registry.json"
           }
         ],
-        "totalEvents": 258,
-        "tierMix": "PROVEN 258 · ATTESTED 0 · DERIVED 0"
+        "totalEvents": 257,
+        "tierMix": "PROVEN 257 · ATTESTED 0 · DERIVED 0"
       },
       "failures": [],
       "sampleAttestations": [
