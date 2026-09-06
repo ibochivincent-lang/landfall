@@ -74,12 +74,30 @@ export function pool() {
   // certificate chain" even with rejectUnauthorized: false set.
   const poolConnectionString = url.replace(/([?&])sslmode=[^&]*&?/, '$1').replace(/[?&]$/, '');
 
+  // TLS for hosted providers, none for a plain local socket.
+  //
+  // This was unconditional, which was fine while this file only ever ran on
+  // Vercel against Supabase — and broke the moment it became the code the
+  // local dev server runs too (packages/api/src/server.ts). A local Postgres
+  // from docker-compose does not speak SSL, so every request died with "The
+  // server does not support SSL connections": the whole documented
+  // clone-and-run path, against the database the compose file exists to
+  // provide.
+  //
+  // The old standalone dev server had exactly this check and it was lost
+  // when the two implementations were merged. Restored here, where both now
+  // read it.
+  const needsTls = /sslmode=require|neon\.tech|supabase\.|railway\.app|render\.com|rds\.amazonaws/.test(url);
+
   _pool = new Pool({
     connectionString: poolConnectionString,
     max: 2,                          // stay within Supabase free-tier limits
     idleTimeoutMillis: 20_000,
     connectionTimeoutMillis: 8_000,
-    ssl: { rejectUnauthorized: false }, // required for Supabase TLS
+    // rejectUnauthorized: false because hosted poolers present certs issued
+    // by intermediaries Node does not ship. The connection is still
+    // encrypted; it is the chain that is not verified.
+    ...(needsTls ? { ssl: { rejectUnauthorized: false } } : {}),
   });
   return _pool;
 }
