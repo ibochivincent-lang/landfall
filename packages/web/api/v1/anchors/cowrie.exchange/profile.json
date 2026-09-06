@@ -1,10 +1,10 @@
 {
   "anchorId": "cowrie.exchange",
   "name": "Cowrie Integrated Systems",
-  "asOf": "2026-09-06T17:24:45.464Z",
+  "asOf": "2026-09-06T19:44:51.540Z",
   "verification": {
     "resolved": true,
-    "checkedAt": "2026-09-06T17:24:45.464Z",
+    "checkedAt": "2026-09-06T19:44:51.540Z",
     "source": "SEP-1 stellar.toml, resolved live; issuer attribution confirmed against each issuer account's own on-chain home_domain",
     "accounts": [
       {
@@ -44,7 +44,7 @@
       "outbound": 1,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 323.14,
+      "hoursSinceActivity": 325.48,
       "topCounterpartyShare": 0.9176
     },
     {
@@ -56,7 +56,7 @@
       "outbound": 20,
       "returns": 1,
       "returnRate": 0.1667,
-      "hoursSinceActivity": 1427.85,
+      "hoursSinceActivity": 1430.19,
       "topCounterpartyShare": 0.8898
     },
     {
@@ -68,7 +68,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 2362.44,
+      "hoursSinceActivity": 2364.78,
       "topCounterpartyShare": null
     },
     {
@@ -80,7 +80,7 @@
       "outbound": 2,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1970.78,
+      "hoursSinceActivity": 1973.12,
       "topCounterpartyShare": null
     }
   ],
@@ -2472,6 +2472,13 @@
         "in": 24,
         "out": 1,
         "hours": 323.14
+      },
+      {
+        "t": "2026-09-06T19:44:51.540Z",
+        "state": "slow",
+        "in": 24,
+        "out": 1,
+        "hours": 325.48
       }
     ],
     "GBQZOJE2GWJU5VBT6NBLD2F3IOVOYUBDAXYUU32XMHDF4RMDOURWV3GT": [
@@ -4861,6 +4868,13 @@
         "in": 6,
         "out": 20,
         "hours": 1427.85
+      },
+      {
+        "t": "2026-09-06T19:44:51.540Z",
+        "state": "dark",
+        "in": 6,
+        "out": 20,
+        "hours": 1430.19
       }
     ],
     "GDI5EK4HNMBHJJQGP3GUXQJIIOHU2CJO3LABPWD6WYSPJZP5NP67TMNN": [
@@ -7250,6 +7264,13 @@
         "in": 0,
         "out": 0,
         "hours": 2362.44
+      },
+      {
+        "t": "2026-09-06T19:44:51.540Z",
+        "state": "dark",
+        "in": 0,
+        "out": 0,
+        "hours": 2364.78
       }
     ],
     "GBSKKRM7RRDHC33O6KFNLUSPS3577F7GYSFFVBVV5J5PDWGY4XWERE3W": [
@@ -9639,6 +9660,13 @@
         "in": 0,
         "out": 2,
         "hours": 1970.78
+      },
+      {
+        "t": "2026-09-06T19:44:51.540Z",
+        "state": "dark",
+        "in": 0,
+        "out": 2,
+        "hours": 1973.12
       }
     ]
   },
