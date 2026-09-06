@@ -1,7 +1,7 @@
 # What Landfall doesn't have yet
 
-An honest inventory as of 12 August 2026, amended 13 August, amended again
-14 August. Ordered by how much each gap could hurt, not by how hard it is to
+An honest inventory as of 12 August 2026, amended 13 August, 14 August, and
+6 September. Ordered by how much each gap could hurt, not by how hard it is to
 fix.
 
 Closed items are struck through rather than deleted. A gap list that only ever
@@ -244,10 +244,15 @@ support address would have been the same lie in a different place.
 
 ---
 
-## 0a. Open and live: Route Scout publishes invented rates and fees
+## 0a. ~~Open and live~~ Mostly closed 6 September: Route Scout published invented rates and fees
 
-Found 14 August, unfixed at time of writing. This is the most serious open item
-on this page.
+Found 14 August. Was the most serious open item on this page for three weeks.
+**Both halves now read from the anchor rather than from a constant** — fees
+from SEP-24 `/info`, rates from SEP-38 — and the second hardcoded catalogue
+hiding in the API was deleted outright. What remains open is not a Landfall
+gap: essentially no tracked anchor runs a SEP-38 quote server yet, so the rate
+column still shows a catalogue estimate, now labelled as one. Full detail in
+the "Partly fixed, 6 September" note at the end of this section.
 
 `/compare.html` headlines itself:
 
@@ -410,9 +415,12 @@ whole problem. The alternative is deleting those sections until they're real.
 
 ## 1. Product — nothing runs on its own
 
-- ~~**No scheduled scanning.**~~ The production compose file loops; a real
-  scheduler is documented and preferred. **Still nothing running anywhere** —
-  the stack is deployable, not deployed.
+- ~~**No scheduled scanning.**~~ ~~**Still nothing running anywhere.**~~
+  Running in production since 5 September: GitHub Actions on a schedule,
+  Supabase Postgres, Vercel at
+  [landfall-chi.vercel.app](https://landfall-chi.vercel.app). Note the cron
+  asks for hourly and GitHub does not deliver it — measured median gap 2.8h
+  over 24h. Every payload carries `asOf`/`staleHours` accordingly.
 - ~~**The site's data is frozen.**~~ Both pages read live and show scan age.
 - ~~**No database.**~~ Postgres, persisted, resumable.
 - **No trend history in the product.** Every scan is stored, so the data for
@@ -420,23 +428,26 @@ whole problem. The alternative is deleting those sections until they're real.
   is still no alerting on state change.
 - ~~**No API**~~ — shipped. ~~**No MCP server.**~~ — shipped, unlinked from
   the site, no external consumer yet. **Still no SDK.**
-- **No live quote data.** Route Scout compares rates and fees from a hardcoded
-  table (section 0a). Until SEP-38 ingestion exists, every commercial figure on
-  that page is invented, and `pickAnchor()` cannot be built on top of it —
-  optimising over fabricated inputs returns a confident answer with nothing
-  behind it.
+- ~~**No live quote data.**~~ SEP-38 ingestion exists
+  (`scripts/fetch-anchor-quotes.mjs`) and fees come from SEP-24 `/info`. But
+  **near-zero coverage**: no tracked anchor currently answers with a usable
+  quote for a corridor it serves, so the rate column is still a catalogue
+  estimate — labelled as one now, rather than presented as live. The blocker
+  moved from us to the ecosystem.
 - **No predictive signal.** Every scan is stored, so the data to detect an
   anchor degrading before it goes dark exists and nothing reads it back. A
   wallet would rather have 48 hours' warning than an accurate post-mortem.
-- ~~**The Soroban oracle has never been deployed.**~~ Live on **testnet** at
-  `CA2IYHFKTKSJWR5IICY6HFD55BJEGE7OMKISWMLMPFSHLESZYO3VICAG` as of
-  13 August 2026. ~~The indexer does not publish to it.~~ `scripts/publish-oracle.mjs`
+- ~~**The Soroban oracle has never been deployed.**~~ Live on **testnet**,
+  currently `CDPCH3UO4ORG6OMWH5B4RCPIHN7TS5NL5QATWRW6DHEN7UYIPOX6B5LW`
+  (redeployed 6 September as a mainnet dry run; the 13 August contract
+  `CA2IYHF…VICAG` is still live but no longer referenced). ~~The indexer does not publish to it.~~ `scripts/publish-oracle.mjs`
   now does, once configured — see the 14 August table above. Still **not on
   mainnet**.
 - **No attestation layer**, so no slippage metric. The most valuable number the
   project could produce does not exist yet.
-- **No dispute portal**, despite the code of conduct and security policy both
-  promising anchors a route to challenge a figure.
+- ~~**No dispute portal**~~ — [DISPUTES.md](../DISPUTES.md) documents the
+  route, and a dispute response attaches to the report it answers. Still a
+  documented process rather than a self-serve portal.
 
 ## 2. Data quality — known weaknesses
 
@@ -444,11 +455,19 @@ whole problem. The alternative is deleting those sections until they're real.
   the fix and it isn't done. Every return figure carries this caveat.
 - **The fiat leg is invisible.** We cannot tell whether money reached anyone.
   Documented, unavoidable without attestation.
-- **Account attribution is unverified.** A TOML declares accounts; nothing
-  proves the domain operates them. This is the single largest correctness risk.
-- **Only 5 domains resolve.** 8 candidates, 3 failed. The Stellar ecosystem has
-  far more anchors than this, so "6 of 13" is a real finding about a small
-  sample, not a census of the ecosystem.
+- ~~**Account attribution is unverified.**~~ **Fixed, and it had already
+  bitten us.** A `stellar.toml` can name any account, and Circle's shared USDC
+  issuer — cited by several anchors — was being credited to whichever anchor
+  cited it, silently inflating that anchor's volume by the whole network's
+  USDC. `discoverDomain` now reads the issuer's own on-chain `home_domain` and
+  refuses to attribute an account that does not point back
+  (`packages/indexer/src/toml.ts`). Regression-tested against the real Circle
+  issuer in `packages/indexer/test/invariants.test.ts`.
+- **Still a curated set, not a census.** Now 27 domains / 108 accounts, up
+  from the 5 domains / 13 accounts behind the original "6 of 13" headline. The
+  caveat is unchanged and still the important part: these are seeded and
+  SEP-1-discovered anchors, not every anchor on Stellar, so the dark-account
+  ratio describes this sample and nothing wider.
 - **`vibrantapp.com` is unexplained** — served a TOML, parser found no accounts.
   Probably our bug, still uninvestigated.
 - **One dormancy figure is approximate** (`GDKL…LMT6`, shown as ≈34.6d).

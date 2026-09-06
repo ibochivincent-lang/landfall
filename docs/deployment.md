@@ -312,10 +312,24 @@ for the same same-origin reason.
 
 ## 5. Oracle contract
 
-**Deployed to testnet** on 13 August 2026:
-`CA2IYHFKTKSJWR5IICY6HFD55BJEGE7OMKISWMLMPFSHLESZYO3VICAG`.
-Sixteen tests pass against the SDK's test environment, and the contract now
-exists on a network. It is **not on mainnet**, and nothing publishes to it.
+**Deployed to testnet.** Current contract, redeployed 6 September 2026 as a
+mainnet dry run:
+[`CDPCH3UO4ORG6OMWH5B4RCPIHN7TS5NL5QATWRW6DHEN7UYIPOX6B5LW`](https://stellar.expert/explorer/testnet/contract/CDPCH3UO4ORG6OMWH5B4RCPIHN7TS5NL5QATWRW6DHEN7UYIPOX6B5LW).
+The first testnet deploy (13 August) was
+`CA2IYHFKTKSJWR5IICY6HFD55BJEGE7OMKISWMLMPFSHLESZYO3VICAG` and is still live
+but no longer the one this repo points at.
+
+Sixteen tests pass against the SDK's test environment. `scripts/publish-oracle.mjs`
+**does** publish to it — verified end to end on 6 September: epoch 0 → 1 with
+`get_digest` matching the scan digest exactly. It is **not on mainnet**.
+
+The dry run found three things that would each have broken a mainnet deploy:
+the verification step invoked `epoch` when the contract exports `get_epoch`
+(so it had never verified anything), the C-linker preflight hard-failed on
+Windows where the linker ships inside Rust, and `publish-oracle.mjs` defaulted
+to the testnet network passphrase while the workflow never passed
+`ORACLE_NETWORK_PASSPHRASE` — which would have made a mainnet oracle fail
+silently every run, since that step is `continue-on-error`.
 
 ### Toolchain first
 
