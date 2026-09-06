@@ -3,7 +3,14 @@ import { fetchTransactionSucceeded, fetchTrc20Transfers, type Trc20Transfer } fr
 import { formatTokenAmount, parseTokenAmount } from "./units.js";
 import type { ChainAdapter, EvidenceTier, ScanOpts, SettlementEvent } from "../../src/types.js";
 
-export { NULL_FIAT_LEG_BINDER } from "./fiatProof.js";
+export { NULL_FIAT_LEG_BINDER, tronRecipientConfirmationBinder } from "./fiatProof.js";
+export type {
+  ConfirmationClaim,
+  ConfirmationLookup,
+  ConfirmationOutcome,
+  ConfirmationRejection,
+} from "../../src/fiatConfirmation.js";
+
 export type { FiatLegProof, FiatLegProofBinder, FiatLegProofKind } from "./fiatProof.js";
 
 /** https://tronscan.org/#/contract/TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t/code — the canonical USDT-TRC20 contract. */

@@ -12,6 +12,8 @@
  *   GET  /api/v1/badges/:domain.svg          -- dynamic SVG reliability status badge
  *   GET  /api/v1/assets
  *   GET  /api/v1/corridors           -- cross-asset flow matrix (path payments)
+*   POST /api/v1/fiat-confirmations  -- recipient self-report that a fiat leg landed (DERIVED evidence input)
+*   GET  /api/v1/fiat-confirmations/:chain/:reference -- status of one confirmation, if any
  *   GET  /health
  *
  * Admin routes (session-cookie gated, see requireSession()):
@@ -431,6 +433,56 @@ export async function corridorRows(db) {
     firstSeen:  new Date(r.first_seen).toISOString(),
     lastSeen:   new Date(r.last_seen).toISOString(),
   }));
+}
+
+/**
+ * Recipient-confirmation evaluation — a plain-JS mirror of
+ * evaluateConfirmation() in packages/adapters/src/fiatConfirmation.ts.
+ *
+ * This file has no build step (vercel.json runs `npm install` only, no
+ * tsc), so the TypeScript package cannot be imported here at runtime. Two
+ * copies of the same eligibility rules is a real drift hazard — the same
+ * one packages/web/intent.js has against packages/intents/src/solve.ts —
+ * so it gets the same treatment: api/fiat-confirmation.test.mjs imports
+ * both this function and the real TypeScript module, runs a shared fixture
+ * set through each, and fails on any disagreement. Change the rule in one
+ * place, the test names the other.
+ *
+ * See fiatConfirmation.ts for why each of these checks exists — the short
+ * version: this is the weakest of three ways to prove a DERIVED-tier
+ * transfer's fiat leg landed, and the only one that needs no counterparty.
+ * What keeps it from being worthless is narrow: an exact reference match,
+ * "recipient" never "sender", a bounded window timed by this function's
+ * caller (never the client), and (enforced at the storage layer by
+ * migrations/008_fiat_confirmations.sql, not here) exactly one confirmation
+ * per transfer, ever.
+ */
+export function evaluateFiatConfirmation(claim, transfer, opts = {}) {
+  if (claim.reference !== transfer.reference) {
+    return { ok: false, reason: 'reference-mismatch' };
+  }
+  if (claim.respondent !== 'recipient') {
+    return { ok: false, reason: 'sender-not-binding' };
+  }
+  if (claim.outcome !== 'received') {
+    return { ok: false, reason: 'not-received' };
+  }
+
+  const submitted = Date.parse(claim.submittedAt);
+  const observed = Date.parse(transfer.observedAt);
+  const maxAgeMs = (opts.maxAgeDays ?? 30) * 24 * 60 * 60 * 1000;
+
+  if (submitted < observed) {
+    return { ok: false, reason: 'too-early' };
+  }
+  if (submitted - observed > maxAgeMs) {
+    return { ok: false, reason: 'too-late' };
+  }
+
+  return {
+    ok: true,
+    proof: { kind: 'recipient_confirmation', ref: `${claim.chain}:${claim.reference}` },
+  };
 }
 
 /**
@@ -1510,6 +1562,116 @@ export default async function handler(req, res) {
       if (!accounts.length) return json(res, 404, { error: `No accounts for ${domain}` });
 
       return json(res, 200, await paymentsPage(db, { accounts, direction, asset, before, limit }));
+    }
+
+    // POST /api/v1/fiat-confirmations
+    //
+    // Recipient self-report that a DERIVED-tier transfer's fiat leg landed —
+    // see packages/adapters/src/fiatConfirmation.ts for what this can and
+    // cannot prove. This endpoint only ever stores the claim; whether it
+    // actually binds as evidence is decided later, at scan time, by
+    // scripts/cross-chain-scan.ts — which is the only place that also has
+    // the on-chain transfer's own timestamp to check it against. What is
+    // checked here (`eligible` in the response) is only the two rules that
+    // do not depend on that timestamp, so a submitter finds out immediately
+    // if their own claim can never bind, without this endpoint pretending to
+    // know more than it does.
+    if (req.method === 'POST' && parts.length === 2 && parts[0] === 'v1' && parts[1] === 'fiat-confirmations') {
+      const bucket = `fiatconfirm:submit:${clientIp(req)}`;
+      const { allowed } = await rateLimit(db, bucket, 10);
+      if (!allowed) return json(res, 429, { error: 'Too many submissions. Try again in a minute.' }, 0);
+
+      const body = await readJsonBody(req);
+      const chain = String(body.chain || '').trim().toLowerCase();
+      const reference = String(body.reference || '').trim();
+      const respondent = String(body.respondent || '').trim();
+      const outcome = String(body.outcome || '').trim();
+      const reportedAmount = body.reportedAmount != null ? String(body.reportedAmount).trim().slice(0, 64) : null;
+      const reportedCurrency = body.reportedCurrency != null ? String(body.reportedCurrency).trim().slice(0, 10) : null;
+      const note = body.note != null ? String(body.note).trim().slice(0, 500) : null;
+
+      if (!chain || chain.length > 40 || !/^[a-z0-9-]+$/.test(chain)) {
+        return json(res, 400, { error: 'chain is required (lowercase letters, digits, hyphens, max 40 chars).' }, 0);
+      }
+      if (!reference || reference.length > 128) {
+        return json(res, 400, { error: 'reference is required (the on-chain transfer id/signature, max 128 chars).' }, 0);
+      }
+      if (respondent !== 'recipient' && respondent !== 'sender') {
+        return json(res, 400, { error: 'respondent must be "recipient" or "sender".' }, 0);
+      }
+      if (outcome !== 'received' && outcome !== 'not_received' && outcome !== 'partial') {
+        return json(res, 400, { error: 'outcome must be "received", "not_received", or "partial".' }, 0);
+      }
+
+      let row;
+      try {
+        const submittedIpHash = sha256Hex(clientIp(req));
+        const { rows } = await db.query(
+          `INSERT INTO fiat_confirmations
+             (chain, reference, respondent, outcome, reported_amount, reported_currency, note, submitted_ip_hash)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+           RETURNING chain, reference, respondent, outcome, submitted_at`,
+          [chain, reference, respondent, outcome, reportedAmount, reportedCurrency, note, submittedIpHash],
+        );
+        row = rows[0];
+      } catch (err) {
+        if (err.message?.includes('unique') || err.message?.includes('duplicate')) {
+          // First submission wins, permanently — see 008_fiat_confirmations.sql
+          // for why there is deliberately no update path.
+          return json(res, 409, { error: 'A confirmation has already been submitted for this transfer.' }, 0);
+        }
+        throw err;
+      }
+
+      // pg returns TIMESTAMPTZ as a JS Date. evaluateFiatConfirmation calls
+      // Date.parse() on these, which expects a string — pass one explicitly
+      // rather than relying on the implicit toString() coercion.
+      const submittedAtIso = row.submitted_at.toISOString();
+
+      // Chain-independent eligibility only — see the comment above this route.
+      const claim = { chain: row.chain, reference: row.reference, respondent: row.respondent, outcome: row.outcome, submittedAt: submittedAtIso };
+      const preview = evaluateFiatConfirmation(claim, { reference: row.reference, observedAt: submittedAtIso });
+
+      return json(res, 201, {
+        ok: true,
+        chain: row.chain,
+        reference: row.reference,
+        submittedAt: submittedAtIso,
+        eligible: preview.ok,
+        ineligibleReason: preview.ok ? null : preview.reason,
+        note: 'Recorded. Whether this counts as settlement evidence is decided when the next cross-chain scan processes this transfer, which is the only place that knows when the transfer itself happened.',
+      }, 0);
+    }
+
+    // GET /api/v1/fiat-confirmations/:chain/:reference
+    if (req.method === 'GET' && parts.length === 4 && parts[0] === 'v1' && parts[1] === 'fiat-confirmations') {
+      const chain = decodeURIComponent(parts[2]).toLowerCase();
+      const reference = decodeURIComponent(parts[3]);
+
+      const { rows } = await db.query(
+        `SELECT chain, reference, respondent, outcome, reported_amount, reported_currency, submitted_at
+         FROM fiat_confirmations WHERE chain = $1 AND reference = $2`,
+        [chain, reference],
+      );
+      const row = rows[0];
+      if (!row) return json(res, 404, { error: 'No confirmation submitted for this reference.' });
+
+      const submittedAtIso = row.submitted_at.toISOString();
+      const claim = { chain: row.chain, reference: row.reference, respondent: row.respondent, outcome: row.outcome, submittedAt: submittedAtIso };
+      const preview = evaluateFiatConfirmation(claim, { reference: row.reference, observedAt: submittedAtIso });
+
+      return json(res, 200, {
+        chain: row.chain,
+        reference: row.reference,
+        respondent: row.respondent,
+        outcome: row.outcome,
+        reportedAmount: row.reported_amount,
+        reportedCurrency: row.reported_currency,
+        submittedAt: submittedAtIso,
+        eligible: preview.ok,
+        ineligibleReason: preview.ok ? null : preview.reason,
+        note: 'eligible reflects only the checks that do not depend on the on-chain transfer\'s own timestamp. The binding decision happens at scan time — see packages/adapters/src/fiatConfirmation.ts.',
+      });
     }
 
     return json(res, 404, { error: `Unknown route: /api/${joined}` });

@@ -350,6 +350,45 @@
     </div>
   </section>
 
+  <!-- Section 3g: recipient confirmation -->
+  <section class="docs-section">
+    <h2>3g. Recipient Confirmation</h2>
+    <p style="font-size:13px; color:var(--muted); margin-bottom:16px;">
+      A DERIVED-tier transfer (Tron, Solana) is a real on-chain event whose fiat leg — a bank
+      deposit, a mobile money credit — happens off-chain, invisible to anything here. This is the
+      weakest of three ways to close that gap, and the only one that needs no anchor cooperation:
+      the person who was supposed to receive the money says whether it arrived. See
+      <a href="https://github.com/ibochivincent-lang/landfall/blob/main/docs/architecture/FIAT_CONFIRMATION.md" target="_blank" rel="noopener">FIAT_CONFIRMATION.md</a>
+      for what it can and cannot prove — short version: nobody is authenticated, only a
+      <em>recipient's</em> report can ever bind, and each transfer can be confirmed exactly once.
+    </p>
+
+    <div class="endpoint-card">
+      <div class="endpoint-title">
+        <span class="badge-get" style="background:#b45309;">POST</span>
+        <span class="endpoint-path">/api/v1/fiat-confirmations</span>
+      </div>
+      <p style="font-size:13px; color:var(--muted); margin-top:8px;">
+        Submits a claim: <code>{ chain, reference, respondent, outcome, reportedAmount?, note? }</code>.
+        Returns <code>eligible</code> immediately for the two rules that don't depend on the
+        transfer's own timestamp — a sender's own report, or a "not received" outcome, can never
+        bind, and this says so right away rather than accepting the submission silently. The
+        timing rules are checked later, when the next cross-chain scan processes the transfer.
+        409 if this transfer already has a confirmation — there is no update path, by design.
+      </p>
+    </div>
+
+    <div class="endpoint-card">
+      <div class="endpoint-title">
+        <span class="badge-get">GET</span>
+        <span class="endpoint-path">/api/v1/fiat-confirmations/{chain}/{reference}</span>
+      </div>
+      <p style="font-size:13px; color:var(--muted); margin-top:8px;">
+        Reads back what was submitted for one transfer, if anything.
+      </p>
+    </div>
+  </section>
+
   <!-- Section 4: MCP Tool -->
   <section class="docs-section">
     <h2>4. AI Agent Integration (Model Context Protocol / MCP)</h2>

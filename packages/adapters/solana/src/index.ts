@@ -4,7 +4,14 @@ import { getSignaturesForAddress, getTokenBalanceDelta, transactionSucceeded } f
 import { formatTokenAmount, parseTokenAmount } from "./units.js";
 import type { ChainAdapter, EvidenceTier, ScanOpts, SettlementEvent } from "../../src/types.js";
 
-export { NULL_FIAT_LEG_BINDER } from "./fiatProof.js";
+export { NULL_FIAT_LEG_BINDER, solanaRecipientConfirmationBinder } from "./fiatProof.js";
+export type {
+  ConfirmationClaim,
+  ConfirmationLookup,
+  ConfirmationOutcome,
+  ConfirmationRejection,
+} from "../../src/fiatConfirmation.js";
+
 export type { FiatLegProof, FiatLegProofBinder, FiatLegProofKind } from "./fiatProof.js";
 export { KNOWN_MINTS } from "./mints.js";
 

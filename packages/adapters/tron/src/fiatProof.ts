@@ -1,6 +1,12 @@
 import type { Trc20Transfer } from "./trongrid.js";
+import {
+  createRecipientConfirmationBinder,
+  type ConfirmationLookup,
+  type EvaluateOptions,
+} from "../../src/fiatConfirmation.js";
 
-export type FiatLegProofKind = "zktls" | "proof_of_reserve";
+
+export type FiatLegProofKind = "zktls" | "proof_of_reserve" | "recipient_confirmation";
 
 export interface FiatLegProof {
   kind: FiatLegProofKind;
@@ -32,3 +38,24 @@ export const NULL_FIAT_LEG_BINDER: FiatLegProofBinder = {
     return null;
   },
 };
+
+/**
+ * The recipient-confirmation binder (packages/adapters/src/fiatConfirmation.ts).
+ * The weakest of the three ways to bind this proof — no counterparty
+ * cooperation needed, no cryptography, just a claim from whoever says they
+ * received the money, timed and scoped tightly enough to be worth something
+ * without pretending to be more than it is. See that module's header for
+ * the full reasoning and docs/architecture/FIAT_CONFIRMATION.md for the
+ * product-level tradeoffs.
+ */
+export function tronRecipientConfirmationBinder(
+  lookup: ConfirmationLookup,
+  opts?: EvaluateOptions,
+): FiatLegProofBinder {
+  return createRecipientConfirmationBinder<Trc20Transfer>(
+    "tron",
+    lookup,
+    (t) => ({ reference: t.transactionId, observedAt: t.observedAt }),
+    opts,
+  );
+}

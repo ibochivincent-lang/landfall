@@ -4,8 +4,9 @@
   "private": true,
   "type": "module",
   "license": "MIT",
-  "description": "Chain-agnostic ChainAdapter interface every per-chain adapter implements (see docs/architecture/MULTICHAIN.md §6).",
+  "description": "Chain-agnostic ChainAdapter interface every per-chain adapter implements (see docs/architecture/MULTICHAIN.md \u00a76).",
   "scripts": {
+    "test": "tsx --test test/*.test.ts",
     "typecheck": "tsc --noEmit"
   }
 }

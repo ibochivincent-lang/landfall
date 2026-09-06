@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Landfall · Stellar — Confirm a payment</title>
+  <meta name="description" content="Report whether a payment referenced on-chain actually arrived.">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="landfall-api" content="">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="dashboard.css">
+  <style>
+    .confirm-wrap { max-width: 640px; margin: 40px auto; padding: 0 20px; }
+    .confirm-card { background: var(--paper); border: 1px solid var(--line); border-radius: 16px; padding: 28px; }
+    .confirm-card h1 { font-size: 22px; font-weight: 800; margin: 0 0 6px; }
+    .confirm-ref { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--muted); word-break: break-all; margin-bottom: 18px; }
+    .confirm-note { font-size: 13px; color: var(--muted); line-height: 1.6; background: #f8fafc; border: 1px dashed var(--line); border-radius: 10px; padding: 14px; margin-bottom: 22px; }
+    .confirm-note strong { color: var(--ink); }
+    .field-group { margin-bottom: 18px; }
+    .field-label { display: block; font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 8px; }
+    .who-row, .outcome-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .choice-btn {
+      flex: 1; min-width: 140px; background: #f1f5f9; border: 1px solid var(--line);
+      border-radius: 8px; padding: 10px 12px; font-size: 13px; font-weight: 700;
+      cursor: pointer; color: var(--muted); font-family: inherit; transition: all 0.15s;
+    }
+    .choice-btn:hover { color: var(--ink); }
+    .choice-btn.is-on { background: #0b9c91; border-color: #0b9c91; color: #fff; }
+    .field-input, .field-textarea {
+      width: 100%; padding: 9px 11px; border: 1px solid var(--line); border-radius: 8px;
+      font-family: inherit; font-size: 14px; box-sizing: border-box;
+    }
+    .field-textarea { resize: vertical; min-height: 70px; }
+    .field-hint { font-size: 11px; color: var(--muted); margin-top: 4px; }
+    .submit-btn {
+      background: #0b9c91; color: #fff; border: none; border-radius: 8px;
+      padding: 12px 22px; font-size: 14px; font-weight: 800; cursor: pointer;
+      width: 100%; transition: background 0.18s;
+    }
+    .submit-btn:hover { background: #087d74; }
+    .submit-btn:disabled { background: #9fb4b1; cursor: not-allowed; }
+    .result-box { margin-top: 18px; padding: 16px; border-radius: 10px; font-size: 13px; line-height: 1.6; }
+    .result-box.is-ok { background: #ecfdf5; border: 1px solid #6ee7b7; color: #065f46; }
+    .result-box.is-warn { background: #fffbeb; border: 1px solid #fcd34d; color: #78350f; }
+    .result-box.is-err { background: #fef2f2; border: 1px solid #fca5a5; color: #7f1d1d; }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body class="dash-body">
+
+<header class="topnav" id="topnav">
+  <div class="wrap topnav__in">
+    <a href="index.html" class="topnav__logo" aria-label="Landfall home">
+      <svg viewBox="0 0 40 40" class="topnav__logo-mark" aria-hidden="true">
+        <path d="M20 3 35 29H5L20 3Z" fill="currentColor"/>
+        <path d="M20 12 28 26H12l8-14Z" fill="#eaf4ef"/>
+        <path d="M20 29v7" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <span>landfall<em>.stellar</em></span>
+    </a>
+  </div>
+</header>
+
+<main class="confirm-wrap">
+  <div class="confirm-card">
+    <h1>Confirm a payment</h1>
+    <div class="confirm-ref" id="refLine">Loading…</div>
+
+    <div class="confirm-note">
+      <strong>What this is.</strong> A crypto transfer landed on-chain, but the fiat payment it was
+      meant to trigger — a bank deposit, a mobile money credit — happens off-chain, where nothing
+      here can see it. This form is the one way to close that gap that needs no cooperation from
+      anyone else: the person who was supposed to receive the money says whether it arrived.
+      <br><br>
+      <strong>What it is not.</strong> Nobody is authenticated. There is no login, no identity check —
+      this is one honest sentence from an unverified visitor, not a verified receipt. It only ever
+      strengthens the record when the reporter identifies as the <em>recipient</em>; a sender's own
+      report that they paid is not evidence the money arrived, and is recorded but never counted as
+      such. Each transfer can be confirmed exactly once — the first submission stands permanently, so
+      there is no path to quietly overwrite an earlier report.
+    </div>
+
+    <form id="confirmForm">
+      <div class="field-group">
+        <label class="field-label">Who are you?</label>
+        <div class="who-row" role="radiogroup" aria-label="Are you the sender or the recipient">
+          <button type="button" class="choice-btn is-on" data-field="respondent" data-value="recipient">I received this payment</button>
+          <button type="button" class="choice-btn" data-field="respondent" data-value="sender">I sent this payment</button>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Did it arrive?</label>
+        <div class="outcome-row" role="radiogroup" aria-label="Outcome">
+          <button type="button" class="choice-btn is-on" data-field="outcome" data-value="received">Yes, in full</button>
+          <button type="button" class="choice-btn" data-field="outcome" data-value="partial">Only part of it</button>
+          <button type="button" class="choice-btn" data-field="outcome" data-value="not_received">No</button>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="amountInput">What arrived (optional)</label>
+        <input class="field-input" id="amountInput" placeholder="e.g. 158,000 NGN">
+        <div class="field-hint">Not checked against anything — it's context for whoever reads this later, not a verified figure.</div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="noteInput">Anything else? (optional)</label>
+        <textarea class="field-textarea" id="noteInput" maxlength="500" placeholder="e.g. arrived a day later than expected"></textarea>
+      </div>
+
+      <button type="submit" class="submit-btn" id="submitBtn">Submit confirmation</button>
+    </form>
+
+    <div class="result-box" id="resultBox" hidden></div>
+  </div>
+</main>
+
+<script src="confirm.js"></script>
+</body>
+</html>

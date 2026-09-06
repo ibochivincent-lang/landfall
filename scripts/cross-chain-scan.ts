@@ -33,6 +33,10 @@ import { StellarAdapter } from "../packages/adapters/stellar/src/index.js";
 import { EvmCctpAdapter } from "../packages/adapters/evm-cctp/src/index.js";
 import { TronAdapter } from "../packages/adapters/tron/src/index.js";
 import { SolanaAdapter } from "../packages/adapters/solana/src/index.js";
+import { tronRecipientConfirmationBinder, type FiatLegProofBinder as TronFiatLegProofBinder } from "../packages/adapters/tron/src/index.js";
+import { solanaRecipientConfirmationBinder, type FiatLegProofBinder as SolanaFiatLegProofBinder } from "../packages/adapters/solana/src/index.js";
+import { createDbConfirmationLookup } from "./lib/fiatConfirmationLookup.js";
+import type { ConfirmationLookup } from "../packages/adapters/src/fiatConfirmation.js";
 import type { ChainAdapter, EvidenceTier } from "../packages/adapters/src/types.js";
 import {
   parseAnchorsRegistry,
@@ -122,13 +126,33 @@ async function resolveStellarAccounts(
   }
 }
 
-/** Builds a non-Stellar adapter for a curated address, or explains why it can't. */
+/**
+ * Builds a non-Stellar adapter for a curated address, or explains why it
+ * can't.
+ *
+ * `confirmationLookup` is only present when DATABASE_URL is set (see main()
+ * below) — without it, Tron and Solana fall back to NULL_FIAT_LEG_BINDER,
+ * exactly as they did before this existed. A DERIVED-tier adapter with no
+ * lookup source is not a regression; it is the same "binds nothing until a
+ * real proof integration is plugged in" default both adapters shipped with.
+ */
 function buildAdapter(
   spec: (typeof CHAINS_IN_SCOPE)[number],
   cctp: CctpDeployments,
+  confirmationLookup: ConfirmationLookup | null,
 ): { adapter: ChainAdapter } | { reason: string } {
-  if (spec.kind === "tron") return { adapter: new TronAdapter({ chain: "tron" }) };
-  if (spec.kind === "solana") return { adapter: new SolanaAdapter({ chain: "solana" }) };
+  if (spec.kind === "tron") {
+    const fiatLegProofBinder: TronFiatLegProofBinder | undefined = confirmationLookup
+      ? tronRecipientConfirmationBinder(confirmationLookup)
+      : undefined;
+    return { adapter: new TronAdapter({ chain: "tron", fiatLegProofBinder }) };
+  }
+  if (spec.kind === "solana") {
+    const fiatLegProofBinder: SolanaFiatLegProofBinder | undefined = confirmationLookup
+      ? solanaRecipientConfirmationBinder(confirmationLookup)
+      : undefined;
+    return { adapter: new SolanaAdapter({ chain: "solana", fiatLegProofBinder }) };
+  }
 
   const deployment = cctp.deployments[spec.chain];
   if (!deployment) {
@@ -149,6 +173,26 @@ function buildAdapter(
 
 async function main(): Promise<void> {
   const since = new Date(Date.now() - WINDOW_DAYS * 86_400_000).toISOString();
+
+  // Recipient-confirmation lookup (packages/adapters/src/fiatConfirmation.ts).
+  // Only constructed when DATABASE_URL is set — the confirmations it reads
+  // are submitted through POST /api/v1/fiat-confirmations, which itself
+  // requires the same database. Without it, Tron and Solana scan exactly as
+  // they always have: NULL_FIAT_LEG_BINDER, zero DERIVED events from either.
+  let confirmationPool: import("pg").Pool | null = null;
+  let confirmationLookup: ConfirmationLookup | null = null;
+  if (process.env.DATABASE_URL) {
+    const { default: pg } = await import("pg");
+    confirmationPool = new pg.Pool({
+      connectionString: process.env.DATABASE_URL.replace(/([?&])sslmode=[^&]*&?/, "$1").replace(/[?&]$/, ""),
+      max: 2,
+      connectionTimeoutMillis: 8_000,
+      ssl: { rejectUnauthorized: false },
+    });
+    confirmationLookup = createDbConfirmationLookup(confirmationPool);
+  } else {
+    console.log("DATABASE_URL not set — Tron/Solana will not bind recipient confirmations this run.");
+  }
 
   const prior = await readJson<{ asOf: string; accounts: Array<{ domain: string; account: string }> }>(ANCHORS_JSON);
   const registry: AnchorsRegistry = parseAnchorsRegistry(await readFile(REGISTRY_JSON, "utf8"));
@@ -182,7 +226,7 @@ async function main(): Promise<void> {
         });
         continue;
       }
-      const built = buildAdapter(spec, cctp);
+      const built = buildAdapter(spec, cctp, confirmationLookup);
       if ("reason" in built) {
         unresolved.push({ chain: spec.chain, maxTier: spec.maxTier, reason: built.reason });
         continue;
@@ -243,6 +287,10 @@ async function main(): Promise<void> {
   console.log(
     `\nWrote ${OUT_FILE}\n  PROVEN ${totals.PROVEN} · ATTESTED ${totals.ATTESTED} · DERIVED ${totals.DERIVED}`,
   );
+
+  // A one-shot script, unlike the API server's long-lived pool — hold the
+  // process open on an idle connection and this exits only on timeout.
+  if (confirmationPool) await confirmationPool.end();
 }
 
 main().catch((err) => {
