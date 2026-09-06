@@ -43,6 +43,7 @@
       <a class="topnav__link" href="dashboard.html">Transactions</a>
       <a class="topnav__link" href="cross-chain.html">Cross-chain</a>
       <a class="topnav__link" href="compare.html">Route Scout</a>
+      <a class="topnav__link" href="trust-check.html">Trust Check</a>
       <a class="topnav__link is-active" href="docs.html" aria-current="page">API Docs</a>
       <a class="topnav__link" href="portal.html">Developer Portal</a>
     </nav>
@@ -418,6 +419,43 @@
     </div>
   </section>
 
+  <!-- Section 3i: trust check -->
+  <section class="docs-section">
+    <h2>3i. Trust Check</h2>
+    <p style="font-size:13px; color:var(--muted); margin-bottom:16px;">
+      Counterparty risk signals for an arbitrary Stellar address, computed live from Horizon — no
+      DATABASE_URL required, since this route never touches this project's own Postgres. See
+      <a href="trust-check.html">/trust-check.html</a> for the rendered form and
+      <a href="https://github.com/ibochivincent-lang/landfall/blob/main/packages/trust-check/src/analyze.ts" target="_blank" rel="noopener">packages/trust-check/src/analyze.ts</a>
+      for the exact, reproducible arithmetic behind every score. Deliberately no external fraud
+      database, scam list, or reputation feed — none exists that this project can independently
+      verify, and inventing one would be exactly the failure mode Landfall exists to catch in other
+      tools. Every flag is a ledger fact with a stated detail, never presented as an accusation.
+    </p>
+
+    <div class="endpoint-card">
+      <div class="endpoint-title">
+        <span class="badge-get">GET</span>
+        <span class="endpoint-path">/api/v1/trust-check?address={G...|txHash}</span>
+      </div>
+      <p style="font-size:13px; color:var(--muted); margin-top:8px;">
+        Accepts a Stellar public key directly, or a transaction hash (resolved to its source
+        account). Returns observed account age — a lower bound only, since Horizon does not retain
+        full history forever — counterparty concentration, a pass-through/fast-forwarding signal,
+        a transparent 0–100 score built from fixed, documented per-flag deductions, a risk level,
+        and a confidence rating that overrides the score when there simply isn't enough observed
+        history to say anything ("unknown" beats a number computed from three payments).
+      </p>
+
+      <div class="try-bar">
+        <input type="text" id="trustCheckInput" class="try-input" value="GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN" placeholder="G... address or transaction hash">
+        <button class="try-btn" onclick="testTrustCheck()">Run Live Check ⚡</button>
+      </div>
+
+      <pre class="response-preview mono" id="trustCheckOut">// Click "Run Live Check" above to test against the live ledger</pre>
+    </div>
+  </section>
+
   <!-- Section 4: MCP Tool -->
   <section class="docs-section">
     <h2>4. AI Agent Integration (Model Context Protocol / MCP)</h2>
@@ -468,6 +506,17 @@
     const out = document.getElementById('corridorsOut');
     out.textContent = 'Querying corridors...';
     fetch('/api/v1/corridors')
+      .then(res => res.json())
+      .then(data => { out.textContent = JSON.stringify(data, null, 2); })
+      .catch(err => { out.textContent = 'Error: ' + err.message; });
+  }
+
+  function testTrustCheck() {
+    const address = document.getElementById('trustCheckInput').value.trim();
+    const out = document.getElementById('trustCheckOut');
+    if (!address) { out.textContent = 'Enter an address or transaction hash first.'; return; }
+    out.textContent = 'Reading the ledger...';
+    fetch('/api/v1/trust-check?address=' + encodeURIComponent(address))
       .then(res => res.json())
       .then(data => { out.textContent = JSON.stringify(data, null, 2); })
       .catch(err => { out.textContent = 'Error: ' + err.message; });

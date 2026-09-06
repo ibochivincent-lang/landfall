@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trust Check — Landfall · Stellar</title>
+  <meta name="description" content="Paste a Stellar address or transaction hash and see what the public ledger shows about it before you pay.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="dashboard.css">
+  <link rel="stylesheet" href="trust-check.css">
+</head>
+<body class="dash-body">
+
+<header class="topnav" id="topnav">
+  <div class="wrap topnav__in">
+    <a href="index.html" class="topnav__logo" aria-label="Landfall home">
+      <svg viewBox="0 0 40 40" class="topnav__logo-mark" aria-hidden="true">
+        <path d="M20 3 35 29H5L20 3Z" fill="currentColor"/>
+        <path d="M20 12 28 26H12l8-14Z" fill="#eaf4ef"/>
+        <path d="M20 29v7" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <span>landfall<em>.stellar</em></span>
+    </a>
+    <nav class="topnav__pill" aria-label="Site navigation">
+      <a class="topnav__link" href="index.html">Overview</a>
+      <a class="topnav__link" href="dashboard.html">Transactions</a>
+      <a class="topnav__link" href="cross-chain.html">Cross-chain</a>
+      <a class="topnav__link" href="compare.html">Route Scout</a>
+      <a class="topnav__link is-active" href="trust-check.html" aria-current="page">Trust Check</a>
+      <a class="topnav__link" href="docs.html">API Docs</a>
+      <a class="topnav__link" href="portal.html">Developer Portal</a>
+    </nav>
+    <div class="topnav__actions">
+      <a class="dash-btn dash-btn--primary" href="portal.html">Get API Keys →</a>
+      <a class="dash-btn dash-btn--ghost" href="https://github.com/ibochivincent-lang/landfall" target="_blank" rel="noopener">GitHub ↗</a>
+    </div>
+  </div>
+</header>
+
+<main class="trust-wrap">
+
+  <div class="dash-head">
+    <div>
+      <h1 class="dash-title">Trust Check</h1>
+      <p class="dash-sub">
+        Paste a Stellar address or transaction hash. See what the public ledger actually shows
+        about it before you pay.
+      </p>
+    </div>
+  </div>
+
+  <div class="disclosure">
+    <strong>What this is, and isn't.</strong>
+    Every signal below is computed live from Stellar's public ledger — nothing here is a fraud
+    database, a scam list, or a reputation feed, because none exists that this project can
+    independently verify. A flag is a ledger fact, never an accusation: the same pattern that looks
+    like a risk can also be an ordinary automated wallet. Read the evidence, don't just read the
+    color.
+  </div>
+
+  <div class="check-form">
+    <label class="check-label" for="checkInput">Stellar address or transaction hash</label>
+    <div class="check-row">
+      <input class="check-input" id="checkInput" type="text" placeholder="G… or a 64-character transaction hash" autocomplete="off" spellcheck="false">
+      <button class="check-btn" id="checkBtn">Check ⚡</button>
+    </div>
+    <div class="check-hint">Try one: <button type="button" class="check-example" data-addr="GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN">Circle USDC issuer</button></div>
+  </div>
+
+  <div id="checkResult"></div>
+
+</main>
+
+<script src="trust-check.js"></script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "name": "@landfall/trust-check",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "Counterparty risk signals for an arbitrary Stellar address, computed only from what the public ledger shows. No external intelligence, no invented labels — see src/analyze.ts for exactly what that limits.",
+  "scripts": {
+    "test": "tsx --test test/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  }
+}

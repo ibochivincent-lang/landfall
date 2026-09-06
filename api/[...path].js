@@ -14,6 +14,7 @@
  *   GET  /api/v1/corridors           -- cross-asset flow matrix (path payments)
 *   POST /api/v1/fiat-confirmations  -- recipient self-report that a fiat leg landed (DERIVED evidence input)
 *   GET  /api/v1/fiat-confirmations/:chain/:reference -- status of one confirmation, if any
+*   GET  /api/v1/trust-check?address=G...|txHash -- ledger-only counterparty risk signals, no DB needed
  *   GET  /health
  *
  * Admin routes (session-cookie gated, see requireSession()):
@@ -486,6 +487,326 @@ export function evaluateFiatConfirmation(claim, transfer, opts = {}) {
 }
 
 /**
+ * Trust Check — a plain-JS mirror of packages/trust-check/src/analyze.ts.
+ *
+ * Same reason as evaluateFiatConfirmation above: this file has no build
+ * step, so the TypeScript package can't be imported here at runtime.
+ * packages/trust-check/test/parity.test.ts loads this exact function from
+ * the deployed file and runs it against the real package on shared
+ * fixtures, so a change to one side that isn't mirrored on this side fails
+ * a test rather than shipping silently different numbers.
+ *
+ * See the TypeScript source for the full reasoning behind every threshold
+ * and, in particular, for why there is no "external intelligence" signal
+ * here at all — fabricating one would be exactly the failure mode this
+ * project exists to catch elsewhere.
+ */
+const TRUST_CHECK_FORWARD_MATCH_FRACTION = 0.9;
+const TRUST_CHECK_FORWARD_WINDOW_MS = 10 * 60 * 1000;
+const TRUST_CHECK_SCORE_DEDUCTIONS = { info: 0, warning: 15, high: 30 };
+
+function trustCheckAssessAge(input) {
+  if (!input.oldestRetainedPaymentAt) {
+    return { oldestRetainedPaymentAt: null, observedDays: null, isLowerBoundOnly: false };
+  }
+  const days = (Date.parse(input.checkedAt) - Date.parse(input.oldestRetainedPaymentAt)) / 86400000;
+  return {
+    oldestRetainedPaymentAt: input.oldestRetainedPaymentAt,
+    observedDays: Math.max(0, Math.round(days * 10) / 10),
+    isLowerBoundOnly: true,
+  };
+}
+
+function trustCheckAssessConcentration(address, payments) {
+  const scale = 10n ** 7n;
+  const toFixed = (s) => {
+    const [w = '0', f = ''] = String(s).split('.');
+    return BigInt(w) * scale + BigInt((f + '0000000').slice(0, 7));
+  };
+
+  const perAsset = new Map();
+  const counterparties = new Set();
+
+  for (const p of payments) {
+    const counterparty = p.from === address ? p.to : p.from;
+    if (counterparty === address) continue;
+    counterparties.add(counterparty);
+
+    const byCounterparty = perAsset.get(p.asset) ?? new Map();
+    byCounterparty.set(counterparty, (byCounterparty.get(counterparty) ?? 0n) + toFixed(p.amount));
+    perAsset.set(p.asset, byCounterparty);
+  }
+
+  if (counterparties.size === 0) {
+    return { topCounterpartyShare: null, topCounterparty: null, distinctCounterparties: 0 };
+  }
+
+  let bestShare = -1;
+  let bestCounterparty = null;
+  for (const byCounterparty of perAsset.values()) {
+    let assetTotal = 0n;
+    for (const v of byCounterparty.values()) assetTotal += v;
+    if (assetTotal === 0n) continue;
+    for (const [counterparty, amount] of byCounterparty) {
+      const share = Number(amount) / Number(assetTotal);
+      if (share > bestShare) {
+        bestShare = share;
+        bestCounterparty = counterparty;
+      }
+    }
+  }
+
+  return {
+    topCounterpartyShare: bestShare < 0 ? null : bestShare,
+    topCounterparty: bestCounterparty,
+    distinctCounterparties: counterparties.size,
+  };
+}
+
+function trustCheckAssessForwarding(address, payments) {
+  const inbound = payments.filter((p) => p.to === address && p.from !== address);
+  const outbound = payments.filter((p) => p.from === address && p.to !== address);
+  const usedOutbound = new Set();
+
+  let fastForwarded = 0;
+  for (const inPay of inbound) {
+    const inAt = Date.parse(inPay.createdAt);
+    const inAmt = Number(inPay.amount);
+    if (!Number.isFinite(inAmt) || inAmt <= 0) continue;
+
+    const matchIdx = outbound.findIndex((outPay, idx) => {
+      if (usedOutbound.has(idx)) return false;
+      if (outPay.asset !== inPay.asset) return false;
+      if (outPay.to === inPay.from) return false;
+      const outAt = Date.parse(outPay.createdAt);
+      if (outAt < inAt || outAt - inAt > TRUST_CHECK_FORWARD_WINDOW_MS) return false;
+      const outAmt = Number(outPay.amount);
+      return Number.isFinite(outAmt) && outAmt >= inAmt * TRUST_CHECK_FORWARD_MATCH_FRACTION;
+    });
+
+    if (matchIdx !== -1) {
+      usedOutbound.add(matchIdx);
+      fastForwarded++;
+    }
+  }
+
+  return {
+    fastForwardedCount: fastForwarded,
+    inboundCount: inbound.length,
+    fastForwardedFraction: inbound.length > 0 ? fastForwarded / inbound.length : null,
+  };
+}
+
+function trustCheckBuildFlags(age, concentration, forwarding, paymentCount) {
+  const flags = [];
+
+  if (age.observedDays !== null && age.observedDays < 7 && paymentCount >= 10) {
+    flags.push({
+      id: 'new-with-high-volume',
+      severity: 'warning',
+      summary: `Observed history reaches back only ${age.observedDays} day(s), with ${paymentCount} payment(s) in that time.`,
+      detail:
+        'A short observed history with a lot of activity is not itself wrong — a busy new service looks the same as this. ' +
+        'It means there is little track record to judge, not that something is wrong.',
+      evidenceTxHashes: [],
+    });
+  }
+
+  if (forwarding.inboundCount >= 3 && forwarding.fastForwardedFraction !== null && forwarding.fastForwardedFraction >= 0.5) {
+    flags.push({
+      id: 'pass-through-pattern',
+      severity: 'high',
+      summary: `${forwarding.fastForwardedCount} of ${forwarding.inboundCount} inbound payments were forwarded onward within ${TRUST_CHECK_FORWARD_WINDOW_MS / 60000} minutes.`,
+      detail:
+        'This is a ledger fact, not a conclusion about intent: this pattern is consistent with a pass-through account — ' +
+        'automated forwarding, a custodial hot wallet, or a sweep service all look identical on-chain to this. ' +
+        'It does not by itself establish fraud, and should not be read as an accusation.',
+      evidenceTxHashes: [],
+    });
+  }
+
+  if (concentration.topCounterpartyShare !== null && concentration.topCounterpartyShare >= 0.8 && paymentCount >= 5) {
+    flags.push({
+      id: 'high-concentration',
+      severity: 'info',
+      summary: `${Math.round(concentration.topCounterpartyShare * 100)}% of observed volume moves through a single counterparty.`,
+      detail:
+        'Concentration alone is common and often benign — a personal wallet paying one merchant repeatedly looks the same. ' +
+        'It is informational context for the other signals, not a finding on its own.',
+      evidenceTxHashes: [],
+    });
+  }
+
+  return flags;
+}
+
+function trustCheckConfidence(paymentCount) {
+  if (paymentCount < 5) return 'low';
+  if (paymentCount < 25) return 'medium';
+  return 'high';
+}
+
+function trustCheckRiskLevel(score, confidence) {
+  if (confidence === 'low') return 'unknown';
+  if (score >= 70) return 'low';
+  if (score >= 40) return 'medium';
+  return 'high';
+}
+
+function trustCheckRecommendation(level, confidence, paymentCount) {
+  if (paymentCount === 0) {
+    return 'No observed payment history for this address. There is nothing here to assess either way — treat it with the same caution you would any new counterparty.';
+  }
+  if (confidence === 'low') {
+    return `Only ${paymentCount} observed payment(s) — too little history to draw a conclusion. A low count is not itself a warning sign.`;
+  }
+  switch (level) {
+    case 'low':
+      return "No concerning patterns observed in this account's ledger history.";
+    case 'medium':
+      return 'Some patterns worth reviewing before sending a large amount — see the flags below and the evidence behind each.';
+    case 'high':
+      return 'Multiple patterns consistent with elevated risk were observed. Review the evidence below before proceeding.';
+    default:
+      return 'Not enough observed activity to assess.';
+  }
+}
+
+export function analyzeTrustCheck(input) {
+  const age = trustCheckAssessAge(input);
+  const concentration = trustCheckAssessConcentration(input.address, input.recentPayments);
+  const forwarding = trustCheckAssessForwarding(input.address, input.recentPayments);
+
+  const inboundCount = input.recentPayments.filter((p) => p.to === input.address).length;
+  const outboundCount = input.recentPayments.filter((p) => p.from === input.address).length;
+  const paymentCount = input.recentPayments.length;
+
+  const flags = trustCheckBuildFlags(age, concentration, forwarding, paymentCount);
+  const riskScore = Math.max(0, 100 - flags.reduce((sum, f) => sum + TRUST_CHECK_SCORE_DEDUCTIONS[f.severity], 0));
+  const confidence = trustCheckConfidence(paymentCount);
+  const riskLevel = trustCheckRiskLevel(riskScore, confidence);
+
+  return {
+    address: input.address,
+    checkedAt: input.checkedAt,
+    age,
+    concentration,
+    forwarding,
+    paymentCount,
+    inboundCount,
+    outboundCount,
+    flags,
+    riskScore,
+    riskLevel,
+    confidence,
+    recommendation: trustCheckRecommendation(riskLevel, confidence, paymentCount),
+    limits:
+      'Computed only from Stellar ledger records Horizon still retains for this address — no external ' +
+      'fraud reports, scam lists, or reputation feeds are used, because none exist here that this project ' +
+      'can independently verify. "Observed days" is a lower bound: the address may be materially older ' +
+      'than that.' +
+      (input.recentPaymentsTruncated
+        ? ` This address has more payment history than the ${input.recentPayments.length} most recent ` +
+          'record(s) inspected here — signals are computed from that recent window, not the full history.'
+        : ` All ${input.recentPayments.length} payment record(s) Horizon retains for this address were inspected.`) +
+      ' Every flag is a ledger fact, not an accusation — see the detail on each.',
+  };
+}
+
+const TRUST_CHECK_HORIZON = 'https://horizon.stellar.org';
+const TRUST_CHECK_MAX_RECORDS = 200;
+const TRUST_CHECK_TIMEOUT_MS = 12_000;
+
+/** "CODE:ISSUER" or "native" — mirrors packages/indexer/src/horizon.ts's assetId() for the one field this route needs. */
+function trustCheckAssetId(rec) {
+  const type = rec.asset_type;
+  if (type === 'native' || type === undefined) return 'native';
+  const code = rec.asset_code;
+  const issuer = rec.asset_issuer;
+  if (typeof code === 'string' && typeof issuer === 'string') return `${code}:${issuer}`;
+  return typeof code === 'string' ? code : 'unknown';
+}
+
+/** Payment-shaped operations only — mirrors packages/indexer/src/horizon.ts's normalise() for the fields this route needs. */
+function trustCheckNormalisePayment(rec) {
+  const type = String(rec.type ?? '');
+  const txHash = String(rec.transaction_hash ?? '');
+  const createdAt = String(rec.created_at ?? '');
+
+  if (type === 'create_account') {
+    if (typeof rec.funder !== 'string' || typeof rec.account !== 'string') return null;
+    return { txHash, from: rec.funder, to: rec.account, amount: String(rec.starting_balance ?? '0'), asset: 'native', createdAt };
+  }
+  if (type === 'payment' || type.startsWith('path_payment')) {
+    if (typeof rec.from !== 'string' || typeof rec.to !== 'string') return null;
+    return { txHash, from: rec.from, to: rec.to, amount: String(rec.amount ?? '0'), asset: trustCheckAssetId(rec), createdAt };
+  }
+  return null;
+}
+
+async function trustCheckGetJson(url) {
+  const res = await fetch(url, { headers: { accept: 'application/json' }, signal: AbortSignal.timeout(TRUST_CHECK_TIMEOUT_MS) });
+  if (!res.ok) {
+    const err = new Error(`Horizon HTTP ${res.status}`);
+    err.status = res.status;
+    throw err;
+  }
+  return res.json();
+}
+
+const G_ADDRESS = /^G[A-Z2-7]{55}$/;
+const TX_HASH = /^[0-9a-fA-F]{64}$/;
+
+/**
+ * Resolves whatever the user pasted to a Stellar account: a G... address is
+ * used directly, a transaction hash is resolved to its source account. This
+ * is the only place this route makes a guess about intent — everything
+ * downstream is a straight ledger read on the resolved address.
+ */
+async function trustCheckResolveAddress(raw) {
+  const value = String(raw ?? '').trim();
+  if (G_ADDRESS.test(value)) return value;
+  if (TX_HASH.test(value)) {
+    const tx = await trustCheckGetJson(`${TRUST_CHECK_HORIZON}/transactions/${value}`);
+    if (typeof tx.source_account === 'string') return tx.source_account;
+    throw new Error('Could not resolve a source account from that transaction hash.');
+  }
+  return null;
+}
+
+/**
+ * Fetches exactly what analyzeTrustCheck needs for one address: the oldest
+ * payment Horizon still retains (a lower bound on age — see the "limits"
+ * text on every result) and up to TRUST_CHECK_MAX_RECORDS of the most
+ * recent activity. Two requests, not a full history walk — this is a
+ * live, on-demand check, not a batch scan, and an address with years of
+ * heavy activity must answer in seconds, not minutes.
+ */
+async function trustCheckFetchInput(address, checkedAt) {
+  const oldestUrl = `${TRUST_CHECK_HORIZON}/accounts/${address}/payments?order=asc&limit=1`;
+  const recentUrl = `${TRUST_CHECK_HORIZON}/accounts/${address}/payments?order=desc&limit=${TRUST_CHECK_MAX_RECORDS}`;
+
+  const [oldestBody, recentBody] = await Promise.all([
+    trustCheckGetJson(oldestUrl),
+    trustCheckGetJson(recentUrl),
+  ]);
+
+  const oldestRecords = (oldestBody._embedded?.records ?? []).map(trustCheckNormalisePayment).filter(Boolean);
+  const recentRecords = (recentBody._embedded?.records ?? []).map(trustCheckNormalisePayment).filter(Boolean);
+
+  return {
+    address,
+    oldestRetainedPaymentAt: oldestRecords[0]?.createdAt ?? null,
+    recentPayments: recentRecords,
+    // A full page back means there is likely more history this fetch never
+    // saw — an exact "is there a next page" check would need a third
+    // request, which this route deliberately avoids to stay fast.
+    recentPaymentsTruncated: recentRecords.length >= TRUST_CHECK_MAX_RECORDS,
+    checkedAt,
+  };
+}
+
+/**
  * Deterministic Anchor Reliability Score (0-100).
  * Derived purely from ledger evidence across an anchor's accounts.
  */
@@ -877,15 +1198,49 @@ export default async function handler(req, res) {
     return res.status(204).end();
   }
 
-  const db = pool();
-  if (!db) {
-    return json(res, 503, { error: 'DATABASE_URL not configured' }, 0);
-  }
-
   const urlPath = (req.url || '').split('?')[0];
   const stripped = urlPath.replace(/^\/api\//, '');
   const parts  = stripped.split('/').filter(Boolean);
   const joined = parts.join('/');
+
+  // GET /api/v1/trust-check?address=G...|txHash
+  //
+  // Deliberately handled before the DATABASE_URL gate below: this route is
+  // a live, stateless read straight from Horizon and never touches this
+  // app's own Postgres, so it has no reason to fail just because that
+  // database happens to be unreachable.
+  if (req.method === 'GET' && joined === 'v1/trust-check') {
+    try {
+      const url = new URL(req.url, `https://${req.headers.host}`);
+      const raw = url.searchParams.get('address') || '';
+
+      const address = await trustCheckResolveAddress(raw);
+      if (!address) {
+        return json(res, 400, { error: 'address must be a Stellar public key (G...) or a transaction hash.' }, 0);
+      }
+
+      const db = pool();
+      if (db) {
+        const bucket = `trustcheck:${clientIp(req)}`;
+        const { allowed } = await rateLimit(db, bucket, 20);
+        if (!allowed) return json(res, 429, { error: 'Too many checks. Try again in a minute.' }, 0);
+      }
+
+      const input = await trustCheckFetchInput(address, new Date().toISOString());
+      return json(res, 200, analyzeTrustCheck(input), 60);
+    } catch (err) {
+      if (err.status === 404) {
+        return json(res, 404, { error: 'That address has no account on the Stellar network.' }, 0);
+      }
+      console.error('[trust-check]', err.message);
+      return json(res, 502, { error: 'Could not reach Horizon to check that address. Try again shortly.' }, 0);
+    }
+  }
+
+  const db = pool();
+  if (!db) {
+    return json(res, 503, { error: 'DATABASE_URL not configured' }, 0);
+  }
 
   try {
     // ── Auth routes (Developer Portal & Admin login/register/reset) ────────
