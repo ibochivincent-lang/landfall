@@ -44,6 +44,25 @@ if (!CONTRACT_ID || !ADMIN_SECRET) {
   process.exit(0);
 }
 
+/* A transaction signed with the wrong network passphrase is rejected by the
+   RPC, and this step runs under continue-on-error — so the failure mode is an
+   hourly no-op that looks exactly like success in the workflow summary. The
+   passphrase defaults to TESTNET, so pointing SOROBAN_RPC_URL at mainnet
+   without also setting ORACLE_NETWORK_PASSPHRASE produces precisely that.
+   Catch it here and say so, rather than letting it fail quietly forever. */
+const rpcLooksMainnet = /mainnet|\bpublic\b/i.test(RPC_URL);
+const passphraseIsTestnet = NETWORK_PASSPHRASE.includes('Test SDF Network');
+if (rpcLooksMainnet && passphraseIsTestnet) {
+  console.error(
+    'Refusing to publish: SOROBAN_RPC_URL looks like mainnet but ORACLE_NETWORK_PASSPHRASE is the ' +
+    'testnet passphrase (or unset, which defaults to testnet).\n' +
+    '  RPC:        ' + RPC_URL + '\n' +
+    '  Passphrase: ' + NETWORK_PASSPHRASE + '\n' +
+    'Set ORACLE_NETWORK_PASSPHRASE to "Public Global Stellar Network ; September 2015".',
+  );
+  process.exit(1);
+}
+
 /** Imports ADMIN_SECRET into a scratch CLI identity, via stdin — never argv, so it never lands in CI logs or process listings. */
 async function importIdentity() {
   await new Promise((resolvePromise, reject) => {

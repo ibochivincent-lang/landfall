@@ -223,6 +223,12 @@ jobs:
           ORACLE_CONTRACT_ID: ${{ secrets.ORACLE_CONTRACT_ID }}
           ORACLE_ADMIN_SECRET: ${{ secrets.ORACLE_ADMIN_SECRET }}
           SOROBAN_RPC_URL: ${{ secrets.SOROBAN_RPC_URL }}
+          # Must be set for mainnet. publish-oracle.mjs defaults this to the
+          # TESTNET passphrase, and a transaction signed with the wrong one is
+          # rejected — so without this, a mainnet oracle would fail to publish
+          # every hour, silently, because this step is continue-on-error.
+          # Mainnet value: "Public Global Stellar Network ; September 2015"
+          ORACLE_NETWORK_PASSPHRASE: ${{ secrets.ORACLE_NETWORK_PASSPHRASE }}
         run: |
           if [ -n "$ORACLE_CONTRACT_ID" ] && [ -n "$ORACLE_ADMIN_SECRET" ]; then
             command -v stellar >/dev/null 2>&1 || cargo install --locked stellar-cli
