@@ -591,6 +591,7 @@ function renderResults(from, to, amount, baseRate, sym, basis) {
   if (byRel[0] && byRel[0].rel.score !== null && RANK_BY !== 'verified') byRel[0].isTopRel = true;
 
   renderVerifiedSummary(RANK_BY === 'verified' ? firstPriced : null, sym);
+  bindPlanToggle();
 
   /* Header */
   var fixedTxt = basis === 'receive'
@@ -671,7 +672,76 @@ function renderVerifiedSummary(top, sym) {
         '<div><span class="verified-lbl">Evidence</span>Stellar ledger · ' + recency + '</div>' +
       '</div>' +
       '<a href="' + esc(top.url) + '" target="_blank" rel="noopener noreferrer" class="action-btn">Off-Ramp via ' + esc(top.name) + ' →</a>' +
+      renderPlan(top) +
     '</div>';
+}
+
+/* ─── The plan — the Intent Engine's second half ─────────────────────────
+   solveIntent answered "which route?"; buildPlan answers "then what?".
+   Rendered here rather than left in the API because a plan nobody can read
+   is not a plan. Each step names its actor, and the one Landfall performs
+   is the only one that touches no money — see packages/intents/src/plan.ts
+   for why that distinction is load-bearing rather than decorative. */
+var ACTOR_LABEL = { user: 'You', wallet: 'Your wallet', anchor: 'The anchor', landfall: 'Landfall' };
+
+function renderPlan(top) {
+  if (!window.LandfallIntent || typeof LandfallIntent.buildPlan !== 'function') return '';
+
+  // buildPlan takes a solver Solution; the card carries the joined quote
+  // object, so map the two fields whose names differ rather than teaching
+  // buildPlan about presentation shapes.
+  var plan;
+  try {
+    plan = LandfallIntent.buildPlan({
+      solution: {
+        domain: top.domain, name: top.name,
+        send: top.amount, receive: top.payout,
+        grade: top.rel.grade || 'U', score: top.rel.score
+      },
+      from: top.from,
+      to: top.to,
+      anchorUrl: top.url,
+      speed: top.speed
+    });
+  } catch (err) {
+    return '';
+  }
+
+  var steps = plan.steps.map(function (s) {
+    return (
+      '<li class="plan-step">' +
+        '<span class="plan-actor plan-actor--' + s.actor + '">' + esc(ACTOR_LABEL[s.actor] || s.actor) + '</span>' +
+        '<div class="plan-body">' +
+          '<div class="plan-title">' + esc(s.title) + (s.conditional ? ' <em>(if needed)</em>' : '') + '</div>' +
+          '<div class="plan-detail">' + esc(s.detail) + '</div>' +
+        '</div>' +
+      '</li>'
+    );
+  }).join('');
+
+  return (
+    '<div class="plan-block">' +
+      '<button type="button" class="plan-toggle" id="planToggle" aria-expanded="false">What happens next →</button>' +
+      '<div class="plan-panel" id="planPanel" hidden>' +
+        (plan.caution ? '<div class="plan-caution">' + esc(plan.caution) + '</div>' : '') +
+        '<ol class="plan-steps">' + steps + '</ol>' +
+        '<div class="plan-note">' + esc(plan.executionNote) + '</div>' +
+      '</div>' +
+    '</div>'
+  );
+}
+
+/* Bound after every render, since renderVerifiedSummary replaces the markup. */
+function bindPlanToggle() {
+  var toggle = qs('#planToggle');
+  var panel = qs('#planPanel');
+  if (!toggle || !panel) return;
+  toggle.addEventListener('click', function () {
+    var open = !panel.hidden;
+    panel.hidden = open;
+    toggle.setAttribute('aria-expanded', String(!open));
+    toggle.textContent = open ? 'What happens next →' : 'Hide the plan';
+  });
 }
 
 function fmtHours(h) {

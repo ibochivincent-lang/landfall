@@ -69,7 +69,157 @@
         '<div class="flags-head">Flags (' + r.flags.length + ')</div>' +
         flagsHtml +
         '<div class="result-limits">' + esc(r.limits) + '</div>' +
+      '</div>' +
+      // Reports live in their own card, not inside the one above. The API
+      // refuses to blend third-party claims into the ledger-derived score;
+      // rendering them in the same box would undo that separation visually
+      // even though the data kept it.
+      '<div id="reportsSection"></div>';
+
+    loadReports(r.address);
+  }
+
+  /* ─── Fraud reports — a separate card, never folded into the score ─────── */
+
+  var CATEGORY_LABEL = {
+    did_not_receive: 'Did not receive',
+    wrong_amount: 'Wrong amount',
+    impersonation: 'Impersonation',
+    unauthorized_debit: 'Unauthorized debit',
+    other: 'Other'
+  };
+
+  function loadReports(address) {
+    var box = qs('#reportsSection');
+    if (!box) return;
+    box.innerHTML = '<div class="reports-card"><div class="reports-head">Reports from other people</div>' +
+      '<div class="flag-detail">Loading…</div></div>';
+
+    fetch('/api/v1/fraud-reports/' + encodeURIComponent(address))
+      .then(function (res) { return res.ok ? res.json() : null; })
+      .then(function (body) {
+        if (!body) { box.innerHTML = ''; return; }
+        renderReports(address, body);
+      })
+      .catch(function () { box.innerHTML = ''; });
+  }
+
+  function renderReports(address, body) {
+    var box = qs('#reportsSection');
+
+    var list = body.reports.length
+      ? body.reports.map(function (rep) {
+          return (
+            '<div class="report-card' + (rep.status === 'disputed' ? ' is-disputed' : '') + '">' +
+              '<div class="report-top">' +
+                '<span class="report-cat">' + esc(CATEGORY_LABEL[rep.category] || rep.category) + '</span>' +
+                '<span class="report-date">' + esc(String(rep.submittedAt).slice(0, 10)) + '</span>' +
+              '</div>' +
+              '<div class="report-note">' + esc(rep.note) + '</div>' +
+              '<div class="report-evidence">Evidence: ' +
+                '<a href="https://stellar.expert/explorer/public/tx/' + esc(rep.evidenceTxHash) + '" target="_blank" rel="noopener">' +
+                  esc(rep.evidenceTxHash.slice(0, 16)) + '…' +
+                '</a>' +
+                ' — verified to exist and involve this address' +
+              '</div>' +
+              (rep.disputeNote
+                ? '<div class="report-dispute"><strong>Response from the reported party:</strong> ' + esc(rep.disputeNote) + '</div>'
+                : '') +
+            '</div>'
+          );
+        }).join('')
+      : '';
+
+    box.innerHTML =
+      '<div class="reports-card">' +
+        '<div class="reports-head">Reports from other people ' +
+          '<span class="reports-count">' + body.total + '</span></div>' +
+        '<div class="reports-summary">' + esc(body.summary) + '</div>' +
+        list +
+        '<div class="reports-disclaimer">' + esc(body.disclaimer) + '</div>' +
+        '<button type="button" class="report-btn" id="openReportForm">Report this address</button>' +
+        '<div id="reportFormBox" hidden></div>' +
       '</div>';
+
+    qs('#openReportForm').addEventListener('click', function () {
+      renderReportForm(address);
+    });
+  }
+
+  function renderReportForm(address) {
+    var box = qs('#reportFormBox');
+    var trigger = qs('#openReportForm');
+    if (!box) return;
+    trigger.hidden = true;
+    box.hidden = false;
+    box.innerHTML =
+      '<div class="report-form">' +
+        '<div class="report-form-note">' +
+          'A report must cite a transaction hash. Landfall checks against the ledger that the transaction ' +
+          'exists and involves this address before storing anything — a report it cannot verify is rejected, ' +
+          'not filed quietly. What gets verified is the transaction, not your account of what happened.' +
+        '</div>' +
+        '<label class="field-label" for="repTx">Transaction hash</label>' +
+        '<input class="field-input" id="repTx" placeholder="64-character hash of a transaction involving this address" autocomplete="off" spellcheck="false">' +
+        '<label class="field-label" for="repCat">What happened</label>' +
+        '<select class="field-input" id="repCat">' +
+          Object.keys(CATEGORY_LABEL).map(function (k) {
+            return '<option value="' + k + '">' + esc(CATEGORY_LABEL[k]) + '</option>';
+          }).join('') +
+        '</select>' +
+        '<label class="field-label" for="repNote">Describe it</label>' +
+        '<textarea class="field-textarea" id="repNote" maxlength="1000" placeholder="What did you send, what did you expect back, and what actually happened?"></textarea>' +
+        '<div class="report-actions">' +
+          '<button type="button" class="report-btn" id="submitReport">Submit report</button>' +
+          '<button type="button" class="report-cancel" id="cancelReport">Cancel</button>' +
+        '</div>' +
+        '<div id="reportResult"></div>' +
+      '</div>';
+
+    qs('#cancelReport').addEventListener('click', function () {
+      box.hidden = true;
+      box.innerHTML = '';
+      trigger.hidden = false;
+    });
+
+    qs('#submitReport').addEventListener('click', function () {
+      submitReport(address);
+    });
+  }
+
+  function submitReport(address) {
+    var btn = qs('#submitReport');
+    var out = qs('#reportResult');
+    btn.disabled = true;
+    btn.textContent = 'Submitting…';
+    out.innerHTML = '';
+
+    fetch('/api/v1/fraud-reports', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        subject: address,
+        evidenceTxHash: qs('#repTx').value.trim(),
+        category: qs('#repCat').value,
+        note: qs('#repNote').value.trim()
+      })
+    })
+      .then(function (res) { return res.json().then(function (b) { return { status: res.status, body: b }; }); })
+      .then(function (r) {
+        if (r.status === 201) {
+          out.innerHTML = '<div class="report-ok">' + esc(r.body.note || 'Recorded.') + '</div>';
+          setTimeout(function () { loadReports(address); }, 800);
+        } else {
+          out.innerHTML = '<div class="report-err">' + esc((r.body && r.body.error) || 'Could not file that report.') + '</div>';
+        }
+      })
+      .catch(function () {
+        out.innerHTML = '<div class="report-err">Could not reach the server. Try again shortly.</div>';
+      })
+      .finally(function () {
+        btn.disabled = false;
+        btn.textContent = 'Submit report';
+      });
   }
 
   function renderStatus(msg, isError) {

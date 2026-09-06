@@ -373,3 +373,43 @@
    typed into our catalog deserve different confidence, so they look different. */
 .fee-src { font-size: 10.5px; margin-top: 4px; opacity: 0.85; }
 .fee-src.is-stale { color: #92400e; }
+
+/* ─── The plan (Intent Engine) ────────────────────────────────────────────
+   Collapsed by default: the summary answers "which route", and the plan
+   answers "then what" — a question the reader only has once they have
+   accepted the first answer. */
+.plan-block { margin-top: 18px; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 14px; }
+.plan-toggle {
+  background: none; border: none; color: #7fe7d5; font-weight: 800;
+  font-size: 13px; cursor: pointer; padding: 0; font-family: inherit;
+}
+.plan-toggle:hover { color: #a5f3e5; }
+.plan-panel { margin-top: 14px; }
+.plan-caution {
+  background: rgba(251,191,36,0.12); border: 1px solid rgba(251,191,36,0.35);
+  border-radius: 8px; padding: 11px 13px; font-size: 12.5px; line-height: 1.55;
+  color: #fde68a; margin-bottom: 14px;
+}
+.plan-steps { list-style: none; margin: 0; padding: 0; counter-reset: plan; }
+.plan-step {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.plan-step:last-child { border-bottom: none; }
+.plan-actor {
+  flex-shrink: 0; font-size: 10px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 0.03em; padding: 3px 8px; border-radius: 5px; margin-top: 2px;
+  min-width: 86px; text-align: center;
+}
+.plan-actor--landfall { background: #0b9c91; color: #fff; }
+.plan-actor--wallet   { background: #1d4ed8; color: #fff; }
+.plan-actor--user     { background: #b45309; color: #fff; }
+.plan-actor--anchor   { background: rgba(255,255,255,0.16); color: #e2e8f0; }
+.plan-body { flex: 1; }
+.plan-title { font-size: 13.5px; font-weight: 700; margin-bottom: 3px; }
+.plan-title em { font-weight: 500; opacity: 0.7; font-style: normal; }
+.plan-detail { font-size: 12px; line-height: 1.55; opacity: 0.75; }
+.plan-note {
+  margin-top: 14px; font-size: 11.5px; line-height: 1.6; opacity: 0.65;
+  border-top: 1px solid rgba(255,255,255,0.12); padding-top: 12px;
+}
