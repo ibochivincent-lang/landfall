@@ -1,10 +1,10 @@
 {
   "anchorId": "ntokens.com",
   "name": "nTokens Serviços Digitais Ltda",
-  "asOf": "2026-09-06T19:44:51.540Z",
+  "asOf": "2026-09-06T23:20:53.656Z",
   "verification": {
     "resolved": true,
-    "checkedAt": "2026-09-06T19:44:51.540Z",
+    "checkedAt": "2026-09-06T23:20:53.656Z",
     "source": "SEP-1 stellar.toml, resolved live; issuer attribution confirmed against each issuer account's own on-chain home_domain",
     "accounts": [
       {
@@ -52,7 +52,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 1431.02,
+      "hoursSinceActivity": 1434.62,
       "topCounterpartyShare": 1
     },
     {
@@ -64,7 +64,7 @@
       "outbound": 474,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 313.37,
+      "hoursSinceActivity": 316.97,
       "topCounterpartyShare": 0.3213
     }
   ],
@@ -2466,6 +2466,13 @@
       },
       {
         "t": "2026-09-06T19:44:51.540Z",
+        "state": "no_activity",
+        "in": 0,
+        "out": 0,
+        "hours": null
+      },
+      {
+        "t": "2026-09-06T23:20:53.656Z",
         "state": "no_activity",
         "in": 0,
         "out": 0,
@@ -4873,6 +4880,13 @@
         "in": 1,
         "out": 0,
         "hours": 1431.02
+      },
+      {
+        "t": "2026-09-06T23:20:53.656Z",
+        "state": "dark",
+        "in": 1,
+        "out": 0,
+        "hours": 1434.62
       }
     ],
     "GDVKY2GU2DRXWTBEYJJWSFXIGBZV6AZNBVVSUHEPZI54LIS6BA7DVVSP": [
@@ -7255,6 +7269,13 @@
         "in": 58,
         "out": 474,
         "hours": 313.37
+      },
+      {
+        "t": "2026-09-06T23:20:53.656Z",
+        "state": "slow",
+        "in": 58,
+        "out": 474,
+        "hours": 316.97
       }
     ]
   },
