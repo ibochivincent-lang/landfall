@@ -197,6 +197,28 @@
 }
 .action-btn:hover { background: #0b9c91; }
 
+/* ─── Verified routing ───────────────────────────────────────────────────── */
+.rank-row { display: flex; align-items: center; gap: 12px; margin: 24px auto 0; max-width: 1040px; padding: 0 20px; flex-wrap: wrap; }
+.rank-lbl { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; }
+
+.liquidity-line { color: var(--muted); }
+
+.verified-summary {
+  max-width: 1040px; margin: 16px auto 0; padding: 20px 22px;
+  background: linear-gradient(135deg, #061f2d 0%, #0b3b45 100%);
+  border-radius: 14px; color: #fff;
+}
+.verified-head { font-size: 13px; font-weight: 800; letter-spacing: 0.02em; opacity: 0.85; margin-bottom: 10px; }
+.verified-anchor { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
+.verified-domain { font-size: 13px; font-weight: 500; opacity: 0.7; font-family: 'DM Mono', monospace; }
+.verified-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px; margin: 14px 0 16px; font-size: 13px;
+}
+.verified-lbl { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; opacity: 0.65; margin-bottom: 3px; }
+.verified-summary .action-btn { max-width: 320px; background: #0b9c91; }
+.verified-summary .action-btn:hover { background: #0d8a80; }
+
 /* ─── Crypto Routes ──────────────────────────────────────────────────────── */
 .crypto-head { margin-top: 52px; padding-top: 28px; border-top: 1px solid var(--line); }
 .crypto-title { font-size: 22px; }

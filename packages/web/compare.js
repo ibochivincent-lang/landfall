@@ -297,6 +297,54 @@ function liveRateFor(anchor, corridor) {
   return c;
 }
 
+/* ─── Verified routing: liquidity + recency from measured settlement ────────
+   "Best payout" and "best verified" are different questions — see
+   docs/architecture/VERIFIED_ROUTES.md. This loads the one artifact both the
+   liquidity signal and the recency figure come from: real payment counts per
+   asset, not an invented number. */
+var assetHealthMap = null;
+
+function loadAssetHealth() {
+  return fetch('api/v1/asset-health.json')
+    .then(function(res) { return res.ok ? res.json() : null; })
+    .then(function(body) {
+      assetHealthMap = {};
+      var rows = (body && body.byAnchor) || [];
+      for (var i = 0; i < rows.length; i++) assetHealthMap[rows[i].anchor] = rows[i];
+    })
+    .catch(function() { assetHealthMap = {}; });
+}
+
+/**
+ * A coarse recent-activity signal, called "liquidity" because that is the
+ * word someone routing a payment reaches for — not a market-depth or
+ * order-book measurement, and the thresholds below are a first cut, not a
+ * calibrated model. Matches the corridor the same way publishedTerms() does:
+ * anchors name assets after the currency they settle (NGNC, ANGN, ARS…), so
+ * a contains-match on the code is right far more often than an exact one.
+ *
+ * Returns "unknown" — never "low" — when there is nothing measured for this
+ * anchor/corridor at all. Silence is not a claim of illiquidity.
+ */
+function liquidityFor(anchor, corridor) {
+  var health = assetHealthMap && assetHealthMap[anchor.domain];
+  if (!health || !health.corridors) return { tier: 'unknown', payments: null, hoursSinceActivity: null };
+
+  var match = health.corridors.filter(function(c) {
+    return c.asset.toUpperCase().indexOf(corridor.toUpperCase()) !== -1;
+  })[0];
+  if (!match) return { tier: 'unknown', payments: null, hoursSinceActivity: null };
+
+  var n = match.totalPayments;
+  var tier = n >= 50 ? 'high' : n >= 10 ? 'medium' : n >= 1 ? 'low' : 'unknown';
+  return {
+    tier: tier,
+    payments: n,
+    hoursSinceActivity: match.liveness ? match.liveness.hoursSinceActivity : null,
+    livenessState: match.liveness ? match.liveness.state : null,
+  };
+}
+
 /**
  * The withdrawal terms an anchor currently publishes for one corridor.
  *
@@ -415,6 +463,26 @@ function setBasis(next) {
   triggerScout();
 }
 
+/* ─── Ranking mode: cheapest vs. most-verified ───────────────────────────
+   "Best payout" and "best verified" are different questions with different
+   right answers — see docs/architecture/VERIFIED_ROUTES.md. Grade decides
+   first, liquidity only breaks a grade tie, price only breaks both: never
+   blended into one number. */
+var RANK_BY = 'payout';
+
+function setRankBy(next) {
+  if (RANK_BY === next) return;
+  RANK_BY = next;
+
+  var payout = qs('#rankPayout'), verified = qs('#rankVerified');
+  if (payout) payout.classList.toggle('is-on', next === 'payout');
+  if (verified) verified.classList.toggle('is-on', next === 'verified');
+  if (payout) payout.setAttribute('aria-checked', String(next === 'payout'));
+  if (verified) verified.setAttribute('aria-checked', String(next === 'verified'));
+
+  triggerScout();
+}
+
 function runScout() {
   var btn    = qs('#runBtn');
   var from   = qs('#fromAsset').value;
@@ -432,7 +500,7 @@ function runScout() {
 
   /* If reliability hasn't loaded yet, fetch it first then re-run */
   if (reliabilityMap === null) {
-    Promise.all([loadReliability(), loadAnchorFees(), loadAnchorQuotes()]).then(function() { renderResults(from, to, amount, baseRate, sym, basis); });
+    Promise.all([loadReliability(), loadAnchorFees(), loadAnchorQuotes(), loadAssetHealth()]).then(function() { renderResults(from, to, amount, baseRate, sym, basis); });
   } else {
     renderResults(from, to, amount, baseRate, sym, basis);
   }
@@ -471,19 +539,22 @@ function renderResults(from, to, amount, baseRate, sym, basis) {
     var rateSource = liveQuote ? 'live' : 'catalog';
     var rateSpread = liveQuote ? (liveQuote.price / baseRate) : (a.rateSpread || 1);
 
-    meta[a.domain] = { url: a.url, speed: a.speed, methods: a.methods, rel: rel, rateSource: rateSource, liveQuote: liveQuote };
+    var liquidity = liquidityFor(a, to);
+
+    meta[a.domain] = { url: a.url, speed: a.speed, methods: a.methods, rel: rel, rateSource: rateSource, liveQuote: liveQuote, liquidity: liquidity };
     return {
       domain: a.domain, name: a.name,
       rateSpread: rateSpread,
       feePercent: live ? live.feePercent : a.feePercent,
       feeFixed: live ? live.feeFixed : a.feeFixed,
       feeSource: feeSource,
-      grade: rel.grade || 'U', score: rel.score
+      grade: rel.grade || 'U', score: rel.score,
+      liquidityTier: liquidity.tier, recentPayments: liquidity.payments
     };
   });
 
   var result = LandfallIntent.solveIntent(
-    { from: from, to: to, basis: basis, amount: amount },
+    { from: from, to: to, basis: basis, amount: amount, sortBy: RANK_BY },
     candidates,
     baseRate
   );
@@ -493,7 +564,7 @@ function renderResults(from, to, amount, baseRate, sym, basis) {
     var m = meta[sol.domain];
     return {
       name: sol.name, domain: sol.domain, url: m.url, speed: m.speed, methods: m.methods,
-      from: from, to: to, rel: m.rel,
+      from: from, to: to, rel: m.rel, liquidity: m.liquidity,
       priced: sol.priced, feeSource: sol.feeSource, rateSource: m.rateSource,
       rate: sol.rate, fee: sol.fee,
       feePercent: candidates.filter(function(c){return c.domain===sol.domain;})[0].feePercent,
@@ -502,15 +573,24 @@ function renderResults(from, to, amount, baseRate, sym, basis) {
     };
   });
 
-  /* Badges. "Best" means most delivered when the send side is fixed, and
-     least spent when the receive side is — the solver has already ordered
-     them that way, so the top priced row is the best row either way. */
+  /* Badges. The solver has already ordered solutions the way this ranking
+     mode defines "best" — most delivered / least spent for payout mode,
+     grade-then-liquidity-then-amount for verified mode — so the top priced
+     row is correct either way. What differs is the LABEL: calling a
+     verified-mode winner "Best Payout" would be a false claim whenever a
+     cheaper row sits below it, which is exactly the case this mode exists
+     to allow. */
   var firstPriced = quotes.filter(function(q) { return q.priced; })[0];
-  if (firstPriced) firstPriced.isBestPayout = true;
+  if (firstPriced) {
+    if (RANK_BY === 'verified') firstPriced.isBestVerified = true;
+    else firstPriced.isBestPayout = true;
+  }
   var byRel = quotes.slice().sort(function(a, b) {
     return (b.rel.score || 0) - (a.rel.score || 0);
   });
-  if (byRel[0] && byRel[0].rel.score !== null) byRel[0].isTopRel = true;
+  if (byRel[0] && byRel[0].rel.score !== null && RANK_BY !== 'verified') byRel[0].isTopRel = true;
+
+  renderVerifiedSummary(RANK_BY === 'verified' ? firstPriced : null, sym);
 
   /* Header */
   var fixedTxt = basis === 'receive'
@@ -545,6 +625,61 @@ var REJECTION_TEXT = {
   'fee-exceeds-principal': 'its fees exceed the amount'
 };
 
+/* A count, not a market-depth measurement — labelled that way rather than
+   left to imply more than it is. See docs/architecture/VERIFIED_ROUTES.md. */
+function liquidityLabel(liq) {
+  var tierTxt = { high: 'High', medium: 'Medium', low: 'Low' }[liq.tier] || 'Unknown';
+  var n = liq.payments;
+  return 'Liquidity: ' + tierTxt + (n != null ? ' (' + n + ' payments observed)' : '');
+}
+
+/**
+ * The headline panel above the card list, shown only in verified-ranking
+ * mode. Deliberately not a fabricated single score — it restates the same
+ * grade / liquidity / rate figures the winning card already shows, just as
+ * the first thing a reader sees rather than the first thing in a list.
+ *
+ * No "Execute" action: this links to the anchor's own off-ramp, the same as
+ * every card below it. Moving funds on someone's behalf is a custody
+ * decision, not a ranking decision — see docs/architecture/VERIFIED_ROUTES.md.
+ */
+function renderVerifiedSummary(top, sym) {
+  var box = qs('#verifiedSummary');
+  if (!box) return;
+  if (!top) { box.hidden = true; box.innerHTML = ''; return; }
+
+  var relTxt = top.rel.score !== null ? (top.rel.grade + ' / ' + top.rel.score) : 'Untracked';
+  var liqTxt = top.liquidity && top.liquidity.tier !== 'unknown'
+    ? liquidityLabel(top.liquidity)
+    : 'Liquidity: not enough measured activity to classify';
+  var recency = (top.liquidity && top.liquidity.hoursSinceActivity != null)
+    ? 'Last verified settlement: ' + fmtHours(top.liquidity.hoursSinceActivity) + ' ago'
+    : 'Last verified settlement: not yet measured for this corridor';
+  var payoutTxt = top.basis === 'receive'
+    ? fmtNum(top.amount, '$') + ' to deliver ' + fmtNum(top.payout, sym)
+    : fmtNum(top.payout, sym) + ' from ' + fmtNum(top.amount, '$');
+
+  box.hidden = false;
+  box.innerHTML =
+    '<div class="verified-head">🏆 Best Verified Route</div>' +
+    '<div class="verified-body">' +
+      '<div class="verified-anchor">' + esc(top.name) + ' <span class="verified-domain">' + esc(top.domain) + '</span></div>' +
+      '<div class="verified-grid">' +
+        '<div><span class="verified-lbl">Payout</span>' + payoutTxt + '</div>' +
+        '<div><span class="verified-lbl">Reliability</span>' + relTxt + '</div>' +
+        '<div><span class="verified-lbl">Liquidity</span>' + liqTxt + '</div>' +
+        '<div><span class="verified-lbl">Evidence</span>Stellar ledger · ' + recency + '</div>' +
+      '</div>' +
+      '<a href="' + esc(top.url) + '" target="_blank" rel="noopener noreferrer" class="action-btn">Off-Ramp via ' + esc(top.name) + ' →</a>' +
+    '</div>';
+}
+
+function fmtHours(h) {
+  if (h < 1) return Math.round(h * 60) + 'm';
+  if (h < 48) return Math.round(h) + 'h';
+  return Math.round(h / 24) + 'd';
+}
+
 /* ─── Render quote cards ─────────────────────────────────────────────────── */
 function renderCards(quotes, sym) {
   var list = qs('#quotesList');
@@ -559,14 +694,15 @@ function renderCards(quotes, sym) {
 
   list.innerHTML = quotes.map(function(q) {
     var isDark  = q.rel.score !== null && q.rel.score < 40;
-    var cardCls = q.isBestPayout && !isDark ? 'is-best' : isDark ? 'is-risk' : '';
+    var cardCls = (q.isBestPayout || q.isBestVerified) && !isDark ? 'is-best' : isDark ? 'is-risk' : '';
     var relG    = q.rel.grade || 'U';
     var relCls  = gradeCls(relG);
     var relTxt  = q.rel.score !== null ? (q.rel.grade + ' · ' + q.rel.score + '/100') : 'Untracked';
     var status  = (q.rel.status || 'unknown').toUpperCase();
 
     var ribbons = '';
-    if (q.isBestPayout && !isDark)  ribbons += '<div class="ribbon ribbon-best">' + (q.basis === 'receive' ? 'Cheapest' : 'Best Payout') + '</div>';
+    if (q.isBestVerified && !isDark) ribbons += '<div class="ribbon ribbon-best">🏆 Best Verified Route</div>';
+    else if (q.isBestPayout && !isDark)  ribbons += '<div class="ribbon ribbon-best">' + (q.basis === 'receive' ? 'Cheapest' : 'Best Payout') + '</div>';
     if (q.isTopRel && !q.isBestPayout) ribbons += '<div class="ribbon ribbon-rel">Top Reliability</div>';
     if (isDark) ribbons += '<div class="ribbon ribbon-risk">High Risk</div>';
 
@@ -606,6 +742,9 @@ function renderCards(quotes, sym) {
           '<span class="rel-pill ' + relCls + '">' + relTxt + '</span>' +
           '<div class="cell-sub" style="margin-top:5px;">' + status + '</div>' +
           '<div class="cell-sub">' + esc(q.rel.recommendation || '') + '</div>' +
+          (q.liquidity && q.liquidity.tier !== 'unknown'
+            ? '<div class="cell-sub liquidity-line">' + liquidityLabel(q.liquidity) + '</div>'
+            : '') +
         '</div>' +
         '<div class="quote-action">' +
           // When the receive side is pinned every anchor delivers the same
@@ -640,6 +779,9 @@ document.addEventListener('DOMContentLoaded', function() {
   qs('#basisSend').addEventListener('click', function() { setBasis('send'); });
   qs('#basisReceive').addEventListener('click', function() { setBasis('receive'); });
 
+  if (qs('#rankPayout')) qs('#rankPayout').addEventListener('click', function() { setRankBy('payout'); });
+  if (qs('#rankVerified')) qs('#rankVerified').addEventListener('click', function() { setRankBy('verified'); });
+
   /* Run button */
   qs('#runBtn').addEventListener('click', function() { triggerScout(); });
 
@@ -657,7 +799,7 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   /* Initial load: pre-fetch reliability then scout */
-  Promise.all([loadReliability(), loadAnchorFees(), loadAnchorQuotes()]).then(function() { runScout(); });
+  Promise.all([loadReliability(), loadAnchorFees(), loadAnchorQuotes(), loadAssetHealth()]).then(function() { runScout(); });
 });
 
 function triggerScout() {

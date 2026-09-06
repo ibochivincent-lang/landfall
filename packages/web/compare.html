@@ -131,6 +131,18 @@
     </div>
   </div>
 
+  <!-- Ranking mode: cheapest vs. most-verified — see docs/architecture/VERIFIED_ROUTES.md -->
+  <div class="rank-row">
+    <span class="rank-lbl">Rank by</span>
+    <div class="basis-row" role="radiogroup" aria-label="How to rank routes" style="max-width:320px;">
+      <button type="button" class="basis is-on" id="rankPayout" role="radio" aria-checked="true">Best payout</button>
+      <button type="button" class="basis" id="rankVerified" role="radio" aria-checked="false">Best verified route</button>
+    </div>
+  </div>
+
+  <!-- Populated only in verified-ranking mode — see renderVerifiedSummary() -->
+  <div class="verified-summary" id="verifiedSummary" hidden></div>
+
   <!-- Results header -->
   <div class="results-hd">
     <h2 id="resultsTitle">Select a corridor and click Scout Routes</h2>

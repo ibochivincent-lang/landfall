@@ -45,12 +45,12 @@ function loadBrowserSolver(): (i: Intent, c: readonly RouteCandidate[], m: numbe
 }
 
 const CANDIDATES: RouteCandidate[] = [
-  { domain: "cowrie.exchange", name: "Cowrie", rateSpread: 0.998, feePercent: 0.8, feeFixed: 0.5, feeSource: "catalog", grade: "D", score: 44 },
-  { domain: "mykobo.co", name: "MyKobo", rateSpread: 0.992, feePercent: 1, feeFixed: 0, feeSource: "live", grade: "C", score: 62 },
-  { domain: "anclap.com", name: "Anclap", rateSpread: 0.995, feePercent: 2, feeFixed: 10, feeSource: "live", grade: "B", score: 78 },
-  { domain: "ntokens.com", name: "nTokens", rateSpread: 1, feePercent: 20, feeFixed: 0, feeSource: "live", grade: "C", score: 55 },
-  { domain: "quiet.example", name: "Quiet", rateSpread: 1, feePercent: 0, feeFixed: 0, feeSource: null, grade: "B", score: 71 },
-  { domain: "gouge.example", name: "Gouger", rateSpread: 1, feePercent: 120, feeFixed: 0, feeSource: "live", grade: "F", score: 12 },
+  { domain: "cowrie.exchange", name: "Cowrie", rateSpread: 0.998, feePercent: 0.8, feeFixed: 0.5, feeSource: "catalog", grade: "D", score: 44, liquidityTier: "low", recentPayments: 4 },
+  { domain: "mykobo.co", name: "MyKobo", rateSpread: 0.992, feePercent: 1, feeFixed: 0, feeSource: "live", grade: "C", score: 62, liquidityTier: "medium", recentPayments: 30 },
+  { domain: "anclap.com", name: "Anclap", rateSpread: 0.995, feePercent: 2, feeFixed: 10, feeSource: "live", grade: "B", score: 78, liquidityTier: "high", recentPayments: 200 },
+  { domain: "ntokens.com", name: "nTokens", rateSpread: 1, feePercent: 20, feeFixed: 0, feeSource: "live", grade: "C", score: 55, liquidityTier: "medium", recentPayments: 15 },
+  { domain: "quiet.example", name: "Quiet", rateSpread: 1, feePercent: 0, feeFixed: 0, feeSource: null, grade: "B", score: 71 }, // liquidity omitted on purpose — must default identically in both implementations
+  { domain: "gouge.example", name: "Gouger", rateSpread: 1, feePercent: 120, feeFixed: 0, feeSource: "live", grade: "F", score: 12, liquidityTier: "unknown", recentPayments: null },
 ];
 
 const INTENTS: Intent[] = [
@@ -63,6 +63,10 @@ const INTENTS: Intent[] = [
   { from: "USDC", to: "NGN", basis: "send", amount: 100, minGrade: "B" },
   { from: "USDC", to: "NGN", basis: "receive", amount: 500_000, requirePricedTerms: true },
   { from: "USDC", to: "NGN", basis: "receive", amount: 500_000, minGrade: "C", requirePricedTerms: true },
+  { from: "USDC", to: "NGN", basis: "send", amount: 100, sortBy: "verified" },
+  { from: "USDC", to: "NGN", basis: "send", amount: 1000, sortBy: "verified" },
+  { from: "USDC", to: "NGN", basis: "receive", amount: 500_000, sortBy: "verified" },
+  { from: "USDC", to: "NGN", basis: "send", amount: 100, sortBy: "verified", minGrade: "C" },
 ];
 
 test("the browser mirror agrees with the package on every fixture", () => {
@@ -91,7 +95,7 @@ test("the browser mirror agrees with the package on every fixture", () => {
     for (let i = 0; i < mine.solutions.length; i++) {
       const a = mine.solutions[i]!;
       const b = theirs.solutions[i]!;
-      for (const field of ["send", "receive", "rate", "fee", "priced", "feeSource"] as const) {
+      for (const field of ["send", "receive", "rate", "fee", "priced", "feeSource", "grade", "liquidityTier", "recentPayments"] as const) {
         assert.deepEqual(plain(b[field]), a[field], `${label}: ${a.domain}.${field}`);
       }
     }

@@ -47,6 +47,24 @@ export interface Intent {
    * `Solution.priced` — so this only controls whether they appear at all.
    */
   requirePricedTerms?: boolean;
+
+  /**
+   * How to rank satisfying routes.
+   *
+   * "payout" (the default, and the only behavior before this field existed)
+   * ranks purely on money: most received, or least sent. "verified" ranks
+   * settlement evidence ahead of price — reliability grade, then recent
+   * activity, with amount only breaking a tie — because a route that is
+   * cheaper by pennies but has no measured settlement history is not
+   * actually the safer choice, whatever the payout column says.
+   *
+   * Deliberately two ranked lists rather than one blended score: this
+   * codebase already refuses to blend evidence tiers into a single number
+   * elsewhere (packages/sdk's pickAnchor, cross-chain.html's "no blended
+   * score" note) for the same reason a blended figure here would have —
+   * it would hide which factor actually decided the order.
+   */
+  sortBy?: "payout" | "verified";
 }
 
 export type Grade = "A" | "B" | "C" | "D" | "F" | "U";
@@ -57,6 +75,19 @@ export const GRADE_ORDER: readonly Grade[] = ["U", "F", "D", "C", "B", "A"];
 export function gradeAtLeast(actual: Grade, floor: Grade): boolean {
   return GRADE_ORDER.indexOf(actual) >= GRADE_ORDER.indexOf(floor);
 }
+
+/**
+ * A coarse recent-activity signal, not a liquidity or market-depth
+ * measurement — nothing here observes an order book or a reserve balance.
+ * Derived from measured payment counts for the matching on-chain asset over
+ * the current scan window (see packages/web/api/v1/asset-health.json).
+ * Called "liquidity" in the product surface because that is the word people
+ * routing a payment actually reach for, but the tier and its threshold are
+ * a first cut, stated as such, not a calibrated model.
+ */
+export type LiquidityTier = "high" | "medium" | "low" | "unknown";
+
+export const LIQUIDITY_ORDER: readonly LiquidityTier[] = ["unknown", "low", "medium", "high"];
 
 /** One anchor's terms for one corridor, as published by the anchor or held in the catalog. */
 export interface RouteCandidate {
@@ -73,6 +104,15 @@ export interface RouteCandidate {
   grade: Grade;
   /** 0–100 settlement reliability, or null when the anchor is untracked. */
   score: number | null;
+  /**
+   * See LiquidityTier. Optional, and defaults to "unknown" rather than
+   * "low" when omitted — callers built before this field existed (and any
+   * test fixture that doesn't care about it) should not be silently scored
+   * as illiquid.
+   */
+  liquidityTier?: LiquidityTier;
+  /** Payments counted for the matching asset in the current scan window. Only meaningful alongside a real tier. */
+  recentPayments?: number | null;
 }
 
 /**
@@ -93,6 +133,8 @@ export interface Solution {
   name: string;
   grade: Grade;
   score: number | null;
+  liquidityTier: LiquidityTier;
+  recentPayments: number | null;
 
   /** False when the anchor publishes no terms; every money field below is then null. */
   priced: boolean;

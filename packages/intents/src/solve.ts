@@ -23,6 +23,8 @@
  */
 
 import {
+  GRADE_ORDER,
+  LIQUIDITY_ORDER,
   gradeAtLeast,
   type Intent,
   type RouteCandidate,
@@ -42,6 +44,8 @@ function unpriced(c: RouteCandidate): Solution {
     name: c.name,
     grade: c.grade,
     score: c.score,
+    liquidityTier: c.liquidityTier ?? "unknown",
+    recentPayments: c.recentPayments ?? null,
     priced: false,
     feeSource: null,
     send: null,
@@ -101,6 +105,7 @@ export function solveIntent(
       const receive = round((send - fee) * rate, 2);
       solutions.push({
         domain: c.domain, name: c.name, grade: c.grade, score: c.score,
+        liquidityTier: c.liquidityTier ?? "unknown", recentPayments: c.recentPayments ?? null,
         priced: true, feeSource: c.feeSource,
         send, receive, rate, fee,
       });
@@ -124,6 +129,7 @@ export function solveIntent(
       const fee = round(send - principal, 2);
       solutions.push({
         domain: c.domain, name: c.name, grade: c.grade, score: c.score,
+        liquidityTier: c.liquidityTier ?? "unknown", recentPayments: c.recentPayments ?? null,
         priced: true, feeSource: c.feeSource,
         send, receive, rate, fee,
       });
@@ -135,12 +141,33 @@ export function solveIntent(
      means the most delivered. Delivering a fixed amount, best means the least
      spent. Ranking a receive-first result by payout would put every anchor in
      a tie, since they all deliver exactly the target. */
+  /** Amount comparison in the direction "better" already means for this intent's basis. */
+  const byAmount = (a: Solution, b: Solution): number =>
+    intent.basis === "send" ? (b.receive ?? 0) - (a.receive ?? 0) : (a.send ?? 0) - (b.send ?? 0);
+
   const better = (a: Solution, b: Solution): number => {
     if (a.priced !== b.priced) return a.priced ? -1 : 1;
     if (!a.priced) return (b.score ?? 0) - (a.score ?? 0);
-    return intent.basis === "send"
-      ? (b.receive ?? 0) - (a.receive ?? 0)
-      : (a.send ?? 0) - (b.send ?? 0);
+
+    if (intent.sortBy === "verified") {
+      // Evidence before price. A route with a stronger grade and more
+      // recently observed activity outranks a cheaper one with neither —
+      // see docs/architecture/VERIFIED_ROUTES.md for why "cheapest that
+      // clears a reliability floor" was rejected in favor of this: a floor
+      // treats a B-grade anchor and a D-grade anchor identically as long as
+      // both clear it, which throws away exactly the distinction a route
+      // ranked by evidence exists to keep. Amount only breaks a tie between
+      // two routes with identical grade and liquidity — it never overrides
+      // either, on purpose: blending them into one score is the thing this
+      // codebase already refuses to do (pickAnchor, cross-chain.html).
+      const gradeDelta = GRADE_ORDER.indexOf(b.grade) - GRADE_ORDER.indexOf(a.grade);
+      if (gradeDelta !== 0) return gradeDelta;
+      const liquidityDelta = LIQUIDITY_ORDER.indexOf(b.liquidityTier) - LIQUIDITY_ORDER.indexOf(a.liquidityTier);
+      if (liquidityDelta !== 0) return liquidityDelta;
+      return byAmount(a, b);
+    }
+
+    return byAmount(a, b);
   };
   solutions.sort((a, b) => better(a, b) || a.domain.localeCompare(b.domain));
   rejected.sort((a, b) => a.domain.localeCompare(b.domain));

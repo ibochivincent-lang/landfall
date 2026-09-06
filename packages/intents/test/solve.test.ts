@@ -136,3 +136,79 @@ test("ties break on domain so the ranking is deterministic", () => {
   const r = solveIntent({ from: "USDC", to: "NGN", basis: "send", amount: 100 }, [a, b], MID);
   assert.deepEqual(r.solutions.map((s) => s.domain), ["a.example", "b.example"]);
 });
+
+/* ── sortBy: "verified" ──────────────────────────────────────────────────
+   The worked example this ranking exists for: the cheapest, best-rate route
+   is the least reliable one, and a route ranked by evidence should say so
+   by NOT putting it first — the opposite of what sortBy: "payout" (the
+   default) would do with the same three routes. */
+
+const routeA: RouteCandidate = {
+  domain: "route-a.example", name: "Route A", rateSpread: 1, feePercent: 0.5, feeFixed: 0,
+  feeSource: "live", grade: "A", score: 94, liquidityTier: "high", recentPayments: 500,
+};
+const routeB: RouteCandidate = {
+  domain: "route-b.example", name: "Route B", rateSpread: 1.003, feePercent: 0.2, feeFixed: 0,
+  feeSource: "live", grade: "C", score: 58, liquidityTier: "medium", recentPayments: 40,
+};
+const routeC: RouteCandidate = {
+  domain: "route-c.example", name: "Route C", rateSpread: 1.007, feePercent: 0.1, feeFixed: 0,
+  feeSource: "live", grade: "D", score: 31, liquidityTier: "low", recentPayments: 3,
+};
+
+test("sortBy 'payout' (the default) picks the cheapest route regardless of evidence", () => {
+  const { solutions } = solveIntent({ from: "USDC", to: "NGN", basis: "send", amount: 1000 }, [routeA, routeB, routeC], MID);
+  // C has the best rate and lowest fee, so plain payout ranking puts it first.
+  assert.equal(solutions[0]!.domain, "route-c.example");
+});
+
+test("sortBy 'verified' ranks grade and liquidity ahead of price, inverting the payout order", () => {
+  const { solutions } = solveIntent(
+    { from: "USDC", to: "NGN", basis: "send", amount: 1000, sortBy: "verified" },
+    [routeA, routeB, routeC],
+    MID,
+  );
+  assert.deepEqual(
+    solutions.map((s) => s.domain),
+    ["route-a.example", "route-b.example", "route-c.example"],
+    "A (grade A, high liquidity) must outrank B and C despite the worse rate and fee",
+  );
+});
+
+test("sortBy 'verified' still breaks a grade+liquidity tie on amount, not by giving up", () => {
+  const twinA: RouteCandidate = { ...routeA, domain: "twin-a.example", feePercent: 2 }; // pricier
+  const twinB: RouteCandidate = { ...routeA, domain: "twin-b.example" };                // same grade+liquidity, cheaper
+  const { solutions } = solveIntent(
+    { from: "USDC", to: "NGN", basis: "send", amount: 1000, sortBy: "verified" },
+    [twinA, twinB],
+    MID,
+  );
+  assert.equal(solutions[0]!.domain, "twin-b.example", "identical evidence must fall back to amount, not domain order");
+});
+
+test("sortBy 'verified' never blends grade and liquidity into one number — grade always decides first", () => {
+  // Deliberately adversarial: lower-liquidity route has the better grade.
+  // If these were multiplied into a single score, a large-enough liquidity
+  // gap could out-vote a grade difference. It must not be able to.
+  const highGradeLowLiquidity: RouteCandidate = {
+    domain: "hg-ll.example", name: "HG-LL", rateSpread: 1, feePercent: 0, feeFixed: 0,
+    feeSource: "live", grade: "B", score: 80, liquidityTier: "low", recentPayments: 2,
+  };
+  const lowGradeHighLiquidity: RouteCandidate = {
+    domain: "lg-hl.example", name: "LG-HL", rateSpread: 1, feePercent: 0, feeFixed: 0,
+    feeSource: "live", grade: "D", score: 30, liquidityTier: "high", recentPayments: 900,
+  };
+  const { solutions } = solveIntent(
+    { from: "USDC", to: "NGN", basis: "send", amount: 1000, sortBy: "verified" },
+    [lowGradeHighLiquidity, highGradeLowLiquidity],
+    MID,
+  );
+  assert.equal(solutions[0]!.domain, "hg-ll.example", "grade must win outright, no amount of liquidity should compensate for a worse grade");
+});
+
+test("an omitted liquidityTier defaults to 'unknown', not 'low' — silence is not a claim of illiquidity", () => {
+  const noLiquidityData: RouteCandidate = { ...routeB, domain: "no-data.example", liquidityTier: undefined, recentPayments: undefined };
+  const { solutions } = solveIntent({ from: "USDC", to: "NGN", basis: "send", amount: 100 }, [noLiquidityData], MID);
+  assert.equal(solutions[0]!.liquidityTier, "unknown");
+  assert.equal(solutions[0]!.recentPayments, null);
+});

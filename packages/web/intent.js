@@ -18,6 +18,7 @@
   'use strict';
 
   var GRADE_ORDER = ['U', 'F', 'D', 'C', 'B', 'A'];
+  var LIQUIDITY_ORDER = ['unknown', 'low', 'medium', 'high'];
 
   function gradeAtLeast(actual, floor) {
     return GRADE_ORDER.indexOf(actual) >= GRADE_ORDER.indexOf(floor);
@@ -31,6 +32,8 @@
   function unpriced(c) {
     return {
       domain: c.domain, name: c.name, grade: c.grade, score: c.score,
+      liquidityTier: c.liquidityTier || 'unknown',
+      recentPayments: (c.recentPayments === undefined || c.recentPayments === null) ? null : c.recentPayments,
       priced: false, feeSource: null,
       send: null, receive: null, rate: null, fee: null
     };
@@ -75,6 +78,8 @@
         }
         solutions.push({
           domain: c.domain, name: c.name, grade: c.grade, score: c.score,
+          liquidityTier: c.liquidityTier || 'unknown',
+          recentPayments: (c.recentPayments === undefined || c.recentPayments === null) ? null : c.recentPayments,
           priced: true, feeSource: c.feeSource,
           send: send, receive: round((send - fee) * rate, 2), rate: rate, fee: fee
         });
@@ -92,6 +97,8 @@
         var sendAmt = Math.ceil(((principal + c.feeFixed) / (1 - p)) * 100) / 100;
         solutions.push({
           domain: c.domain, name: c.name, grade: c.grade, score: c.score,
+          liquidityTier: c.liquidityTier || 'unknown',
+          recentPayments: (c.recentPayments === undefined || c.recentPayments === null) ? null : c.recentPayments,
           priced: true, feeSource: c.feeSource,
           send: sendAmt, receive: receive, rate: rate, fee: round(sendAmt - principal, 2)
         });
@@ -101,13 +108,27 @@
     // Best means most delivered when sending a fixed amount, least spent when
     // delivering a fixed amount. Ranking a receive-first result by payout
     // would tie every anchor, since they all deliver exactly the target.
+    function byAmount(a, b) {
+      return intent.basis === 'send' ? (b.receive || 0) - (a.receive || 0) : (a.send || 0) - (b.send || 0);
+    }
+
     solutions.sort(function (a, b) {
       var d;
       if (a.priced !== b.priced) return a.priced ? -1 : 1;
-      if (!a.priced) d = (b.score || 0) - (a.score || 0);
-      else if (intent.basis === 'send') d = (b.receive || 0) - (a.receive || 0);
-      else d = (a.send || 0) - (b.send || 0);
-      return d || a.domain.localeCompare(b.domain);
+      if (!a.priced) return (b.score || 0) - (a.score || 0);
+
+      if (intent.sortBy === 'verified') {
+        // Evidence before price — see packages/intents/src/solve.ts for the
+        // full reasoning. Grade decides first, liquidity breaks a grade tie,
+        // amount only breaks a tie in both. Never blended into one number.
+        d = GRADE_ORDER.indexOf(b.grade) - GRADE_ORDER.indexOf(a.grade);
+        if (d !== 0) return d;
+        d = LIQUIDITY_ORDER.indexOf(b.liquidityTier) - LIQUIDITY_ORDER.indexOf(a.liquidityTier);
+        if (d !== 0) return d;
+        return byAmount(a, b) || a.domain.localeCompare(b.domain);
+      }
+
+      return byAmount(a, b) || a.domain.localeCompare(b.domain);
     });
     rejected.sort(function (a, b) { return a.domain.localeCompare(b.domain); });
 
@@ -125,6 +146,7 @@
   root.LandfallIntent = {
     solveIntent: solveIntent,
     gradeAtLeast: gradeAtLeast,
-    GRADE_ORDER: GRADE_ORDER
+    GRADE_ORDER: GRADE_ORDER,
+    LIQUIDITY_ORDER: LIQUIDITY_ORDER
   };
 })(typeof globalThis !== 'undefined' ? globalThis : this);
