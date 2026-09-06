@@ -143,8 +143,121 @@
     };
   }
 
+  /**
+   * Mirror of packages/intents/src/plan.ts — see that file for why every
+   * step carries an actor and why "landfall" never appears on one that
+   * moves value.
+   *
+   * Lives here rather than in a third hand-written copy inside
+   * api/[...path].js: that file imports THIS one for side effects and reads
+   * globalThis.LandfallIntent, so the browser and the API run the same
+   * plain-JS implementation and packages/intents/test/parity.test.ts holds
+   * both of them to the TypeScript package.
+   */
+  var CAUTION_AT_OR_BELOW = ['D', 'F', 'U'];
+
+  function buildPlan(input) {
+    var solution = input.solution;
+    var from = input.from;
+    var to = input.to;
+    var steps = [];
+    var order = 1;
+
+    function push(step) {
+      step.order = order++;
+      steps.push(step);
+    }
+
+    push({
+      id: 'verify-counterparty',
+      actor: 'landfall',
+      title: 'Check ' + solution.domain + ' before committing',
+      detail:
+        "Read what the ledger shows about the anchor's own declared accounts — observed history, " +
+        'counterparty concentration, and any pass-through pattern — before sending anything to them.',
+      endpoint: '/api/v1/trust-check?address=' + solution.domain
+    });
+
+    push({
+      id: 'open-anchor-flow',
+      actor: 'user',
+      title: 'Start a withdrawal with ' + solution.name,
+      detail: input.anchorUrl
+        ? 'Open ' + input.anchorUrl + ' and begin a SEP-24 withdrawal. The anchor runs its own KYC and quoting; ' +
+          'Landfall is not in this exchange and never sees those details.'
+        : "Open the anchor's own withdrawal flow. The anchor runs its own KYC and quoting; Landfall is not in " +
+          'this exchange and never sees those details.'
+    });
+
+    push({
+      id: 'establish-trustline',
+      actor: 'wallet',
+      conditional: true,
+      title: 'Establish a trustline for ' + from + ' if you do not already hold one',
+      detail:
+        'Sending ' + from + " requires a trustline to that asset's issuer. Most wallets do this automatically " +
+        'when needed; it is listed because it is a real on-chain operation with its own fee and reserve.'
+    });
+
+    push({
+      id: 'send-payment',
+      actor: 'wallet',
+      title: solution.send !== null && solution.send !== undefined
+        ? 'Send ' + solution.send + ' ' + from + ' to the address and memo the anchor gives you'
+        : 'Send ' + from + ' to the address and memo the anchor gives you',
+      detail:
+        "The destination address and memo come from the anchor's own SEP-24 response, never from Landfall — " +
+        'a memo taken from the wrong place is how deposits get lost. Sign and submit from your own wallet; ' +
+        'Landfall holds no keys and cannot submit this for you.'
+    });
+
+    push({
+      id: 'await-settlement',
+      actor: 'anchor',
+      title: input.speed ? 'Wait for payout (' + input.speed + ')' : 'Wait for the anchor to pay out',
+      detail: solution.receive !== null && solution.receive !== undefined
+        ? 'The anchor converts and pays out roughly ' + solution.receive + ' ' + to + '. The exact figure is the ' +
+          "anchor's to quote at execution — the number here is computed from its published terms, not a guarantee."
+        : 'The anchor converts and pays out in local currency, at a rate it quotes at execution.'
+    });
+
+    push({
+      id: 'confirm-receipt',
+      actor: 'user',
+      title: 'Confirm whether the money actually arrived',
+      detail:
+        'This is the only step that produces evidence the fiat leg completed. Nothing on-chain shows a bank ' +
+        'deposit, so without a recipient saying so, the payout is invisible to Landfall and to everyone else ' +
+        'reading the ledger.',
+      endpoint: '/api/v1/fiat-confirmations'
+    });
+
+    var weakEvidence = CAUTION_AT_OR_BELOW.indexOf(solution.grade) !== -1;
+
+    return {
+      anchor: solution.name,
+      anchorDomain: solution.domain,
+      from: from,
+      to: to,
+      send: solution.send,
+      receive: solution.receive,
+      steps: steps,
+      executionNote:
+        'This is a plan, not an execution. Landfall holds no keys, no funds and no custody, and every step ' +
+        'that moves value is performed by your own wallet or by the anchor. No step here can be triggered by ' +
+        'calling a Landfall endpoint.',
+      caution: weakEvidence
+        ? "This route's settlement evidence is graded " + solution.grade +
+          (solution.score !== null && solution.score !== undefined ? ' (' + solution.score + '/100)' : ' (untracked)') +
+          '. That is a statement about how much settlement history the ledger shows for this anchor, not an ' +
+          'allegation about the operator — but it is thin evidence on which to send a large amount.'
+        : null
+    };
+  }
+
   root.LandfallIntent = {
     solveIntent: solveIntent,
+    buildPlan: buildPlan,
     gradeAtLeast: gradeAtLeast,
     GRADE_ORDER: GRADE_ORDER,
     LIQUIDITY_ORDER: LIQUIDITY_ORDER

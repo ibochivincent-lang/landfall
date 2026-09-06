@@ -35,12 +35,32 @@
   // object instead of its `accounts` array, so `.map` threw and the error was
   // swallowed by an empty `.catch`. The result was a page that showed
   // hardcoded numbers under a "LIVE" badge and never once displayed live data.
-  const fallback = [
-    { state: 'live' }, { state: 'live' }, { state: 'live' }, { state: 'live' },
-    { state: 'slow' }, { state: 'slow' }, { state: 'slow' }, { state: 'dark' },
-    { state: 'dark' }, { state: 'dark' }, { state: 'dark' }, { state: 'dark' },
-    { state: 'no_activity' }
-  ];
+  // Proportions from the 6 September 2026 scan (19 live / 26 slow / 62 dark /
+  // 1 no-activity across 108 accounts, 27 domains). Regenerated rather than
+  // left at the original 13-account shape, which drifted to understating the
+  // tracked network by 8x while still rendering under a badge reading "LIVE".
+  //
+  // A stale fallback is tolerable; a stale fallback that *looks* live is not,
+  // so markStale() below flips the badge whenever these numbers are what the
+  // visitor is actually seeing.
+  const fallbackCounts = { live: 19, slow: 26, dark: 62, no_activity: 1 };
+  const FALLBACK_DOMAINS = 27;
+  const fallback = (() => {
+    const rows = [];
+    // One running counter across all states, so the synthetic domains overlap
+    // the way real ones do — a per-state counter gave each state its own set
+    // and reported 73 domains for a 27-domain network.
+    let i = 0;
+    for (const [state, n] of Object.entries(fallbackCounts)) {
+      for (let k = 0; k < n; k++) rows.push({ state, domain: 'fallback-' + (i++ % FALLBACK_DOMAINS) });
+    }
+    return rows;
+  })();
+
+  function markStale() {
+    const badge = $('ledgerBadge');
+    if (badge) badge.textContent = 'STELLAR LEDGER · LAST KNOWN';
+  }
 
   const fmt = (n) => Number(n || 0).toLocaleString('en-US');
 
@@ -53,9 +73,16 @@
     const dark  = accounts.filter(a => (a.state || a.status) === 'dark').length;
     const fast  = total > 0 ? Math.round((live / total) * 100) : 0;
 
+    // Home domains, counted from the rows rather than typed into the footer.
+    // It sat hardcoded at "5" while the tracked network grew to 27 — the exact
+    // failure this file's scanDate comment below warns about, in the same
+    // sentence, one span to the left.
+    const domains = new Set(accounts.map(a => a.domain).filter(Boolean)).size;
+
     if ($('anchorCount'))    $('anchorCount').textContent    = total;
     if ($('coverageCount'))  $('coverageCount').textContent  = total;
     if ($('footerAccounts')) $('footerAccounts').textContent = total;
+    if ($('footerDomains') && domains > 0) $('footerDomains').textContent = domains;
     if ($('cardAccounts'))   $('cardAccounts').textContent   = total + ' accounts';
     if ($('liveCount'))     $('liveCount').textContent     = live;
     if ($('darkCount'))     $('darkCount').textContent     = dark;
@@ -129,6 +156,8 @@
       if (typeof console !== 'undefined') {
         console.warn('[landfall] live anchor data unavailable, showing snapshot:', err && err.message);
       }
+      // And now visible to the visitor too, not just to whoever opens devtools.
+      markStale();
     });
 
   // ── Set initial GSAP hidden states ────────────────────────────

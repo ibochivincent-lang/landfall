@@ -1,0 +1,12 @@
+{
+  "name": "@landfall/fraud-reports",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "User-submitted, evidence-anchored reports about Stellar addresses. A report is a claim by a stranger, never a finding — see src/types.ts for how that constraint shapes every field.",
+  "scripts": {
+    "test": "tsx --test test/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  }
+}

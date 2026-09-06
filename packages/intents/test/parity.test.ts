@@ -17,6 +17,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
 
+import { buildPlan } from "../src/plan.js";
 import { solveIntent } from "../src/solve.js";
 import type { Intent, RouteCandidate, SolveResult } from "../src/types.js";
 
@@ -109,4 +110,27 @@ test("the browser mirror exposes the same grade ordering", () => {
   vm.runInContext(source, context, { filename: BROWSER_FILE });
   const api = (context as { LandfallIntent: { GRADE_ORDER: string[] } }).LandfallIntent;
   assert.deepEqual(JSON.parse(JSON.stringify(api.GRADE_ORDER)), ["U", "F", "D", "C", "B", "A"]);
+});
+
+test("the browser mirror's buildPlan agrees with the package", () => {
+  const source = readFileSync(BROWSER_FILE, "utf8");
+  const context: Record<string, unknown> = {};
+  vm.createContext(context);
+  vm.runInContext(source, context, { filename: BROWSER_FILE });
+  const api = (context as { LandfallIntent: { buildPlan: (i: unknown) => unknown } }).LandfallIntent;
+  assert.ok(typeof api.buildPlan === "function", "browser mirror does not expose buildPlan");
+
+  // Every candidate shape that changes a plan: a strong route, a weak one
+  // (caution), an untracked one, and with/without the anchor URL.
+  for (const candidate of CANDIDATES.filter((c) => c.feeSource !== null)) {
+    for (const anchorUrl of [undefined, "https://example.test/offramp"]) {
+      const { solutions } = solveIntent({ from: "USDC", to: "NGN", basis: "send", amount: 1000 }, [candidate], 1610.5);
+      const solution = solutions[0];
+      if (!solution || !solution.priced) continue;
+
+      const mine = buildPlan({ solution, from: "USDC", to: "NGN", anchorUrl });
+      const theirs = plain(api.buildPlan({ solution, from: "USDC", to: "NGN", anchorUrl }));
+      assert.deepEqual(theirs, mine, `${candidate.domain} anchorUrl=${String(anchorUrl)}`);
+    }
+  }
 });

@@ -107,12 +107,30 @@ We would rather list this honestly than let a roadmap read as a changelog. Full 
 
 ## Current finding
 
-From the ongoing ledger scans across anchor accounts on major Stellar home domains:
+From the hourly ledger scan, most recently 6 September 2026, across 108 declared
+anchor accounts on 27 Stellar home domains:
 
-> **6 of 13 anchor accounts have processed no on-chain settlement in over 30 days.**
-> Every account with payment history at several candidate anchors is dark.
+> **62 of 108 anchor accounts have processed no on-chain settlement in over 30 days.**
+> A further 26 are slow (nothing in 3–30 days); 19 are settling; 1 has no payment
+> history at all.
 
-Verified against stellar.expert. Every figure ships with its transaction hashes — see the `/dashboard.html` on the live site.
+Two things this is not. It is **not a census** — the scan covers accounts seeded in
+`packages/indexer/data/anchors.json` and discovered from their own SEP-1
+declarations, which is a curated set, not every anchor on Stellar. And a dark
+account is **not a failed anchor**: an issuer account that never moves, a rotated
+account still declared in a stale `stellar.toml`, and an operator who has actually
+stopped settling all look identical from the ledger. The figure is what the ledger
+shows, not a verdict on any operator — see [DISPUTES.md](DISPUTES.md) if you run one
+of these and think a specific figure is wrong.
+
+Every figure ships with its transaction hashes — see `/dashboard.html` on the live
+site, and `/api/v1/anchors.json` for the raw records behind it.
+
+*(An earlier version of this section read "6 of 13 accounts", from the first scan on
+12 August 2026. That number was true of that scan and is preserved in
+[docs/gaps.md](docs/gaps.md) and [docs/scf-submission.md](docs/scf-submission.md) as
+the dated record it is — the network tracked here has since grown from 5 domains to
+27.)*
 
 ## Tech stack
 

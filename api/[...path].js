@@ -15,6 +15,9 @@
 *   POST /api/v1/fiat-confirmations  -- recipient self-report that a fiat leg landed (DERIVED evidence input)
 *   GET  /api/v1/fiat-confirmations/:chain/:reference -- status of one confirmation, if any
 *   GET  /api/v1/trust-check?address=G...|txHash -- ledger-only counterparty risk signals, no DB needed
+*   POST /api/v1/intent             -- Intent + Route Engine: rank routes, return an executable plan
+*   POST /api/v1/fraud-reports      -- file an evidence-anchored report about an address
+*   GET  /api/v1/fraud-reports/:subject -- reports filed about one address, with disclaimer attached
  *   GET  /health
  *
  * Admin routes (session-cookie gated, see requireSession()):
@@ -42,6 +45,13 @@ import { promisify } from 'node:util';
 import { assertPublicHostname } from './_lib/net-guard.js';
 import { sendEmail } from './_lib/email.js';
 import { graphql, buildSchema } from 'graphql';
+// Side-effect import: packages/web/intent.js is a plain script that assigns
+// its API to globalThis. Imported rather than mirrored a third time — the
+// browser already ships that exact file, and packages/intents/test/parity.test.ts
+// holds it to the TypeScript package, so importing it here means the Intent
+// Engine's arithmetic exists in one plain-JS place rather than two that can
+// disagree. See that file's header.
+import { LandfallIntent } from './_lib/intent-bridge.js';
 
 const { Pool } = pg;
 const scrypt = promisify(scryptCb);
@@ -713,6 +723,92 @@ export function analyzeTrustCheck(input) {
   };
 }
 
+/**
+ * Fraud Reports — validation mirrored from packages/fraud-reports/src/validate.ts.
+ *
+ * Same no-build-step reason as the trust-check and fiat-confirmation
+ * mirrors above; packages/fraud-reports/test/parity.test.ts holds the two
+ * sides together.
+ *
+ * The one thing this file adds beyond that package is the check the package
+ * deliberately cannot do: confirming the cited transaction actually exists
+ * on the ledger and actually involves the reported address. That is the
+ * whole difference between this and a comment box, so it happens before a
+ * row is written, not after.
+ */
+const FRAUD_NOTE_MAX_LENGTH = 1000;
+const FRAUD_CATEGORIES = ['did_not_receive', 'wrong_amount', 'impersonation', 'unauthorized_debit', 'other'];
+const FRAUD_G_ADDRESS = /^G[A-Z2-7]{55}$/;
+const FRAUD_TX_HASH = /^[0-9a-f]{64}$/i;
+
+export function validateFraudSubmission(draft) {
+  const subject = String(draft.subject ?? '').trim();
+  const txHash = String(draft.evidenceTxHash ?? '').trim();
+  const note = String(draft.note ?? '').trim();
+  const category = String(draft.category ?? '').trim();
+
+  if (!FRAUD_G_ADDRESS.test(subject)) {
+    return { ok: false, reason: 'invalid-subject', message: 'The reported address must be a Stellar public key (G...).' };
+  }
+  if (!FRAUD_TX_HASH.test(txHash)) {
+    return {
+      ok: false,
+      reason: 'invalid-tx-hash',
+      message:
+        'A report must cite a transaction hash (64 hex characters). A report with no on-chain evidence ' +
+        'cannot be checked by anyone, including you, so it is not accepted.',
+    };
+  }
+  if (!FRAUD_CATEGORIES.includes(category)) {
+    return { ok: false, reason: 'invalid-category', message: `Category must be one of: ${FRAUD_CATEGORIES.join(', ')}.` };
+  }
+  if (note.length === 0) {
+    return { ok: false, reason: 'note-empty', message: 'Describe what happened — a category alone is not a report.' };
+  }
+  if (note.length > FRAUD_NOTE_MAX_LENGTH) {
+    return { ok: false, reason: 'note-too-long', message: `Keep the description under ${FRAUD_NOTE_MAX_LENGTH} characters.` };
+  }
+  const reporter = String(draft.reporterAddress ?? '').trim();
+  if (reporter && reporter === subject) {
+    return { ok: false, reason: 'self-report', message: 'An address cannot file a report against itself.' };
+  }
+  return { ok: true };
+}
+
+export function summariseFraudReports(subject, all) {
+  const visible = all.filter((r) => r.status !== 'withdrawn' && r.status !== 'rejected');
+  const disputed = visible.filter((r) => r.status === 'disputed').length;
+
+  let summary;
+  if (visible.length === 0) {
+    summary =
+      'No reports have been filed about this address. That is not a clean bill of health — it may equally ' +
+      'mean nobody affected has found this page.';
+  } else {
+    const plural = visible.length === 1 ? 'report' : 'reports';
+    summary =
+      `${visible.length} ${plural} filed by ${visible.length === 1 ? 'someone' : 'people'} claiming to have been ` +
+      'affected, each citing a transaction that was checked to exist on-chain and involve this address. ' +
+      'The transaction is verified; the claim about what it means is not. ' +
+      (disputed > 0
+        ? `${disputed} of them ${disputed === 1 ? 'has' : 'have'} a response from the reported party attached.`
+        : 'None has been disputed by the reported party.');
+  }
+
+  return {
+    subject,
+    reports: visible,
+    total: visible.length,
+    disputed,
+    summary,
+    disclaimer:
+      'These are claims by third parties, not findings by Landfall. Landfall verifies only that the cited ' +
+      'transaction exists and involves this address — it has no way to establish what was agreed between ' +
+      'the parties, and does not try. Report volume is never scored, ranked, or blended into any Landfall ' +
+      'figure. If a report about you is wrong, see DISPUTES.md; a response will be attached to it here.',
+  };
+}
+
 const TRUST_CHECK_HORIZON = 'https://horizon.stellar.org';
 const TRUST_CHECK_MAX_RECORDS = 200;
 const TRUST_CHECK_TIMEOUT_MS = 12_000;
@@ -804,6 +900,51 @@ async function trustCheckFetchInput(address, checkedAt) {
     recentPaymentsTruncated: recentRecords.length >= TRUST_CHECK_MAX_RECORDS,
     checkedAt,
   };
+}
+
+/**
+ * Confirms a fraud report's cited transaction actually exists AND actually
+ * involves the address being reported.
+ *
+ * Without this, "cite a transaction hash" is a formality anyone could
+ * satisfy with any random hash, and the report becomes an unfalsifiable
+ * accusation with a decorative reference number attached. With it, a report
+ * is anchored to something a reader can independently look up — which is
+ * the only reason this feature is defensible at all.
+ *
+ * Checks the transaction's own operations rather than its source account:
+ * the reported party is usually the *recipient* of a payment, not the
+ * account that signed the transaction.
+ */
+async function fraudVerifyEvidence(txHash, subject) {
+  let ops;
+  try {
+    ops = await trustCheckGetJson(`${TRUST_CHECK_HORIZON}/transactions/${txHash}/operations?limit=200`);
+  } catch (err) {
+    if (err.status === 404) {
+      return { ok: false, message: 'That transaction does not exist on the Stellar ledger.' };
+    }
+    throw err;
+  }
+
+  const records = ops._embedded?.records ?? [];
+  const involved = records.some((rec) => {
+    const p = trustCheckNormalisePayment(rec);
+    if (p) return p.from === subject || p.to === subject;
+    // Non-payment operations still name accounts; a report can legitimately
+    // cite one (an impersonation via a data entry or account merge, say).
+    return rec.source_account === subject || rec.account === subject || rec.into === subject;
+  });
+
+  if (!involved) {
+    return {
+      ok: false,
+      message:
+        'That transaction exists, but it does not involve the address being reported. Cite a transaction ' +
+        'that the reported address actually took part in.',
+    };
+  }
+  return { ok: true };
 }
 
 /**
@@ -1768,6 +1909,204 @@ export default async function handler(req, res) {
       if (!accounts.length) return json(res, 404, { error: `No accounts for ${domain}` });
 
       return json(res, 200, await paymentsPage(db, { accounts, direction, asset, before, limit }));
+    }
+
+    // POST /api/v1/intent
+    //
+    // The Intent Engine and Route Engine as one call: state the outcome you
+    // want, get back every route that can satisfy it — ranked — plus an
+    // executable plan for the winner.
+    //
+    // Commercial terms (rate spread, fees) come from the caller, because
+    // Landfall does not own them: they are each anchor's own published
+    // figures, which the site republishes at /api/v1/anchor-fees.json and
+    // /api/v1/anchor-quotes.json for exactly this purpose.
+    //
+    // The reliability grade does NOT come from the caller. It is overwritten
+    // from this database on every request, whatever the caller sent, because
+    // a route-ranking API where the ranked party can supply its own score is
+    // not a ranking API. That asymmetry is the point of the endpoint.
+    if (req.method === 'POST' && joined === 'v1/intent') {
+      if (await enforcePublicReadRateLimit(req, res, db)) return;
+
+      const body = await readJsonBody(req);
+      const from = String(body.from || '').trim().toUpperCase();
+      const to = String(body.to || '').trim().toUpperCase();
+      const basis = body.basis === 'receive' ? 'receive' : 'send';
+      const amount = Number(body.amount);
+      const midRate = Number(body.midRate);
+
+      if (!from || !to) return json(res, 400, { error: '`from` and `to` are required.' }, 0);
+      if (!Number.isFinite(amount) || amount <= 0) return json(res, 400, { error: '`amount` must be a positive number.' }, 0);
+      if (!Number.isFinite(midRate) || midRate <= 0) {
+        return json(res, 400, {
+          error: '`midRate` (mid-market rate, `to` per one `from`) is required. Landfall does not carry an FX feed and will not invent one.',
+        }, 0);
+      }
+      if (!Array.isArray(body.candidates) || body.candidates.length === 0) {
+        return json(res, 400, {
+          error: '`candidates` must be a non-empty array of routes with their published terms. See /api/v1/anchor-fees.json for the tracked anchors\' own figures.',
+        }, 0);
+      }
+      if (body.candidates.length > 50) {
+        return json(res, 400, { error: 'At most 50 candidates per request.' }, 0);
+      }
+
+      // Landfall's own grades, keyed by domain — the caller cannot influence these.
+      // Grouped in one pass rather than re-filtering the whole account list per
+      // domain: at 108 accounts over 27 domains the difference is invisible, but
+      // this list only grows.
+      const allAccounts = await accountRows(db);
+      const accountsByDomain = new Map();
+      for (const account of allAccounts) {
+        const key = String(account.domain || '').toLowerCase();
+        if (!key) continue;
+        const bucket = accountsByDomain.get(key);
+        if (bucket) bucket.push(account);
+        else accountsByDomain.set(key, [account]);
+      }
+      const gradeByDomain = new Map();
+      for (const [key, accounts] of accountsByDomain) {
+        gradeByDomain.set(key, computeDomainReliability(accounts));
+      }
+
+      const candidates = body.candidates.map((c) => {
+        const domain = String(c.domain || '').toLowerCase();
+        const rel = gradeByDomain.get(domain);
+        return {
+          domain: c.domain,
+          name: String(c.name || c.domain || 'unknown'),
+          rateSpread: Number.isFinite(Number(c.rateSpread)) ? Number(c.rateSpread) : 1,
+          feePercent: Number.isFinite(Number(c.feePercent)) ? Number(c.feePercent) : 0,
+          feeFixed: Number.isFinite(Number(c.feeFixed)) ? Number(c.feeFixed) : 0,
+          feeSource: c.feeSource === 'live' || c.feeSource === 'catalog' ? c.feeSource : null,
+          // Overwritten, never merged — see the note above this route.
+          grade: rel ? rel.grade : 'U',
+          score: rel ? rel.score : null,
+          liquidityTier: ['high', 'medium', 'low'].includes(c.liquidityTier) ? c.liquidityTier : 'unknown',
+          recentPayments: Number.isFinite(Number(c.recentPayments)) ? Number(c.recentPayments) : null,
+        };
+      });
+
+      const intent = {
+        from, to, basis, amount,
+        sortBy: body.sortBy === 'verified' ? 'verified' : 'payout',
+        ...(body.minGrade ? { minGrade: String(body.minGrade).toUpperCase() } : {}),
+        ...(body.requirePricedTerms ? { requirePricedTerms: true } : {}),
+      };
+
+      const result = LandfallIntent.solveIntent(intent, candidates, midRate);
+      const winner = result.solutions.find((s) => s.priced) || null;
+      const chosen = winner
+        ? body.candidates.find((c) => String(c.domain).toLowerCase() === String(winner.domain).toLowerCase())
+        : null;
+
+      return json(res, 200, {
+        intent,
+        midRate,
+        solutions: result.solutions,
+        rejected: result.rejected,
+        unsatisfiable: result.unsatisfiable,
+        plan: winner
+          ? LandfallIntent.buildPlan({
+              solution: winner,
+              from,
+              to,
+              anchorUrl: chosen && chosen.url ? String(chosen.url) : undefined,
+              speed: chosen && chosen.speed ? String(chosen.speed) : undefined,
+            })
+          : null,
+        gradesFrom: 'Landfall ledger scan — supplied grades in the request were ignored.',
+        termsFrom: "The caller's own figures. Landfall does not verify that a rate or fee is what the anchor will actually honour; see /api/v1/anchor-fees.json for each anchor's own published terms.",
+      }, 0);
+    }
+
+    // POST /api/v1/fraud-reports
+    //
+    // A stranger publishing an allegation about a named party. Treated with
+    // more suspicion than anything else in this file: the cited transaction
+    // is verified against the ledger BEFORE a row is written, and a report
+    // that fails that check is rejected rather than stored at low weight.
+    if (req.method === 'POST' && joined === 'v1/fraud-reports') {
+      if (await enforceAuthRateLimit(req, res, db, 'fraud-report', 5)) return;
+
+      const body = await readJsonBody(req);
+      const draft = {
+        subject: body.subject,
+        evidenceTxHash: body.evidenceTxHash,
+        category: body.category,
+        note: body.note,
+        reporterAddress: body.reporterAddress,
+      };
+
+      const shape = validateFraudSubmission(draft);
+      if (!shape.ok) return json(res, 400, { error: shape.message, reason: shape.reason }, 0);
+
+      const subject = String(draft.subject).trim();
+      const txHash = String(draft.evidenceTxHash).trim().toLowerCase();
+
+      let evidence;
+      try {
+        evidence = await fraudVerifyEvidence(txHash, subject);
+      } catch (err) {
+        console.error('[fraud-reports]', err.message);
+        return json(res, 502, { error: 'Could not reach Horizon to verify that transaction. Try again shortly.' }, 0);
+      }
+      if (!evidence.ok) return json(res, 400, { error: evidence.message, reason: 'evidence-not-verified' }, 0);
+
+      try {
+        const { rows } = await db.query(
+          `INSERT INTO fraud_reports (subject, evidence_tx_hash, category, note, reporter_ip_hash)
+           VALUES ($1, $2, $3, $4, $5)
+           RETURNING id, subject, evidence_tx_hash, category, note, status, submitted_at`,
+          [subject, txHash, String(draft.category).trim(), String(draft.note).trim(), sha256Hex(clientIp(req))],
+        );
+        const row = rows[0];
+        return json(res, 201, {
+          ok: true,
+          id: String(row.id),
+          subject: row.subject,
+          status: row.status,
+          submittedAt: row.submitted_at.toISOString(),
+          note:
+            'Recorded as a claim, and shown as one. Landfall verified only that the cited transaction exists ' +
+            'and involves this address — it has not established what happened between you and them, and will ' +
+            'not say that it has. The reported party can attach a response.',
+        }, 0);
+      } catch (err) {
+        if (err.message?.includes('unique') || err.message?.includes('duplicate')) {
+          return json(res, 409, { error: 'You have already filed a report citing this transaction for this address.' }, 0);
+        }
+        throw err;
+      }
+    }
+
+    // GET /api/v1/fraud-reports/:subject
+    if (req.method === 'GET' && parts.length === 3 && parts[0] === 'v1' && parts[1] === 'fraud-reports') {
+      const subject = decodeURIComponent(parts[2]);
+      if (!FRAUD_G_ADDRESS.test(subject)) {
+        return json(res, 400, { error: 'Subject must be a Stellar public key (G...).' }, 0);
+      }
+
+      const { rows } = await db.query(
+        `SELECT id, subject, evidence_tx_hash, category, note, status, submitted_at, disputed_at, dispute_note
+         FROM fraud_reports WHERE subject = $1 ORDER BY submitted_at DESC LIMIT 200`,
+        [subject],
+      );
+
+      const reports = rows.map((r) => ({
+        id: String(r.id),
+        subject: r.subject,
+        evidenceTxHash: r.evidence_tx_hash,
+        category: r.category,
+        note: r.note,
+        status: r.status,
+        submittedAt: r.submitted_at.toISOString(),
+        disputedAt: r.disputed_at ? r.disputed_at.toISOString() : null,
+        disputeNote: r.dispute_note ?? null,
+      }));
+
+      return json(res, 200, summariseFraudReports(subject, reports), 60);
     }
 
     // POST /api/v1/fiat-confirmations

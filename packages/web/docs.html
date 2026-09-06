@@ -456,6 +456,86 @@
     </div>
   </section>
 
+  <!-- Section 3j: intent + route engine -->
+  <section class="docs-section">
+    <h2>3j. Intent &amp; Route Engine</h2>
+    <p style="font-size:13px; color:var(--muted); margin-bottom:16px;">
+      State the outcome you want — "deliver ₦500,000", or "send $1,000" — and get back every candidate
+      route ranked, plus an <strong>executable plan</strong> for the winner: the ordered steps, each
+      naming who performs it. Landfall never appears as the actor on a step that moves value, because
+      it holds no keys, no funds and no custody. See
+      <a href="https://github.com/ibochivincent-lang/landfall/blob/main/docs/architecture/VERIFIED_ROUTES.md" target="_blank" rel="noopener">VERIFIED_ROUTES.md</a>
+      for why ranking is lexicographic (grade first, then liquidity, then price) rather than a blended score.
+    </p>
+
+    <div class="endpoint-card">
+      <div class="endpoint-title">
+        <span class="badge-get" style="background:#b45309;">POST</span>
+        <span class="endpoint-path">/api/v1/intent</span>
+      </div>
+      <p style="font-size:13px; color:var(--muted); margin-top:8px;">
+        Body: <code>{ from, to, basis: "send"|"receive", amount, midRate, candidates[], sortBy?,
+        minGrade?, requirePricedTerms? }</code>.
+      </p>
+      <p style="font-size:13px; color:var(--muted); margin-top:8px;">
+        <strong>What the caller supplies, and what it cannot.</strong> Commercial terms — rate spread,
+        fees, payout speed — come from the caller, because they are each anchor's own published figures,
+        not Landfall's; the tracked anchors' current ones are republished at
+        <code>/api/v1/anchor-fees.json</code> and <code>/api/v1/anchor-quotes.json</code> for exactly
+        this. The <em>reliability grade is overwritten from Landfall's ledger scan on every request</em>,
+        whatever the caller sent. A route-ranking API where the ranked party supplies its own score is
+        not a ranking API — that asymmetry is the point of the endpoint. <code>midRate</code> is required
+        rather than defaulted: Landfall carries no FX feed and will not invent one.
+      </p>
+    </div>
+  </section>
+
+  <!-- Section 3k: fraud reports -->
+  <section class="docs-section">
+    <h2>3k. Fraud Reports</h2>
+    <p style="font-size:13px; color:var(--muted); margin-bottom:16px;">
+      Lets someone who was affected file a report about an address — and lets the reported party
+      respond. This is the module Landfall spent a long time deliberately <em>not</em> faking: Trust
+      Check ships with a line saying no external fraud feed is used "because none exist here that this
+      project can independently verify." This is that feed, built so the promise still holds.
+    </p>
+    <p style="font-size:13px; color:var(--muted); margin-bottom:16px;">
+      <strong>A report is a claim, never a finding.</strong> Every report must cite a transaction hash,
+      and Landfall verifies against the ledger that the transaction exists <em>and</em> involves the
+      reported address before storing anything — a report failing that check is rejected outright, not
+      kept at low weight. What Landfall verifies is the transaction; what it cannot verify, and never
+      claims to, is what the parties agreed. Report volume is never scored, ranked, or blended into any
+      Landfall figure, and there is no "confirmed" status in the schema because nothing here could
+      establish one. The reported party's response travels in the same payload as the accusation — see
+      <a href="https://github.com/ibochivincent-lang/landfall/blob/main/DISPUTES.md" target="_blank" rel="noopener">DISPUTES.md</a>.
+    </p>
+
+    <div class="endpoint-card">
+      <div class="endpoint-title">
+        <span class="badge-get" style="background:#b45309;">POST</span>
+        <span class="endpoint-path">/api/v1/fraud-reports</span>
+      </div>
+      <p style="font-size:13px; color:var(--muted); margin-top:8px;">
+        Body: <code>{ subject, evidenceTxHash, category, note, reporterAddress? }</code>. Categories:
+        <code>did_not_receive</code>, <code>wrong_amount</code>, <code>impersonation</code>,
+        <code>unauthorized_debit</code>, <code>other</code>. Returns 400 if the cited transaction does
+        not exist or does not involve the subject; 409 if you have already filed on that transaction.
+      </p>
+    </div>
+
+    <div class="endpoint-card">
+      <div class="endpoint-title">
+        <span class="badge-get">GET</span>
+        <span class="endpoint-path">/api/v1/fraud-reports/{subject}</span>
+      </div>
+      <p style="font-size:13px; color:var(--muted); margin-top:8px;">
+        Reports filed about one address, with the disclaimer attached to the payload rather than left
+        to the client to remember. Withdrawn and rejected reports are excluded. Zero reports is
+        reported as absence of evidence, explicitly not as a clean record.
+      </p>
+    </div>
+  </section>
+
   <!-- Section 4: MCP Tool -->
   <section class="docs-section">
     <h2>4. AI Agent Integration (Model Context Protocol / MCP)</h2>
