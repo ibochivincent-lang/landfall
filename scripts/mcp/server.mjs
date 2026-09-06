@@ -10,8 +10,17 @@
 // wrapper around the exact same exported functions the live Vercel API
 // route (`api/[...path].js`) and its GraphQL layer already use:
 // `latestScan`, `accountRows`, `paymentsPage`, `assetRows`, `domainAccounts`,
-// `corridorRows`, and `computeDomainReliability`. One source of truth for
-// "what does the ledger say" — three ways to ask it (REST, GraphQL, MCP).
+// `corridorRows`, `computeDomainReliability`, `trustCheckResolveAddress`,
+// `trustCheckFetchInput`, `analyzeTrustCheck`, `fetchFraudReports`, and
+// `resolveIntent`. One source of truth for "what does the ledger say" —
+// three ways to ask it (REST, GraphQL, MCP).
+//
+// Deliberately NOT exposed: filing a fraud report, or disputing one. See
+// docs/MCP.md's "What this deliberately does not expose" for why — in
+// short, one is an accusation an agent should not be able to make on
+// someone's behalf at the cost of a single tool call, and the other needs a
+// private key, which no tool on this server should ever take as an
+// argument.
 //
 // Run:
 //   DATABASE_URL=postgresql://... node scripts/mcp/server.mjs
@@ -32,6 +41,11 @@ import {
   domainAccounts,
   corridorRows,
   computeDomainReliability,
+  trustCheckResolveAddress,
+  trustCheckFetchInput,
+  analyzeTrustCheck,
+  fetchFraudReports,
+  resolveIntent,
 } from '../../api/[...path].js';
 
 function text(payload) {
@@ -197,6 +211,118 @@ function buildServer() {
       try {
         const scan = await latestScan(db);
         return text({ ok: true, asOf: scan?.finishedAt ?? null, staleHours: scan?.staleHours ?? null });
+      } catch (err) {
+        return errorText(err);
+      }
+    }
+  );
+
+  server.registerTool(
+    'landfall_trust_check',
+    {
+      title: 'Check a Stellar address before paying it',
+      description:
+        'Live, ledger-only counterparty signals for an arbitrary Stellar address or transaction ' +
+        'hash — observed history (a lower bound, since Horizon does not retain everything ' +
+        'forever), counterparty concentration, a pass-through/fast-forwarding pattern, a ' +
+        'transparent 0-100 score with every deduction traceable to a named flag, and a ' +
+        'confidence rating that overrides the score when there is too little history to say ' +
+        'anything. No external fraud database is consulted — none exists here that can be ' +
+        'independently verified, and inventing one would be exactly the failure mode this tool ' +
+        'exists to avoid in other systems. Every flag states a ledger fact, never an accusation.',
+      inputSchema: {
+        address: z.string().describe('A Stellar public key (G...) or a 64-character transaction hash'),
+      },
+    },
+    async ({ address }) => {
+      try {
+        const resolved = await trustCheckResolveAddress(address);
+        if (!resolved) {
+          return text({ error: 'address must be a Stellar public key (G...) or a transaction hash.' });
+        }
+        const input = await trustCheckFetchInput(resolved, new Date().toISOString());
+        return text(analyzeTrustCheck(input));
+      } catch (err) {
+        if (err.status === 404) return text({ error: 'That address has no account on the Stellar network.' });
+        return errorText(err);
+      }
+    }
+  );
+
+  server.registerTool(
+    'landfall_fraud_reports',
+    {
+      title: 'Read fraud reports filed about an address',
+      description:
+        'Reports other people have filed about a Stellar address, each anchored to a ' +
+        'transaction Landfall verified exists and involves that address. These are claims by ' +
+        'third parties, not findings by Landfall — the transaction is verified, the account of ' +
+        'what happened is not, and report volume is never scored or ranked. A response from the ' +
+        'reported party, if one exists, is attached to its report. This tool only reads; filing ' +
+        'or disputing a report is a deliberately human action taken through the Trust Check page, ' +
+        'not something this server exposes for an agent to do on someone\'s behalf.',
+      inputSchema: {
+        subject: z.string().describe('The Stellar public key (G...) the reports are about'),
+      },
+    },
+    async ({ subject }) => {
+      try {
+        if (!/^G[A-Z2-7]{55}$/.test(subject)) {
+          return text({ error: 'subject must be a Stellar public key (G...).' });
+        }
+        return text(await fetchFraudReports(db, subject));
+      } catch (err) {
+        return errorText(err);
+      }
+    }
+  );
+
+  server.registerTool(
+    'landfall_intent',
+    {
+      title: 'Rank routes for a payment intent and get an executable plan',
+      description:
+        'State an outcome — send a fixed amount, or deliver a fixed amount — and get every ' +
+        'candidate route ranked, plus a step-by-step plan for the winner naming who performs ' +
+        'each step. Commercial terms (rate, fees) come from the caller, because they are each ' +
+        'anchor\'s own published figures, not Landfall\'s — see /api/v1/anchor-fees.json and ' +
+        '/api/v1/anchor-quotes.json for the tracked anchors\' current ones. The reliability grade ' +
+        'is always overwritten from Landfall\'s own ledger scan, regardless of what is supplied: ' +
+        'a route-ranking tool where the ranked party supplies its own score would not be one. ' +
+        'Every plan step names its actor, and Landfall performs only the read-only check — every ' +
+        'step that moves value belongs to the wallet or the anchor, because this tool computes a ' +
+        'plan, it does not execute one, and holds no keys or funds to execute one with.',
+      inputSchema: {
+        from: z.string().describe('Asset the user sends, e.g. "USDC"'),
+        to: z.string().describe('Destination currency, e.g. "NGN"'),
+        basis: z.enum(['send', 'receive']).describe(
+          '"send": amount is the fixed amount sent. "receive": amount is the fixed amount the recipient must get.'
+        ),
+        amount: z.number().positive(),
+        midRate: z.number().positive().describe(
+          'Mid-market rate, `to` units per one `from` unit. Landfall carries no FX feed and will not invent one — this is required.'
+        ),
+        candidates: z.array(z.object({
+          domain: z.string(),
+          name: z.string().optional(),
+          rateSpread: z.number().optional().describe('Multiplier on midRate; 1 = mid, 0.99 = 1% spread against the user'),
+          feePercent: z.number().optional(),
+          feeFixed: z.number().optional(),
+          feeSource: z.enum(['live', 'catalog']).optional(),
+          url: z.string().optional().describe('Anchor off-ramp URL, carried into the plan'),
+          speed: z.string().optional().describe('Human payout-speed description, carried into the plan'),
+        })).min(1).max(50).describe('Candidate routes with their published terms — see /api/v1/anchor-fees.json'),
+        sortBy: z.enum(['payout', 'verified']).optional().describe(
+          '"payout" (default): most received / least sent. "verified": reliability grade, then liquidity, then price — never blended into one score.'
+        ),
+        minGrade: z.string().optional().describe('Reject routes graded below this (A-F, or U for untracked)'),
+        requirePricedTerms: z.boolean().optional().describe('Reject routes with no published rate card, instead of listing them unpriced'),
+      },
+    },
+    async (body) => {
+      try {
+        const result = await resolveIntent(db, body);
+        return text(result.body);
       } catch (err) {
         return errorText(err);
       }

@@ -466,6 +466,116 @@ export async function corridorRows(db) {
 }
 
 /**
+ * The Intent + Route Engine, in one place.
+ *
+ * Originally inline in the POST /api/v1/intent handler below. Pulled out
+ * once the MCP server needed the identical logic, rather than becoming a
+ * second copy of it — this file's own header already commits every MCP
+ * tool to wrapping "the exact same exported functions" the REST and
+ * GraphQL layers use, and an intent tool that quietly recomputed this
+ * itself would break that on the one route that matters most for an agent.
+ *
+ * Returns `{ status, body }` rather than writing to `res` directly, so a
+ * caller with no HTTP response object — the MCP tool — can use it exactly
+ * the same way the route does.
+ */
+export async function resolveIntent(db, body) {
+  const from = String(body.from || '').trim().toUpperCase();
+  const to = String(body.to || '').trim().toUpperCase();
+  const basis = body.basis === 'receive' ? 'receive' : 'send';
+  const amount = Number(body.amount);
+  const midRate = Number(body.midRate);
+
+  if (!from || !to) return { status: 400, body: { error: '`from` and `to` are required.' } };
+  if (!Number.isFinite(amount) || amount <= 0) {
+    return { status: 400, body: { error: '`amount` must be a positive number.' } };
+  }
+  if (!Number.isFinite(midRate) || midRate <= 0) {
+    return {
+      status: 400,
+      body: { error: '`midRate` (mid-market rate, `to` per one `from`) is required. Landfall does not carry an FX feed and will not invent one.' },
+    };
+  }
+  if (!Array.isArray(body.candidates) || body.candidates.length === 0) {
+    return {
+      status: 400,
+      body: { error: '`candidates` must be a non-empty array of routes with their published terms. See /api/v1/anchor-fees.json for the tracked anchors\' own figures.' },
+    };
+  }
+  if (body.candidates.length > 50) {
+    return { status: 400, body: { error: 'At most 50 candidates per request.' } };
+  }
+
+  // Landfall's own grades, keyed by domain — the caller cannot influence these.
+  const allAccounts = await accountRows(db);
+  const accountsByDomain = new Map();
+  for (const account of allAccounts) {
+    const key = String(account.domain || '').toLowerCase();
+    if (!key) continue;
+    const bucket = accountsByDomain.get(key);
+    if (bucket) bucket.push(account);
+    else accountsByDomain.set(key, [account]);
+  }
+  const gradeByDomain = new Map();
+  for (const [key, accounts] of accountsByDomain) {
+    gradeByDomain.set(key, computeDomainReliability(accounts));
+  }
+
+  const candidates = body.candidates.map((c) => {
+    const domain = String(c.domain || '').toLowerCase();
+    const rel = gradeByDomain.get(domain);
+    return {
+      domain: c.domain,
+      name: String(c.name || c.domain || 'unknown'),
+      rateSpread: Number.isFinite(Number(c.rateSpread)) ? Number(c.rateSpread) : 1,
+      feePercent: Number.isFinite(Number(c.feePercent)) ? Number(c.feePercent) : 0,
+      feeFixed: Number.isFinite(Number(c.feeFixed)) ? Number(c.feeFixed) : 0,
+      feeSource: c.feeSource === 'live' || c.feeSource === 'catalog' ? c.feeSource : null,
+      // Overwritten, never merged — see the header comment on this function.
+      grade: rel ? rel.grade : 'U',
+      score: rel ? rel.score : null,
+      liquidityTier: ['high', 'medium', 'low'].includes(c.liquidityTier) ? c.liquidityTier : 'unknown',
+      recentPayments: Number.isFinite(Number(c.recentPayments)) ? Number(c.recentPayments) : null,
+    };
+  });
+
+  const intent = {
+    from, to, basis, amount,
+    sortBy: body.sortBy === 'verified' ? 'verified' : 'payout',
+    ...(body.minGrade ? { minGrade: String(body.minGrade).toUpperCase() } : {}),
+    ...(body.requirePricedTerms ? { requirePricedTerms: true } : {}),
+  };
+
+  const result = LandfallIntent.solveIntent(intent, candidates, midRate);
+  const winner = result.solutions.find((s) => s.priced) || null;
+  const chosen = winner
+    ? body.candidates.find((c) => String(c.domain).toLowerCase() === String(winner.domain).toLowerCase())
+    : null;
+
+  return {
+    status: 200,
+    body: {
+      intent,
+      midRate,
+      solutions: result.solutions,
+      rejected: result.rejected,
+      unsatisfiable: result.unsatisfiable,
+      plan: winner
+        ? LandfallIntent.buildPlan({
+            solution: winner,
+            from,
+            to,
+            anchorUrl: chosen && chosen.url ? String(chosen.url) : undefined,
+            speed: chosen && chosen.speed ? String(chosen.speed) : undefined,
+          })
+        : null,
+      gradesFrom: 'Landfall ledger scan — supplied grades in the request were ignored.',
+      termsFrom: "The caller's own figures. Landfall does not verify that a rate or fee is what the anchor will actually honour; see /api/v1/anchor-fees.json for each anchor's own published terms.",
+    },
+  };
+}
+
+/**
  * Recipient-confirmation evaluation — a plain-JS mirror of
  * evaluateConfirmation() in packages/adapters/src/fiatConfirmation.ts.
  *
@@ -829,6 +939,32 @@ export function summariseFraudReports(subject, all) {
 }
 
 /**
+ * Reads every report for one subject and hands it to summariseFraudReports.
+ * Pulled out of the GET route for the same reason resolveIntent was: the
+ * MCP server needs the identical query and shaping, and a second copy of
+ * either is exactly the drift this file has already been bitten by twice.
+ */
+export async function fetchFraudReports(db, subject) {
+  const { rows } = await db.query(
+    `SELECT id, subject, evidence_tx_hash, category, note, status, submitted_at, disputed_at, dispute_note
+     FROM fraud_reports WHERE subject = $1 ORDER BY submitted_at DESC LIMIT 200`,
+    [subject],
+  );
+  const reports = rows.map((r) => ({
+    id: String(r.id),
+    subject: r.subject,
+    evidenceTxHash: r.evidence_tx_hash,
+    category: r.category,
+    note: r.note,
+    status: r.status,
+    submittedAt: r.submitted_at.toISOString(),
+    disputedAt: r.disputed_at ? r.disputed_at.toISOString() : null,
+    disputeNote: r.dispute_note ?? null,
+  }));
+  return summariseFraudReports(subject, reports);
+}
+
+/**
  * Dispute responses — mirror of packages/fraud-reports/src/dispute.ts.
  *
  * A response is the reported party's own words attached to an accusation,
@@ -1004,7 +1140,7 @@ const TX_HASH = /^[0-9a-fA-F]{64}$/;
  * is the only place this route makes a guess about intent — everything
  * downstream is a straight ledger read on the resolved address.
  */
-async function trustCheckResolveAddress(raw) {
+export async function trustCheckResolveAddress(raw) {
   const value = String(raw ?? '').trim();
   if (G_ADDRESS.test(value)) return value;
   if (TX_HASH.test(value)) {
@@ -1023,7 +1159,7 @@ async function trustCheckResolveAddress(raw) {
  * live, on-demand check, not a batch scan, and an address with years of
  * heavy activity must answer in seconds, not minutes.
  */
-async function trustCheckFetchInput(address, checkedAt) {
+export async function trustCheckFetchInput(address, checkedAt) {
   const oldestUrl = `${TRUST_CHECK_HORIZON}/accounts/${address}/payments?order=asc&limit=1`;
   const recentUrl = `${TRUST_CHECK_HORIZON}/accounts/${address}/payments?order=desc&limit=${TRUST_CHECK_MAX_RECORDS}`;
 
@@ -1061,7 +1197,7 @@ async function trustCheckFetchInput(address, checkedAt) {
  * the reported party is usually the *recipient* of a payment, not the
  * account that signed the transaction.
  */
-async function fraudVerifyEvidence(txHash, subject) {
+export async function fraudVerifyEvidence(txHash, subject) {
   let ops;
   try {
     ops = await trustCheckGetJson(`${TRUST_CHECK_HORIZON}/transactions/${txHash}/operations?limit=200`);
@@ -2101,97 +2237,9 @@ export default async function handler(req, res) {
     // not a ranking API. That asymmetry is the point of the endpoint.
     if (req.method === 'POST' && joined === 'v1/intent') {
       if (await enforcePublicReadRateLimit(req, res, db)) return;
-
       const body = await readJsonBody(req);
-      const from = String(body.from || '').trim().toUpperCase();
-      const to = String(body.to || '').trim().toUpperCase();
-      const basis = body.basis === 'receive' ? 'receive' : 'send';
-      const amount = Number(body.amount);
-      const midRate = Number(body.midRate);
-
-      if (!from || !to) return json(res, 400, { error: '`from` and `to` are required.' }, 0);
-      if (!Number.isFinite(amount) || amount <= 0) return json(res, 400, { error: '`amount` must be a positive number.' }, 0);
-      if (!Number.isFinite(midRate) || midRate <= 0) {
-        return json(res, 400, {
-          error: '`midRate` (mid-market rate, `to` per one `from`) is required. Landfall does not carry an FX feed and will not invent one.',
-        }, 0);
-      }
-      if (!Array.isArray(body.candidates) || body.candidates.length === 0) {
-        return json(res, 400, {
-          error: '`candidates` must be a non-empty array of routes with their published terms. See /api/v1/anchor-fees.json for the tracked anchors\' own figures.',
-        }, 0);
-      }
-      if (body.candidates.length > 50) {
-        return json(res, 400, { error: 'At most 50 candidates per request.' }, 0);
-      }
-
-      // Landfall's own grades, keyed by domain — the caller cannot influence these.
-      // Grouped in one pass rather than re-filtering the whole account list per
-      // domain: at 108 accounts over 27 domains the difference is invisible, but
-      // this list only grows.
-      const allAccounts = await accountRows(db);
-      const accountsByDomain = new Map();
-      for (const account of allAccounts) {
-        const key = String(account.domain || '').toLowerCase();
-        if (!key) continue;
-        const bucket = accountsByDomain.get(key);
-        if (bucket) bucket.push(account);
-        else accountsByDomain.set(key, [account]);
-      }
-      const gradeByDomain = new Map();
-      for (const [key, accounts] of accountsByDomain) {
-        gradeByDomain.set(key, computeDomainReliability(accounts));
-      }
-
-      const candidates = body.candidates.map((c) => {
-        const domain = String(c.domain || '').toLowerCase();
-        const rel = gradeByDomain.get(domain);
-        return {
-          domain: c.domain,
-          name: String(c.name || c.domain || 'unknown'),
-          rateSpread: Number.isFinite(Number(c.rateSpread)) ? Number(c.rateSpread) : 1,
-          feePercent: Number.isFinite(Number(c.feePercent)) ? Number(c.feePercent) : 0,
-          feeFixed: Number.isFinite(Number(c.feeFixed)) ? Number(c.feeFixed) : 0,
-          feeSource: c.feeSource === 'live' || c.feeSource === 'catalog' ? c.feeSource : null,
-          // Overwritten, never merged — see the note above this route.
-          grade: rel ? rel.grade : 'U',
-          score: rel ? rel.score : null,
-          liquidityTier: ['high', 'medium', 'low'].includes(c.liquidityTier) ? c.liquidityTier : 'unknown',
-          recentPayments: Number.isFinite(Number(c.recentPayments)) ? Number(c.recentPayments) : null,
-        };
-      });
-
-      const intent = {
-        from, to, basis, amount,
-        sortBy: body.sortBy === 'verified' ? 'verified' : 'payout',
-        ...(body.minGrade ? { minGrade: String(body.minGrade).toUpperCase() } : {}),
-        ...(body.requirePricedTerms ? { requirePricedTerms: true } : {}),
-      };
-
-      const result = LandfallIntent.solveIntent(intent, candidates, midRate);
-      const winner = result.solutions.find((s) => s.priced) || null;
-      const chosen = winner
-        ? body.candidates.find((c) => String(c.domain).toLowerCase() === String(winner.domain).toLowerCase())
-        : null;
-
-      return json(res, 200, {
-        intent,
-        midRate,
-        solutions: result.solutions,
-        rejected: result.rejected,
-        unsatisfiable: result.unsatisfiable,
-        plan: winner
-          ? LandfallIntent.buildPlan({
-              solution: winner,
-              from,
-              to,
-              anchorUrl: chosen && chosen.url ? String(chosen.url) : undefined,
-              speed: chosen && chosen.speed ? String(chosen.speed) : undefined,
-            })
-          : null,
-        gradesFrom: 'Landfall ledger scan — supplied grades in the request were ignored.',
-        termsFrom: "The caller's own figures. Landfall does not verify that a rate or fee is what the anchor will actually honour; see /api/v1/anchor-fees.json for each anchor's own published terms.",
-      }, 0);
+      const result = await resolveIntent(db, body);
+      return json(res, result.status, result.body, 0);
     }
 
     // POST /api/v1/fraud-reports
@@ -2329,26 +2377,7 @@ export default async function handler(req, res) {
       if (!FRAUD_G_ADDRESS.test(subject)) {
         return json(res, 400, { error: 'Subject must be a Stellar public key (G...).' }, 0);
       }
-
-      const { rows } = await db.query(
-        `SELECT id, subject, evidence_tx_hash, category, note, status, submitted_at, disputed_at, dispute_note
-         FROM fraud_reports WHERE subject = $1 ORDER BY submitted_at DESC LIMIT 200`,
-        [subject],
-      );
-
-      const reports = rows.map((r) => ({
-        id: String(r.id),
-        subject: r.subject,
-        evidenceTxHash: r.evidence_tx_hash,
-        category: r.category,
-        note: r.note,
-        status: r.status,
-        submittedAt: r.submitted_at.toISOString(),
-        disputedAt: r.disputed_at ? r.disputed_at.toISOString() : null,
-        disputeNote: r.dispute_note ?? null,
-      }));
-
-      return json(res, 200, summariseFraudReports(subject, reports), 60);
+      return json(res, 200, await fetchFraudReports(db, subject), 60);
     }
 
     // POST /api/v1/fiat-confirmations
