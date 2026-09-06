@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-05T23:28:06.543Z",
+  "generatedAt": "2026-09-06T01:53:55.409Z",
   "stpVersion": "1",
   "window": {
-    "since": "2026-08-06T23:27:45.429Z",
+    "since": "2026-08-07T01:53:46.079Z",
     "days": 30,
     "maxRecordsPerAccount": 200
   },
@@ -900,38 +900,38 @@
             "byAsset": [
               {
                 "asset": "APSEURM",
-                "count": 117,
-                "volume": "1374386.77"
+                "count": 113,
+                "volume": "1374667.33"
               },
               {
                 "asset": "APSUSDM",
-                "count": 65,
-                "volume": "812249.57"
+                "count": 70,
+                "volume": "818649.62"
               },
               {
                 "asset": "APSBPIUSD",
-                "count": 28,
-                "volume": "595.584"
+                "count": 38,
+                "volume": "4776.01"
               },
               {
                 "asset": "APSBPOUSD",
-                "count": 22,
-                "volume": "2470.88"
+                "count": 16,
+                "volume": "4692.64"
               },
               {
                 "asset": "APSBPIEUR",
-                "count": 15,
-                "volume": "359.8"
+                "count": 11,
+                "volume": "301.05"
               },
               {
                 "asset": "APSSARM",
-                "count": 7,
-                "volume": "6706192.49"
+                "count": 10,
+                "volume": "6708756.39"
               },
               {
                 "asset": "APSBPIGBP",
-                "count": 5,
-                "volume": "664.88"
+                "count": 1,
+                "volume": "20.6300000"
               }
             ]
           },
@@ -1103,29 +1103,29 @@
                 "volume": "2800638.2471883"
               },
               {
-                "asset": "gdICE",
-                "count": 41,
-                "volume": "750124150.9361902"
-              },
-              {
                 "asset": "upvoteICE",
-                "count": 40,
-                "volume": "32501739.324151"
+                "count": 41,
+                "volume": "32409704.432323"
               },
               {
                 "asset": "governICE",
-                "count": 40,
-                "volume": "32501739.324151"
+                "count": 41,
+                "volume": "32409704.432323"
               },
               {
                 "asset": "ICE",
-                "count": 40,
-                "volume": "32501739.324151"
+                "count": 41,
+                "volume": "32409704.432323"
+              },
+              {
+                "asset": "gdICE",
+                "count": 39,
+                "volume": "802202508.4975649"
               },
               {
                 "asset": "dICE",
-                "count": 39,
-                "volume": "411676446.2108705"
+                "count": 38,
+                "volume": "326690650.9800034"
               }
             ]
           },
@@ -2654,7 +2654,7 @@
               {
                 "asset": "XTAR",
                 "count": 180,
-                "volume": "0.0215521"
+                "volume": "0.0215517"
               },
               {
                 "asset": "AQUA",
@@ -2808,15 +2808,15 @@
             "asset": "XTAR",
             "direction": "deposit",
             "amount": "0.0001641",
-            "onchain_ref": "8c18cee159dc2965fe86161b3d3c4aee59bb3ee47c9937409bc0243b88bbf724",
+            "onchain_ref": "686ab6039ca8bd2a40b0cd2a0d77f82b81506812f17dd0901864c2351300347b",
             "fiat_leg_ref": null,
             "evidence_tier": "PROVEN",
             "evidence_detail": "stellar_ledger",
             "keystone_ref": null,
-            "observed_at": "2026-09-05T23:01:49Z",
+            "observed_at": "2026-09-06T01:01:29Z",
             "signer": "landfall-attester-dev"
           },
-          "digest": "5b4220fd7fa1f129544a1d360dbd99812e400fcbbddce5b1fb785ae3ae387273",
+          "digest": "39ffd2eab06c87d21d76225ce0ba1a87623ecc8805d52067dd53bdda74607c3f",
           "signed": false
         }
       ]

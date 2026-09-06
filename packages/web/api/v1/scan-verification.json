@@ -1,6 +1,6 @@
 {
-  "checkedAt": "2026-09-05T23:27:07.596Z",
-  "scanFile": "scan-2026-09-05T23-27-06-979Z.json",
+  "checkedAt": "2026-09-06T01:53:08.226Z",
+  "scanFile": "scan-2026-09-06T01-53-07-564Z.json",
   "accountsChecked": 108,
   "comparedAgainst": {
     "publishedAccounts": 108
@@ -8,10 +8,16 @@
   "outcome": "blocked",
   "published": false,
   "counts": {
-    "errors": 6,
+    "errors": 7,
     "warnings": 0
   },
   "findings": [
+    {
+      "severity": "error",
+      "code": "implausible-shrink",
+      "message": "mykobo.co account GAQRF3UGHBT6JYQZ7YSUYCIYWAF4T2SAA5237Q5LIQYJOHHFAWDXZ7NM fell from 35 to 11 payments in one scan.",
+      "detail": "Published counts do not normally collapse — a drop this size means the scan lost records rather than that the ledger did, and publishing it would report an outage as an anchor going quiet. Most likely cause in this pipeline: the run had no DATABASE_URL, so it re-paged the most recent --max-records payments statelessly instead of accumulating via mergeWithHistory, and the published figures it is being compared against were built with that history. Expected when running locally; if it happens in CI, the database is unreachable and the scan is not publishable until it is back."
+    },
     {
       "severity": "error",
       "code": "implausible-shrink",
@@ -33,7 +39,7 @@
     {
       "severity": "error",
       "code": "implausible-shrink",
-      "message": "aps.money account GBN32NH6TMWE4ZD4G245CF3UVOQRXD4FK3FDCLZ4DE5642HWFKSLLRMB fell from 2976 to 497 payments in one scan.",
+      "message": "aps.money account GBN32NH6TMWE4ZD4G245CF3UVOQRXD4FK3FDCLZ4DE5642HWFKSLLRMB fell from 2976 to 499 payments in one scan.",
       "detail": "Published counts do not normally collapse — a drop this size means the scan lost records rather than that the ledger did, and publishing it would report an outage as an anchor going quiet. Most likely cause in this pipeline: the run had no DATABASE_URL, so it re-paged the most recent --max-records payments statelessly instead of accumulating via mergeWithHistory, and the published figures it is being compared against were built with that history. Expected when running locally; if it happens in CI, the database is unreachable and the scan is not publishable until it is back."
     },
     {

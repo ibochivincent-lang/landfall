@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-05T23:27:32.449Z",
+  "generatedAt": "2026-09-06T01:53:33.071Z",
   "note": "Which anchors can move value into a given local currency, and which of them are demonstrably working. Joins three things that previously had to be joined by the caller: the currencies an anchor declares, whether its SEP endpoints answered when probed, and whether it has settled anything on the ledger lately.",
   "ranking": "Ordered by evidence, not by a score. Endpoints answering and a recent settlement ranks above endpoints answering and a long silence, which ranks above a declared corridor with a dead API. Every route carries the evidence inline so a consumer that disagrees can impose its own order.",
   "vocabulary": {
@@ -30,7 +30,7 @@
               "SEP-10"
             ],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:23.520Z"
+            "checkedAt": "2026-09-06T01:53:23.639Z"
           },
           "ledger": {
             "state": "settling",
@@ -56,7 +56,7 @@
               "SEP-10"
             ],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:23.816Z"
+            "checkedAt": "2026-09-06T01:53:23.500Z"
           },
           "ledger": {
             "state": "settling",
@@ -83,7 +83,7 @@
               "SEP-10"
             ],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:21.282Z"
+            "checkedAt": "2026-09-06T01:53:21.820Z"
           },
           "ledger": {
             "state": "slow",
@@ -109,7 +109,7 @@
               "SEP-10"
             ],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:20.992Z"
+            "checkedAt": "2026-09-06T01:53:21.529Z"
           },
           "ledger": {
             "state": "untracked",
@@ -136,7 +136,7 @@
             "failingSeps": [
               "SEP-10"
             ],
-            "checkedAt": "2026-09-05T23:27:20.475Z"
+            "checkedAt": "2026-09-06T01:53:20.988Z"
           },
           "ledger": {
             "state": "untracked",
@@ -159,7 +159,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:21.539Z"
+            "checkedAt": "2026-09-06T01:53:21.700Z"
           },
           "ledger": {
             "state": "settling",
@@ -180,7 +180,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:21.568Z"
+            "checkedAt": "2026-09-06T01:53:21.890Z"
           },
           "ledger": {
             "state": "settling",
@@ -201,7 +201,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:21.833Z"
+            "checkedAt": "2026-09-06T01:53:22.247Z"
           },
           "ledger": {
             "state": "settling",
@@ -222,7 +222,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:22.639Z"
+            "checkedAt": "2026-09-06T01:53:22.980Z"
           },
           "ledger": {
             "state": "settling",
@@ -243,7 +243,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:21.193Z"
+            "checkedAt": "2026-09-06T01:53:21.589Z"
           },
           "ledger": {
             "state": "slow",
@@ -264,7 +264,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:22.060Z"
+            "checkedAt": "2026-09-06T01:53:22.533Z"
           },
           "ledger": {
             "state": "slow",
@@ -285,7 +285,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:22.019Z"
+            "checkedAt": "2026-09-06T01:53:22.318Z"
           },
           "ledger": {
             "state": "dark",
@@ -325,7 +325,7 @@
               "SEP-10"
             ],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:21.282Z"
+            "checkedAt": "2026-09-06T01:53:21.820Z"
           },
           "ledger": {
             "state": "slow",
@@ -346,7 +346,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:21.193Z"
+            "checkedAt": "2026-09-06T01:53:21.589Z"
           },
           "ledger": {
             "state": "slow",
@@ -370,7 +370,7 @@
               "SEP-24",
               "SEP-10"
             ],
-            "checkedAt": "2026-09-05T23:27:22.202Z"
+            "checkedAt": "2026-09-06T01:53:22.433Z"
           },
           "ledger": {
             "state": "settling",
@@ -411,7 +411,7 @@
               "SEP-10"
             ],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:21.798Z"
+            "checkedAt": "2026-09-06T01:53:22.070Z"
           },
           "ledger": {
             "state": "slow",
@@ -434,7 +434,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:21.539Z"
+            "checkedAt": "2026-09-06T01:53:21.700Z"
           },
           "ledger": {
             "state": "settling",
@@ -455,7 +455,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:21.193Z"
+            "checkedAt": "2026-09-06T01:53:21.589Z"
           },
           "ledger": {
             "state": "slow",
@@ -496,7 +496,7 @@
               "SEP-10"
             ],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:22.827Z"
+            "checkedAt": "2026-09-06T01:53:23.494Z"
           },
           "ledger": {
             "state": "dark",
@@ -517,7 +517,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:21.539Z"
+            "checkedAt": "2026-09-06T01:53:21.700Z"
           },
           "ledger": {
             "state": "settling",
@@ -538,7 +538,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:21.193Z"
+            "checkedAt": "2026-09-06T01:53:21.589Z"
           },
           "ledger": {
             "state": "slow",
@@ -578,7 +578,7 @@
               "SEP-10"
             ],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:20.944Z"
+            "checkedAt": "2026-09-06T01:53:21.000Z"
           },
           "ledger": {
             "state": "settling",
@@ -601,7 +601,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:21.539Z"
+            "checkedAt": "2026-09-06T01:53:21.700Z"
           },
           "ledger": {
             "state": "settling",
@@ -622,7 +622,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:21.193Z"
+            "checkedAt": "2026-09-06T01:53:21.589Z"
           },
           "ledger": {
             "state": "slow",
@@ -658,7 +658,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:21.539Z"
+            "checkedAt": "2026-09-06T01:53:21.700Z"
           },
           "ledger": {
             "state": "settling",
@@ -679,7 +679,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:21.193Z"
+            "checkedAt": "2026-09-06T01:53:21.589Z"
           },
           "ledger": {
             "state": "slow",
@@ -700,7 +700,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:22.060Z"
+            "checkedAt": "2026-09-06T01:53:22.533Z"
           },
           "ledger": {
             "state": "slow",
@@ -736,7 +736,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:23.209Z"
+            "checkedAt": "2026-09-06T01:53:23.836Z"
           },
           "ledger": {
             "state": "settling",
@@ -757,7 +757,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:21.193Z"
+            "checkedAt": "2026-09-06T01:53:21.589Z"
           },
           "ledger": {
             "state": "slow",
@@ -778,7 +778,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:22.492Z"
+            "checkedAt": "2026-09-06T01:53:22.847Z"
           },
           "ledger": {
             "state": "slow",
@@ -814,7 +814,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:21.539Z"
+            "checkedAt": "2026-09-06T01:53:21.700Z"
           },
           "ledger": {
             "state": "settling",
@@ -835,7 +835,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:21.193Z"
+            "checkedAt": "2026-09-06T01:53:21.589Z"
           },
           "ledger": {
             "state": "slow",
@@ -856,7 +856,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:23.359Z"
+            "checkedAt": "2026-09-06T01:53:23.824Z"
           },
           "ledger": {
             "state": "dark",
@@ -892,7 +892,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:21.193Z"
+            "checkedAt": "2026-09-06T01:53:21.589Z"
           },
           "ledger": {
             "state": "slow",
@@ -916,7 +916,7 @@
               "SEP-24",
               "SEP-10"
             ],
-            "checkedAt": "2026-09-05T23:27:22.202Z"
+            "checkedAt": "2026-09-06T01:53:22.433Z"
           },
           "ledger": {
             "state": "settling",
@@ -952,7 +952,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:21.193Z"
+            "checkedAt": "2026-09-06T01:53:21.589Z"
           },
           "ledger": {
             "state": "slow",
@@ -976,7 +976,7 @@
               "SEP-24",
               "SEP-10"
             ],
-            "checkedAt": "2026-09-05T23:27:22.202Z"
+            "checkedAt": "2026-09-06T01:53:22.433Z"
           },
           "ledger": {
             "state": "settling",
@@ -1017,7 +1017,7 @@
               "SEP-10"
             ],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:23.816Z"
+            "checkedAt": "2026-09-06T01:53:23.500Z"
           },
           "ledger": {
             "state": "settling",
@@ -1038,7 +1038,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:21.193Z"
+            "checkedAt": "2026-09-06T01:53:21.589Z"
           },
           "ledger": {
             "state": "slow",
@@ -1078,7 +1078,7 @@
               "SEP-10"
             ],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:20.944Z"
+            "checkedAt": "2026-09-06T01:53:21.000Z"
           },
           "ledger": {
             "state": "settling",
@@ -1101,7 +1101,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:21.193Z"
+            "checkedAt": "2026-09-06T01:53:21.589Z"
           },
           "ledger": {
             "state": "slow",
@@ -1137,7 +1137,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:21.539Z"
+            "checkedAt": "2026-09-06T01:53:21.700Z"
           },
           "ledger": {
             "state": "settling",
@@ -1158,7 +1158,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:21.193Z"
+            "checkedAt": "2026-09-06T01:53:21.589Z"
           },
           "ledger": {
             "state": "slow",
@@ -1194,7 +1194,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:21.539Z"
+            "checkedAt": "2026-09-06T01:53:21.700Z"
           },
           "ledger": {
             "state": "settling",
@@ -1215,7 +1215,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:21.193Z"
+            "checkedAt": "2026-09-06T01:53:21.589Z"
           },
           "ledger": {
             "state": "slow",
@@ -1251,7 +1251,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:21.539Z"
+            "checkedAt": "2026-09-06T01:53:21.700Z"
           },
           "ledger": {
             "state": "settling",
@@ -1272,7 +1272,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:21.193Z"
+            "checkedAt": "2026-09-06T01:53:21.589Z"
           },
           "ledger": {
             "state": "slow",
@@ -1308,7 +1308,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:23.209Z"
+            "checkedAt": "2026-09-06T01:53:23.836Z"
           },
           "ledger": {
             "state": "settling",
@@ -1329,7 +1329,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:21.193Z"
+            "checkedAt": "2026-09-06T01:53:21.589Z"
           },
           "ledger": {
             "state": "slow",
@@ -1370,7 +1370,7 @@
               "SEP-10"
             ],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:23.816Z"
+            "checkedAt": "2026-09-06T01:53:23.500Z"
           },
           "ledger": {
             "state": "settling",
@@ -1391,7 +1391,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:21.193Z"
+            "checkedAt": "2026-09-06T01:53:21.589Z"
           },
           "ledger": {
             "state": "slow",
@@ -1427,7 +1427,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:21.193Z"
+            "checkedAt": "2026-09-06T01:53:21.589Z"
           },
           "ledger": {
             "state": "slow",
@@ -1463,7 +1463,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:21.193Z"
+            "checkedAt": "2026-09-06T01:53:21.589Z"
           },
           "ledger": {
             "state": "slow",
@@ -1499,7 +1499,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:21.193Z"
+            "checkedAt": "2026-09-06T01:53:21.589Z"
           },
           "ledger": {
             "state": "slow",
@@ -1535,7 +1535,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-05T23:27:21.193Z"
+            "checkedAt": "2026-09-06T01:53:21.589Z"
           },
           "ledger": {
             "state": "slow",
