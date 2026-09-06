@@ -1,0 +1,12 @@
+{
+  "name": "@landfall/intents",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "Payment intents: a declarative target ('deliver ₦500,000 to a Nigerian bank account') and the solver that ranks routes against it. See docs/architecture/INTENTS.md.",
+  "scripts": {
+    "test": "tsx --test test/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  }
+}

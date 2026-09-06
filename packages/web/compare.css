@@ -42,6 +42,21 @@
 }
 
 .amount-row { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+
+/* Which side of the payment is fixed. Two states, both always visible, so
+   the choice is legible before it is made rather than hidden in a dropdown. */
+.basis-row { display: flex; gap: 0; margin-bottom: 6px; }
+.basis {
+  flex: 1; background: #f1f5f9; border: 1px solid var(--line);
+  padding: 6px 10px; font-size: 12px; font-weight: 700; cursor: pointer;
+  color: var(--muted); transition: all 0.15s; font-family: inherit;
+}
+.basis:first-child { border-radius: 6px 0 0 6px; }
+.basis:last-child  { border-radius: 0 6px 6px 0; border-left: none; }
+.basis:hover { color: var(--ink); }
+.basis.is-on { background: #0b9c91; border-color: #0b9c91; color: #fff; }
+.basis.is-on:hover { color: #fff; }
+
 .preset {
   background: #f1f5f9; border: 1px solid var(--line);
   border-radius: 5px; padding: 4px 9px;

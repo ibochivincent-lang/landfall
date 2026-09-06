@@ -310,11 +310,87 @@ function loadReliability() {
 }
 
 /* ─── Run the scout ─────────────────────────────────────────────────────── */
+/* ─── Which side of the payment is fixed ─────────────────────────────────
+   "I send $100" and "they receive ₦500,000" are different instructions.
+   The second one can be unsatisfiable, and saying so is a real answer —
+   see packages/intents/src/types.ts.                                      */
+var BASIS = 'send';
+
+var PRESETS = {
+  send: [['50','$50'],['100','$100'],['250','$250'],['500','$500'],['1000','$1,000']],
+  receive: null   /* built per currency below — a ₦50 preset would be absurd */
+};
+
+/* Receive-side presets are derived from the corridor rate so they land on
+   round local amounts rather than round dollar amounts. */
+function receivePresets(to) {
+  var rate = FX[to] || 1;
+  var sym = SYM[to] || (to + " ");
+  return [50, 100, 250, 500, 1000].map(function (usd) {
+    var raw = usd * rate;
+    /* round to a sane magnitude so the chip reads as a human amount */
+    var mag = Math.pow(10, Math.max(0, String(Math.round(raw)).length - 2));
+    var v = Math.round(raw / mag) * mag;
+    return [String(v), sym + fmtNum(v, "")];
+  });
+}
+
+function renderPresets() {
+  var to = qs('#toCurrency').value;
+  var rows = BASIS === 'send' ? PRESETS.send : receivePresets(to);
+  qs('#presetRow').innerHTML = rows.map(function (r) {
+    return '<button type="button" class="preset" data-amt="' + r[0] + '">' + esc(r[1]) + '</button>';
+  }).join('');
+  bindPresets();
+}
+
+function bindPresets() {
+  var presets = document.querySelectorAll('#presetRow .preset');
+  for (var i = 0; i < presets.length; i++) {
+    (function (btn) {
+      btn.addEventListener('click', function () {
+        qs('#sendAmount').value = btn.dataset.amt;
+        for (var j = 0; j < presets.length; j++) presets[j].classList.remove('is-active');
+        btn.classList.add('is-active');
+        triggerScout();
+      });
+    })(presets[i]);
+  }
+}
+
+function setBasis(next) {
+  if (BASIS === next) return;
+  BASIS = next;
+
+  var send = qs('#basisSend'), recv = qs('#basisReceive');
+  send.classList.toggle('is-on', next === 'send');
+  recv.classList.toggle('is-on', next === 'receive');
+  send.setAttribute('aria-checked', String(next === 'send'));
+  recv.setAttribute('aria-checked', String(next === 'receive'));
+
+  var to = qs('#toCurrency').value;
+  var from = qs('#fromAsset').value;
+  qs('#amountLabel').textContent = next === 'send'
+    ? 'Amount (' + from + ')'
+    : 'They receive (' + to + ')';
+
+  /* Carry the amount across so switching does not silently reprice. */
+  var cur = parseFloat(qs('#sendAmount').value) || 0;
+  var rate = FX[to] || 1;
+  if (cur > 0) qs('#sendAmount').value = next === 'receive'
+    ? String(Math.round(cur * rate))
+    : String(Math.max(1, Math.round((cur / rate) * 100) / 100));
+
+  renderPresets();
+  triggerScout();
+}
+
 function runScout() {
   var btn    = qs('#runBtn');
   var from   = qs('#fromAsset').value;
   var to     = qs('#toCurrency').value;
   var amount = Math.max(parseFloat(qs('#sendAmount').value) || 100, 1);
+  var basis  = BASIS;
 
   btn.disabled    = true;
   btn.textContent = 'Scouting…';
@@ -326,85 +402,109 @@ function runScout() {
 
   /* If reliability hasn't loaded yet, fetch it first then re-run */
   if (reliabilityMap === null) {
-    Promise.all([loadReliability(), loadAnchorFees()]).then(function() { renderResults(from, to, amount, baseRate, sym); });
+    Promise.all([loadReliability(), loadAnchorFees()]).then(function() { renderResults(from, to, amount, baseRate, sym, basis); });
   } else {
-    renderResults(from, to, amount, baseRate, sym);
+    renderResults(from, to, amount, baseRate, sym, basis);
   }
 
   btn.disabled    = false;
   btn.textContent = 'Scout Routes ⚡';
 }
 
-function renderResults(from, to, amount, baseRate, sym) {
+function renderResults(from, to, amount, baseRate, sym, basis) {
   /* Filter anchors that serve this corridor */
   var eligible = CATALOG.filter(function(a) {
     return a.corridors.indexOf(to) !== -1;
   });
 
-  /* Build quote objects */
-  var quotes = eligible.map(function(a) {
-    var rel   = (reliabilityMap && reliabilityMap[a.domain]) ||
-                { score: null, grade: 'U', status: 'untracked', recommendation: 'Not yet indexed on-chain.' };
+  /* Candidates carry only what the solver needs to price a route. Anchor
+     presentation (url, speed, methods) is joined back afterwards, so the
+     arithmetic has no opinion about how a card looks. */
+  var meta = {};
+  var candidates = eligible.map(function(a) {
+    var rel = (reliabilityMap && reliabilityMap[a.domain]) ||
+              { score: null, grade: 'U', status: 'untracked', recommendation: 'Not yet indexed on-chain.' };
 
-    // What the anchor publishes now beats what was typed here once. Fall back
-    // to the catalog only when the anchor states nothing, and mark which was
-    // used — a fetched fee and a stale constant deserve different confidence.
+    /* What the anchor publishes now beats what was typed here once. Fall
+       back to the catalog only when the anchor states nothing, and mark
+       which was used — a fetched fee and a stale constant deserve
+       different confidence. */
     var live = publishedTerms(a, to);
-    var feePercent = live ? live.feePercent : a.feePercent;
-    var feeFixed = live ? live.feeFixed : a.feeFixed;
     var feeSource = live ? 'live' : (a.feesPublished === false ? null : 'catalog');
 
-    // Nothing published and nothing in the catalog: listed, but not priced.
-    // Inventing a spread would put a fabricated number on a page people use to
-    // decide where to send money.
-    if (feeSource === null) {
-      return { name: a.name, domain: a.domain, url: a.url, speed: a.speed, methods: a.methods,
-               from: from, to: to, amount: amount, priced: false, payout: null, rel: rel,
-               feeSource: null };
-    }
-
-    // No anchor publishes an FX spread, so that part is always ours; an anchor
-    // with live fees but no catalog entry is priced at mid-market.
-    var rate  = parseFloat((baseRate * (a.rateSpread || 1)).toFixed(4));
-    var fee   = parseFloat((amount * (feePercent / 100) + feeFixed).toFixed(2));
-    var net   = Math.max(amount - fee, 0);
-    var payout = parseFloat((net * rate).toFixed(2));
-    return { name: a.name, domain: a.domain, url: a.url, speed: a.speed, methods: a.methods,
-             from: from, to: to, amount: amount, priced: true, rate: rate, feePercent: feePercent,
-             feeFixed: feeFixed, fee: fee, payout: payout, rel: rel, feeSource: feeSource };
+    meta[a.domain] = { url: a.url, speed: a.speed, methods: a.methods, rel: rel };
+    return {
+      domain: a.domain, name: a.name,
+      rateSpread: a.rateSpread || 1,
+      feePercent: live ? live.feePercent : a.feePercent,
+      feeFixed: live ? live.feeFixed : a.feeFixed,
+      feeSource: feeSource,
+      grade: rel.grade || 'U', score: rel.score
+    };
   });
 
-  /* Priced anchors first, best payout at the top; unpriced ones after, since
-     they cannot be ranked on payout and should not be interleaved as though
-     they had scored zero. */
-  quotes.sort(function(a, b) {
-    if (a.priced !== b.priced) return a.priced ? -1 : 1;
-    if (!a.priced) return (b.rel.score || 0) - (a.rel.score || 0);
-    return b.payout - a.payout;
+  var result = LandfallIntent.solveIntent(
+    { from: from, to: to, basis: basis, amount: amount },
+    candidates,
+    baseRate
+  );
+
+  /* Join the solver output back onto anchor presentation. */
+  var quotes = result.solutions.map(function(sol) {
+    var m = meta[sol.domain];
+    return {
+      name: sol.name, domain: sol.domain, url: m.url, speed: m.speed, methods: m.methods,
+      from: from, to: to, rel: m.rel,
+      priced: sol.priced, feeSource: sol.feeSource,
+      rate: sol.rate, fee: sol.fee,
+      feePercent: candidates.filter(function(c){return c.domain===sol.domain;})[0].feePercent,
+      feeFixed: candidates.filter(function(c){return c.domain===sol.domain;})[0].feeFixed,
+      amount: sol.send, payout: sol.receive, basis: basis
+    };
   });
 
-  /* Tag badges. "Best Payout" is only meaningful among anchors that have a
-     payout — an unpriced anchor is not the best or the worst, it is unknown,
-     and badging it either way would be an invented comparison. */
-  if (quotes.length > 0) {
-    if (quotes[0].priced) quotes[0].isBestPayout = true;
-    var sorted = quotes.slice().sort(function(a, b) {
-      return (b.rel.score || 0) - (a.rel.score || 0);
-    });
-    if (sorted[0] && sorted[0].rel.score !== null) {
-      sorted[0].isTopRel = true;
-    }
-  }
+  /* Badges. "Best" means most delivered when the send side is fixed, and
+     least spent when the receive side is — the solver has already ordered
+     them that way, so the top priced row is the best row either way. */
+  var firstPriced = quotes.filter(function(q) { return q.priced; })[0];
+  if (firstPriced) firstPriced.isBestPayout = true;
+  var byRel = quotes.slice().sort(function(a, b) {
+    return (b.rel.score || 0) - (a.rel.score || 0);
+  });
+  if (byRel[0] && byRel[0].rel.score !== null) byRel[0].isTopRel = true;
 
-  /* Update header */
+  /* Header */
+  var fixedTxt = basis === 'receive'
+    ? 'to deliver ' + fmtNum(amount, sym)
+    : 'for ' + fmtNum(amount, '$') + ' ' + from;
   qs('#resultsTitle').textContent =
-    quotes.length + ' anchor' + (quotes.length !== 1 ? 's' : '') +
-    ' for ' + fmtNum(amount, '$') + ' ' + from + ' → ' + to;
-  qs('#resultsMeta').textContent =
-    'Mid-market ~' + fmtNum(baseRate, '') + ' ' + to + '/USD · priced anchors first, then anchors that publish no rate';
+    quotes.length + ' anchor' + (quotes.length !== 1 ? 's' : '') + ' ' + fixedTxt +
+    (basis === 'receive' ? ' in ' + to : ' → ' + to);
+
+  /* An intent with no priced route is unsatisfiable, and that is a real
+     answer rather than an empty table. Say so, and say why each route was
+     ruled out instead of leaving a blank. */
+  var meta2 = 'Mid-market ~' + fmtNum(baseRate, '') + ' ' + to + '/USD · ' +
+    (basis === 'receive'
+      ? 'cheapest send first, then anchors that publish no rate'
+      : 'priced anchors first, then anchors that publish no rate');
+  if (result.unsatisfiable) {
+    var why = result.rejected.map(function(r) {
+      return r.domain + ' (' + REJECTION_TEXT[r.rejected] + ')';
+    }).join(', ');
+    meta2 = 'No anchor can satisfy this' + (why ? ' — ' + why : '') + '.';
+  }
+  qs('#resultsMeta').textContent = meta2;
 
   renderCards(quotes, sym);
 }
+
+/* Plain-language reasons, kept next to the codes they explain. */
+var REJECTION_TEXT = {
+  'unpriced': 'publishes no rate card',
+  'below-grade-floor': 'below the reliability floor you set',
+  'fee-exceeds-principal': 'its fees exceed the amount'
+};
 
 /* ─── Render quote cards ─────────────────────────────────────────────────── */
 function renderCards(quotes, sym) {
@@ -427,7 +527,7 @@ function renderCards(quotes, sym) {
     var status  = (q.rel.status || 'unknown').toUpperCase();
 
     var ribbons = '';
-    if (q.isBestPayout && !isDark)  ribbons += '<div class="ribbon ribbon-best">Best Payout</div>';
+    if (q.isBestPayout && !isDark)  ribbons += '<div class="ribbon ribbon-best">' + (q.basis === 'receive' ? 'Cheapest' : 'Best Payout') + '</div>';
     if (q.isTopRel && !q.isBestPayout) ribbons += '<div class="ribbon ribbon-rel">Top Reliability</div>';
     if (isDark) ribbons += '<div class="ribbon ribbon-risk">High Risk</div>';
 
@@ -466,9 +566,18 @@ function renderCards(quotes, sym) {
           '<div class="cell-sub">' + esc(q.rel.recommendation || '') + '</div>' +
         '</div>' +
         '<div class="quote-action">' +
-          '<div class="cell-lbl">You receive</div>' +
+          // When the receive side is pinned every anchor delivers the same
+          // amount, so the figure that distinguishes them is what it costs
+          // to deliver it. Showing "you receive ₦500,000" five times would
+          // be five identical numbers and no comparison at all.
+          '<div class="cell-lbl">' + (q.basis === 'receive' ? 'You send' : 'You receive') + '</div>' +
           (q.priced
-            ? '<span class="payout-val' + (isDark ? ' is-risk' : '') + '">' + fmtNum(q.payout, sym) + '</span>'
+            ? '<span class="payout-val' + (isDark ? ' is-risk' : '') + '">' +
+                (q.basis === 'receive' ? fmtNum(q.amount, '$') : fmtNum(q.payout, sym)) +
+              '</span>' +
+              (q.basis === 'receive'
+                ? '<div class="cell-sub">to deliver ' + fmtNum(q.payout, sym) + '</div>'
+                : '')
             : '<span class="payout-val payout-val--none">Quoted in&nbsp;flow</span>') +
           '<a href="' + esc(q.url) + '" target="_blank" rel="noopener noreferrer" class="action-btn">' +
             'Off-Ramp via ' + esc(q.name) + ' →' +
@@ -482,25 +591,21 @@ function renderCards(quotes, sym) {
 /* ─── Wire up event listeners — no onclick attributes ──────────────────── */
 document.addEventListener('DOMContentLoaded', function() {
 
-  /* Preset amount buttons */
-  var presets = document.querySelectorAll('.preset');
-  for (var i = 0; i < presets.length; i++) {
-    (function(btn) {
-      btn.addEventListener('click', function() {
-        qs('#sendAmount').value = btn.dataset.amt;
-        /* highlight active preset */
-        for (var j = 0; j < presets.length; j++) presets[j].classList.remove('is-active');
-        btn.classList.add('is-active');
-        triggerScout();
-      });
-    })(presets[i]);
-  }
+  /* Preset amount buttons — re-bound whenever the basis changes, since the
+     chips themselves are rebuilt in the destination currency. */
+  bindPresets();
+
+  qs('#basisSend').addEventListener('click', function() { setBasis('send'); });
+  qs('#basisReceive').addEventListener('click', function() { setBasis('receive'); });
 
   /* Run button */
   qs('#runBtn').addEventListener('click', function() { triggerScout(); });
 
   /* Dropdowns auto-run */
-  qs('#toCurrency').addEventListener('change', function() { triggerScout(); });
+  qs('#toCurrency').addEventListener('change', function() {
+    if (BASIS === 'receive') renderPresets();
+    triggerScout();
+  });
   qs('#fromAsset').addEventListener('change',  function() { triggerScout(); });
 
   /* Amount field — debounced */

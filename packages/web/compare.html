@@ -108,9 +108,13 @@
       </div>
 
       <div class="ctrl-group">
-        <label class="ctrl-label" for="sendAmount">Amount (USD)</label>
+        <label class="ctrl-label" for="sendAmount"><span id="amountLabel">Amount (USD)</span></label>
+        <div class="basis-row" role="radiogroup" aria-label="Which side of the payment is fixed">
+          <button type="button" class="basis is-on" id="basisSend" role="radio" aria-checked="true">I send</button>
+          <button type="button" class="basis" id="basisReceive" role="radio" aria-checked="false">They receive</button>
+        </div>
         <input class="ctrl-input" type="number" id="sendAmount" value="100" min="1" step="5">
-        <div class="amount-row">
+        <div class="amount-row" id="presetRow">
           <button class="preset" data-amt="50">$50</button>
           <button class="preset" data-amt="100">$100</button>
           <button class="preset" data-amt="250">$250</button>
@@ -290,6 +294,7 @@
   </div>
 </footer>
 
+<script src="intent.js"></script>
 <script src="compare.js"></script>
 <script src="crypto-routes.js"></script>
 </body>

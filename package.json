@@ -16,6 +16,7 @@
     "packages/adapters/evm-cctp",
     "packages/adapters/tron",
     "packages/adapters/solana",
+    "packages/intents",
     "packages/anchoring"
   ],
   "engines": {
@@ -29,8 +30,8 @@
     "scan:verify": "tsx scripts/verify-scan.ts",
     "scan:evidence": "tsx scripts/build-evidence.ts",
     "api": "npm run dev -w @landfall/api",
-    "test": "npm run test -w @landfall/indexer && npm run test -w @landfall/stp && npm run test -w @landfall/anchoring && npm run test -w @landfall/registry && npm run test -w @landfall/adapter-stellar && npm run test -w @landfall/adapter-evm-cctp && npm run test -w @landfall/adapter-tron && npm run test -w @landfall/adapter-solana && npm run test -w @landfall/sdk",
-    "typecheck": "npm run typecheck -w @landfall/indexer && npm run typecheck -w @landfall/api && npm run typecheck -w @landfall/stp && npm run typecheck -w @landfall/anchoring && npm run typecheck -w @landfall/registry && npm run typecheck -w @landfall/adapters && npm run typecheck -w @landfall/adapter-stellar && npm run typecheck -w @landfall/adapter-evm-cctp && npm run typecheck -w @landfall/adapter-tron && npm run typecheck -w @landfall/adapter-solana && npm run typecheck -w @landfall/sdk",
+    "test": "npm run test -w @landfall/indexer && npm run test -w @landfall/stp && npm run test -w @landfall/anchoring && npm run test -w @landfall/intents && npm run test -w @landfall/registry && npm run test -w @landfall/adapter-stellar && npm run test -w @landfall/adapter-evm-cctp && npm run test -w @landfall/adapter-tron && npm run test -w @landfall/adapter-solana && npm run test -w @landfall/sdk",
+    "typecheck": "npm run typecheck -w @landfall/indexer && npm run typecheck -w @landfall/api && npm run typecheck -w @landfall/stp && npm run typecheck -w @landfall/anchoring && npm run typecheck -w @landfall/intents && npm run typecheck -w @landfall/registry && npm run typecheck -w @landfall/adapters && npm run typecheck -w @landfall/adapter-stellar && npm run typecheck -w @landfall/adapter-evm-cctp && npm run typecheck -w @landfall/adapter-tron && npm run typecheck -w @landfall/adapter-solana && npm run typecheck -w @landfall/sdk",
     "db:migrate": "bash scripts/migrate.sh",
     "mcp": "node scripts/mcp/server.mjs",
     "stack:up": "docker compose up -d",
