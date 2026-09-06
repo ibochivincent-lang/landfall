@@ -397,7 +397,10 @@ function renderPage({ domain, name, accounts, asOf, verification, history, capab
     <p><a class="api-link mono" href="../api/v1/anchors/${esc(domain)}/profile.json">/api/v1/anchors/${esc(domain)}/profile.json</a></p>
   </section>
 
-  <p class="muted small asof">Scan of ${esc(asOf)} · verified against stellar.expert · <a href="../docs.html">methodology</a></p>
+  <p class="muted small asof">
+    Scan of ${esc(asOf)} · verified against stellar.expert · <a href="../docs.html">methodology</a> ·
+    <a href="https://github.com/ibochivincent-lang/landfall/blob/main/DISPUTES.md">dispute a figure on this page</a>
+  </p>
 </main>
 
 <footer class="dash-footer">

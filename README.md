@@ -228,6 +228,7 @@ Copy `.env.example` to `.env` and adjust. Nothing in the example file is a secre
 | [docs/scf-submission.md](docs/scf-submission.md) | Interest-form answers and the full Build Award draft. |
 | [SECURITY.md](SECURITY.md) | Disclosure policy. |
 | [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | Includes a project-specific clause on discussing named anchors factually. |
+| [DISPUTES.md](DISPUTES.md) | For a graded anchor operator: what a grade is and isn't, and how to challenge a specific figure. |
 
 ## Honesty rules
 

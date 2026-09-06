@@ -204,8 +204,8 @@ npm run mcp               # MCP server over stdio, needs $DATABASE_URL — docs/
 The indexer works with no database at all — `--persist` opts in. A contributor
 who only wants to fix a metric never has to start Docker.
 
-`npm run api` starts `packages/api/src/server.ts`, the local dev API. It is
-currently behind the deployed API (`api/[...path].js`, the Vercel serverless
-function) — the Developer Portal, reliability scoring, corridors, and the new
-GraphQL/MCP layer all live only in the deployed function today. See
-`docs/gaps.md` for why, and treat local dev as stale until that's reconciled.
+`npm run api` starts `packages/api/src/server.ts`, the local dev API. It has
+no routes of its own — it imports `api/[...path].js`'s handler (the same code
+Vercel deploys) and runs it under plain `http.createServer`, so local dev and
+production are, by construction, the same implementation rather than two that
+can drift apart. See `docs/gaps.md` for the split-brain state this replaced.

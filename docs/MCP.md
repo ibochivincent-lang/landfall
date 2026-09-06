@@ -84,14 +84,21 @@ error). All six tools returned clean, correct results against seeded data
 (one anchor, one live and one dark account, a path payment populating
 `corridors`).
 
-## A known gap this surfaced
+## A gap this surfaced, since closed
 
 Building this against `packages/api/src/server.ts` (the local dev API) would
 have required either duplicating query logic or backporting a large amount of
-work a teammate has since pushed straight to the deployed
-`api/[...path].js` (developer portal auth, reliability scoring, corridors,
-badges — none of which exist in the local dev server). Rather than rush that
+work a teammate had pushed straight to the deployed `api/[...path].js`
+(developer portal auth, reliability scoring, corridors, badges — none of
+which existed in the local dev server at the time). Rather than rush that
 backport under the SCF deadline, this server and the GraphQL layer both
-import directly from `api/[...path].js`, the file actually running in
-production. `packages/api/src/server.ts` is now meaningfully behind what's
-deployed; see `docs/gaps.md` for the honest accounting of that gap.
+imported directly from `api/[...path].js`, the file actually running in
+production.
+
+`packages/api/src/server.ts` has since been rewritten the same way: it no
+longer has its own routes at all. It is a thin `http.createServer` wrapper
+that imports `api/[...path].js`'s handler directly and adds the two response
+methods (`res.status().json()`, `.send()`) a bare `http.ServerResponse`
+doesn't have. `npm run api` now runs the exact code Vercel deploys — there is
+one implementation, not two that can drift. See `docs/gaps.md` for the
+history of the gap this closed.

@@ -60,3 +60,12 @@ guess here would let a settlement get credited to the wrong entity, which
 is the one failure mode `evidence_tier` can't catch, because it happens
 before an event is even attributed. When in doubt, leave the anchor out
 rather than add a low-confidence address.
+
+**If you are the anchor operator**, this is the fastest path to getting your
+own non-Stellar addresses tracked: open a PR against this file (see
+[CONTRIBUTING.md](../CONTRIBUTING.md)) adding your entry, and include in the
+PR description one of the verification forms above — a link to your own
+published docs listing the address, or a message signed by that address. A
+PR from the domain's own operator, with that evidence attached, is exactly
+the kind of independent confirmation this file requires; it is reviewed
+against that evidence, not merged on request alone.

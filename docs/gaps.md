@@ -112,16 +112,29 @@ Three further things surfaced while fixing it:
   `source_asset`/`asset` columns `003_path_payments.sql` already added —
   verified against a real database both before the fix (error) and after
   (correct aggregated rows from seeded path-payment data).
-- **`packages/api/src/server.ts` (local dev API) is now meaningfully behind
-  `api/[...path].js` (the deployed API).** A teammate shipped the Developer
-  Portal, reliability scoring, health-check, badges, and corridors straight
-  to the deployed function without updating local dev. Rather than rush a
-  backport of someone else's large feature set under the SCF deadline, the
-  new GraphQL layer and MCP server both import directly from
-  `api/[...path].js` — the file actually running in production — so they're
-  correct today, but `npm run api` (local dev) does not yet reflect any of
-  this. Whoever picks this up next should treat it as a real backport task,
-  not a quick sync.
+- **Fixed, 6 September: `packages/api/src/server.ts` (local dev API) was
+  meaningfully behind `api/[...path].js` (the deployed API).** A teammate
+  shipped the Developer Portal, reliability scoring, health-check, badges,
+  and corridors straight to the deployed function without updating local
+  dev. The GraphQL layer and MCP server had already sidestepped this by
+  importing directly from `api/[...path].js`; `packages/api/src/server.ts`
+  did not, and stayed a ~700-line independent reimplementation — its own
+  Postgres pool, its own scrypt/session logic, its own subset of routes —
+  that `npm run api` ran locally while silently missing roughly half the
+  system's endpoints.
+
+  Backporting the missing half would only have recreated the same problem
+  the next time either file changed. Fixed the other way instead:
+  `packages/api/src/server.ts` is now a thin `http.createServer` wrapper
+  that imports `api/[...path].js`'s handler directly and supplies only the
+  two response methods (`res.status().json()`, `.send()`) a bare
+  `http.ServerResponse` lacks — verified by grepping every `res.` method the
+  handler actually calls rather than guessing at Vercel's full response API.
+  Confirmed working end to end: started the local server with no
+  `DATABASE_URL` set and hit both an old route (`/api/v1/anchors`) and one
+  that only ever existed in the deployed function (`/api/v1/badges/*.svg`) —
+  both returned the identical 503 the production handler returns in that
+  state, because it is, byte for byte, the same code running.
 
 ---
 

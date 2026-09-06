@@ -178,6 +178,9 @@ surprise PR is a waste of your time.
 
 ## 6. Reporting a data error
 
+If you operate an anchor this project tracks, see [DISPUTES.md](DISPUTES.md)
+instead — same process, written for you rather than for a contributor.
+
 If a published figure looks wrong, open an issue with the account, the scan
 timestamp, and the transaction hashes from the JSON output. Every number is
 traceable to ledger records, so disagreements are settled by checking the
