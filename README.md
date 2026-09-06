@@ -160,6 +160,14 @@ docker compose up
 
 Brings up a local Stellar Quickstart node, Postgres with the schema applied, the indexer, and the API — no account anywhere, no mainnet, no credentials. Site on `:8080`, API on `:8787`, Horizon on `:8000`.
 
+If you already run Postgres natively, port 5432 is taken and both servers will bind it — host
+connections then reach the wrong one and fail with a password error against credentials that are
+correct. Publish the container somewhere else instead:
+
+```bash
+POSTGRES_PORT=55432 docker compose up
+```
+
 **Just the indexer.** Requires Node 20+, no Docker, no database.
 
 ```bash
@@ -168,7 +176,7 @@ npm run anchors:discover  # propose new anchor domains from an independent direc
 npm run discover          # resolve tracked anchor domains to on-chain accounts
 npm run scan              # index payment history and print the finding
 npm run scan:verify       # check the newest scan before it could be published
-npm test                  # 139 tests, no network required
+npm test                  # 342 tests, no network required
 npm run typecheck
 ```
 
