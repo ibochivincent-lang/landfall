@@ -1966,7 +1966,12 @@ export default async function handler(req, res) {
        a separate list rather than loosening POST_ROUTES to prefixes: a
        prefix would also admit v1/fraud-reports/anything, and the point of
        this guard is that an unrecognised write is rejected here. */
-    const POST_ROUTE_PATTERNS = [/^v1\/fraud-reports\/\d+\/dispute$/];
+    // [^/]+ rather than \d+: the guard's job is "is this a known write
+    // path", not "is this id well-formed". Requiring digits here made the
+    // route's own 400 ("Report id must be numeric") unreachable and
+    // answered a malformed id with 405, which says the method was wrong
+    // when the method was fine.
+    const POST_ROUTE_PATTERNS = [/^v1\/fraud-reports\/[^/]+\/dispute$/];
     const postAllowed = POST_ROUTES.has(joined) || POST_ROUTE_PATTERNS.some((re) => re.test(joined));
     if (req.method !== 'GET' && !(req.method === 'POST' && postAllowed)) {
       return json(res, 405, { error: 'Method not allowed' });
