@@ -1,10 +1,10 @@
 {
   "anchorId": "nafuloo.com",
   "name": "No one person or group owns or controls Nafuloo, and anyone can participate.",
-  "asOf": "2026-09-06T11:36:32.692Z",
+  "asOf": "2026-09-06T14:36:20.129Z",
   "verification": {
     "resolved": true,
-    "checkedAt": "2026-09-06T11:36:32.692Z",
+    "checkedAt": "2026-09-06T14:36:20.129Z",
     "source": "SEP-1 stellar.toml, resolved live; issuer attribution confirmed against each issuer account's own on-chain home_domain",
     "accounts": [
       {
@@ -36,7 +36,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 1214.18,
+      "hoursSinceActivity": 1217.18,
       "topCounterpartyShare": 0.9995
     },
     {
@@ -48,7 +48,7 @@
       "outbound": 1,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 5076.73,
+      "hoursSinceActivity": 5079.73,
       "topCounterpartyShare": null
     }
   ],
@@ -88,6 +88,13 @@
         "in": 3,
         "out": 0,
         "hours": 1214.18
+      },
+      {
+        "t": "2026-09-06T14:36:20.129Z",
+        "state": "dark",
+        "in": 3,
+        "out": 0,
+        "hours": 1217.18
       }
     ],
     "GCY7VH763TOMBGSCWAVBG3LRLYYY6Z6ZJFPHFQKKUWBXAKC376KDUUSY": [
@@ -125,6 +132,13 @@
         "in": 0,
         "out": 1,
         "hours": 5076.73
+      },
+      {
+        "t": "2026-09-06T14:36:20.129Z",
+        "state": "dark",
+        "in": 0,
+        "out": 1,
+        "hours": 5079.73
       }
     ]
   },

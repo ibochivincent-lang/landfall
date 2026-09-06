@@ -1,10 +1,10 @@
 {
   "anchorId": "luxpayband.io",
   "name": "LUX Payband, LLC",
-  "asOf": "2026-09-06T11:36:32.692Z",
+  "asOf": "2026-09-06T14:36:20.129Z",
   "verification": {
     "resolved": true,
-    "checkedAt": "2026-09-06T11:36:32.692Z",
+    "checkedAt": "2026-09-06T14:36:20.129Z",
     "source": "SEP-1 stellar.toml, resolved live; issuer attribution confirmed against each issuer account's own on-chain home_domain",
     "accounts": [
       {
@@ -48,7 +48,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 26.4,
+      "hoursSinceActivity": 29.39,
       "topCounterpartyShare": 0.584
     },
     {
@@ -60,7 +60,7 @@
       "outbound": 1,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1401.37,
+      "hoursSinceActivity": 1404.37,
       "topCounterpartyShare": null
     },
     {
@@ -72,7 +72,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1422.95,
+      "hoursSinceActivity": 1425.95,
       "topCounterpartyShare": null
     },
     {
@@ -84,7 +84,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1423.62,
+      "hoursSinceActivity": 1426.61,
       "topCounterpartyShare": null
     },
     {
@@ -136,6 +136,13 @@
         "in": 6,
         "out": 0,
         "hours": 26.4
+      },
+      {
+        "t": "2026-09-06T14:36:20.129Z",
+        "state": "live",
+        "in": 6,
+        "out": 0,
+        "hours": 29.39
       }
     ],
     "GDTEQF6YGCKLIBD37RJZE5GTL3ZY6CBQIKH7COAW654SYEBE6XJJOLOW": [
@@ -173,6 +180,13 @@
         "in": 0,
         "out": 1,
         "hours": 1401.37
+      },
+      {
+        "t": "2026-09-06T14:36:20.129Z",
+        "state": "dark",
+        "in": 0,
+        "out": 1,
+        "hours": 1404.37
       }
     ],
     "GDARCVAHFMA7GCCULAPCRAV7VXSFFMNOP3X6ZONDJU4SCJULZ6IJ77QD": [
@@ -210,6 +224,13 @@
         "in": 0,
         "out": 0,
         "hours": 1422.95
+      },
+      {
+        "t": "2026-09-06T14:36:20.129Z",
+        "state": "dark",
+        "in": 0,
+        "out": 0,
+        "hours": 1425.95
       }
     ],
     "GBYYKQYUY2XWVMM4VFCBJJVCCQC3QJ3BCLV4276DWHY4BQ7V5AB4U5VA": [
@@ -247,6 +268,13 @@
         "in": 0,
         "out": 0,
         "hours": 1423.62
+      },
+      {
+        "t": "2026-09-06T14:36:20.129Z",
+        "state": "dark",
+        "in": 0,
+        "out": 0,
+        "hours": 1426.61
       }
     ],
     "GDIU57QSVCGU7MTRC53RUWAADKIE75GFNG27C26URMU7CKHNXOQ5RDME": [
@@ -280,6 +308,13 @@
       },
       {
         "t": "2026-09-06T11:36:32.692Z",
+        "state": "live",
+        "in": 10,
+        "out": 0,
+        "hours": 0.59
+      },
+      {
+        "t": "2026-09-06T14:36:20.129Z",
         "state": "live",
         "in": 10,
         "out": 0,
