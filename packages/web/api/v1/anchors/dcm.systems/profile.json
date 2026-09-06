@@ -1,10 +1,10 @@
 {
   "anchorId": "dcm.systems",
   "name": "Transparent Network",
-  "asOf": "2026-09-06T14:36:20.129Z",
+  "asOf": "2026-09-06T17:24:45.464Z",
   "verification": {
     "resolved": true,
-    "checkedAt": "2026-09-06T14:36:20.129Z",
+    "checkedAt": "2026-09-06T17:24:45.464Z",
     "source": "SEP-1 stellar.toml, resolved live; issuer attribution confirmed against each issuer account's own on-chain home_domain",
     "accounts": [
       {
@@ -32,7 +32,7 @@
       "outbound": 1,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 1224.01,
+      "hoursSinceActivity": 1226.82,
       "topCounterpartyShare": 1
     }
   ],
@@ -65,6 +65,13 @@
         "in": 97,
         "out": 1,
         "hours": 1224.01
+      },
+      {
+        "t": "2026-09-06T17:24:45.464Z",
+        "state": "dark",
+        "in": 97,
+        "out": 1,
+        "hours": 1226.82
       }
     ]
   },
