@@ -364,10 +364,10 @@
       const pre = $('#quickstartCode');
 
       if (lang === 'curl') {
-        pre.textContent = `curl -X GET "https://landfall-ib.vercel.app/api/v1/anchors/cowrie.exchange/health-check" \\
+        pre.textContent = `curl -X GET "https://landfall-chi.vercel.app/api/v1/anchors/cowrie.exchange/health-check" \\
   -H "x-api-key: YOUR_API_KEY"`;
       } else if (lang === 'js') {
-        pre.textContent = `const res = await fetch('https://landfall-ib.vercel.app/api/v1/anchors/cowrie.exchange/health-check', {
+        pre.textContent = `const res = await fetch('https://landfall-chi.vercel.app/api/v1/anchors/cowrie.exchange/health-check', {
   headers: { 'x-api-key': 'YOUR_API_KEY' }
 });
 const { healthy, score, recommendation } = await res.json();
@@ -376,7 +376,7 @@ if (!healthy) console.warn('Anchor settlement degraded:', recommendation);`;
         pre.textContent = `import requests
 
 res = requests.get(
-  "https://landfall-ib.vercel.app/api/v1/anchors/cowrie.exchange/health-check",
+  "https://landfall-chi.vercel.app/api/v1/anchors/cowrie.exchange/health-check",
   headers={"x-api-key": "YOUR_API_KEY"}
 )
 data = res.json()

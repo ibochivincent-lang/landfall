@@ -1820,7 +1820,24 @@ export default async function handler(req, res) {
       return json(res, status, result, 0);
     }
 
-    if (req.method !== 'GET') return json(res, 405, { error: 'Method not allowed' });
+    /* ── Everything below is read-only, with three exceptions ──────────────
+       This guard predates the write endpoints and used to be an unqualified
+       "GET only", which silently stranded every POST route defined after it:
+       fiat-confirmations returned 405 from the day it shipped, and intent
+       and fraud-reports joined it. The routes existed, were tested, and were
+       unreachable — a 405 on a path the docs advertise looks like a platform
+       problem, not a routing bug, which is why it survived.
+
+       Listed explicitly rather than loosened to "allow any POST": the point
+       of the guard is that an unrecognised write should be rejected here
+       rather than falling through to a 404 that implies the path might work
+       with different input. Adding a write route means adding it here too —
+       which the test in api/_lib/routes.test.mjs now enforces, so the next
+       one cannot be forgotten the way these three were. */
+    const POST_ROUTES = new Set(['v1/intent', 'v1/fraud-reports', 'v1/fiat-confirmations']);
+    if (req.method !== 'GET' && !(req.method === 'POST' && POST_ROUTES.has(joined))) {
+      return json(res, 405, { error: 'Method not allowed' });
+    }
 
     // GET /health
     if (joined === 'health' || joined === '') {

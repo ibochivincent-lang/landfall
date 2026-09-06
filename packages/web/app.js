@@ -400,7 +400,7 @@
       `Topic: ${topic}`,
       name  ? `From: ${name}`         : null,
       email ? `Reply-to: ${email}`    : null,
-      'Sent from the landfall-ib.vercel.app contact form.',
+      'Sent from the landfall-chi.vercel.app contact form.',
     ].filter(Boolean).join('\n');
 
     const url =

@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![CI](https://github.com/ibochivincent-lang/landfall/actions/workflows/ci.yml/badge.svg)](https://github.com/ibochivincent-lang/landfall/actions/workflows/ci.yml)
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed-Vercel-black?logo=vercel)](https://landfall-ib.vercel.app)
+[![Deployed on Vercel](https://img.shields.io/badge/Deployed-Vercel-black?logo=vercel)](https://landfall-chi.vercel.app)
 
 **Did the money land?**
 
@@ -10,7 +10,7 @@ A settlement-quality record for Stellar anchors, computed entirely from the publ
 
 Every existing anchor monitor *interrogates* — pings an endpoint, validates a `stellar.toml`, records the answer the anchor chose to give. Landfall *observes* — it reads what anchor accounts actually did on-chain under SEP-24, and turns that into liveness, settlement volume, counterparty concentration, and refund rate. A TOML file can be edited in ten seconds. Two years of settlement history cannot.
 
-**Live: [landfall-ib.vercel.app](https://landfall-ib.vercel.app)**
+**Live: [landfall-chi.vercel.app](https://landfall-chi.vercel.app)**
 
 > **Submitted to the Drips Stellar Wave Program.** Issues are labelled by
 > complexity — `trivial-100`, `medium-150`, `high-200` — and tagged

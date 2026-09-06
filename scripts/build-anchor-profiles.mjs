@@ -325,7 +325,7 @@ function renderPage({ domain, name, accounts, asOf, verification, history, capab
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(name || domain)} — settlement record | Landfall</title>
 <meta name="description" content="Independent, ledger-derived settlement record for ${esc(domain)}: ${accounts.length} declared Stellar account(s), ${live} settling, ${dark} dark. Every figure traces to a transaction hash.">
-<link rel="canonical" href="https://landfall-ib.vercel.app/anchor/${esc(domain)}">
+<link rel="canonical" href="https://landfall-chi.vercel.app/anchor/${esc(domain)}">
 <meta property="og:title" content="${esc(name || domain)} — settlement record">
 <meta property="og:description" content="${live} of ${accounts.length} accounts settling. Read from the public Stellar ledger, not self-reported.">
 <meta property="og:type" content="website">

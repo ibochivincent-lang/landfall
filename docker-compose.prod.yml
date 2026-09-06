@@ -52,7 +52,7 @@ services:
       PORT: 8787
       # Lock this to your site's origin in production. '*' is the local
       # default and is wrong the moment the API is on the internet.
-      CORS_ORIGIN: ${CORS_ORIGIN:?set CORS_ORIGIN to your site origin, e.g. https://landfall-ib.vercel.app}
+      CORS_ORIGIN: ${CORS_ORIGIN:?set CORS_ORIGIN to your site origin, e.g. https://landfall-chi.vercel.app}
     ports:
       - "${API_PORT:-8787}:8787"
 

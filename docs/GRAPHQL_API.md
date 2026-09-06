@@ -1,7 +1,7 @@
 # GraphQL API
 
 `POST /api/v1/graphql` (also accepts `GET` with `?query=` for quick testing) on
-the deployed API — `https://landfall-ib.vercel.app/api/v1/graphql`.
+the deployed API — `https://landfall-chi.vercel.app/api/v1/graphql`.
 
 It answers the same questions as the REST endpoints (`/api/v1/anchors`,
 `/api/v1/corridors`, `/api/v1/assets`, `/api/v1/anchors/{domain}/payments`) —
@@ -125,7 +125,7 @@ API — nothing here writes to the database.
 Every tracked anchor, its reliability score, and its accounts, in one call:
 
 ```bash
-curl -s https://landfall-ib.vercel.app/api/v1/graphql \
+curl -s https://landfall-chi.vercel.app/api/v1/graphql \
   -H 'Content-Type: application/json' \
   -d '{"query":"{ anchors { asOf staleHours reliability { domain score grade } accounts { account domain state } } }"}'
 ```
@@ -134,7 +134,7 @@ One anchor, by domain — returns `null` for `anchor` (not an error) if the
 domain isn't tracked:
 
 ```bash
-curl -s https://landfall-ib.vercel.app/api/v1/graphql \
+curl -s https://landfall-chi.vercel.app/api/v1/graphql \
   -H 'Content-Type: application/json' \
   -d '{"query":"query($d: String!) { anchor(domain: $d) { score grade recommendation } }","variables":{"d":"example-anchor.com"}}'
 ```
@@ -142,7 +142,7 @@ curl -s https://landfall-ib.vercel.app/api/v1/graphql \
 Corridors and assets in a single round trip, where REST needs two requests:
 
 ```bash
-curl -s https://landfall-ib.vercel.app/api/v1/graphql \
+curl -s https://landfall-chi.vercel.app/api/v1/graphql \
   -H 'Content-Type: application/json' \
   -d '{"query":"{ corridors { fromAsset toAsset count volume } assets { asset count } }"}'
 ```
@@ -150,7 +150,7 @@ curl -s https://landfall-ib.vercel.app/api/v1/graphql \
 Quick `GET`-based testing in a browser or with no request body:
 
 ```
-https://landfall-ib.vercel.app/api/v1/graphql?query={health{ok asOf staleHours}}
+https://landfall-chi.vercel.app/api/v1/graphql?query={health{ok asOf staleHours}}
 ```
 
 ## Errors

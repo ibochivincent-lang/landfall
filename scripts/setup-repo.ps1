@@ -18,7 +18,7 @@
 [CmdletBinding(SupportsShouldProcess = $true)]
 param(
     [string]$Repo = "",
-    [string]$Homepage = "https://landfall-ib.vercel.app"
+    [string]$Homepage = "https://landfall-chi.vercel.app"
 )
 
 # NOT 'Stop'. With 'Stop', PowerShell turns anything a native command writes
