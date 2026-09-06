@@ -11,6 +11,7 @@ import { dirname, resolve } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
+import { decodeStellarPublicKey, disputeMessage, verifyDispute, type DisputeSubmission } from "../src/dispute.js";
 import { summariseForSubject, validateSubmission, type SubmissionDraft } from "../src/validate.js";
 import type { FraudReport } from "../src/types.js";
 
@@ -76,5 +77,47 @@ test("the deployed API's report summary agrees with the package on every set", a
     const mine = summariseForSubject(SUBJECT, set);
     const theirs = JSON.parse(JSON.stringify(mod.summariseFraudReports!(SUBJECT, set)));
     assert.deepEqual(theirs, mine, `report set ${i}`);
+  }
+});
+
+test("the deployed API's dispute verification agrees with the package", async () => {
+  const mod = (await import(pathToFileUrl(API_FILE))) as {
+    verifyDispute?: (s: DisputeSubmission, now: Date) => unknown;
+    decodeStellarPublicKey?: (a: string) => Uint8Array | null;
+    disputeMessage?: (r: string, s: string, i: string) => string;
+  };
+  assert.ok(typeof mod.verifyDispute === "function", "verifyDispute not exported");
+  assert.ok(typeof mod.decodeStellarPublicKey === "function", "decodeStellarPublicKey not exported");
+  assert.ok(typeof mod.disputeMessage === "function", "disputeMessage not exported");
+
+  // The signed message must be byte-identical, or a signature made against
+  // one implementation would fail against the other.
+  assert.equal(
+    mod.disputeMessage!("7", SUBJECT, "2026-01-01T00:00:00.000Z"),
+    disputeMessage("7", SUBJECT, "2026-01-01T00:00:00.000Z"),
+  );
+
+  // Address decoding must agree, including on the malformed cases.
+  for (const addr of [SUBJECT, OTHER, "not-an-address", "", "G".repeat(56)]) {
+    const mine = decodeStellarPublicKey(addr);
+    const theirs = mod.decodeStellarPublicKey!(addr);
+    assert.equal(theirs === null, mine === null, `null-agreement for ${addr.slice(0, 12)}`);
+    if (mine && theirs) assert.deepEqual(Buffer.from(theirs), Buffer.from(mine), `bytes for ${addr.slice(0, 12)}`);
+  }
+
+  const now = new Date("2026-01-01T12:00:00.000Z");
+  const cases: DisputeSubmission[] = [
+    { reportId: "1", subject: SUBJECT, issuedAt: now.toISOString(), signature: "x".repeat(88), note: "ok" },
+    { reportId: "1", subject: "bad", issuedAt: now.toISOString(), signature: "", note: "ok" },
+    { reportId: "1", subject: SUBJECT, issuedAt: now.toISOString(), signature: "", note: "" },
+    { reportId: "1", subject: SUBJECT, issuedAt: now.toISOString(), signature: "", note: "x".repeat(1001) },
+    { reportId: "1", subject: SUBJECT, issuedAt: "2020-01-01T00:00:00.000Z", signature: "", note: "ok" },
+    { reportId: "1", subject: SUBJECT, issuedAt: "2030-01-01T00:00:00.000Z", signature: "", note: "ok" },
+    { reportId: "1", subject: SUBJECT, issuedAt: "not-a-date", signature: "", note: "ok" },
+  ];
+  for (const [i, c] of cases.entries()) {
+    const mine = verifyDispute(c, now);
+    const theirs = JSON.parse(JSON.stringify(mod.verifyDispute!(c, now)));
+    assert.deepEqual(theirs, mine, `dispute case ${i}`);
   }
 });

@@ -169,3 +169,37 @@
   margin-top: 12px; padding: 12px 14px; border-radius: 8px; font-size: 12.5px;
   line-height: 1.55; background: #fef2f2; border: 1px solid #fca5a5; color: #7f1d1d;
 }
+
+/* ─── Dispute response ────────────────────────────────────────────────────
+   The message to sign is shown in full and the signature comes back as
+   text. No field here ever asks for a secret key — an anchor should not
+   learn the habit of pasting an issuer secret into a web form, least of
+   all one asking it to answer an accusation. */
+.report-respond {
+  background: none; border: 1px solid var(--line); border-radius: 7px;
+  padding: 7px 12px; font-size: 11.5px; font-weight: 700; cursor: pointer;
+  color: var(--muted); font-family: inherit; margin-top: 10px;
+}
+.report-respond:hover { border-color: #0b9c91; color: #0b9c91; }
+
+.dispute-form { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line); }
+.dispute-note {
+  font-size: 12px; line-height: 1.6; color: var(--muted);
+  background: #f8fafc; border: 1px dashed var(--line);
+  border-radius: 8px; padding: 12px 14px; margin-bottom: 14px;
+}
+.dispute-note strong { color: var(--ink); }
+.dispute-note a { color: #0b9c91; font-weight: 600; }
+.dispute-expiry { font-weight: 500; text-transform: none; letter-spacing: 0; opacity: 0.8; }
+.dispute-message {
+  background: #04121b; color: #eaf4ef; border-radius: 8px;
+  padding: 12px 14px; font-size: 11.5px; line-height: 1.6;
+  white-space: pre-wrap; word-break: break-all; margin: 0 0 8px;
+  font-family: 'DM Mono', monospace;
+}
+.dispute-copy {
+  background: none; border: 1px solid var(--line); border-radius: 6px;
+  padding: 5px 11px; font-size: 11px; font-weight: 700; cursor: pointer;
+  color: var(--muted); font-family: inherit; margin-bottom: 14px;
+}
+.dispute-copy:hover { border-color: #0b9c91; color: #0b9c91; }

@@ -18,6 +18,7 @@
 *   POST /api/v1/intent             -- Intent + Route Engine: rank routes, return an executable plan
 *   POST /api/v1/fraud-reports      -- file an evidence-anchored report about an address
 *   GET  /api/v1/fraud-reports/:subject -- reports filed about one address, with disclaimer attached
+*   POST /api/v1/fraud-reports/:id/dispute -- reported party responds, gated on a signature from that address
  *   GET  /health
  *
  * Admin routes (session-cookie gated, see requireSession()):
@@ -40,7 +41,7 @@
  */
 
 import pg from 'pg';
-import { scrypt as scryptCb, randomBytes, timingSafeEqual, createHash } from 'node:crypto';
+import { scrypt as scryptCb, randomBytes, timingSafeEqual, createHash, createPublicKey, verify as ed25519Verify } from 'node:crypto';
 import { promisify } from 'node:util';
 import { assertPublicHostname } from './_lib/net-guard.js';
 import { sendEmail } from './_lib/email.js';
@@ -807,6 +808,132 @@ export function summariseFraudReports(subject, all) {
       'the parties, and does not try. Report volume is never scored, ranked, or blended into any Landfall ' +
       'figure. If a report about you is wrong, see DISPUTES.md; a response will be attached to it here.',
   };
+}
+
+/**
+ * Dispute responses — mirror of packages/fraud-reports/src/dispute.ts.
+ *
+ * A response is the reported party's own words attached to an accusation,
+ * so it has to prove it came from whoever controls the reported address.
+ * On Stellar the only thing that proves that — with no account, password
+ * or identity document — is a signature from the account's own key.
+ *
+ * Stateless: the signed message carries the report id and its own
+ * timestamp, so there is no challenge table to store and expire. Replay is
+ * bounded twice: the timestamp must be recent, and a report takes exactly
+ * one response, so a captured signature cannot overwrite one already
+ * posted.
+ *
+ * See the TypeScript source for why the human path in DISPUTES.md stays:
+ * an anchor whose reported account is a cold issuer key cannot sign a web
+ * form, and making this the only route would leave the companies with the
+ * best key hygiene least able to answer.
+ */
+const DISPUTE_WINDOW_MS = 10 * 60 * 1000;
+const DISPUTE_NOTE_MAX_LENGTH = 1000;
+const STRKEY_BASE32 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+
+function strkeyBase32Decode(input) {
+  let bits = 0, value = 0;
+  const out = [];
+  for (const ch of input) {
+    const idx = STRKEY_BASE32.indexOf(ch);
+    if (idx === -1) return null;
+    value = (value << 5) | idx;
+    bits += 5;
+    if (bits >= 8) { out.push((value >>> (bits - 8)) & 0xff); bits -= 8; }
+  }
+  return Uint8Array.from(out);
+}
+
+function strkeyCrc16(bytes) {
+  let crc = 0x0000;
+  for (const byte of bytes) {
+    crc ^= byte << 8;
+    for (let i = 0; i < 8; i++) crc = crc & 0x8000 ? ((crc << 1) ^ 0x1021) & 0xffff : (crc << 1) & 0xffff;
+  }
+  return crc & 0xffff;
+}
+
+export function decodeStellarPublicKey(address) {
+  if (typeof address !== 'string' || address.length !== 56 || !address.startsWith('G')) return null;
+  const decoded = strkeyBase32Decode(address);
+  if (!decoded || decoded.length !== 35) return null;
+  if (decoded[0] !== 0x30) return null;
+  const payload = decoded.subarray(0, 33);
+  const expected = decoded[33] | (decoded[34] << 8);
+  if (strkeyCrc16(payload) !== expected) return null;
+  return decoded.subarray(1, 33);
+}
+
+export function disputeMessage(reportId, subject, issuedAt) {
+  return [
+    'Landfall dispute response',
+    `report: ${reportId}`,
+    `subject: ${subject}`,
+    `issued: ${issuedAt}`,
+  ].join('\n');
+}
+
+export function verifyDispute(submission, now) {
+  const note = String(submission.note ?? '').trim();
+  if (note.length === 0) return { ok: false, reason: 'note-empty', message: 'A response needs to say something.' };
+  if (note.length > DISPUTE_NOTE_MAX_LENGTH) {
+    return { ok: false, reason: 'note-too-long', message: `Keep the response under ${DISPUTE_NOTE_MAX_LENGTH} characters.` };
+  }
+
+  const rawKey = decodeStellarPublicKey(String(submission.subject ?? ''));
+  if (!rawKey) return { ok: false, reason: 'invalid-subject', message: 'The subject is not a valid Stellar public key.' };
+
+  const issued = Date.parse(submission.issuedAt);
+  if (!Number.isFinite(issued)) {
+    return { ok: false, reason: 'stale-timestamp', message: 'The signed message carries no readable timestamp.' };
+  }
+  const drift = now.getTime() - issued;
+  if (drift > DISPUTE_WINDOW_MS) {
+    return { ok: false, reason: 'stale-timestamp', message: 'That signed response is too old. Sign a fresh one — the window is 10 minutes.' };
+  }
+  if (drift < -DISPUTE_WINDOW_MS) {
+    return { ok: false, reason: 'future-timestamp', message: 'That signed response is dated in the future. Check your system clock.' };
+  }
+
+  let signatureBytes;
+  try {
+    signatureBytes = Buffer.from(String(submission.signature ?? ''), 'base64');
+    if (signatureBytes.length !== 64) {
+      return { ok: false, reason: 'invalid-signature-encoding', message: 'An Ed25519 signature must be 64 bytes, base64-encoded.' };
+    }
+  } catch {
+    return { ok: false, reason: 'invalid-signature-encoding', message: 'The signature is not valid base64.' };
+  }
+
+  const message = Buffer.from(
+    disputeMessage(String(submission.reportId), String(submission.subject), String(submission.issuedAt)),
+    'utf8',
+  );
+
+  let verified = false;
+  try {
+    const key = createPublicKey({
+      key: { kty: 'OKP', crv: 'Ed25519', x: Buffer.from(rawKey).toString('base64url') },
+      format: 'jwk',
+    });
+    verified = ed25519Verify(null, message, key, signatureBytes);
+  } catch {
+    verified = false;
+  }
+
+  if (!verified) {
+    return {
+      ok: false,
+      reason: 'signature-mismatch',
+      message:
+        'That signature does not verify against the reported address. A response has to be signed by the key ' +
+        'that controls the account, which is the only thing that makes it more than an anonymous claim.',
+    };
+  }
+
+  return { ok: true };
 }
 
 const TRUST_CHECK_HORIZON = 'https://horizon.stellar.org';
@@ -1835,7 +1962,13 @@ export default async function handler(req, res) {
        which the test in api/_lib/routes.test.mjs now enforces, so the next
        one cannot be forgotten the way these three were. */
     const POST_ROUTES = new Set(['v1/intent', 'v1/fraud-reports', 'v1/fiat-confirmations']);
-    if (req.method !== 'GET' && !(req.method === 'POST' && POST_ROUTES.has(joined))) {
+    /* Parameterised write paths, which an exact set cannot express. Kept as
+       a separate list rather than loosening POST_ROUTES to prefixes: a
+       prefix would also admit v1/fraud-reports/anything, and the point of
+       this guard is that an unrecognised write is rejected here. */
+    const POST_ROUTE_PATTERNS = [/^v1\/fraud-reports\/\d+\/dispute$/];
+    const postAllowed = POST_ROUTES.has(joined) || POST_ROUTE_PATTERNS.some((re) => re.test(joined));
+    if (req.method !== 'GET' && !(req.method === 'POST' && postAllowed)) {
       return json(res, 405, { error: 'Method not allowed' });
     }
 
@@ -2096,6 +2229,75 @@ export default async function handler(req, res) {
         }
         throw err;
       }
+    }
+
+    // POST /api/v1/fraud-reports/:id/dispute
+    //
+    // The reported party answering back. Gated on a signature from the
+    // reported address's own key — see verifyDispute above for why that is
+    // the only thing that makes a response more than another anonymous
+    // claim, and why DISPUTES.md's human path stays for cold-key accounts
+    // that cannot sign a web form.
+    if (req.method === 'POST' && parts.length === 4 && parts[0] === 'v1' && parts[1] === 'fraud-reports' && parts[3] === 'dispute') {
+      if (await enforceAuthRateLimit(req, res, db, 'fraud-dispute', 10)) return;
+
+      const reportId = decodeURIComponent(parts[2]);
+      if (!/^\d+$/.test(reportId)) return json(res, 400, { error: 'Report id must be numeric.' }, 0);
+
+      const body = await readJsonBody(req);
+
+      const { rows } = await db.query(
+        `SELECT id, subject, status, disputed_at FROM fraud_reports WHERE id = $1`,
+        [reportId],
+      );
+      const report = rows[0];
+      if (!report) return json(res, 404, { error: 'No report with that id.' }, 0);
+      if (report.disputed_at) {
+        return json(res, 409, {
+          error: 'That report already carries a response. A report takes one, so a later signature cannot overwrite an earlier answer.',
+        }, 0);
+      }
+
+      // The subject comes from the stored report, never from the request —
+      // otherwise a caller could name an address they do control and have
+      // the signature check pass against a report about someone else.
+      const verification = verifyDispute(
+        {
+          reportId: String(report.id),
+          subject: report.subject,
+          issuedAt: body.issuedAt,
+          signature: body.signature,
+          note: body.note,
+        },
+        new Date(),
+      );
+      if (!verification.ok) {
+        return json(res, verification.reason === 'signature-mismatch' ? 403 : 400, {
+          error: verification.message,
+          reason: verification.reason,
+        }, 0);
+      }
+
+      const { rows: updated } = await db.query(
+        `UPDATE fraud_reports
+            SET status = 'disputed', disputed_at = now(), dispute_note = $2
+          WHERE id = $1 AND disputed_at IS NULL
+        RETURNING id, subject, status, disputed_at, dispute_note`,
+        [reportId, String(body.note).trim()],
+      );
+      if (!updated[0]) {
+        return json(res, 409, { error: 'That report already carries a response.' }, 0);
+      }
+
+      return json(res, 200, {
+        ok: true,
+        id: String(updated[0].id),
+        status: updated[0].status,
+        disputedAt: updated[0].disputed_at.toISOString(),
+        note:
+          'Response recorded and attached to the report. It is shown alongside the accusation wherever that ' +
+          'report appears — Landfall does not adjudicate between the two, and does not claim to know which is right.',
+      }, 0);
     }
 
     // GET /api/v1/fraud-reports/:subject

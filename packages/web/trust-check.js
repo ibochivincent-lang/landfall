@@ -124,7 +124,10 @@
               '</div>' +
               (rep.disputeNote
                 ? '<div class="report-dispute"><strong>Response from the reported party:</strong> ' + esc(rep.disputeNote) + '</div>'
-                : '') +
+                : '<button type="button" class="report-respond" data-report="' + esc(rep.id) + '">' +
+                    'I control this address — respond' +
+                  '</button>') +
+              '<div class="dispute-box" id="disputeBox-' + esc(rep.id) + '" hidden></div>' +
             '</div>'
           );
         }).join('')
@@ -144,6 +147,113 @@
     qs('#openReportForm').addEventListener('click', function () {
       renderReportForm(address);
     });
+
+    var respondButtons = document.querySelectorAll('.report-respond');
+    for (var i = 0; i < respondButtons.length; i++) {
+      (function (btn) {
+        btn.addEventListener('click', function () {
+          renderDisputeForm(address, btn.dataset.report, btn);
+        });
+      })(respondButtons[i]);
+    }
+  }
+
+  /* ─── Dispute response — gated on a signature from the reported address ──
+     Landfall never sees a secret key. The page shows the exact message to
+     sign and takes back only the signature, so signing happens wherever the
+     key already lives — a wallet, the Stellar Laboratory, an offline
+     machine. Anything that asked for the key here would be asking an anchor
+     to paste its issuer secret into a web form, which is not a thing anyone
+     should build a habit of. */
+  function renderDisputeForm(address, reportId, trigger) {
+    var box = qs('#disputeBox-' + reportId);
+    if (!box) return;
+    trigger.hidden = true;
+    box.hidden = false;
+
+    var issuedAt = new Date().toISOString();
+    var message = 'Landfall dispute response\n' +
+      'report: ' + reportId + '\n' +
+      'subject: ' + address + '\n' +
+      'issued: ' + issuedAt;
+
+    box.innerHTML =
+      '<div class="dispute-form">' +
+        '<div class="dispute-note">' +
+          '<strong>Responding requires proving you control ' + esc(address.slice(0, 8)) + '…</strong> ' +
+          'Sign the message below with that account\'s key, using your wallet or the Stellar Laboratory, and ' +
+          'paste the signature back here. Landfall never asks for and never receives a secret key. ' +
+          'Cold-key account, or not the keyholder? The human route in ' +
+          '<a href="https://github.com/ibochivincent-lang/landfall/blob/main/DISPUTES.md" target="_blank" rel="noopener">DISPUTES.md</a> ' +
+          'stays open for exactly that case.' +
+        '</div>' +
+        '<label class="field-label">Message to sign <span class="dispute-expiry">(valid 10 minutes)</span></label>' +
+        '<pre class="dispute-message" id="dmsg-' + esc(reportId) + '">' + esc(message) + '</pre>' +
+        '<button type="button" class="dispute-copy" data-msg="' + esc(reportId) + '">Copy message</button>' +
+        '<label class="field-label" for="dsig-' + esc(reportId) + '">Signature (base64)</label>' +
+        '<input class="field-input" id="dsig-' + esc(reportId) + '" placeholder="base64-encoded Ed25519 signature" autocomplete="off" spellcheck="false">' +
+        '<label class="field-label" for="dnote-' + esc(reportId) + '">Your response</label>' +
+        '<textarea class="field-textarea" id="dnote-' + esc(reportId) + '" maxlength="1000" placeholder="What actually happened, from your side."></textarea>' +
+        '<div class="report-actions">' +
+          '<button type="button" class="report-btn" id="dsubmit-' + esc(reportId) + '">Submit response</button>' +
+          '<button type="button" class="report-cancel" id="dcancel-' + esc(reportId) + '">Cancel</button>' +
+        '</div>' +
+        '<div id="dresult-' + esc(reportId) + '"></div>' +
+      '</div>';
+
+    qs('#dcancel-' + reportId).addEventListener('click', function () {
+      box.hidden = true;
+      box.innerHTML = '';
+      trigger.hidden = false;
+    });
+
+    var copyBtn = box.querySelector('.dispute-copy');
+    copyBtn.addEventListener('click', function () {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(message).then(function () {
+          copyBtn.textContent = 'Copied';
+          setTimeout(function () { copyBtn.textContent = 'Copy message'; }, 1500);
+        });
+      }
+    });
+
+    qs('#dsubmit-' + reportId).addEventListener('click', function () {
+      submitDispute(address, reportId, issuedAt);
+    });
+  }
+
+  function submitDispute(address, reportId, issuedAt) {
+    var btn = qs('#dsubmit-' + reportId);
+    var out = qs('#dresult-' + reportId);
+    btn.disabled = true;
+    btn.textContent = 'Verifying signature…';
+    out.innerHTML = '';
+
+    fetch('/api/v1/fraud-reports/' + encodeURIComponent(reportId) + '/dispute', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        issuedAt: issuedAt,
+        signature: qs('#dsig-' + reportId).value.trim(),
+        note: qs('#dnote-' + reportId).value.trim()
+      })
+    })
+      .then(function (res) { return res.json().then(function (b) { return { status: res.status, body: b }; }); })
+      .then(function (r) {
+        if (r.status === 200) {
+          out.innerHTML = '<div class="report-ok">' + esc(r.body.note || 'Response recorded.') + '</div>';
+          setTimeout(function () { loadReports(address); }, 900);
+        } else {
+          out.innerHTML = '<div class="report-err">' + esc((r.body && r.body.error) || 'Could not record that response.') + '</div>';
+        }
+      })
+      .catch(function () {
+        out.innerHTML = '<div class="report-err">Could not reach the server. Try again shortly.</div>';
+      })
+      .finally(function () {
+        btn.disabled = false;
+        btn.textContent = 'Submit response';
+      });
   }
 
   function renderReportForm(address) {
