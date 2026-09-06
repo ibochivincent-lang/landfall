@@ -72,7 +72,7 @@ But the question is now the ecosystem's, not just ours.
 | Capability | Status | Description |
 |---|---|---|
 | SEP-1 discovery | ✅ **shipping** | Permissionless domain $\rightarrow$ declared issuer/distribution accounts |
-| Horizon indexing & incremental sync | ✅ **shipping** | Hourly scan with fast `order=asc` cursor pagination (sub-minute runtime) |
+| Horizon indexing & incremental sync | ✅ **shipping** | Scheduled scan with fast `order=asc` cursor pagination (sub-minute runtime) |
 | Liveness, volume, concentration, returns | ✅ **shipping** | Deterministic settlement metrics without requesting data from anchors |
 | **Path payments (cross-asset flows)** | ✅ **shipping** | Extracts source & delivered asset pairs (`USD ➔ NGN`, `EUR ➔ BRL`) |
 | **Settlement corridors API + export** | ✅ **shipping** | `GET /api/v1/corridors` with real-time matrix and compliance CSV export |
@@ -85,7 +85,7 @@ But the question is now the ecosystem's, not just ours.
 | **GraphQL API** | ✅ **shipping** | `POST /api/v1/graphql` for structured queries |
 | Postgres persistence + REST API | ✅ **shipping** | Supabase Session Pooler + serverless Vercel function endpoints |
 | Live transactions dashboard | ✅ **shipping** | `/dashboard.html` with dark account indicators and counterparty breakdown |
-| Hourly ledger scan (GitHub Actions) | ✅ **shipping** | Scheduled cron (`0 * * * *`) with `$0/month` hosting upkeep |
+| Scheduled ledger scan (GitHub Actions) | ✅ **shipping** | Cron asks for hourly (`0 * * * *`); GitHub runs scheduled workflows best-effort, so the measured cadence over 24h is a **median 2.8h gap** (range 1.7–4.8h), starting a median 38 minutes past the hour. Every payload carries `asOf`/`staleHours` so a consumer reads the real age rather than trusting a schedule. `$0/month` hosting upkeep |
 | **Anchor Route Scout** (`/compare.html`) | ⚠️ **partly real** | Reliability grades are ledger-derived. Fees are live where an anchor publishes SEP-24 terms, hardcoded catalogue otherwise. FX rates now check every anchor's SEP-38 quote server too — but as of this writing SEP-38 adoption among tracked anchors is close to zero, so the rate column is still mostly the catalogue spread. See [docs/gaps.md](docs/gaps.md) and `/api/v1/anchor-quotes.json` for exactly which anchor, if any |
 | **Trust Check** (`/trust-check.html`) | ✅ **shipping** | Paste a Stellar address or transaction hash — live, ledger-only counterparty signals (observed history, counterparty concentration, pass-through/forwarding pattern), a transparent 0–100 score with every deduction traceable to a named flag, and a confidence rating that overrides the score when there isn't enough history to say anything. No external fraud database — none exists that this project can independently verify, and fabricating one would be the exact failure mode Landfall exists to catch elsewhere. See `packages/trust-check/src/analyze.ts` |
 | **Crypto Routes** (`/compare.html`, same page) | ✅ **shipping** | Live XLM→BTC/ETH/SOL/BNB quotes fetched client-side from [NEAR Intents](https://near-intents.org)' public 1Click API — real market rates, no API key, no backend. Informational only: Landfall never executes the swap. Stellar-side USDC isn't wired up yet (see the note in the page) |
@@ -107,7 +107,7 @@ We would rather list this honestly than let a roadmap read as a changelog. Full 
 
 ## Current finding
 
-From the hourly ledger scan, most recently 6 September 2026, across 108 declared
+From the scheduled ledger scan, most recently 6 September 2026, across 108 declared
 anchor accounts on 27 Stellar home domains:
 
 > **62 of 108 anchor accounts have processed no on-chain settlement in over 30 days.**
@@ -142,7 +142,7 @@ the dated record it is — the network tracked here has since grown from 5 domai
 | Oracle | Rust, Soroban SDK — deployed to testnet |
 | AI Integration | Model Context Protocol (MCP) stdio server (`@modelcontextprotocol/sdk`) |
 | Database | PostgreSQL (Supabase Session Pooler or local via Docker) |
-| Deployment | Vercel (frontend + API proxy), GitHub Actions (hourly ledger scan cron) |
+| Deployment | Vercel (frontend + API proxy), GitHub Actions (scheduled ledger scan cron) |
 
 ## Getting started
 
