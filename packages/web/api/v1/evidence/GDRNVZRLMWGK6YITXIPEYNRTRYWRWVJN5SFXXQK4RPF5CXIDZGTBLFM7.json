@@ -1,7 +1,7 @@
 {
-  "asOf": "2026-09-07T01:50:36.360Z",
-  "scanFile": "scan-2026-09-07T01-50-36-360Z.json",
-  "datasetRoot": "e0f8ca5ba87f753109ebc5445d8f67dfb3ab11f1983f711bc14763dbf9aca2c4",
+  "asOf": "2026-09-07T06:47:20.730Z",
+  "scanFile": "scan-2026-09-07T06-47-20-730Z.json",
+  "datasetRoot": "a3ac64606ae892210bf9017f90d5b8f3542ebfd26b72d482466694a5f6c889ae",
   "methodology": {
     "id": "11a4c3a9bfd0c485",
     "parameters": {
@@ -23,7 +23,7 @@
     "outbound": 0,
     "returns": 0,
     "returnRate": null,
-    "hoursSinceActivity": 1435.61,
+    "hoursSinceActivity": 1440.56,
     "sampled": 0,
     "windowStart": null,
     "windowEnd": null
@@ -34,27 +34,27 @@
     "path": [
       {
         "position": "right",
-        "hash": "cdb5373fecc8d759f5d6198994a82ee37734a758c6cd4eaa2c495379a1125410"
+        "hash": "9f4ff6bf89bf3829748eab33e026565d898c12ae24b0fb9acfbd315729c869fc"
       },
       {
         "position": "right",
-        "hash": "593cd1eab088dacf67c6d054b894b34fda032a050f3972d538b4ac5fe2f20453"
+        "hash": "21c767a8ef698b2bc73f4f5e82c1d38fb4e3ed609601b7ff2ae5017b4847639e"
       },
       {
         "position": "right",
-        "hash": "e017f2b78caada6d14227ccfb1741cfa62f5c0e6913101b90f440f190c10c355"
+        "hash": "edb5969b5280738cb46f4d20f5b5568fb9c675c76ad5b95391f9414c125ce67b"
       },
       {
         "position": "right",
-        "hash": "62300692c573caf865e54a821abd2e5a7f490fdd45ec9d5250e504ae50272925"
+        "hash": "d0d8e9ad2116527a5a3ce03d3caeefa6aa08d751b4142595d4f80720d5dacc5f"
       },
       {
         "position": "left",
-        "hash": "02d37963307222b00992cea5d3106a4099289cf670fc3a52b10731da434001e3"
+        "hash": "d0034b810b9dac392ecd0107f772493c1b3d84b348609358412eebc02474de89"
       },
       {
         "position": "left",
-        "hash": "ea91d91c5a7c4d3beef8b7ccec732e55dae4d9ab135ca522f4c79e350376db31"
+        "hash": "1d6e5c6bb50494b29566bbd6cb224bc00dedf5ebdbe3f038e89e9a0d882b5cbd"
       }
     ],
     "namespace": "landfall-settlement-v1",
