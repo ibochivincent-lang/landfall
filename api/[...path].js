@@ -1949,12 +1949,31 @@ export default async function handler(req, res) {
         } catch {
           return adminJson(res, 400, { error: 'Webhook target resolves to a blocked network range.' });
         }
+        // Which events this endpoint wants. Previously ignored entirely: the
+        // column default decided, so a caller passing `events` had it
+        // silently dropped and every webhook subscribed to the same two —
+        // one of which has never fired and one of which has no producer.
+        const ALLOWED_EVENTS = ['anchor.dark', 'anchor.degraded'];
+        let events = ALLOWED_EVENTS;
+        if (body.events !== undefined) {
+          if (!Array.isArray(body.events) || body.events.length === 0) {
+            return adminJson(res, 400, { error: 'events must be a non-empty array.' });
+          }
+          const unknown = body.events.filter((e) => !ALLOWED_EVENTS.includes(e));
+          if (unknown.length) {
+            return adminJson(res, 400, {
+              error: `Unknown event(s): ${unknown.join(', ')}. Supported: ${ALLOWED_EVENTS.join(', ')}.`,
+            });
+          }
+          events = [...new Set(body.events)];
+        }
+
         const secret = 'whsec_' + randomBytes(20).toString('hex');
         const { rows } = await db.query(
-          `INSERT INTO user_webhooks (user_id, target_url, secret)
-           VALUES ($1, $2, $3)
+          `INSERT INTO user_webhooks (user_id, target_url, secret, events)
+           VALUES ($1, $2, $3, $4)
            RETURNING id, target_url, events, active, created_at`,
-          [session.id, targetUrl, secret],
+          [session.id, targetUrl, secret, events],
         );
         return adminJson(res, 200, { ok: true, webhook: rows[0], secret, message: 'Webhook endpoint registered.' });
       }

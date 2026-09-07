@@ -98,17 +98,43 @@ async function main() {
   );
   const domainByAccount = new Map(accountDomains.map((r) => [r.account_id, r.domain]));
 
-  const transitions = current.filter(
-    (r) => r.state === 'dark' && previousState.get(r.account_id) && previousState.get(r.account_id) !== 'dark',
-  );
+  // How states rank. A degradation is a move to a lower rank — not merely a
+  // change, so a slow -> live recovery never fires an alert.
+  const RANK = { live: 3, slow: 2, no_activity: 1, dark: 0 };
+
+  // This used to look only for transitions INTO dark, which sounds right and
+  // was in practice dead code: across every account and a month of stored
+  // scans, zero transitions into dark have ever been observed — every dark
+  // account was already dark the first time it was seen. Meanwhile 15 live ->
+  // slow degradations happened and alerted nobody. See /api/v1/trends.json.
+  //
+  // anchor.dark is still emitted with the identical payload it always had, so
+  // existing subscribers are unaffected; anchor.degraded is the new event that
+  // fires for the transitions that actually occur.
+  const transitions = current
+    .map((r) => {
+      const from = previousState.get(r.account_id);
+      if (!from || from === r.state) return null;
+      if ((RANK[r.state] ?? 0) >= (RANK[from] ?? 0)) return null;
+      return {
+        account_id: r.account_id,
+        from,
+        to: r.state,
+        event: r.state === 'dark' ? 'anchor.dark' : 'anchor.degraded',
+      };
+    })
+    .filter(Boolean);
 
   if (!transitions.length) {
-    console.log('No dark transitions this scan.');
+    console.log('No degradations this scan.');
     return;
   }
 
+  const eventsNeeded = [...new Set(transitions.map((t) => t.event))];
   const { rows: webhooks } = await pool.query(
-    `SELECT id, target_url, secret FROM user_webhooks WHERE active = true AND 'anchor.dark' = ANY(events)`,
+    `SELECT id, target_url, secret, events FROM user_webhooks
+      WHERE active = true AND events && $1::text[]`,
+    [eventsNeeded],
   );
 
   let delivered = 0;
@@ -116,7 +142,8 @@ async function main() {
 
   for (const t of transitions) {
     const domain = domainByAccount.get(t.account_id) || null;
-    for (const webhook of webhooks) {
+    // Only deliver to subscribers of this specific event.
+    for (const webhook of webhooks.filter((w) => (w.events || []).includes(t.event))) {
       let hostname;
       try {
         hostname = new URL(webhook.target_url).hostname;
@@ -128,19 +155,19 @@ async function main() {
         failed++;
         await pool.query(
           `INSERT INTO webhook_deliveries (webhook_id, event, account_id, domain, status, attempts, response_status)
-           VALUES ($1, 'anchor.dark', $2, $3, 'failed', 0, NULL)`,
-          [webhook.id, t.account_id, domain],
+           VALUES ($1, $2, $3, $4, 'failed', 0, NULL)`,
+          [webhook.id, t.event, t.account_id, domain],
         ).catch(() => {});
         console.error(`Skipped delivery to webhook ${webhook.id}: ${err.message}`);
         continue;
       }
 
       const payload = {
-        event: 'anchor.dark',
+        event: t.event,
         account: t.account_id,
         domain,
-        previousState: previousState.get(t.account_id),
-        currentState: 'dark',
+        previousState: t.from,
+        currentState: t.to,
         scanId: currentScanId,
         occurredAt: new Date().toISOString(),
       };
@@ -150,13 +177,18 @@ async function main() {
 
       await pool.query(
         `INSERT INTO webhook_deliveries (webhook_id, event, account_id, domain, status, attempts, response_status)
-         VALUES ($1, 'anchor.dark', $2, $3, $4, $5, $6)`,
-        [webhook.id, t.account_id, domain, result.status, result.attempts, result.responseStatus],
+         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+        [webhook.id, t.event, t.account_id, domain, result.status, result.attempts, result.responseStatus],
       ).catch(() => {});
     }
   }
 
-  console.log(`Dispatched ${transitions.length} dark-transition webhook(s): ${delivered} delivered, ${failed} failed.`);
+  const byEvent = transitions.reduce((acc, t) => {
+    acc[t.event] = (acc[t.event] || 0) + 1;
+    return acc;
+  }, {});
+  const summary = Object.entries(byEvent).map(([e, n]) => `${n} ${e}`).join(', ');
+  console.log(`Dispatched ${transitions.length} degradation webhook(s) (${summary}): ${delivered} delivered, ${failed} failed.`);
 }
 
 try {
