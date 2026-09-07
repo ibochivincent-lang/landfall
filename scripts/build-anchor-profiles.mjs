@@ -29,6 +29,7 @@
 
 import { execFile } from 'node:child_process';
 import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
+import { currentRun, findTransitions } from './build-trends.mjs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
@@ -420,6 +421,76 @@ function renderIndex(rows, asOf) {
 `;
 }
 
+/**
+ * What has actually changed for this anchor, from the stored scan history.
+ *
+ * Uses the same functions build-trends.mjs publishes /api/v1/trends.json
+ * from, so the page and the artifact cannot tell different stories about the
+ * same account.
+ *
+ * Deliberately reports only what was observed. No forecast: across every
+ * account and every stored scan, zero transitions INTO the dark state have
+ * been seen, so there is nothing to build a "going dark soon" warning on.
+ */
+function renderTrend(history) {
+  const entries = Object.entries(history || {});
+  if (entries.length === 0) return '';
+
+  const transitions = [];
+  const runs = [];
+  for (const [account, points] of entries) {
+    for (const t of findTransitions(points)) transitions.push({ account, ...t });
+    const run = currentRun(points);
+    if (run) runs.push({ account, ...run });
+  }
+
+  if (transitions.length === 0) {
+    const longest = runs.sort((a, b) => b.days - a.days)[0];
+    return `
+  <section class="anchor-block">
+    <h2>Trend</h2>
+    <p class="muted small">
+      No state change has been observed on any of this anchor's accounts across
+      ${runs[0]?.observations ?? 0} recorded scans${longest ? `, the longest unchanged run being <strong>${esc(longest.state)}</strong> for ${longest.days} day(s)` : ''}.
+      That is stability as far as this record goes, and it is bounded by how long
+      the record is — observation began 12 August 2026.
+    </p>
+  </section>`;
+  }
+
+  transitions.sort((a, b) => Date.parse(b.at) - Date.parse(a.at));
+  const rank = { live: 3, slow: 2, no_activity: 1, dark: 0 };
+  const items = transitions
+    .slice(0, 12)
+    .map((t) => {
+      const worse = (rank[t.to] ?? 0) < (rank[t.from] ?? 0);
+      return `<li>
+        <span class="mono">${esc(t.account.slice(0, 8))}…${esc(t.account.slice(-6))}</span>
+        went <strong class="${worse ? 'trend-down' : 'trend-up'}">${esc(t.from)} → ${esc(t.to)}</strong>
+        on ${esc(t.at.slice(0, 10))}
+      </li>`;
+    })
+    .join('');
+
+  const degradations = transitions.filter((t) => (rank[t.to] ?? 0) < (rank[t.from] ?? 0)).length;
+
+  return `
+  <section class="anchor-block">
+    <h2>Trend</h2>
+    <p class="muted small">
+      ${transitions.length} state change(s) observed across this anchor's accounts,
+      ${degradations} of them to a weaker state.
+    </p>
+    <ul class="trend-list">${items}</ul>
+    <p class="muted small">
+      Observed, not predicted. A change is only visible if two scans straddle it, and
+      no account anywhere in this dataset has yet been seen entering the dark state —
+      every dark account was already dark when first observed. There is therefore no
+      basis for forecasting one, and none is offered.
+    </p>
+  </section>`;
+}
+
 function renderPage({ domain, name, accounts, asOf, verification, history, capabilities }) {
   const dark = accounts.filter((a) => a.state === 'dark').length;
   const live = accounts.filter((a) => a.state === 'live').length;
@@ -520,6 +591,8 @@ function renderPage({ domain, name, accounts, asOf, verification, history, capab
       ${accounts.map((a) => stateLabel(a.state)).some((s) => s.startsWith('Dark')) ? 'Dark means no settlement in over 30 days — a fact about the ledger, not a claim about why.' : ''}
     </p>
   </section>
+
+  ${renderTrend(history)}
 
   ${renderCapabilities(capabilities)}
 

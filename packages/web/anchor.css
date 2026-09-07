@@ -88,3 +88,12 @@
 .cap--yes { background: #dcfce7; color: #166534; }
 .cap--no  { background: #fee2e2; color: #991b1b; }
 .cap--na  { background: #f1f5f9; color: #64748b; }
+
+/* ─── Trend section — observed state changes, never a forecast ───────────── */
+.trend-list { list-style: none; margin: 12px 0; padding: 0; }
+.trend-list li {
+  padding: 9px 0; border-top: 1px solid var(--line, #d9e2dd);
+  font-size: 13px; line-height: 1.5;
+}
+.trend-down { color: #9b1c1c; }
+.trend-up   { color: #065f46; }

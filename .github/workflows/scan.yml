@@ -178,6 +178,15 @@ jobs:
       # The scan already computes byAsset totals and the API rolled them up into
       # one verdict per anchor, hiding anchors busy in one asset and dark in
       # another. This surfaces what was already measured.
+      # ── 5b6. Trend history ───────────────────────────────────────────────
+      # Reads back the per-account history every scan has been appending.
+      # Reports observed state transitions only — see the script header for
+      # why it does not forecast.
+      - name: Build trend history
+        if: steps.verify.outcome == 'success'
+        continue-on-error: true
+        run: node scripts/build-trends.mjs
+
       - name: Build per-asset settlement health
         if: steps.verify.outcome == 'success'
         continue-on-error: true
@@ -252,7 +261,7 @@ jobs:
                   packages/web/api/v1/history.json packages/web/api/v1/verify.json \
                   packages/web/api/v1/anchors packages/web/api/v1/evidence packages/web/api/v1/evidence.json packages/web/api/v1/anchor-fees.json packages/web/api/v1/capabilities.json packages/web/api/v1/routes.json \
                   packages/web/api/v1/scan-verification.json packages/web/api/v1/toml-drift.json \
-                  packages/web/api/v1/asset-health.json packages/web/api/v1/anchor-quotes.json \
+                  packages/web/api/v1/asset-health.json packages/web/api/v1/anchor-quotes.json packages/web/api/v1/trends.json \
                   packages/web/anchor packages/web/index.html
           # Only commit if there are actual changes
           git diff --staged --quiet || git commit -m "chore: hourly ledger scan $(date -u +%Y-%m-%d-%H00)"

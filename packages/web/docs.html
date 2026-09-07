@@ -537,6 +537,35 @@
     </div>
   </section>
 
+  <!-- Section 3i: trend history -->
+  <section class="docs-section">
+    <h2>3i. Trend History</h2>
+    <p style="font-size:13px; color:var(--muted); margin-bottom:16px;">
+      Every scan since 12 August has appended a per-account observation, and until now nothing read
+      it back. This does: state changes actually observed, how long each account has been in its
+      current state, and whether its payment counters are still rising.
+    </p>
+
+    <div class="endpoint-card">
+      <div class="endpoint-title">
+        <span class="badge-get">GET</span>
+        <span class="endpoint-path">/api/v1/trends.json</span>
+      </div>
+      <p style="font-size:13px; color:var(--muted); margin-top:8px;">
+        Per account: <code>current</code> run (state, observations, days, and
+        <code>everChanged</code> — which separates "dark for 26 days" from "dark for as long as
+        anyone has been looking"), every observed <code>transition</code> with its date, and a
+        <code>volume</code> direction derived from the delta in cumulative counters rather than
+        their size.
+        <br><br>
+        <strong>It does not forecast.</strong> Across every account and every stored scan, zero
+        transitions <em>into</em> the dark state have been observed — every dark account was already
+        dark when first seen. A "this anchor is about to go dark" warning needs examples of anchors
+        going dark, and this dataset contains none. What is reported is what happened.
+      </p>
+    </div>
+  </section>
+
   <!-- Section 4: MCP Tool -->
   <section class="docs-section">
     <h2>4. AI Agent Integration (Model Context Protocol / MCP)</h2>

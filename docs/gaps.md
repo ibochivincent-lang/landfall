@@ -423,9 +423,11 @@ whole problem. The alternative is deleting those sections until they're real.
   over 24h. Every payload carries `asOf`/`staleHours` accordingly.
 - ~~**The site's data is frozen.**~~ Both pages read live and show scan age.
 - ~~**No database.**~~ Postgres, persisted, resumable.
-- **No trend history in the product.** Every scan is stored, so the data for
-  "dark for N consecutive scans" exists — nothing reads it back yet, and there
-  is still no alerting on state change.
+- ~~**No trend history in the product.**~~ `scripts/build-trends.mjs` reads it
+  back: `/api/v1/trends.json` and a Trend section on every anchor page, showing
+  observed state changes with dates and how long each account has held its
+  current state. 23 transitions found across 14 anchors. **Still no alerting**
+  on state change — the data is published, nothing pushes it.
 - ~~**No API**~~ — shipped. ~~**No MCP server.**~~ — shipped, unlinked from
   the site, no external consumer yet. **Still no SDK.**
 - ~~**No live quote data.**~~ SEP-38 ingestion exists
@@ -434,9 +436,13 @@ whole problem. The alternative is deleting those sections until they're real.
   quote for a corridor it serves, so the rate column is still a catalogue
   estimate — labelled as one now, rather than presented as live. The blocker
   moved from us to the ecosystem.
-- **No predictive signal.** Every scan is stored, so the data to detect an
-  anchor degrading before it goes dark exists and nothing reads it back. A
-  wallet would rather have 48 hours' warning than an accurate post-mortem.
+- **No predictive signal, and the data does not yet support one.** Now
+  measured rather than assumed: 15 live→slow, 7 slow→live, 1 dark→live, and
+  **zero transitions into dark** — every dark account was already dark when
+  first observed. A "48 hours' warning" model needs examples of the event it
+  predicts and there are none, so `/api/v1/trends.json` reports observed
+  changes and explicitly refuses to forecast. Revisit when a live→dark
+  transition has actually been caught.
 - ~~**The Soroban oracle has never been deployed.**~~ Live on **testnet**,
   currently `CDPCH3UO4ORG6OMWH5B4RCPIHN7TS5NL5QATWRW6DHEN7UYIPOX6B5LW`
   (redeployed 6 September as a mainnet dry run; the 13 August contract
