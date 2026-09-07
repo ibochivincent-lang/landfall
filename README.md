@@ -248,6 +248,7 @@ Copy `.env.example` to `.env` and adjust. Nothing in the example file is a secre
 | [docs/architecture/MULTICHAIN.md](docs/architecture/MULTICHAIN.md) | The cross-chain design: the STP attestation schema, the `ChainAdapter` interface, and the evidence-tier ladder that keeps a custodial guess from reading as ledger truth. |
 | [docs/methodology.md](docs/methodology.md) | Exactly how each published metric is computed, and where the method is weak. |
 | [docs/gaps.md](docs/gaps.md) | Honest inventory of what isn't built yet, ordered by how much each gap could hurt. |
+| [docs/product-vision-status.md](docs/product-vision-status.md) | The product vision deck, module by module, checked against what's actually running. |
 | [ROADMAP.md](ROADMAP.md) | Milestones mapped to the Stellar Community Fund Build Award's three tranches. |
 | [docs/deployment.md](docs/deployment.md) | Full deploy path: Supabase, production compose, Vercel, the oracle. |
 | [docs/GRAPHQL_API.md](docs/GRAPHQL_API.md) | The `/api/v1/graphql` schema, examples, and how it reuses the REST resolvers. |
