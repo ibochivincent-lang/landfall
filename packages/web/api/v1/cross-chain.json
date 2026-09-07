@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-06T23:26:07.016Z",
+  "generatedAt": "2026-09-07T01:56:30.109Z",
   "stpVersion": "1",
   "window": {
-    "since": "2026-08-07T23:25:48.487Z",
+    "since": "2026-08-08T01:56:08.989Z",
     "days": 30,
     "maxRecordsPerAccount": 200
   },
@@ -900,23 +900,23 @@
             "byAsset": [
               {
                 "asset": "APSUSDM",
-                "count": 93,
-                "volume": "671627.3"
+                "count": 105,
+                "volume": "693376.24"
               },
               {
                 "asset": "APSBPIUSD",
-                "count": 69,
-                "volume": "6383.21"
+                "count": 77,
+                "volume": "30851.88"
               },
               {
                 "asset": "APSEURM",
-                "count": 68,
-                "volume": "1234426.59"
+                "count": 49,
+                "volume": "1233203.16"
               },
               {
                 "asset": "APSBPOUSD",
-                "count": 10,
-                "volume": "4639.74"
+                "count": 14,
+                "volume": "1871.8"
               },
               {
                 "asset": "APSSARM",
@@ -925,13 +925,8 @@
               },
               {
                 "asset": "APSBPIEUR",
-                "count": 5,
-                "volume": "544.12"
-              },
-              {
-                "asset": "APSBPIGBP",
                 "count": 2,
-                "volume": "749.75"
+                "volume": "75"
               }
             ]
           },
@@ -1104,28 +1099,28 @@
               },
               {
                 "asset": "upvoteICE",
-                "count": 46,
-                "volume": "23858843.4231232"
+                "count": 47,
+                "volume": "27192752.0314526"
               },
               {
                 "asset": "governICE",
-                "count": 46,
-                "volume": "23858843.4231232"
+                "count": 47,
+                "volume": "27192752.0314526"
               },
               {
                 "asset": "ICE",
-                "count": 46,
-                "volume": "23858843.4231232"
+                "count": 47,
+                "volume": "27192752.0314526"
               },
               {
                 "asset": "gdICE",
-                "count": 34,
-                "volume": "455197464.1891905"
+                "count": 31,
+                "volume": "214894598.277608"
               },
               {
                 "asset": "dICE",
                 "count": 28,
-                "volume": "218506475.2925621"
+                "volume": "215792860.4609913"
               }
             ]
           },
@@ -1594,7 +1589,7 @@
               {
                 "asset": "USDC",
                 "count": 391,
-                "volume": "754950919.8656612"
+                "volume": "754556241.4956612"
               },
               {
                 "asset": "USDCAllow",
@@ -1704,6 +1699,25 @@
             "chain": "stellar",
             "asset": "USDC",
             "direction": "deposit",
+            "amount": "53502.6300000",
+            "onchain_ref": "ef6fcd9bb6826da095de6458268ff24eed1e7dee6b203d1e0063e2b079f93c3b",
+            "fiat_leg_ref": null,
+            "evidence_tier": "PROVEN",
+            "evidence_detail": "stellar_ledger",
+            "keystone_ref": null,
+            "observed_at": "2026-09-07T01:35:25Z",
+            "signer": "landfall-attester-dev"
+          },
+          "digest": "32cc12513277822bd39de9bec8de30feebbcf19bf486ba51942f51913c3f890b",
+          "signed": false
+        },
+        {
+          "attestation": {
+            "stp_version": "1",
+            "anchor_id": "centre.io",
+            "chain": "stellar",
+            "asset": "USDC",
+            "direction": "deposit",
             "amount": "213514.9100000",
             "onchain_ref": "1068360bca7c1e6681f02100526ccca70e9fa4ce06dc3354d936026020f03e43",
             "fiat_leg_ref": null,
@@ -1733,25 +1747,6 @@
             "signer": "landfall-attester-dev"
           },
           "digest": "bf12a2f3d396d3cb7c8c117ff332747a4c0256edb5d9a9c40160c09bee6442eb",
-          "signed": false
-        },
-        {
-          "attestation": {
-            "stp_version": "1",
-            "anchor_id": "centre.io",
-            "chain": "stellar",
-            "asset": "USDC",
-            "direction": "deposit",
-            "amount": "0.0100000",
-            "onchain_ref": "c1bbc39dd2f5f0e68c6ca7385cb55f07b4f9f8e050642fb0f1a2cd7360312cdd",
-            "fiat_leg_ref": null,
-            "evidence_tier": "PROVEN",
-            "evidence_detail": "stellar_ledger",
-            "keystone_ref": null,
-            "observed_at": "2026-09-06T06:43:16Z",
-            "signer": "landfall-attester-dev"
-          },
-          "digest": "6035acd04f4b3ce4b7c315c6cae3c5ab9a13272dcdbb8a80a48af98bcc298717",
           "signed": false
         }
       ]
@@ -2654,7 +2649,7 @@
               {
                 "asset": "XTAR",
                 "count": 180,
-                "volume": "0.0215492"
+                "volume": "0.021549"
               },
               {
                 "asset": "AQUA",
@@ -2808,15 +2803,15 @@
             "asset": "XTAR",
             "direction": "deposit",
             "amount": "0.0001641",
-            "onchain_ref": "82e807f7a781b0b5438f301ecfe00dad62165d52189c5cead00017dd1e7f2e5b",
+            "onchain_ref": "9053f8c0e49c1df2c77e905862cfa195a6906a7dca4a919ec0946be1c8d7583d",
             "fiat_leg_ref": null,
             "evidence_tier": "PROVEN",
             "evidence_detail": "stellar_ledger",
             "keystone_ref": null,
-            "observed_at": "2026-09-06T23:01:15Z",
+            "observed_at": "2026-09-07T01:01:03Z",
             "signer": "landfall-attester-dev"
           },
-          "digest": "64d8c32bff10ebf4d12c59c7cf8d2172271c87d3a64dedf746f5f8b1db55732d",
+          "digest": "086a9e3037736b85a122da87e00b56311863f8056c8d88126e7c98b502edf4b0",
           "signed": false
         }
       ]
