@@ -9,8 +9,35 @@ Expect an acknowledgement within 72 hours and an assessment within a week.
 
 ## What counts as a vulnerability here
 
-Landfall holds no user funds and has no authentication, so the usual web
-application surface mostly does not apply. What matters for this project:
+Landfall holds no user funds and moves no money. It does, however, have real
+authentication — an earlier version of this page said it had none, which was
+true when written and stopped being true when the developer portal shipped.
+Both the ordinary web application surface and the project-specific one below
+are in scope.
+
+**Authentication and the developer portal.** `/portal.html` has self-serve
+accounts (email plus scrypt-hashed password), server-side sessions over
+cookies, and issued API keys (`lf_live_…`) stored hashed, under token-bucket
+rate limits. All of it is in scope: session fixation or forgery, privilege
+escalation between accounts, API keys that outlive revocation, rate limits
+that can be bypassed, timing attacks on key or password comparison, and
+anything letting one portal user read another's data.
+
+**Signature-gated endpoints.** Disputing a fraud report requires an Ed25519
+signature from the reported Stellar account
+(`packages/fraud-reports/src/dispute.ts`). Any way to attach a response to a
+report without controlling that account, replay another account's signature,
+or get a signature accepted outside its validity window, is in scope — a
+forged response is as damaging as a forged accusation.
+
+**Admin and oracle authority.** The Soroban oracle's admin key can rewrite
+every published score, and its trust assumptions are documented plainly in
+[docs/TRUST.md](docs/TRUST.md). Weaknesses in how that authority is held,
+used, or could be escalated are in scope. So is anything letting a fraud
+report, a dispute, or an investigation be created or altered by someone who
+should not be able to.
+
+What matters most for this project, beyond the above:
 
 **Data integrity — the most serious class.** Anything that lets a third party
 influence a published figure. Landfall's entire value is that its numbers are

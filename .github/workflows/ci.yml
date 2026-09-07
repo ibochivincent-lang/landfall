@@ -51,6 +51,26 @@ jobs:
       - name: Build the publishable SDK
         run: npm run build -w @landfall/sdk
 
+      # SECURITY.md names supply chain as in-scope, and until now nothing
+      # checked. Runs on one Node version only — the dependency tree is the
+      # same on both, so a second run would just duplicate the finding.
+      #
+      # Fails on high and critical, reports moderate and below without
+      # blocking. The threshold is a judgement, not a default: a moderate
+      # advisory in a dev-only tool should not stop a data-integrity fix from
+      # merging, but a high in a tree that writes the published record — or
+      # builds the oracle contract — should stop everything until it is looked
+      # at. Both advisories present when this step was added (a fast-uri SSRF
+      # chain and a qs DoS) were fixed rather than grandfathered in.
+      - name: Audit dependencies
+        if: matrix.node == '20'
+        run: npm audit --audit-level=high
+
+      - name: Report non-blocking advisories
+        if: matrix.node == '20'
+        continue-on-error: true
+        run: npm audit --audit-level=low || true
+
       # ── Database steps ────────────────────────────────────────────────────
       # The database is optional in this project: the scan runs without it and
       # publishes static JSON either way. So an absent secret skips these with

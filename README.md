@@ -252,6 +252,7 @@ Copy `.env.example` to `.env` and adjust. Nothing in the example file is a secre
 | [docs/architecture.md](docs/architecture.md) | Package layout, the request/scan flow, and where each piece runs. |
 | [docs/architecture/MULTICHAIN.md](docs/architecture/MULTICHAIN.md) | The cross-chain design: the STP attestation schema, the `ChainAdapter` interface, and the evidence-tier ladder that keeps a custodial guess from reading as ledger truth. |
 | [docs/methodology.md](docs/methodology.md) | Exactly how each published metric is computed, and where the method is weak. |
+| [docs/TRUST.md](docs/TRUST.md) | What you have to trust to rely on this, stated plainly — including the one place you must trust a key rather than check a computation, and why the oracle is not on mainnet yet. |
 | [docs/gaps.md](docs/gaps.md) | Honest inventory of what isn't built yet, ordered by how much each gap could hurt. |
 | [docs/product-vision-status.md](docs/product-vision-status.md) | The product vision deck, module by module, checked against what's actually running. |
 | [ROADMAP.md](ROADMAP.md) | Milestones mapped to the Stellar Community Fund Build Award's three tranches. |

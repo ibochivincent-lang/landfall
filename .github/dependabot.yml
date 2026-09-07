@@ -1,0 +1,52 @@
+# Dependency updates.
+#
+# SECURITY.md names supply chain as in-scope — "a compromised dependency, or a
+# build step that could inject code into published output" — and until now
+# nothing actually watched for one. That gap matters twice here, because two
+# separate dependency trees feed things with real authority:
+#
+#   npm    — the hourly scan writes the published record, and api/[...path].js
+#            serves it. A compromised package there can falsify data whose
+#            entire value is that it is not supplied by an interested party.
+#
+#   cargo  — packages/contracts/landfall-oracle compiles to a Soroban contract
+#            whose admin can rewrite every published score. A compromised
+#            build dependency there reaches on-chain state, not just a website.
+#
+# Grouped so a week of patch bumps arrives as one reviewable PR rather than
+# twenty. Security updates are NOT grouped — those should land alone and
+# obviously.
+version: 2
+
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      dev-dependencies:
+        dependency-type: development
+        update-types: [minor, patch]
+      production-patches:
+        dependency-type: production
+        update-types: [patch]
+    commit-message:
+      prefix: "deps"
+
+  - package-ecosystem: cargo
+    directory: /packages/contracts/landfall-oracle
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    # Deliberately ungrouped: this tree builds a contract with on-chain
+    # authority, so each bump is worth seeing on its own.
+    commit-message:
+      prefix: "deps(contract)"
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: "deps(ci)"
