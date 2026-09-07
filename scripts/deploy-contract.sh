@@ -24,7 +24,7 @@ cd "$ROOT"
 # emit a wasm the network will reject. wasm32v1-none is the supported target.
 TARGET="wasm32v1-none"
 WASM="packages/contracts/target/$TARGET/release/landfall_oracle.wasm"
-ID_FILE=".contract-id"
+ID_FILE=""   # set per-network below, at the guard
 IDENTITY="landfall-deployer"
 
 say()  { printf '\n\033[1m%s\033[0m\n' "$*"; }
@@ -84,13 +84,29 @@ case "$NETWORK" in
   *)       fail "Unknown network '$NETWORK'. Use local, testnet or mainnet." ;;
 esac
 
+# One file per network. This used to be a single `.contract-id` shared by all
+# three, which meant a mainnet deploy either refused to run because the testnet
+# id was sitting there, or - with --force - overwrote it, destroying the only
+# local record of which contract is on which network. The ids are not
+# interchangeable, and confusing them points a publisher at the wrong ledger.
+# This repo already had .contract-id and .contract-id.testnet disagreeing.
+ID_FILE=".contract-id.$NETWORK"
+
+if [ -f ".contract-id" ] && [ ! -f ".contract-id.testnet" ]; then
+  mv ".contract-id" ".contract-id.testnet"
+  printf 'Moved legacy .contract-id to .contract-id.testnet\n'
+fi
+
 if [ -f "$ID_FILE" ] && [ "$FORCE" != "--force" ]; then
   fail "$ID_FILE already exists:
 
   $(cat "$ID_FILE")
 
-Deploying again would orphan it. Delete the file, or pass --force if that is
-genuinely what you want."
+That is the contract currently deployed to $NETWORK. Deploying again would
+orphan it - the old contract keeps existing, keeps its state, and every
+consumer still pointing at it keeps reading a digest nobody updates.
+
+Delete the file, or pass --force if that is genuinely what you want."
 fi
 
 # ------------------------------------------------------------------ build
@@ -133,8 +149,23 @@ if [ -n "$FRIENDBOT" ]; then
     && printf '     funded via friendbot\n' \
     || printf '     friendbot declined (already funded, most likely)\n'
 else
-  printf '     mainnet: fund %s yourself before continuing\n' "$ADDRESS"
-  read -r -p "     Funded? [y/N] " ok
+  printf '     mainnet: this account must hold XLM before continuing\n'
+  printf '     fund:  %s\n' "$ADDRESS"
+  printf '     needs: ~15 XLM setup, then ~84 XLM/year - measured on testnet\n'
+
+  # Check rather than take the operator's word for it: a deploy that dies
+  # halfway because the account is empty leaves an uploaded wasm and no
+  # contract, and whoever ran it must then work out which half happened.
+  BAL="$(curl -fsS "https://horizon.stellar.org/accounts/$ADDRESS" 2>/dev/null | tr ',' '\n' | grep -A1 '"asset_type":"native"' | grep '"balance"' | head -1 | sed 's/.*: *"//; s/".*//' || true)"
+  if [ -z "$BAL" ]; then
+    fail "That account does not exist on mainnet yet:
+
+  $ADDRESS
+
+Send it XLM first, then re-run. Nothing has been deployed."
+  fi
+  printf '     balance: %s XLM\n' "$BAL"
+  read -r -p "     Proceed with a REAL mainnet deploy? [y/N] " ok
   [ "$ok" = "y" ] || fail "Stopped."
 fi
 

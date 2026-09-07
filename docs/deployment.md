@@ -331,6 +331,30 @@ to the testnet network passphrase while the workflow never passed
 `ORACLE_NETWORK_PASSPHRASE` — which would have made a mainnet oracle fail
 silently every run, since that step is `continue-on-error`.
 
+### What mainnet costs
+
+Measured on testnet rather than estimated — Soroban resource fees use the same
+formula on both networks, so these are the real numbers:
+
+| | XLM | When |
+|---|---|---|
+| Account minimum reserve | 1.00 | once, recoverable if the account is merged |
+| Wasm upload (15.6 KB optimised) | 1.09 | once |
+| Deploy + initialise | 0.004 | once |
+| First `publish` — 90-day rent | 12.88 | once |
+| **Steady-state `publish`** | **0.000765** | every scan |
+| Rent re-extension | 12.88 | roughly every 60 days |
+
+So **~15 XLM to set up** and **~84 XLM/year** to keep running, dominated
+entirely by rent rather than by the hourly writes.
+
+That 12.88 figure is worth understanding before it alarms anyone: `publish`
+calls `extend_ttl(30 days → 90 days)`, which only charges when the TTL has
+actually fallen below the threshold. The first publish after a deploy pays for
+90 days of instance rent; the next 8,600 or so pay 0.000765 each. Confirmed by
+publishing twice to testnet and reading `fee_charged` on both — a 16,833×
+difference between the first call and the second.
+
 ### Toolchain first
 
 Two installs, roughly fifteen minutes between them. Check before you build,
