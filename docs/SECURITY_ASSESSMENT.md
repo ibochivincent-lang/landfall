@@ -44,7 +44,7 @@ Everything below is ranked by which of those it enables.
 | 1 | Any registered user could reach every `/admin` route, including anchor writes | A01 | Elevation of Privilege | **Critical** | Fixed |
 | 2 | Unhandled errors returned internal messages to the caller | A10 | Information Disclosure | Medium | Fixed |
 | 3 | Oracle admin is a single hot key, no multisig, no timelock | A06 | Tampering / EoP | **High** (prospective) | Open — needs a key decision |
-| 4 | No alerting when the scan, oracle publish, or dispatch silently stops | A09 | Repudiation / DoS | Medium | Open |
+| 4 | No alerting when the scan, oracle publish, or dispatch silently stops | A09 | Repudiation / DoS | Medium | Fixed |
 | 5 | `clientIp()` trusts the leftmost `X-Forwarded-For` | A01 | Spoofing | Low today | Documented assumption |
 | 6 | Contract has no external audit | A06 | Tampering | Medium (prospective) | Open — Audit Bank |
 
@@ -131,7 +131,7 @@ The distinction that matters, and that summaries usually blur:
 The contract emits `AdminChanged` on handover, so a takeover is publicly
 visible — but see finding 4: nothing watches.
 
-### 4. No alerting — Medium, open
+### 4. No alerting — Medium, fixed
 
 **A09:2025 Security Logging and Alerting Failures · STRIDE: Repudiation, DoS**
 
@@ -146,8 +146,22 @@ specific:
   would want paged about, and no consumer exists for it.
 - A repeatedly failing dispatch means degradation webhooks quietly stop.
 
-**Suggested fix:** an `if: failure()` step that opens (or updates) a GitHub
-issue. Cheap, needs no external service, and puts the alert where the work is.
+**Fixed.** `if: failure()` would not have worked: with `continue-on-error`
+the job's conclusion is *success*, so it never fires. The alert step
+(`scripts/alert-on-failure.mjs`, wired as the last step with `if: always()`)
+reads each identified step's **outcome** out of `toJSON(steps)` instead —
+which required giving ids to the 14 `continue-on-error` steps that had none,
+since a step without an id does not appear there at all.
+
+It opens one tracking issue, comments only when the failing set *changes* (an
+hourly cron against a persistently broken step would otherwise post 24
+identical comments a day and train everyone to ignore the label), and closes
+the issue on recovery. It is itself `continue-on-error` and exits 0 on any
+error: an alerter that fails the job converts a missing notification into a
+broken pipeline.
+
+Still open within this finding: nothing watches the oracle's `AdminChanged`
+event, which is a different signal on a different system.
 
 ### 5. `X-Forwarded-For` trust — Low today, documented
 

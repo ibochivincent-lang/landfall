@@ -19,6 +19,9 @@ concurrency:
 
 permissions:
   contents: write
+  # The alert step below opens, comments on and closes one tracking issue
+  # when a continue-on-error step fails silently. See scripts/alert-on-failure.mjs.
+  issues: write
 
 jobs:
   scan:
@@ -50,6 +53,7 @@ jobs:
       # Without it the scan still runs and writes JSON to ./out — that's enough
       # for the static API update step below.
       - name: Run ledger scan
+        id: scan
         continue-on-error: true   # persist failure must not skip the JSON update
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
@@ -115,6 +119,7 @@ jobs:
       # must not hold the settlement data hostage — the previous pages stay in
       # place and go visibly stale, which is the honest failure.
       - name: Build anchor profiles and pages
+        id: profiles
         if: steps.verify.outcome == 'success'
         continue-on-error: true
         run: node scripts/build-anchor-profiles.mjs
@@ -128,6 +133,7 @@ jobs:
       # continue-on-error for the same reason as the steps around it: this is a
       # derived artifact, and the ledger scan is what must reach the commit.
       - name: Build evidence commitments
+        id: evidence
         if: steps.verify.outcome == 'success'
         continue-on-error: true
         run: npx tsx scripts/build-evidence.ts
@@ -137,6 +143,7 @@ jobs:
       # terms. Replaces a hardcoded table that had drifted badly — Anclap
       # publishes 2% where the table said 0.5%, nTokens 20% where it said 0.4%.
       - name: Refresh anchor fees
+        id: fees
         continue-on-error: true
         run: node scripts/fetch-anchor-fees.mjs
 
@@ -147,6 +154,7 @@ jobs:
       # the artifact says exactly which, and why — but the ones that do get
       # priced from a live quote instead of a constant nobody has revisited.
       - name: Refresh anchor FX quotes
+        id: quotes
         continue-on-error: true
         run: node scripts/fetch-anchor-quotes.mjs
 
@@ -156,10 +164,12 @@ jobs:
       # that with declared currencies and ledger liveness into a routing index
       # a wallet can query in one request.
       - name: Probe anchor capabilities
+        id: capabilities
         continue-on-error: true
         run: node scripts/probe-capabilities.mjs
 
       - name: Build routing index
+        id: routes
         continue-on-error: true
         run: node scripts/build-routes.mjs
 
@@ -171,6 +181,7 @@ jobs:
       # yesterday can be told apart. Runs regardless of the scan gate: drift is
       # about the declaration, not about the ledger figures.
       - name: Detect SEP-1 configuration drift
+        id: drift
         continue-on-error: true
         run: node scripts/detect-toml-drift.mjs
 
@@ -183,11 +194,13 @@ jobs:
       # Reports observed state transitions only — see the script header for
       # why it does not forecast.
       - name: Build trend history
+        id: trends
         if: steps.verify.outcome == 'success'
         continue-on-error: true
         run: node scripts/build-trends.mjs
 
       - name: Build per-asset settlement health
+        id: asset_health
         if: steps.verify.outcome == 'success'
         continue-on-error: true
         run: node scripts/build-asset-health.mjs
@@ -205,6 +218,7 @@ jobs:
       # file from git history. Blocking the snapshot commit over it would
       # trade a recoverable gap for an unrecoverable one.
       - name: Append scan to measurement history
+        id: history
         if: steps.verify.outcome == 'success'
         continue-on-error: true
         run: node scripts/append-scan-history.mjs
@@ -220,6 +234,7 @@ jobs:
       # the page's freshness stamp shows it going stale, which is the honest
       # outcome — better than committing a half-written scan.
       - name: Run cross-chain scan
+        id: cross_chain
         continue-on-error: true
         env:
           HORIZON_URL: https://horizon.stellar.org
@@ -234,6 +249,7 @@ jobs:
       # No-ops cleanly (exit 0, clear log line) until DATABASE_URL is set and
       # there are two finished scans to diff — see scripts/dispatch-webhooks.mjs.
       - name: Dispatch dark-transition webhooks
+        id: webhooks
         continue-on-error: true   # a delivery failure must not block the JSON commit
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
@@ -243,6 +259,7 @@ jobs:
       # No-ops cleanly until ORACLE_CONTRACT_ID/ORACLE_ADMIN_SECRET are set —
       # see scripts/publish-oracle.mjs and docs/gaps.md.
       - name: Publish scan digest to oracle
+        id: oracle
         continue-on-error: true
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
@@ -284,3 +301,22 @@ jobs:
           # Only commit if there are actual changes
           git diff --staged --quiet || git commit -m "chore: hourly ledger scan $(date -u +%Y-%m-%d-%H00)"
           git push
+
+      # ── 9. Say something when a swallowed failure happens ─────────────────────
+      # Almost every step above is continue-on-error on purpose, which means a
+      # step can fail every hour and the workflow stays green. `if: failure()`
+      # would never fire here — with continue-on-error the job's conclusion is
+      # success. So this reads each identified step's *outcome* instead.
+      #
+      # always(): it must run after a real failure too, not only after the
+      # swallowed kind. It opens one tracking issue, comments only when the
+      # failing set changes, and closes it on recovery.
+      #
+      # docs/SECURITY_ASSESSMENT.md finding 4 (OWASP A09:2025).
+      - name: Alert on silent step failure
+        if: always()
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          STEPS_JSON: ${{ toJSON(steps) }}
+        run: node scripts/alert-on-failure.mjs
