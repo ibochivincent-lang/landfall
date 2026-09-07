@@ -868,7 +868,28 @@ footer {
    RESPONSIVE — 850px
    ============================================================ */
 @media (max-width: 850px) {
-  .nav__links, .nav__actions .text-link { display: none; }
+  /* The hamburger toggles .is-open on .nav__links (app.js). That class was
+     never styled, so the button reported aria-expanded="true" and the menu
+     stayed display:none — it could not open at all. */
+  .nav__links { display: none; }
+  .nav__actions .text-link { display: none; }
+
+  .nav__links.is-open {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    padding: 8px;
+    background: var(--paper, #fff);
+    border-bottom: 1px solid var(--line, #e5e7eb);
+    box-shadow: 0 12px 24px rgba(6, 31, 45, 0.08);
+    z-index: 60;
+  }
+  .nav__links.is-open a { padding: 12px 14px; }
+  .nav { position: relative; }
   .nav { gap: 0; }
   .nav__actions { margin-left: auto; margin-right: 16px; }
   .menu { display: grid; gap: 5px; }

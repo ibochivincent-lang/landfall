@@ -382,8 +382,60 @@
 /* ============================================================
    RESPONSIVE
    ============================================================ */
+/* ── Mobile navigation ──────────────────────────────────────────────────
+   The burger is created by nav.js, not written into six copies of the
+   header markup. Hidden above the breakpoint entirely. */
+.topnav__burger { display: none; }
+
 @media (max-width: 780px) {
-  .topnav__pill { display: none; }
+  /* The nav collapses into a panel rather than disappearing. It used to be
+     display:none with nothing to bring it back, which left every page using
+     this header with no navigation at all on a phone. */
+  .topnav__pill {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    gap: 0;
+    margin: 0;
+    padding: 8px;
+    background: var(--paper, #fbfcfa);
+    border-bottom: 1px solid var(--line, #d9e2dd);
+    box-shadow: 0 12px 24px rgba(6, 31, 45, 0.08);
+    z-index: 60;
+  }
+  .topnav__pill.is-open { display: flex; }
+  .topnav__pill .topnav__link { padding: 12px 14px; border-radius: 8px; }
+
+  .topnav { position: relative; }
+  .topnav__in { position: relative; }
+
+  .topnav__burger {
+    display: grid;
+    gap: 5px;
+    margin-left: auto;
+    background: transparent;
+    border: 0;
+    padding: 8px 4px;
+    cursor: pointer;
+  }
+  .topnav__burger i {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: var(--ink, #061f2d);
+    transition: transform 0.18s ease, opacity 0.18s ease;
+  }
+  .topnav__burger.is-open i:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .topnav__burger.is-open i:nth-child(2) { opacity: 0; }
+  .topnav__burger.is-open i:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* The action buttons crowd the burger on a narrow screen; the panel
+     carries the same destinations. */
+  .topnav__actions { display: none; }
+
   .dash { padding: 38px 0; }
   .dash-head { display: block; }
   .freshness { display: inline-block; margin-top: 16px; }
