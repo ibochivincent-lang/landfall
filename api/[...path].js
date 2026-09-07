@@ -1391,7 +1391,8 @@ export function assembleInvestigation(reportId, investigatedAt, prepared, narrat
   };
 }
 
-const INVESTIGATOR_MODEL = 'gpt-4o-mini';
+const INVESTIGATOR_MODEL = 'openai/gpt-4o-mini';
+const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1';
 
 /**
  * The only network call to an LLM in this file. Returns null (never throws
@@ -1399,13 +1400,19 @@ const INVESTIGATOR_MODEL = 'gpt-4o-mini';
  * cited facts still compute and display either way, matching the
  * STP-signing and Soroban-oracle degrade-without-config pattern used
  * elsewhere in this codebase.
+ *
+ * Routed through OpenRouter (OpenAI-compatible API, so the same `openai`
+ * client works with just a different baseURL) rather than OpenAI directly —
+ * that's the account actually configured for this project. Model id is
+ * OpenRouter's namespaced form, not OpenAI's own ("openai/gpt-4o-mini",
+ * not "gpt-4o-mini").
  */
 async function investigatorCallModel(prompt) {
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) return null;
   try {
     const { default: OpenAI } = await import('openai');
-    const client = new OpenAI({ apiKey });
+    const client = new OpenAI({ apiKey, baseURL: OPENROUTER_BASE_URL });
     const completion = await client.chat.completions.create({
       model: INVESTIGATOR_MODEL,
       messages: [
@@ -2633,7 +2640,7 @@ export default async function handler(req, res) {
     //
     // Sentinel's "Analyzed" stage. Computes cited_facts and relevant_signals
     // with no AI involved — those alone are the return value whenever no
-    // OPENAI_API_KEY is configured. When a key is configured, the same
+    // OPENROUTER_API_KEY is configured. When a key is configured, the same
     // deterministic prompt is sent to the model and its prose is stored
     // alongside the facts, explicitly labeled with the model name. Report
     // volume about the subject is never fetched here and never enters the

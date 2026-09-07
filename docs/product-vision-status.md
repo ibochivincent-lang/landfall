@@ -31,7 +31,7 @@ Last checked: 7 September 2026.
 |---|---|---|
 | **Trust Check** | ✅ Shipping | `/trust-check.html` — paste an address or tx hash, get history/concentration/forwarding signals, a transparent 0–100 score, confidence rating |
 | **Fraud Reports** | ✅ Shipping, minus review | `POST /api/v1/fraud-reports` — every report must cite a tx hash Landfall verifies exists and involves the subject before storing it. Reports render on the Trust Check page, kept in their own card, never blended into the score |
-| **AI Investigator** | ⚠️ Shipping, narrative needs a key | `packages/investigator`, `POST /api/v1/fraud-reports/:id/investigate` — cited facts and relevant Trust Check signals are deterministic and always computed, with no AI. The narrative half is optional AI prose over exactly those facts, and is `null` whenever `OPENAI_API_KEY` isn't configured — no key is set in production yet, so today every investigation returns facts with no narrative |
+| **AI Investigator** | ⚠️ Shipping, narrative needs a key | `packages/investigator`, `POST /api/v1/fraud-reports/:id/investigate` — cited facts and relevant Trust Check signals are deterministic and always computed, with no AI. The narrative half is optional AI prose over exactly those facts, and is `null` whenever `OPENROUTER_API_KEY` isn't configured — no key is set in production yet, so today every investigation returns facts with no narrative |
 | **Intent Engine** | ✅ Shipping | `packages/intents/src/solve.ts` + `plan.ts` — `solveIntent()` picks a route, `buildPlan()` turns it into ordered steps, each carrying an explicit actor (`user`/`wallet`/`anchor`/`landfall`) so a plan can never imply Landfall executes anything |
 | **Route Engine** | ✅ Shipping | Same package — cost/reliability/liquidity-ranked routing, `sortBy: "verified"` mode ranks evidence ahead of price. See `docs/architecture/VERIFIED_ROUTES.md` |
 | **Agent Gateway** | ⚠️ Partial | MCP server ships (`scripts/mcp/server.mjs`, 11 tools — see below); SDK published to npm ([`@landfall/sdk`](https://www.npmjs.com/package/@landfall/sdk)); x402 payee-safety check wired (`packages/x402`), no facilitator — see below, on purpose |
@@ -60,7 +60,7 @@ inferred by a model.
 |---|---|
 | Reported | ✅ `POST /api/v1/fraud-reports` |
 | Observed | ✅ The cited tx hash is verified against the ledger before the report is stored — fabricated or unrelated evidence is rejected, not filed |
-| Analyzed | ⚠️ `POST /api/v1/fraud-reports/:id/investigate` computes deterministic cited facts and relevant Trust Check signals for the report, with no AI. It also asks a model for a plain-language narrative of exactly those facts — but no `OPENAI_API_KEY` is configured in production yet, so the narrative half returns `null` until one is set |
+| Analyzed | ⚠️ `POST /api/v1/fraud-reports/:id/investigate` computes deterministic cited facts and relevant Trust Check signals for the report, with no AI. It also asks a model for a plain-language narrative of exactly those facts — but no `OPENROUTER_API_KEY` is configured in production yet, so the narrative half returns `null` until one is set |
 | Reviewed | ✅ Dispute path exists — `POST /api/v1/fraud-reports/:id/dispute`, gated on a signature from the reported address, per `DISPUTES.md` |
 | Attested | ⚠️ Reports are stored and disputable; no cryptographic attestation is generated over a report+dispute pair the way settlement events are |
 
@@ -141,7 +141,7 @@ works, verified against the live registry copy.
 ~~AI Investigator / the "Analyzed" stage of Sentinel.~~ **Code done, 7
 September** — `packages/investigator`, `POST /api/v1/fraud-reports/:id/investigate`,
 `landfall_investigation` MCP tool. Cited facts and Trust Check signals are
-deterministic and live now; the AI narrative needs `OPENAI_API_KEY` set in
+deterministic and live now; the AI narrative needs `OPENROUTER_API_KEY` set in
 production, which is not done yet — until then every investigation returns
 facts with a `null` narrative, which is the module's documented degrade
 path, not a bug.
@@ -153,7 +153,7 @@ before an agent signs. Deliberately does not verify or settle a payment —
 that stays the facilitator's job, not this repo's, the same custody line
 `plan.ts` and `VERIFIED_ROUTES.md` already draw.
 
-1. **Set `OPENAI_API_KEY` in production**, or decide not to — the narrative
+1. **Set `OPENROUTER_API_KEY` in production**, or decide not to — the narrative
    half of AI Investigator is otherwise finished code waiting on a key and a
    decision about that cost, not an engineering gap.
 2. **Get one external consumer of anything** — a wallet calling
