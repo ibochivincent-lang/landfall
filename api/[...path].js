@@ -57,6 +57,13 @@ import { graphql, buildSchema } from 'graphql';
 // Engine's arithmetic exists in one plain-JS place rather than two that can
 // disagree. See that file's header.
 import { LandfallIntent } from './_lib/intent-bridge.js';
+import {
+  buildChallenge,
+  issueJwt,
+  readChallengeIdentity,
+  sep10Config,
+  verifyChallenge,
+} from './_lib/sep10.js';
 
 const { Pool } = pg;
 const scrypt = promisify(scryptCb);
@@ -1924,6 +1931,124 @@ export default async function handler(req, res) {
   const parts  = stripped.split('/').filter(Boolean);
   const joined = parts.join('/');
 
+  /* ── SEP-10 Stellar Web Authentication ──────────────────────────────────
+     GET  /api/v1/auth?account=G...  -> a challenge transaction to sign
+     POST /api/v1/auth {transaction} -> a JWT, if the signatures check out
+
+     For anchor operators, this is the login that actually asks the right
+     question. The portal's email/password proves someone knows a secret;
+     this proves they control the Stellar account Landfall is scoring, which
+     is the only claim worth making here. Same principle the dispute path
+     already uses, in the standard, wallet-interoperable form.
+
+     Handled before the DATABASE_URL gate for the same reason trust-check is:
+     it reads Horizon and this app's own Postgres has no part in it. */
+  if (joined === 'v1/auth' && (req.method === 'GET' || req.method === 'POST')) {
+    const cfg = sep10Config();
+    if (!cfg) {
+      return json(res, 503, {
+        error: 'Stellar web authentication is not enabled on this deployment.',
+        detail: 'SEP10_SERVER_SECRET is not configured. Nothing is half-enabled: no challenge is issued and no token can be minted.',
+      }, 0);
+    }
+
+    if (req.method === 'GET') {
+      const url = new URL(req.url, `https://${req.headers.host}`);
+      const account = url.searchParams.get('account') || '';
+      try {
+        return json(res, 200, buildChallenge(account, cfg), 0);
+      } catch (err) {
+        return json(res, 400, { error: err.message }, 0);
+      }
+    }
+
+    // POST — verify the signed challenge.
+    //
+    // Requires the database, and fails closed without it. Every other route
+    // here degrades to "answer anyway" when Postgres is unreachable, because
+    // serving stale ledger data beats serving nothing. This one is the
+    // exception: without storage there is no way to enforce single use, and
+    // an authentication endpoint that cannot refuse a replayed challenge
+    // should refuse everything instead.
+    const db = pool();
+    if (!db) {
+      return json(res, 503, {
+        error: 'Authentication is temporarily unavailable.',
+        detail: 'Single-use enforcement for challenges needs the database, and it is unreachable. Refusing rather than issuing tokens that could be replayed.',
+      }, 0);
+    }
+
+    const { allowed } = await rateLimit(db, `sep10:${clientIp(req)}`, 20);
+    if (!allowed) return json(res, 429, { error: 'Too many authentication attempts. Try again in a minute.' }, 0);
+
+    const body = await readJsonBody(req);
+    const xdr = body?.transaction;
+    if (typeof xdr !== 'string' || !xdr) {
+      return json(res, 400, { error: 'Body must include the signed challenge as "transaction".' }, 0);
+    }
+
+    // The client account is read out of the challenge itself, never from the
+    // request — otherwise a caller could name an account they do control and
+    // have the signature checked against the wrong one.
+    let identity;
+    try {
+      identity = readChallengeIdentity(xdr, cfg);
+    } catch (err) {
+      return json(res, 400, { error: err.message }, 0);
+    }
+    const clientAccount = identity.account;
+
+    // On-chain reality: the account's real signers and medium threshold. A
+    // 404 means the account does not exist yet, which SEP-10 handles as
+    // "master key must sign, exactly once" rather than as an error.
+    let signers = null;
+    try {
+      const acct = await trustCheckGetJson(`${TRUST_CHECK_HORIZON}/accounts/${clientAccount}`);
+      signers = {
+        signers: (acct.signers ?? []).map((s) => ({ key: s.key, weight: s.weight })),
+        threshold: acct.thresholds?.med_threshold ?? 1,
+      };
+    } catch (err) {
+      if (err.status !== 404) {
+        console.error('[sep10]', err.message);
+        return json(res, 502, { error: 'Could not reach Horizon to read that account. Try again shortly.' }, 0);
+      }
+    }
+
+    let verified;
+    try {
+      verified = verifyChallenge(xdr, cfg, signers);
+    } catch (err) {
+      return json(res, err.code === 'unauthorized' ? 401 : 400, { error: err.message }, 0);
+    }
+
+    // Spend the nonce. The unique constraint is the check, not a preceding
+    // SELECT — two requests racing with the same captured challenge must not
+    // both win, and only the database can decide that.
+    try {
+      const { rowCount } = await db.query(
+        `INSERT INTO sep10_challenges (nonce, account, expires_at)
+         VALUES ($1, $2, $3) ON CONFLICT (nonce) DO NOTHING`,
+        [identity.nonce, verified.account, identity.expiresAt],
+      );
+      if (rowCount === 0) {
+        return json(res, 401, {
+          error: 'That challenge has already been used. Request a new one.',
+          detail: 'Challenges are single-use, so a captured one cannot be replayed for a second token.',
+        }, 0);
+      }
+    } catch (err) {
+      console.error('[sep10]', err.message);
+      return json(res, 503, { error: 'Could not record the challenge as used. Refusing rather than risking a replayable token.' }, 0);
+    }
+
+    // Opportunistic sweep of spent nonces that could no longer be accepted
+    // anyway. Cheap, bounded, and keeps the table from growing without end.
+    db.query(`DELETE FROM sep10_challenges WHERE expires_at < now() - interval '1 hour'`).catch(() => {});
+
+    return json(res, 200, { token: issueJwt(verified.account, cfg) }, 0);
+  }
+
   // GET /api/v1/trust-check?address=G...|txHash
   //
   // Deliberately handled before the DATABASE_URL gate below: this route is
@@ -2433,7 +2558,10 @@ export default async function handler(req, res) {
        with different input. Adding a write route means adding it here too —
        which the test in api/_lib/routes.test.mjs now enforces, so the next
        one cannot be forgotten the way these three were. */
-    const POST_ROUTES = new Set(['v1/intent', 'v1/fraud-reports', 'v1/fiat-confirmations', 'v1/x402/check-payee']);
+    // v1/auth is listed even though it is handled above this guard and never
+    // reaches it — belt and braces, so that moving the route down here later
+    // does not silently strand it the way three routes were stranded before.
+    const POST_ROUTES = new Set(['v1/intent', 'v1/fraud-reports', 'v1/fiat-confirmations', 'v1/x402/check-payee', 'v1/auth']);
     /* Parameterised write paths, which an exact set cannot express. Kept as
        a separate list rather than loosening POST_ROUTES to prefixes: a
        prefix would also admit v1/fraud-reports/anything, and the point of

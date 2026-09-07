@@ -242,6 +242,10 @@ Copy `.env.example` to `.env` and adjust. Nothing in the example file is a secre
 | `CORS_ORIGIN` | No | `*` | API CORS origin. |
 | `ORACLE_CONTRACT_ID` | Only to publish on-chain | — | Deployed Soroban oracle contract id. |
 | `ORACLE_ADMIN_SECRET` | Only to publish on-chain | — | Admin key for the oracle contract. Never commit this. |
+| `SEP10_SERVER_SECRET` | For Stellar web auth | — | Server signing key (`S...`) for [SEP-10](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0010.md). Unset means `/api/v1/auth` reports that web auth is disabled — no challenge, no token, nothing half-enabled. |
+| `SEP10_HOME_DOMAIN` | No | `landfall-chi.vercel.app` | Home domain named in the challenge. Must match what the client expects, or its wallet will refuse to sign. |
+| `SEP10_NETWORK_PASSPHRASE` | No | Public network | Set to the testnet passphrase to authenticate testnet accounts. |
+| `SEP10_JWT_LIFETIME_SECONDS` | No | `86400` | Token lifetime. |
 | `RESEND_API_KEY` | For password-reset emails | — | [Resend](https://resend.com) API key. Without it, the reset endpoint logs a clear failure instead of pretending to succeed. |
 | `FROM_EMAIL` | Same as above | — | Sending address. Must be on a domain verified with Resend — it cannot send from a `vercel.app` subdomain this project doesn't control DNS for. |
 

@@ -60,6 +60,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.30.0",
+    "@stellar/stellar-base": "^15.0.0",
     "graphql": "^17.0.2",
     "openai": "^4.55.0",
     "pg": "^8.13.1",

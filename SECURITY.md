@@ -30,6 +30,15 @@ report without controlling that account, replay another account's signature,
 or get a signature accepted outside its validity window, is in scope — a
 forged response is as damaging as a forged accusation.
 
+**SEP-10 Stellar web authentication** (`api/_lib/sep10.js`, `/api/v1/auth`).
+Anchor operators can authenticate by proving control of a Stellar account
+instead of with a password. In scope: any way to obtain a token for an
+account you do not control, replay a captured challenge (they are single-use,
+enforced by a unique constraint — see migration 013), get a challenge this
+server never issued accepted, defeat the signer-weight check against an
+account's medium threshold so that one key authenticates a multisig account,
+or forge or extend a JWT.
+
 **Admin and oracle authority.** The Soroban oracle's admin key can rewrite
 every published score, and its trust assumptions are documented plainly in
 [docs/TRUST.md](docs/TRUST.md). Weaknesses in how that authority is held,
