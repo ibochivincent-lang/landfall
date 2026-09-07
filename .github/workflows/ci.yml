@@ -41,6 +41,16 @@ jobs:
       - name: Test
         run: npm test
 
+      # The SDK is published to npm, and its publish build is not the same
+      # compilation as `typecheck` above: it emits, and it pulls in two
+      # sibling packages by relative path so the tarball is self-contained.
+      # That means it can break in ways nothing else here would notice —
+      # a moved file in packages/stp would leave the last published version
+      # fine and the next one broken. Build it on every run so that failure
+      # arrives now rather than at `npm publish`.
+      - name: Build the publishable SDK
+        run: npm run build -w @landfall/sdk
+
       # ── Database steps ────────────────────────────────────────────────────
       # The database is optional in this project: the scan runs without it and
       # publishes static JSON either way. So an absent secret skips these with

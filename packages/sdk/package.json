@@ -1,15 +1,54 @@
 {
   "name": "@landfall/sdk",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "type": "module",
   "license": "MIT",
-  "description": "Cross-chain scan orchestration: runs every ChainAdapter for one anchor, turns events into STP attestations, and reports the tier mix. See docs/architecture/MULTICHAIN.md.",
+  "description": "Evidence-tiered anchor ranking and cross-chain settlement scanning for Stellar. pickAnchor() never lets weaker evidence outrank ledger-proven settlement.",
   "scripts": {
     "test": "tsx --test test/*.test.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "build": "tsc -p tsconfig.build.json",
+    "prepublishOnly": "npm run build && npm test"
   },
   "dependencies": {
     "zod": "^4.4.3"
+  },
+  "keywords": [
+    "stellar",
+    "anchor",
+    "sep-1",
+    "settlement",
+    "soroban",
+    "attestation",
+    "cross-chain"
+  ],
+  "homepage": "https://landfall-chi.vercel.app",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ibochivincent-lang/landfall.git",
+    "directory": "packages/sdk"
+  },
+  "bugs": {
+    "url": "https://github.com/ibochivincent-lang/landfall/issues"
+  },
+  "author": "ibochivincent-lang",
+  "engines": {
+    "node": ">=20"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "main": "./dist/sdk/src/index.js",
+  "types": "./dist/sdk/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/sdk/src/index.d.ts",
+      "import": "./dist/sdk/src/index.js"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

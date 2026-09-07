@@ -1,0 +1,38 @@
+/*
+ * Publish build for @landfall/sdk.
+ *
+ * The source imports two sibling workspace packages by relative path
+ * (`../../stp/src/...`, `../../adapters/src/...`). Inside this monorepo that
+ * resolves fine; published on its own it would not, and a package whose
+ * imports point at directories that are not in the tarball is worse than no
+ * package at all.
+ *
+ * Rather than pull in a bundler, `rootDir` is set one level up so tsc
+ * compiles those siblings too and emits them alongside, preserving the
+ * relative structure the imports already use. The result is self-contained:
+ * dist/sdk/src/index.js is the entry point, and its `../../stp/...` imports
+ * resolve to dist/stp/... in the same tarball.
+ *
+ * The siblings are internal implementation detail of this SDK, same repo,
+ * same MIT licence — shipping their compiled form is honest, not a vendoring
+ * trick. If either is ever published in its own right, this becomes a real
+ * dependency instead and the relative imports change with it.
+ */
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "rootDir": "..",
+    "outDir": "dist",
+    "types": ["node"]
+  },
+  "include": [
+    "src/**/*.ts",
+    "../stp/src/**/*.ts",
+    "../adapters/src/**/*.ts"
+  ],
+  "exclude": ["test/**/*", "dist/**/*"]
+}

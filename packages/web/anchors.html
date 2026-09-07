@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Every tracked anchor — settlement records | Landfall</title>
+<meta name="description" content="Ledger-derived settlement records for 27 Stellar anchors across 108 declared accounts. 62 dark, 19 settling. Every figure traces to a transaction hash.">
+<link rel="canonical" href="https://landfall-chi.vercel.app/anchors">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --ink:#061f2d; --paper:#fbfcfa; --muted:#65777c; --line:#d9e2dd; --teal:#0b9c91; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--paper); color:var(--ink); font-family:Manrope,system-ui,sans-serif; }
+  .wrap { max-width:1040px; margin:0 auto; padding:0 20px; }
+  header { border-bottom:1px solid var(--line); padding:18px 0; }
+  .logo { font-weight:800; text-decoration:none; color:var(--ink); font-size:15px; }
+  .logo em { font-style:normal; color:var(--teal); }
+  h1 { font-size:28px; font-weight:800; margin:32px 0 6px; }
+  .sub { color:var(--muted); font-size:14px; line-height:1.6; max-width:70ch; margin:0 0 22px; }
+  .totals { display:flex; gap:22px; flex-wrap:wrap; padding:16px 0 20px; border-bottom:1px solid var(--line); }
+  .totals div { font-size:13px; color:var(--muted); }
+  .totals b { display:block; font-size:22px; color:var(--ink); font-weight:800; }
+  .head, .row { display:grid; grid-template-columns:2.2fr 1.7fr .9fr .9fr .6fr; gap:12px; align-items:center; }
+  .head { padding:14px 10px; font-size:11px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); font-weight:700; }
+  .row { padding:14px 10px; border-top:1px solid var(--line); text-decoration:none; color:inherit; }
+  .row:hover { background:#fff; }
+  .row--dark { background:#fff8f8; }
+  .row__name { font-weight:700; font-size:14px; display:flex; flex-direction:column; gap:2px; }
+  .row__name em { font-style:normal; font-weight:400; font-size:12px; color:var(--muted); font-family:'DM Mono',monospace; }
+  .row__states { display:flex; gap:6px; flex-wrap:wrap; }
+  .s { font-size:11px; font-weight:700; padding:3px 7px; border-radius:5px; }
+  .s--live { background:#e8f8f2; color:#065f46; }
+  .s--slow { background:#fef6e7; color:#8a5a00; }
+  .s--dark { background:#fdecec; color:#9b1c1c; }
+  .row__num { font-size:13px; color:var(--muted); font-family:'DM Mono',monospace; }
+  footer { color:var(--muted); font-size:12px; padding:28px 0 40px; line-height:1.7; }
+  @media (max-width:760px) {
+    .head { display:none; }
+    .row { grid-template-columns:1fr; gap:6px; }
+  }
+</style>
+</head>
+<body>
+<header><div class="wrap"><a class="logo" href="/">landfall<em>.stellar</em></a></div></header>
+<main class="wrap">
+  <h1>Every tracked anchor</h1>
+  <p class="sub">
+    One permanent record per anchor, built from the public Stellar ledger rather than from
+    asking the operator. Sorted with the quietest first. A dark account means no on-chain
+    settlement in over 30 days — that is a fact about the ledger, not a verdict about a
+    business, and the reasons an account can be legitimately quiet are on each record.
+  </p>
+
+  <div class="totals">
+    <div><b>27</b>anchors</div>
+    <div><b>108</b>declared accounts</div>
+    <div><b>19</b>settling</div>
+    <div><b>26</b>slow</div>
+    <div><b>62</b>dark</div>
+  </div>
+
+  <div class="head">
+    <span>Anchor</span><span>State</span><span>Accounts</span><span>Payments in</span><span>Last seen</span>
+  </div>
+  
+      <a class="row" href="/anchor/zeam.money">
+        <span class="row__name">ZEAM LIMITED<em>zeam.money</em></span>
+        <span class="row__states">
+          <b class="s s--live">2 settling</b>
+          <b class="s s--slow">1 slow</b>
+          <b class="s s--dark">12 dark</b>
+        </span>
+        <span class="row__num">15 accounts</span>
+        <span class="row__num">143 in</span>
+        <span class="row__num">2.4d</span>
+      </a>
+      <a class="row row--dark" href="/anchor/gratz.io">
+        <span class="row__name">Gratz<em>gratz.io</em></span>
+        <span class="row__states">
+          
+          <b class="s s--slow">2 slow</b>
+          <b class="s s--dark">8 dark</b>
+        </span>
+        <span class="row__num">10 accounts</span>
+        <span class="row__num">20 in</span>
+        <span class="row__num">6.1d</span>
+      </a>
+      <a class="row" href="/anchor/ixinium.io">
+        <span class="row__name">Baltic Representative Office<em>ixinium.io</em></span>
+        <span class="row__states">
+          <b class="s s--live">2 settling</b>
+          
+          <b class="s s--dark">6 dark</b>
+        </span>
+        <span class="row__num">8 accounts</span>
+        <span class="row__num">73 in</span>
+        <span class="row__num">7.6h</span>
+      </a>
+      <a class="row row--dark" href="/anchor/pr.network">
+        <span class="row__name">PR.network LLC<em>pr.network</em></span>
+        <span class="row__states">
+          
+          <b class="s s--slow">1 slow</b>
+          <b class="s s--dark">4 dark</b>
+        </span>
+        <span class="row__num">5 accounts</span>
+        <span class="row__num">2 in</span>
+        <span class="row__num">26.4d</span>
+      </a>
+      <a class="row row--dark" href="/anchor/mgusd.moneygram.com">
+        <span class="row__name">MoneyGram Payment Systems, Inc.<em>mgusd.moneygram.com</em></span>
+        <span class="row__states">
+          
+          
+          <b class="s s--dark">4 dark</b>
+        </span>
+        <span class="row__num">4 accounts</span>
+        <span class="row__num">14 in</span>
+        <span class="row__num">59.7d</span>
+      </a>
+      <a class="row row--dark" href="/anchor/vnx.io">
+        <span class="row__name">VNX Global Ltd.<em>vnx.io</em></span>
+        <span class="row__states">
+          
+          
+          <b class="s s--dark">4 dark</b>
+        </span>
+        <span class="row__num">4 accounts</span>
+        <span class="row__num">70 in</span>
+        <span class="row__num">47.4d</span>
+      </a>
+      <a class="row" href="/anchor/ultracapital.xyz">
+        <span class="row__name">Ultra Capital LLC<em>ultracapital.xyz</em></span>
+        <span class="row__states">
+          <b class="s s--live">1 settling</b>
+          <b class="s s--slow">9 slow</b>
+          <b class="s s--dark">3 dark</b>
+        </span>
+        <span class="row__num">13 accounts</span>
+        <span class="row__num">638 in</span>
+        <span class="row__num">3.7h</span>
+      </a>
+      <a class="row" href="/anchor/luxpayband.io">
+        <span class="row__name">LUX Payband, LLC<em>luxpayband.io</em></span>
+        <span class="row__states">
+          <b class="s s--live">2 settling</b>
+          
+          <b class="s s--dark">3 dark</b>
+        </span>
+        <span class="row__num">5 accounts</span>
+        <span class="row__num">17 in</span>
+        <span class="row__num">0.7h</span>
+      </a>
+      <a class="row row--dark" href="/anchor/cowrie.exchange">
+        <span class="row__name">Cowrie Integrated Systems<em>cowrie.exchange</em></span>
+        <span class="row__states">
+          
+          <b class="s s--slow">1 slow</b>
+          <b class="s s--dark">3 dark</b>
+        </span>
+        <span class="row__num">4 accounts</span>
+        <span class="row__num">30 in</span>
+        <span class="row__num">13.6d</span>
+      </a>
+      <a class="row row--dark" href="/anchor/stellarport.io">
+        <span class="row__name">Stellarport<em>stellarport.io</em></span>
+        <span class="row__states">
+          
+          <b class="s s--slow">1 slow</b>
+          <b class="s s--dark">3 dark</b>
+        </span>
+        <span class="row__num">4 accounts</span>
+        <span class="row__num">30 in</span>
+        <span class="row__num">6.5d</span>
+      </a>
+      <a class="row" href="/anchor/afreum.com">
+        <span class="row__name">Afreum DAO<em>afreum.com</em></span>
+        <span class="row__states">
+          <b class="s s--live">2 settling</b>
+          <b class="s s--slow">2 slow</b>
+          <b class="s s--dark">2 dark</b>
+        </span>
+        <span class="row__num">6 accounts</span>
+        <span class="row__num">686 in</span>
+        <span class="row__num">5.7h</span>
+      </a>
+      <a class="row row--dark" href="/anchor/nafuloo.com">
+        <span class="row__name">No one person or group owns or controls Nafuloo, and anyone can participate.<em>nafuloo.com</em></span>
+        <span class="row__states">
+          
+          
+          <b class="s s--dark">2 dark</b>
+        </span>
+        <span class="row__num">2 accounts</span>
+        <span class="row__num">3 in</span>
+        <span class="row__num">50.9d</span>
+      </a>
+      <a class="row" href="/anchor/anclap.com">
+        <span class="row__name">Grupo Anchor S.A.<em>anclap.com</em></span>
+        <span class="row__states">
+          <b class="s s--live">1 settling</b>
+          <b class="s s--slow">1 slow</b>
+          <b class="s s--dark">1 dark</b>
+        </span>
+        <span class="row__num">3 accounts</span>
+        <span class="row__num">1,288 in</span>
+        <span class="row__num">2.2h</span>
+      </a>
+      <a class="row row--dark" href="/anchor/ntokens.com">
+        <span class="row__name">nTokens Serviços Digitais Ltda<em>ntokens.com</em></span>
+        <span class="row__states">
+          
+          <b class="s s--slow">1 slow</b>
+          <b class="s s--dark">1 dark</b>
+        </span>
+        <span class="row__num">3 accounts</span>
+        <span class="row__num">59 in</span>
+        <span class="row__num">13.1d</span>
+      </a>
+      <a class="row" href="/anchor/audd.digital">
+        <span class="row__name">AUDC PTY LTD<em>audd.digital</em></span>
+        <span class="row__states">
+          <b class="s s--live">1 settling</b>
+          
+          <b class="s s--dark">1 dark</b>
+        </span>
+        <span class="row__num">2 accounts</span>
+        <span class="row__num">230 in</span>
+        <span class="row__num">2.2d</span>
+      </a>
+      <a class="row row--dark" href="/anchor/bitbondsto.com">
+        <span class="row__name">Bitbond Finance GmbH<em>bitbondsto.com</em></span>
+        <span class="row__states">
+          
+          <b class="s s--slow">1 slow</b>
+          <b class="s s--dark">1 dark</b>
+        </span>
+        <span class="row__num">2 accounts</span>
+        <span class="row__num">0 in</span>
+        <span class="row__num">4.3d</span>
+      </a>
+      <a class="row row--dark" href="/anchor/funtracker.site">
+        <span class="row__name">funtracker.site<em>funtracker.site</em></span>
+        <span class="row__states">
+          
+          <b class="s s--slow">1 slow</b>
+          <b class="s s--dark">1 dark</b>
+        </span>
+        <span class="row__num">2 accounts</span>
+        <span class="row__num">2 in</span>
+        <span class="row__num">26.4d</span>
+      </a>
+      <a class="row row--dark" href="/anchor/mobius.network">
+        <span class="row__name">Mochi, Inc.<em>mobius.network</em></span>
+        <span class="row__states">
+          
+          <b class="s s--slow">1 slow</b>
+          <b class="s s--dark">1 dark</b>
+        </span>
+        <span class="row__num">2 accounts</span>
+        <span class="row__num">32 in</span>
+        <span class="row__num">4.2d</span>
+      </a>
+      <a class="row row--dark" href="/anchor/clpx.finance">
+        <span class="row__name">CLPX S.A.<em>clpx.finance</em></span>
+        <span class="row__states">
+          
+          
+          <b class="s s--dark">1 dark</b>
+        </span>
+        <span class="row__num">1 account</span>
+        <span class="row__num">7 in</span>
+        <span class="row__num">52.5d</span>
+      </a>
+      <a class="row row--dark" href="/anchor/dcm.systems">
+        <span class="row__name">Transparent Network<em>dcm.systems</em></span>
+        <span class="row__states">
+          
+          
+          <b class="s s--dark">1 dark</b>
+        </span>
+        <span class="row__num">1 account</span>
+        <span class="row__num">97 in</span>
+        <span class="row__num">51.2d</span>
+      </a>
+      <a class="row" href="/anchor/aps.money">
+        <span class="row__name">Advanced Payment Solutions Ltd.<em>aps.money</em></span>
+        <span class="row__states">
+          <b class="s s--live">2 settling</b>
+          
+          
+        </span>
+        <span class="row__num">2 accounts</span>
+        <span class="row__num">1,119 in</span>
+        <span class="row__num">0.0h</span>
+      </a>
+      <a class="row" href="/anchor/aqua.network">
+        <span class="row__name">Aquarius<em>aqua.network</em></span>
+        <span class="row__states">
+          <b class="s s--live">2 settling</b>
+          
+          
+        </span>
+        <span class="row__num">2 accounts</span>
+        <span class="row__num">260 in</span>
+        <span class="row__num">0.0h</span>
+      </a>
+      <a class="row" href="/anchor/centre.io">
+        <span class="row__name">Centre Consortium LLC<em>centre.io</em></span>
+        <span class="row__states">
+          <b class="s s--live">2 settling</b>
+          
+          
+        </span>
+        <span class="row__num">2 accounts</span>
+        <span class="row__num">2,338 in</span>
+        <span class="row__num">0.4h</span>
+      </a>
+      <a class="row" href="/anchor/mykobo.co">
+        <span class="row__name">MYKOBO<em>mykobo.co</em></span>
+        <span class="row__states">
+          
+          <b class="s s--slow">2 slow</b>
+          
+        </span>
+        <span class="row__num">2 accounts</span>
+        <span class="row__num">865 in</span>
+        <span class="row__num">26.6d</span>
+      </a>
+      <a class="row" href="/anchor/ngnc.online">
+        <span class="row__name">LINK.IO LTD.<em>ngnc.online</em></span>
+        <span class="row__states">
+          <b class="s s--live">1 settling</b>
+          <b class="s s--slow">1 slow</b>
+          
+        </span>
+        <span class="row__num">2 accounts</span>
+        <span class="row__num">112 in</span>
+        <span class="row__num">14.5h</span>
+      </a>
+      <a class="row" href="/anchor/app.phoenix-hub.io">
+        <span class="row__name">Phoenix Protocol Group<em>app.phoenix-hub.io</em></span>
+        <span class="row__states">
+          <b class="s s--live">1 settling</b>
+          
+          
+        </span>
+        <span class="row__num">1 account</span>
+        <span class="row__num">1 in</span>
+        <span class="row__num">2.6d</span>
+      </a>
+      <a class="row" href="/anchor/stablecoin.z.com">
+        <span class="row__name">GMO-Z.com Trust Company, Inc.<em>stablecoin.z.com</em></span>
+        <span class="row__states">
+          
+          <b class="s s--slow">1 slow</b>
+          
+        </span>
+        <span class="row__num">1 account</span>
+        <span class="row__num">15 in</span>
+        <span class="row__num">4.0d</span>
+      </a>
+
+  <footer>
+    Scan of 2026-09-06 · this is a curated set of anchors, seeded and
+    then discovered through their own SEP-1 declarations — not a census of every anchor on Stellar.
+    <a href="/dashboard">Live dashboard</a> · <a href="/api/v1/anchors">API</a> ·
+    <a href="https://github.com/ibochivincent-lang/landfall/blob/main/DISPUTES.md">Dispute a figure</a>
+  </footer>
+</main>
+</body>
+</html>
