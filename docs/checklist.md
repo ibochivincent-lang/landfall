@@ -52,17 +52,15 @@ Repo: https://github.com/ibochivincent-lang/landfall (public)
 
 ---
 
-## SCF — the only hard deadline
+## SCF #45 — window closed, unsubmitted
 
-**Interest form closes 16 August 2026.**
+The interest form closed 16 August 2026. It was never submitted, so there is
+nothing left to act on for this round — leaving the checklist below would
+misread as an open task with a live clock, when the clock has already run
+out. `docs/scf-submission.md` stays as the prepared pack for whenever a
+future round opens; it just isn't this round.
 
-- [ ] **Submit the interest form**
-      - what you're building: the paragraph block
-      - track: Integration
-      - referral: leave blank
-      - form lives on https://communityfund.stellar.org/awards under SCF #45
-
-Then only if invited to the full Build Award submission:
+If a future SCF round is worth targeting, the pack needs before submitting:
 
 - [ ] One line of real background per team member, with links
 - [ ] State part-time or full-time so the budget arithmetic holds
@@ -72,7 +70,7 @@ Then only if invited to the full Build Award submission:
 
 ---
 
-## Drips Wave — no deadline
+## Drips Wave — still no deadline
 
 - [ ] Read the 20 backlog items and cut or reword anything you don't want
       contributors touching. Easier to edit a markdown file than to close

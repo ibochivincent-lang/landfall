@@ -901,7 +901,15 @@ footer {
 /* ============================================================
    RESPONSIVE — 850px
    ============================================================ */
-@media (max-width: 850px) {
+/* Nav collapse: its own, wider breakpoint. The header's natural content
+   width (logo + 7 links + the "Developer Portal" button) measures ~1263px,
+   so anything narrower than that was already cramping the links together
+   well before 850px — a 13" laptop with the browser at, say, 1152px got a
+   nav squeezed into less space than it needed rather than a working menu
+   bar. Kept separate from the 850px block below, which is genuine
+   phone/tablet content reflow (hero columns, card grids) and has no reason
+   to fire just because the nav also needs to collapse. */
+@media (max-width: 1300px) {
   /* The hamburger toggles .is-open on .nav__links (app.js). That class was
      never styled, so the button reported aria-expanded="true" and the menu
      stayed display:none — it could not open at all. */
@@ -928,7 +936,9 @@ footer {
   .nav__actions { margin-left: auto; margin-right: 16px; }
   .menu { display: grid; gap: 5px; }
   .menu i { width: 22px; height: 2px; background: var(--ink); display: block; }
+}
 
+@media (max-width: 850px) {
   .hero { grid-template-columns: 1fr; padding-top: 52px; }
   .visual { max-width: 550px; width: 100%; margin: auto; }
 

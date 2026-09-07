@@ -1,7 +1,8 @@
 # SCF #45 — submission pack
 
-Interest form closes **16 August 2026**. Reviews are rolling; earlier is better
-than polished.
+**Round closed 16 August 2026, unsubmitted.** This pack was prepared for that
+window and the window is gone — kept here as the ready pack for whenever a
+future SCF round opens, not as an active submission in progress.
 
 Everything below is written to one rule, the same rule the tool itself follows:
 **no claim we cannot show you.** Where a fact is missing it is marked `[FILL]`

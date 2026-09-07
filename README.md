@@ -12,9 +12,11 @@ Every existing anchor monitor *interrogates* — pings an endpoint, validates a 
 
 **Live: [landfall-chi.vercel.app](https://landfall-chi.vercel.app)**
 
-> **Submitted to the Drips Stellar Wave Program.** Issues are labelled by
-> complexity — `trivial-100`, `medium-150`, `high-200` — and tagged
-> `Stellar Wave`. New contributors should start with `good first issue`, and
+> **Preparing for the Drips Stellar Wave Program** — the repo is not yet
+> applied. 20 issues are filed and labelled by complexity —
+> `trivial-100`, `medium-150`, `high-200` — and tagged `Stellar Wave`, ready
+> for when it is. No deadline on this one; see [docs/checklist.md](docs/checklist.md).
+> New contributors should still start with `good first issue`, and
 > **wait to be assigned before writing code** — an unassigned issue is not
 > yours. See [CONTRIBUTING.md](CONTRIBUTING.md).
 

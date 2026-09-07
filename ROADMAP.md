@@ -65,7 +65,8 @@ than becoming a second changelog.
 
 ---
 
-## 🎯 Horizon 1 — Close the "nothing runs on its own" 
+## 🎯 Horizon 1 — Close the "nothing runs on its own" gap
+
 ### Measurement — the highest-leverage engineering item open
 
 - [ ] **Memo-based leg correlation** (backlog M1, SEP-24) — turns refund detection from a heuristic into a measurement; also Tranche 1 of the grant, so this is milestone work either way

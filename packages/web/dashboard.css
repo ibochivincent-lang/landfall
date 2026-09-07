@@ -89,7 +89,13 @@
   color: var(--ink);
   box-shadow: 0 1px 4px rgba(6,31,45,.1);
 }
-.topnav__actions { margin-left: auto; }
+/* margin-left: auto pushed this to the right correctly, but with no flex
+   layout of its own the two links inside (a "Portal / API Keys" button and a
+   "GitHub" link) are plain inline elements — once the header got tight,
+   normal text wrapping put the second link on its own line, and it spilled
+   below the 72px header into the page content underneath. Real bug, seen at
+   1024px: measured actions.bottom at 86.5px against a 72px header. */
+.topnav__actions { margin-left: auto; display: flex; align-items: center; gap: 10px; flex-shrink: 0; white-space: nowrap; }
 
 /* ============================================================
    SHARED BUTTONS
@@ -382,12 +388,20 @@
 /* ============================================================
    RESPONSIVE
    ============================================================ */
-/* ── Mobile navigation ──────────────────────────────────────────────────
+/* ── Collapsed navigation ─────────────────────────────────────────────────
    The burger is created by nav.js, not written into six copies of the
-   header markup. Hidden above the breakpoint entirely. */
+   header markup. Hidden above the breakpoint entirely.
+
+   The breakpoint is 1150px, not a phone-sized number: the header's natural
+   width (logo + 7 links + two action buttons) measures ~1113px, so anything
+   narrower actually breaks — at 1024px the action buttons wrapped onto a
+   second line and spilled below the header entirely, not merely looking
+   tight. That covers a real laptop with the browser un-maximized, not only
+   a phone, hence the file's own name for this rule staying "collapsed"
+   rather than "mobile". */
 .topnav__burger { display: none; }
 
-@media (max-width: 780px) {
+@media (max-width: 1150px) {
   /* The nav collapses into a panel rather than disappearing. It used to be
      display:none with nothing to bring it back, which left every page using
      this header with no navigation at all on a phone. */
@@ -435,7 +449,14 @@
   /* The action buttons crowd the burger on a narrow screen; the panel
      carries the same destinations. */
   .topnav__actions { display: none; }
+}
 
+/* Phone-width content adjustments — kept at the original, tighter breakpoint.
+   These were sharing the 1150px nav-collapse block above, which meant a
+   laptop at ~1100px got the dashboard stats forced into two columns and
+   other phone-tuned layout it didn't need just because the nav also
+   collapsed there. Nav width and content width are different questions. */
+@media (max-width: 780px) {
   .dash { padding: 38px 0; }
   .dash-head { display: block; }
   .freshness { display: inline-block; margin-top: 16px; }
