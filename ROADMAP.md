@@ -65,15 +65,7 @@ than becoming a second changelog.
 
 ---
 
-## 🎯 Horizon 1 — Close the "nothing runs on its own" gap + grant resubmission (now → SCF deadline)
-
-### Grant path — the only item on this page with a hard clock
-
-- [ ] Submit the SCF #45 interest form — **deadline 16 August 2026**
-- [ ] Fill the remaining `[FILL]`s in `docs/scf-submission.md`: one line of real background per team member with a link, and whether the team is part-time or full-time (the budget arithmetic depends on it)
-- [ ] Apply the repo to the Stellar Wave in Drips — the 20 issues are filed; the application itself is not made
-- [ ] Re-run the scan on submission day and update every figure that moved
-
+## 🎯 Horizon 1 — Close the "nothing runs on its own" 
 ### Measurement — the highest-leverage engineering item open
 
 - [ ] **Memo-based leg correlation** (backlog M1, SEP-24) — turns refund detection from a heuristic into a measurement; also Tranche 1 of the grant, so this is milestone work either way
