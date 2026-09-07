@@ -147,14 +147,6 @@ ongoing work rather than a one-time checklist:
 
 ---
 
-## 📊 Success metrics per horizon
-
-| Horizon | The bar |
-|---|---|
-| H1 — SCF deadline (~days) | Interest form submitted; Wave application made; memo correlation shipped; resume cursors closed (#13); every site claim matches what's built |
-| H2 (months 1–6) | ≥1 signed settlement receipt ingested; slippage metric live; ≥1 wallet conversation in progress; `@landfall/sdk` published to npm |
-| H3 (months 6–12+) | Oracle publishing real digests on testnet continuously; mainnet oracle live with a seeded dataset; ≥1 external MCP/agent consumer; dispute portal live |
-
 ---
 
 ## Dependencies and risks (from the original tranche plan)
