@@ -615,6 +615,40 @@ em { font-style: normal; color: var(--teal); }
 .data-card a { font-size: 12px; color: var(--teal); font-weight: 800; text-decoration: none; margin-top: auto; }
 
 /* ============================================================
+   PRODUCT GRID — what's actually running, one card per real page
+   ============================================================ */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 17px;
+  margin-top: 54px;
+}
+.product-card {
+  display: block;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  padding: 24px;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s, transform 0.15s;
+}
+.product-card:hover { border-color: var(--teal); transform: translateY(-2px); }
+.product-card__tag {
+  display: inline-block;
+  font: 700 11px/1 'DM Mono', monospace;
+  letter-spacing: 0.02em;
+  color: var(--teal);
+  background: #e6f5f3;
+  padding: 4px 9px;
+  border-radius: 99px;
+  margin-bottom: 14px;
+}
+.product-card__tag--partial { color: #92620a; background: #fdf1dc; }
+.product-card h3 { font-size: 18px; margin: 0 0 8px; }
+.product-card p { font-size: 13px; line-height: 1.6; color: var(--muted); margin: 0; }
+.product-card code { font: 12px 'DM Mono', monospace; background: #eef4f1; padding: 1px 5px; border-radius: 4px; }
+
+/* ============================================================
    STEPS
    ============================================================ */
 .steps {
@@ -899,6 +933,7 @@ footer {
   .visual { max-width: 550px; width: 100%; margin: auto; }
 
   .data-grid, .developer__grid, .contact, .compare-grid { grid-template-columns: 1fr; }
+  .product-grid { grid-template-columns: 1fr; }
   .metrics-strip { grid-template-columns: 1fr 1fr; }
   .metric-item:nth-child(even) { border-right: 0; }
   .metric-item { border-bottom: 1px solid var(--line); }

@@ -270,6 +270,51 @@
     </div>
   </section>
 
+  <!-- ============ PRODUCT SURFACE ============ -->
+  <!-- Every card links to a page that is actually live, with copy that
+       matches the status column in README.md's feature table — not
+       aspirational language. If a card's claim stops being true, the fix
+       belongs here AND in that table, not in one and not the other. -->
+  <section class="section wrap" id="product">
+    <div class="section__intro">
+      <p class="eyebrow">What's actually running</p>
+      <h2>Six surfaces, one ledger underneath.</h2>
+      <p>Every page below reads the same indexed Stellar data. None of it asks an anchor anything.</p>
+    </div>
+    <div class="product-grid">
+      <a class="product-card" href="dashboard.html">
+        <span class="product-card__tag">Shipping</span>
+        <h3>Transactions</h3>
+        <p>Every indexed payment per anchor, each row linked to its transaction hash on a block explorer.</p>
+      </a>
+      <a class="product-card" href="trust-check.html">
+        <span class="product-card__tag">Shipping</span>
+        <h3>Trust Check</h3>
+        <p>Paste a Stellar address or transaction hash. Ledger-only signals — history, concentration, forwarding pattern — plus reports other people filed, kept separate from the score, never blended in.</p>
+      </a>
+      <a class="product-card" href="compare.html">
+        <span class="product-card__tag product-card__tag--partial">Partly real</span>
+        <h3>Route Scout</h3>
+        <p>Compare anchors by reliability, fees, and rate — plus a verified-routing mode that ranks evidence ahead of price. Fee and rate figures are live where an anchor publishes them, catalogue estimate otherwise, labelled either way.</p>
+      </a>
+      <a class="product-card" href="anchors.html">
+        <span class="product-card__tag">Shipping</span>
+        <h3>Every anchor</h3>
+        <p>One permanent record per anchor — 27 tracked, 9 with a state change in the last 14 days — with the observed history behind every figure.</p>
+      </a>
+      <a class="product-card" href="cross-chain.html">
+        <span class="product-card__tag">Shipping</span>
+        <h3>Cross-chain evidence</h3>
+        <p>Settlement evidence across Stellar, EVM/CCTP, Tron and Solana, every figure labelled PROVEN, ATTESTED or DERIVED — never blended into one score.</p>
+      </a>
+      <a class="product-card" href="docs.html">
+        <span class="product-card__tag">Shipping</span>
+        <h3>API, SDK &amp; MCP</h3>
+        <p>A read-only REST + GraphQL API, an MCP server for AI agents, and <code>@landfall/sdk</code> — packaged and tested, not yet on npm.</p>
+      </a>
+    </div>
+  </section>
+
   <!-- ============ DEVELOPERS ============ -->
   <section class="developer" id="developers">
     <div class="wrap developer__grid">
@@ -279,17 +324,17 @@
         <p>Landfall is building a simple interface for wallets and payment agents to factor real settlement quality into their routing decisions.</p>
         <a class="button button--light" href="#contact">Build with us <span>→</span></a>
       </div>
-      <pre><code><span class="code__muted">// planned interface — not published, no npm package exists yet</span>
-<span class="code__blue">const</span> anchor = <span class="code__blue">await</span> pickAnchor({
-  from: <span class="code__green">'USDC'</span>,
-  to: <span class="code__green">'NGN'</span>,
-  amount: <span class="code__gold">100</span>
-})
+      <pre><code><span class="code__muted">// @landfall/sdk — packaged, tested, not yet published to npm.</span>
+<span class="code__muted">// Real signature: packages/sdk/README.md</span>
+<span class="code__blue">const</span> ranked = pickAnchor([
+  { anchorId: <span class="code__green">'alpha.example'</span>, summary: derivedSummary },
+  { anchorId: <span class="code__green">'beta.example'</span>,  summary: provenSummary  },
+])
 
-<span class="code__muted">// settlement signal, backed by the ledger</span>
-anchor.confidence <span class="code__muted">// 0.94</span>
-anchor.lastSeen   <span class="code__muted">// "2.1h ago"</span>
-anchor.darkRisk   <span class="code__muted">// false</span></code></pre>
+<span class="code__muted">// evidence tier decides, never a blended score</span>
+ranked[0].anchorId   <span class="code__muted">// "beta.example" — 12 proven beats 900 derived</span>
+ranked[0].tierMix    <span class="code__muted">// "PROVEN 12 · ATTESTED 0 · DERIVED 0"</span>
+ranked[0].rationale  <span class="code__muted">// "Ranked on 12 ledger-proven settlement(s)."</span></code></pre>
     </div>
   </section>
 
