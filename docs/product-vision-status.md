@@ -92,7 +92,7 @@ hasn't been assembled.
 |---|---|
 | **Web app** | ✅ Live at [landfall-chi.vercel.app](https://landfall-chi.vercel.app) |
 | **API** | ✅ REST (`api/[...path].js`) + GraphQL (`POST /api/v1/graphql`) |
-| **SDK** | ⚠️ Built, tested, packaged (`packages/sdk`) — verified working from a real installed tarball outside this repo. **Not published to npm** — needs the `@landfall` scope created and `npm publish` run, both account actions |
+| **SDK** | ✅ Published — [`npm install @landfall/sdk`](https://www.npmjs.com/package/@landfall/sdk). Verified 7 September against the real registry copy, not just the local build: installed fresh into a scratch project outside this repo, ran the README's `pickAnchor()` example, 12 PROVEN correctly outranked 900 DERIVED |
 | **MCP server** | ✅ `scripts/mcp/server.mjs` — **9 tools**, correctly listed in full in `docs/MCP.md`: `landfall_anchors`, `landfall_anchor_detail`, `landfall_payments`, `landfall_assets`, `landfall_corridors`, `landfall_health`, `landfall_trust_check`, `landfall_fraud_reports`, `landfall_intent`. (`docs/gaps.md`'s "six tools" entry is a dated 14 August record, from before the last three shipped — correctly left as the historical record it is, not a live count) |
 | **Wallets** | ❌ Zero external wallet integrations. Nothing outside this repo calls any of the above yet |
 | **Agents** | ❌ Same — no external MCP/agent consumer confirmed |
@@ -126,21 +126,25 @@ in passing.
 
 ## What's actually left, in priority order
 
-1. **Publish `@landfall/sdk` to npm.** Code-complete, tested, verified. Blocked
-   on `npm login` + creating the `@landfall` scope — both need you.
-2. **AI Investigator / the "Analyzed" stage of Sentinel.** The one module
+~~Publish `@landfall/sdk` to npm.~~ **Done, 7 September** —
+[`npm install @landfall/sdk`](https://www.npmjs.com/package/@landfall/sdk)
+works, verified against the live registry copy.
+
+1. **AI Investigator / the "Analyzed" stage of Sentinel.** The one module
    named in the deck with nothing behind it. Report/Observe/Review already
    work; this is the missing fourth piece.
-3. **Get one external consumer of anything** — a wallet calling
+2. **Get one external consumer of anything** — a wallet calling
    `pickAnchor()`, an agent calling the MCP server. This is the actual bar
    the roadmap sets for "infrastructure," and nothing here can close it
-   without an outside party adopting it.
-4. **Mainnet oracle.** Rehearsed and verified on testnet; needs funded keys —
+   without an outside party adopting it. Publishing the SDK is a
+   precondition for this, not the milestone itself — nobody has installed
+   it yet.
+3. **Mainnet oracle.** Rehearsed and verified on testnet; needs funded keys —
    your call on timing and custody of the admin key.
-5. **x402 assembly.** Lower priority than the above because it's mostly
+4. **x402 assembly.** Lower priority than the above because it's mostly
    wiring existing pieces together, not new capability — but it's the
    specific "Landfall for AI agents" module and currently has zero code.
-6. **Registry stays empty** (`registry/anchors.registry.json`) — every
+5. **Registry stays empty** (`registry/anchors.registry.json`) — every
    non-Stellar chain reports `unresolved`. Needs anchor outreach to get a
    verified address, not code; a guessed one would misattribute settlement.
 
