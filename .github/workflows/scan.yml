@@ -192,6 +192,23 @@ jobs:
         continue-on-error: true
         run: node scripts/build-asset-health.mjs
 
+      # Appends this scan's per-account rows to data/scan-history.ndjson, the
+      # measurement record the early-warning work will eventually train on.
+      #
+      # The series used to exist only in git history of anchors.json, which
+      # the 5 September rewrite orphaned onto local-only branches — 26 days of
+      # readings that Horizon cannot reproduce retroactively. Appending to a
+      # tracked file makes it survive any future rewrite (see data/README.md).
+      #
+      # continue-on-error, like the other artifact builders: a missed hour is
+      # recoverable with scripts/extract-scan-history.mjs, which rebuilds the
+      # file from git history. Blocking the snapshot commit over it would
+      # trade a recoverable gap for an unrecoverable one.
+      - name: Append scan to measurement history
+        if: steps.verify.outcome == 'success'
+        continue-on-error: true
+        run: node scripts/append-scan-history.mjs
+
       # ── 5c. Cross-chain scan → tier-labelled artifact ─────────────────────────
       # Runs the ChainAdapter layer (docs/architecture/MULTICHAIN.md) over every
       # tracked anchor and writes packages/web/api/v1/cross-chain.json, which
@@ -262,7 +279,8 @@ jobs:
                   packages/web/api/v1/anchors packages/web/api/v1/evidence packages/web/api/v1/evidence.json packages/web/api/v1/anchor-fees.json packages/web/api/v1/capabilities.json packages/web/api/v1/routes.json \
                   packages/web/api/v1/scan-verification.json packages/web/api/v1/toml-drift.json \
                   packages/web/api/v1/asset-health.json packages/web/api/v1/anchor-quotes.json packages/web/api/v1/trends.json \
-                  packages/web/anchor packages/web/index.html
+                  packages/web/anchor packages/web/index.html \
+                  data/scan-history.ndjson
           # Only commit if there are actual changes
           git diff --staged --quiet || git commit -m "chore: hourly ledger scan $(date -u +%Y-%m-%d-%H00)"
           git push

@@ -4,7 +4,12 @@
 git history of `packages/web/api/v1/anchors.json`. One JSON object per line,
 one line per (scan, account), ordered oldest first.
 
-Regenerate or extend it with:
+**It maintains itself.** The hourly scan workflow appends each new scan
+(`scripts/append-scan-history.mjs`, keyed on `asOf` so re-runs add nothing),
+and commits the result alongside the rest of the API snapshot.
+
+To rebuild the whole file from git history — a backfill, or after a missed
+hour, since the append step is `continue-on-error`:
 
 ```bash
 node scripts/extract-scan-history.mjs
