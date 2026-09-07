@@ -21,6 +21,7 @@
 *   POST /api/v1/fraud-reports/:id/dispute -- reported party responds, gated on a signature from that address
 *   POST /api/v1/fraud-reports/:id/investigate -- Sentinel's "Analyzed" stage: deterministic cited facts, plus an optional AI narrative of those same facts
 *   GET  /api/v1/fraud-reports/:id/investigation -- the most recent investigation of one report, if any
+*   POST /api/v1/x402/check-payee    -- Trust Check every Stellar payee in an x402 402 response's `accepts` array, before an agent signs
  *   GET  /health
  *
  * Admin routes (session-cookie gated, see requireSession()):
@@ -1423,6 +1424,47 @@ async function investigatorCallModel(prompt) {
 }
 
 /**
+ * ===========================================================
+ * x402 assembly — mirror of packages/x402/src/evaluate.ts.
+ *
+ * Answers x402's own open question — "who should an agent pay" — for the
+ * Stellar payees named in a 402 response's `accepts` array, by running the
+ * same Trust Check used on the Trust Check page against each one before an
+ * agent authorizes a signature. Network/address identifiers here match
+ * x402-foundation/x402's packages/mechanisms/stellar/src/constants.ts
+ * exactly (stellar:pubnet / stellar:testnet CAIP-2 ids, G-account regex) —
+ * not approximated, since a wrong match here would tell an agent to trust
+ * (or skip) the wrong payee. This is read-only: it never verifies or
+ * settles a payment, which is the facilitator's job, not this file's.
+ * ===========================================================
+ */
+
+const X402_STELLAR_NETWORKS = new Set(['stellar:pubnet', 'stellar:testnet']);
+
+export async function evaluatePaymentRequirements(accepts, runTrustCheck) {
+  return Promise.all(
+    accepts.map(async (requirement) => {
+      if (!X402_STELLAR_NETWORKS.has(requirement.network)) {
+        return {
+          requirement,
+          supported: false,
+          reason: `network "${requirement.network}" is not Stellar — Trust Check reads Stellar ledger history only.`,
+        };
+      }
+      if (!G_ADDRESS.test(requirement.payTo)) {
+        return {
+          requirement,
+          supported: false,
+          reason: `payTo "${requirement.payTo}" is not a classic Stellar account (G...) — likely a Soroban contract or muxed address, which Trust Check cannot attribute to an operator.`,
+        };
+      }
+      const trustCheck = await runTrustCheck(requirement.payTo);
+      return { requirement, supported: true, trustCheck };
+    }),
+  );
+}
+
+/**
  * Deterministic Anchor Reliability Score (0-100).
  * Derived purely from ledger evidence across an anchor's accounts.
  */
@@ -2328,7 +2370,7 @@ export default async function handler(req, res) {
        with different input. Adding a write route means adding it here too —
        which the test in api/_lib/routes.test.mjs now enforces, so the next
        one cannot be forgotten the way these three were. */
-    const POST_ROUTES = new Set(['v1/intent', 'v1/fraud-reports', 'v1/fiat-confirmations']);
+    const POST_ROUTES = new Set(['v1/intent', 'v1/fraud-reports', 'v1/fiat-confirmations', 'v1/x402/check-payee']);
     /* Parameterised write paths, which an exact set cannot express. Kept as
        a separate list rather than loosening POST_ROUTES to prefixes: a
        prefix would also admit v1/fraud-reports/anything, and the point of
@@ -2679,6 +2721,46 @@ export default async function handler(req, res) {
         return json(res, 400, { error: 'Subject must be a Stellar public key (G...).' }, 0);
       }
       return json(res, 200, await fetchFraudReports(db, subject), 60);
+    }
+
+    // POST /api/v1/x402/check-payee
+    //
+    // Given the `accepts` array from an x402 402 response (the exact
+    // PaymentRequirements shape from x402-foundation/x402), runs Trust
+    // Check against every Stellar G-account payee before an agent
+    // authorizes a signature. Read-only and stateless — this never
+    // verifies or settles a payment, and holds no rate limit of its own
+    // beyond the same per-IP bucket trust-check itself uses, since it's
+    // the same Horizon calls under a different entry point.
+    if (req.method === 'POST' && joined === 'v1/x402/check-payee') {
+      const body = await readJsonBody(req);
+      const accepts = Array.isArray(body.accepts) ? body.accepts : null;
+      if (!accepts || accepts.length === 0) {
+        return json(res, 400, { error: 'Body must include a non-empty "accepts" array — the same shape as an x402 PaymentRequired response.' }, 0);
+      }
+      if (accepts.length > 20) {
+        return json(res, 400, { error: 'At most 20 payment requirements per call.' }, 0);
+      }
+      for (const r of accepts) {
+        if (typeof r?.network !== 'string' || typeof r?.payTo !== 'string') {
+          return json(res, 400, { error: 'Every entry in "accepts" must have at least "network" and "payTo" fields.' }, 0);
+        }
+      }
+
+      const bucket = `x402check:${clientIp(req)}`;
+      const { allowed } = await rateLimit(db, bucket, 20);
+      if (!allowed) return json(res, 429, { error: 'Too many checks. Try again in a minute.' }, 0);
+
+      try {
+        const results = await evaluatePaymentRequirements(accepts, async (address) => {
+          const input = await trustCheckFetchInput(address, new Date().toISOString());
+          return analyzeTrustCheck(input);
+        });
+        return json(res, 200, { results }, 0);
+      } catch (err) {
+        console.error('[x402]', err.message);
+        return json(res, 502, { error: 'Could not reach Horizon to check one or more payees. Try again shortly.' }, 0);
+      }
     }
 
     // POST /api/v1/fiat-confirmations

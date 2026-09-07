@@ -47,6 +47,7 @@ import {
   fetchFraudReports,
   fetchInvestigation,
   resolveIntent,
+  evaluatePaymentRequirements,
 } from '../../api/[...path].js';
 
 function text(payload) {
@@ -301,6 +302,46 @@ function buildServer() {
         const investigation = await fetchInvestigation(db, reportId);
         if (!investigation) return text({ error: 'This report has not been investigated yet.' });
         return text(investigation);
+      } catch (err) {
+        return errorText(err);
+      }
+    }
+  );
+
+  server.registerTool(
+    'landfall_x402_check_payee',
+    {
+      title: "Trust Check every Stellar payee in an x402 402 response, before paying",
+      description:
+        'x402 (docs.x402.org) settles how much an agent may spend; it deliberately leaves open who ' +
+        'an agent should be willing to pay. Pass the `accepts` array from a 402 response\'s own ' +
+        'PaymentRequirements list and this runs Trust Check against every payTo that is a classic ' +
+        'Stellar account (G...) on stellar:pubnet or stellar:testnet, before any signature is ' +
+        'requested. Entries on another chain, or a Soroban contract / muxed payTo Trust Check ' +
+        'cannot attribute to an operator, come back as `supported: false` with a stated reason — ' +
+        'never silently dropped. This only reads; it never verifies or settles a payment, which is ' +
+        'the facilitator\'s job (see docs.x402.org/core-concepts/facilitator), not this tool\'s.',
+      inputSchema: {
+        accepts: z.array(
+          z.object({
+            scheme: z.string(),
+            network: z.string().describe('CAIP-2 network id, e.g. "stellar:pubnet" or "stellar:testnet"'),
+            asset: z.string(),
+            amount: z.string(),
+            payTo: z.string().describe('The address payment would settle to'),
+            maxTimeoutSeconds: z.number(),
+            extra: z.record(z.unknown()).optional().default({}),
+          }),
+        ).min(1).max(20).describe('The `accepts` array from an x402 PaymentRequired (402) response'),
+      },
+    },
+    async ({ accepts }) => {
+      try {
+        const results = await evaluatePaymentRequirements(accepts, async (address) => {
+          const input = await trustCheckFetchInput(address, new Date().toISOString());
+          return analyzeTrustCheck(input);
+        });
+        return text({ results });
       } catch (err) {
         return errorText(err);
       }

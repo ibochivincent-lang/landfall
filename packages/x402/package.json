@@ -1,0 +1,12 @@
+{
+  "name": "@landfall/x402",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "Answers x402's open question, 'who should an agent pay', for the Stellar payees named in a 402 response's own PaymentRequirements — by running Trust Check against each one before an agent authorizes a signature. See src/evaluate.ts.",
+  "scripts": {
+    "test": "tsx --test test/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  }
+}

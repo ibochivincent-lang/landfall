@@ -74,6 +74,7 @@ exposes is a `SELECT`, but the connection string controls that, not the code.
 | `landfall_fraud_reports` | `subject` (G...) | Third-party reports filed about an address, each anchored to a verified on-chain transaction |
 | `landfall_intent` | `from`, `to`, `basis`, `amount`, `midRate`, `candidates[]`, `sortBy?`, `minGrade?`, `requirePricedTerms?` | Every candidate route ranked, plus an executable plan for the winner |
 | `landfall_investigation` | `reportId` | The Analyzed-stage result for one fraud report, if it has been run: deterministic cited facts, relevant Trust Check signals, and an optional AI narrative labeled with its model |
+| `landfall_x402_check_payee` | `accepts[]` (x402 `PaymentRequirements[]`) | Trust Check for every Stellar G-account `payTo` in an x402 402 response, before an agent signs — see below |
 
 Each tool returns its result as a JSON text block. Failures (bad domain
 filter, database error) come back as a tool error with a plain-English
@@ -115,6 +116,15 @@ excluded the same way filing a report is: it calls a paid model and writes a
 row, and collapsing that to a single tool call would let an agent trigger it
 at scale for no reason a person chose. `landfall_investigation` only reads
 whatever investigation already exists — running one stays a page action.
+
+x402's `/verify` and `/settle` are not implemented here either, and not
+because they were forgotten — building them means running a facilitator,
+which means holding or routing funds during settlement. Stellar already has
+one (SDF partnered with OpenZeppelin for audited spending-limit contracts;
+see [stellar.org/x402](https://stellar.org/x402)), and duplicating it would
+be custody this project has refused everywhere else. `landfall_x402_check_payee`
+only reads Trust Check data about a `payTo` already named in a real 402
+response — it cannot cause a payment to happen or fail.
 
 ## Verification
 
