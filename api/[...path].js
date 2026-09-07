@@ -1518,8 +1518,11 @@ export async function evaluatePaymentRequirements(accepts, runTrustCheck) {
           reason: `payTo "${requirement.payTo}" is not a classic Stellar account (G...) — likely a Soroban contract or muxed address, which Trust Check cannot attribute to an operator.`,
         };
       }
-      const trustCheck = await runTrustCheck(requirement.payTo);
-      return { requirement, supported: true, trustCheck };
+      const outcome = await runTrustCheck(requirement.payTo);
+      if (!outcome.ok) {
+        return { requirement, supported: false, reason: outcome.reason, retryable: outcome.retryable };
+      }
+      return { requirement, supported: true, trustCheck: outcome.trustCheck };
     }),
   );
 }
@@ -2890,16 +2893,34 @@ export default async function handler(req, res) {
       const { allowed } = await rateLimit(db, bucket, 20);
       if (!allowed) return json(res, 429, { error: 'Too many checks. Try again in a minute.' }, 0);
 
-      try {
-        const results = await evaluatePaymentRequirements(accepts, async (address) => {
+      // Failures are classified per payee, never batch-wide. One payee that
+      // Horizon cannot resolve used to fail the whole request with a 502,
+      // which threw away every other payee's answer and — worse — made "that
+      // account does not exist on the ledger", the most damning finding this
+      // route can return, look identical to Horizon being down.
+      const results = await evaluatePaymentRequirements(accepts, async (address) => {
+        try {
           const input = await trustCheckFetchInput(address, new Date().toISOString());
-          return analyzeTrustCheck(input);
-        });
-        return json(res, 200, { results }, 0);
-      } catch (err) {
-        console.error('[x402]', err.message);
-        return json(res, 502, { error: 'Could not reach Horizon to check one or more payees. Try again shortly.' }, 0);
-      }
+          return { ok: true, trustCheck: analyzeTrustCheck(input) };
+        } catch (err) {
+          if (err.status === 404 || err.status === 400) {
+            return {
+              ok: false,
+              retryable: false,
+              reason:
+                'no account for this address exists on the Stellar network. An address that has never been ' +
+                'funded has no settlement history at all — treat this as a reason not to pay, not as a missing check.',
+            };
+          }
+          console.error('[x402]', address, err.message);
+          return {
+            ok: false,
+            retryable: true,
+            reason: 'could not reach Horizon to check this payee. This is a temporary failure, not a finding about the address — retry before drawing any conclusion.',
+          };
+        }
+      });
+      return json(res, 200, { results }, 0);
     }
 
     // POST /api/v1/fiat-confirmations

@@ -57,11 +57,27 @@ test("the deployed API's x402 evaluator agrees with the package on every fixture
   };
   assert.equal(typeof mod.evaluatePaymentRequirements, "function", "evaluatePaymentRequirements missing from api/[...path].js");
 
-  const stubTrustCheck = async (address: string) => ({ address, riskLevel: "low" });
+  // Must return the Result shape the checker contract now specifies. An
+  // earlier version of this stub returned a bare Trust Check result, which
+  // made both sides take the failure branch identically — parity passed
+  // while exercising nothing. Assert the success path is actually reached.
+  const stubOk = async (address: string) => ({ ok: true as const, trustCheck: { address, riskLevel: "low" } });
+  const stubMissing = async () => ({ ok: false as const, reason: "no such account.", retryable: false });
+  const stubDown = async () => ({ ok: false as const, reason: "horizon unreachable.", retryable: true });
 
   for (const accepts of FIXTURES) {
-    const pkgResult = await evaluatePaymentRequirements(accepts, stubTrustCheck);
-    const apiResult = await mod.evaluatePaymentRequirements!(accepts, stubTrustCheck);
-    assert.deepEqual(apiResult, pkgResult);
+    for (const stub of [stubOk, stubMissing, stubDown]) {
+      const pkgResult = await evaluatePaymentRequirements(accepts, stub);
+      const apiResult = await mod.evaluatePaymentRequirements!(accepts, stub);
+      assert.deepEqual(apiResult, pkgResult);
+    }
   }
+
+  // Guard against the coincidental pass returning: at least one fixture must
+  // produce a supported payee, or this test proves nothing about that path.
+  const checkable = (await evaluatePaymentRequirements(FIXTURES.flat(), stubOk)) as Array<{ supported: boolean }>;
+  assert.ok(
+    checkable.some((r) => r.supported === true),
+    "fixtures must include at least one checkable Stellar payee, or the success path goes untested",
+  );
 });

@@ -53,7 +53,26 @@ export interface UnsupportedPayee {
   supported: false;
   /** Always says exactly what Landfall couldn't check and why — never a silent drop. */
   reason: string;
+  /**
+   * True when the check failed for a transient reason (Horizon unreachable)
+   * rather than a structural one (wrong chain, contract address, no such
+   * account). Both mean "do not treat this payee as checked", but only one is
+   * worth retrying — and conflating them would let a temporary outage read
+   * the same as an address that does not exist, which is the single most
+   * damning thing this check can find.
+   */
+  retryable?: boolean;
 }
+
+/**
+ * What the injected checker hands back. A Result shape rather than a thrown
+ * exception, so classifying a failure — is this address absent, or is Horizon
+ * down? — stays with the caller that made the request and knows, instead of
+ * being guessed at from an error message in here.
+ */
+export type PayeeCheckOutcome<TrustCheckResult> =
+  | { ok: true; trustCheck: TrustCheckResult }
+  | { ok: false; reason: string; retryable: boolean };
 
 export interface SupportedPayee<TrustCheckResult> {
   requirement: PaymentRequirements;
