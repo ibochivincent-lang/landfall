@@ -31,10 +31,10 @@ Last checked: 7 September 2026.
 |---|---|---|
 | **Trust Check** | ✅ Shipping | `/trust-check.html` — paste an address or tx hash, get history/concentration/forwarding signals, a transparent 0–100 score, confidence rating |
 | **Fraud Reports** | ✅ Shipping, minus review | `POST /api/v1/fraud-reports` — every report must cite a tx hash Landfall verifies exists and involves the subject before storing it. Reports render on the Trust Check page, kept in their own card, never blended into the score |
-| **AI Investigator** | ❌ Not built | No LLM reads reports or ledger activity and writes an analysis. This is the one module in "the complete product" slide with nothing behind it yet |
+| **AI Investigator** | ⚠️ Shipping, narrative needs a key | `packages/investigator`, `POST /api/v1/fraud-reports/:id/investigate` — cited facts and relevant Trust Check signals are deterministic and always computed, with no AI. The narrative half is optional AI prose over exactly those facts, and is `null` whenever `OPENAI_API_KEY` isn't configured — no key is set in production yet, so today every investigation returns facts with no narrative |
 | **Intent Engine** | ✅ Shipping | `packages/intents/src/solve.ts` + `plan.ts` — `solveIntent()` picks a route, `buildPlan()` turns it into ordered steps, each carrying an explicit actor (`user`/`wallet`/`anchor`/`landfall`) so a plan can never imply Landfall executes anything |
 | **Route Engine** | ✅ Shipping | Same package — cost/reliability/liquidity-ranked routing, `sortBy: "verified"` mode ranks evidence ahead of price. See `docs/architecture/VERIFIED_ROUTES.md` |
-| **Agent Gateway** | ⚠️ Partial | MCP server ships (`scripts/mcp/server.mjs`, 9 tools — see below); no SDK on npm yet; no x402 wiring |
+| **Agent Gateway** | ⚠️ Partial | MCP server ships (`scripts/mcp/server.mjs`, 10 tools — see below); SDK published to npm ([`@landfall/sdk`](https://www.npmjs.com/package/@landfall/sdk)); no x402 wiring |
 
 ---
 
@@ -60,13 +60,14 @@ inferred by a model.
 |---|---|
 | Reported | ✅ `POST /api/v1/fraud-reports` |
 | Observed | ✅ The cited tx hash is verified against the ledger before the report is stored — fabricated or unrelated evidence is rejected, not filed |
-| Analyzed | ❌ No AI reads the report and explains a pattern. This is "AI Investigator" from the module slide, same gap |
-| Reviewed | ✅ Dispute path exists — `PATCH /api/v1/fraud-reports/:id/dispute`, gated on a signature from the reported address, per `DISPUTES.md` |
+| Analyzed | ⚠️ `POST /api/v1/fraud-reports/:id/investigate` computes deterministic cited facts and relevant Trust Check signals for the report, with no AI. It also asks a model for a plain-language narrative of exactly those facts — but no `OPENAI_API_KEY` is configured in production yet, so the narrative half returns `null` until one is set |
+| Reviewed | ✅ Dispute path exists — `POST /api/v1/fraud-reports/:id/dispute`, gated on a signature from the reported address, per `DISPUTES.md` |
 | Attested | ⚠️ Reports are stored and disputable; no cryptographic attestation is generated over a report+dispute pair the way settlement events are |
 
-**Sentinel as named in the deck does not exist as one system.** Report,
-Observe and Review are real and working; Analyze is the missing piece that
-would turn three working parts into the thing the deck describes.
+**Sentinel as named in the deck does not fully exist as one system yet.**
+Report, Observe, Analyze (its deterministic half) and Review are real and
+working; what's missing is a configured model key to turn Analyze's
+narrative half on, and the Attest stage.
 
 ---
 
@@ -93,7 +94,7 @@ hasn't been assembled.
 | **Web app** | ✅ Live at [landfall-chi.vercel.app](https://landfall-chi.vercel.app) |
 | **API** | ✅ REST (`api/[...path].js`) + GraphQL (`POST /api/v1/graphql`) |
 | **SDK** | ✅ Published — [`npm install @landfall/sdk`](https://www.npmjs.com/package/@landfall/sdk). Verified 7 September against the real registry copy, not just the local build: installed fresh into a scratch project outside this repo, ran the README's `pickAnchor()` example, 12 PROVEN correctly outranked 900 DERIVED |
-| **MCP server** | ✅ `scripts/mcp/server.mjs` — **9 tools**, correctly listed in full in `docs/MCP.md`: `landfall_anchors`, `landfall_anchor_detail`, `landfall_payments`, `landfall_assets`, `landfall_corridors`, `landfall_health`, `landfall_trust_check`, `landfall_fraud_reports`, `landfall_intent`. (`docs/gaps.md`'s "six tools" entry is a dated 14 August record, from before the last three shipped — correctly left as the historical record it is, not a live count) |
+| **MCP server** | ✅ `scripts/mcp/server.mjs` — **10 tools**, correctly listed in full in `docs/MCP.md`: `landfall_anchors`, `landfall_anchor_detail`, `landfall_payments`, `landfall_assets`, `landfall_corridors`, `landfall_health`, `landfall_trust_check`, `landfall_fraud_reports`, `landfall_investigation`, `landfall_intent`. (`docs/gaps.md`'s "six tools" entry is a dated 14 August record, from before the rest shipped — correctly left as the historical record it is, not a live count) |
 | **Wallets** | ❌ Zero external wallet integrations. Nothing outside this repo calls any of the above yet |
 | **Agents** | ❌ Same — no external MCP/agent consumer confirmed |
 | **Stellar** | ⚠️ Soroban oracle deployed to **testnet only**. `scripts/publish-oracle.mjs` verified publishing real digests end to end (6 September dry run). **Not on mainnet** — needs funded keys, which is your call, not a code blocker |
@@ -130,9 +131,17 @@ in passing.
 [`npm install @landfall/sdk`](https://www.npmjs.com/package/@landfall/sdk)
 works, verified against the live registry copy.
 
-1. **AI Investigator / the "Analyzed" stage of Sentinel.** The one module
-   named in the deck with nothing behind it. Report/Observe/Review already
-   work; this is the missing fourth piece.
+~~AI Investigator / the "Analyzed" stage of Sentinel.~~ **Code done, 7
+September** — `packages/investigator`, `POST /api/v1/fraud-reports/:id/investigate`,
+`landfall_investigation` MCP tool. Cited facts and Trust Check signals are
+deterministic and live now; the AI narrative needs `OPENAI_API_KEY` set in
+production, which is not done yet — until then every investigation returns
+facts with a `null` narrative, which is the module's documented degrade
+path, not a bug.
+
+1. **Set `OPENAI_API_KEY` in production**, or decide not to — the narrative
+   half of AI Investigator is otherwise finished code waiting on a key and a
+   decision about that cost, not an engineering gap.
 2. **Get one external consumer of anything** — a wallet calling
    `pickAnchor()`, an agent calling the MCP server. This is the actual bar
    the roadmap sets for "infrastructure," and nothing here can close it

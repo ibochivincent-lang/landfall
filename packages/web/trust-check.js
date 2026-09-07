@@ -128,6 +128,8 @@
                     'I control this address — respond' +
                   '</button>') +
               '<div class="dispute-box" id="disputeBox-' + esc(rep.id) + '" hidden></div>' +
+              '<button type="button" class="investigate-btn" data-report="' + esc(rep.id) + '">Investigate</button>' +
+              '<div class="investigation-box" id="investigationBox-' + esc(rep.id) + '" hidden></div>' +
             '</div>'
           );
         }).join('')
@@ -156,6 +158,77 @@
         });
       })(respondButtons[i]);
     }
+
+    var investigateButtons = document.querySelectorAll('.investigate-btn');
+    for (var j = 0; j < investigateButtons.length; j++) {
+      (function (btn) {
+        btn.addEventListener('click', function () {
+          runInvestigation(btn.dataset.report, btn);
+        });
+      })(investigateButtons[j]);
+    }
+  }
+
+  var SEVERITY_LABEL = { info: 'Info', warning: 'Warning', high: 'High' };
+
+  /* ─── AI Investigator — Sentinel's "Analyzed" stage ───────────────────────
+     citedFacts are deterministic, computed with no AI, and always shown.
+     narrative is optional AI prose over exactly those facts — labeled with
+     the model that wrote it, and shown as "no narrative" rather than hidden
+     when no model is configured, so a viewer isn't left wondering whether
+     the button silently did nothing. */
+  function runInvestigation(reportId, trigger) {
+    var box = qs('#investigationBox-' + reportId);
+    if (!box) return;
+    trigger.disabled = true;
+    trigger.textContent = 'Investigating…';
+    box.hidden = false;
+    box.innerHTML = '<div class="flag-detail">Gathering cited facts from the ledger…</div>';
+
+    fetch('/api/v1/fraud-reports/' + encodeURIComponent(reportId) + '/investigate', { method: 'POST' })
+      .then(function (res) { return res.json().then(function (body) { return { ok: res.ok, body: body }; }); })
+      .then(function (result) {
+        trigger.hidden = true;
+        if (!result.ok) {
+          box.innerHTML = '<div class="report-err">' + esc(result.body.error || 'Could not run the investigation.') + '</div>';
+          return;
+        }
+        renderInvestigation(box, result.body);
+      })
+      .catch(function () {
+        trigger.disabled = false;
+        trigger.textContent = 'Investigate';
+        box.innerHTML = '<div class="report-err">Could not reach Landfall. Try again shortly.</div>';
+      });
+  }
+
+  function renderInvestigation(box, inv) {
+    var factsHtml = inv.citedFacts.map(function (f) {
+      return '<li>' + esc(f) + '</li>';
+    }).join('');
+
+    var signalsHtml = inv.relevantSignals.length
+      ? inv.relevantSignals.map(function (s) {
+          return '<li><span class="investigation-sev is-' + esc(s.severity) + '">' + esc(SEVERITY_LABEL[s.severity] || s.severity) + '</span> ' +
+            esc(s.summary) + ' — ' + esc(s.detail) + '</li>';
+        }).join('')
+      : '<li class="investigation-none">No warning- or high-severity Trust Check signals for this address.</li>';
+
+    var narrativeHtml = inv.narrative
+      ? '<div class="investigation-narrative">' +
+          '<div class="investigation-narrative-label">AI summary of the facts above — written by ' + esc(inv.narrativeModel) + ', not a finding</div>' +
+          '<div class="investigation-narrative-text">' + esc(inv.narrative) + '</div>' +
+        '</div>'
+      : '<div class="investigation-none">No AI narrative — no model is configured. The cited facts above are unaffected either way.</div>';
+
+    box.innerHTML =
+      '<div class="investigation-card">' +
+        '<div class="investigation-head">Cited facts <span class="investigation-tag">no AI</span></div>' +
+        '<ul class="investigation-facts">' + factsHtml + '</ul>' +
+        '<div class="investigation-head">Relevant Trust Check signals</div>' +
+        '<ul class="investigation-facts">' + signalsHtml + '</ul>' +
+        narrativeHtml +
+      '</div>';
   }
 
   /* ─── Dispute response — gated on a signature from the reported address ──

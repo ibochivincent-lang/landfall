@@ -73,6 +73,7 @@ exposes is a `SELECT`, but the connection string controls that, not the code.
 | `landfall_trust_check` | `address` (G... or tx hash) | Live counterparty signals for an arbitrary Stellar address — see `packages/trust-check` |
 | `landfall_fraud_reports` | `subject` (G...) | Third-party reports filed about an address, each anchored to a verified on-chain transaction |
 | `landfall_intent` | `from`, `to`, `basis`, `amount`, `midRate`, `candidates[]`, `sortBy?`, `minGrade?`, `requirePricedTerms?` | Every candidate route ranked, plus an executable plan for the winner |
+| `landfall_investigation` | `reportId` | The Analyzed-stage result for one fraud report, if it has been run: deterministic cited facts, relevant Trust Check signals, and an optional AI narrative labeled with its model |
 
 Each tool returns its result as a JSON text block. Failures (bad domain
 filter, database error) come back as a tool error with a plain-English
@@ -108,6 +109,12 @@ an agent in a position where doing so looks like the normal way to use it.
 
 Both remain reachable exactly where they already were — the Trust Check page
 and the REST API directly.
+
+Running a new investigation (`POST /api/v1/fraud-reports/:id/investigate`) is
+excluded the same way filing a report is: it calls a paid model and writes a
+row, and collapsing that to a single tool call would let an agent trigger it
+at scale for no reason a person chose. `landfall_investigation` only reads
+whatever investigation already exists — running one stays a page action.
 
 ## Verification
 

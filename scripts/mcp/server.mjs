@@ -45,6 +45,7 @@ import {
   trustCheckFetchInput,
   analyzeTrustCheck,
   fetchFraudReports,
+  fetchInvestigation,
   resolveIntent,
 } from '../../api/[...path].js';
 
@@ -271,6 +272,35 @@ function buildServer() {
           return text({ error: 'subject must be a Stellar public key (G...).' });
         }
         return text(await fetchFraudReports(db, subject));
+      } catch (err) {
+        return errorText(err);
+      }
+    }
+  );
+
+  server.registerTool(
+    'landfall_investigation',
+    {
+      title: 'Read the Analyzed-stage investigation for one fraud report',
+      description:
+        'The result of Sentinel\'s "Analyzed" stage for one fraud report, if it has been run: ' +
+        'cited_facts (deterministic, computed with no AI, always present once an investigation ' +
+        'exists) and relevant_signals (the subject\'s own warning/high Trust Check flags). ' +
+        'narrative is an optional AI-written summary of exactly those facts, labeled with the ' +
+        'model that wrote it — null whenever no model was configured. Read-only: this tool never ' +
+        'triggers a new investigation (that calls a paid model and writes a row) and never reads ' +
+        'how many other reports exist about the subject, the same restraint fraud reports\' own ' +
+        'design applies — report counts are never treated as evidence.',
+      inputSchema: {
+        reportId: z.string().describe('The numeric fraud report id, from landfall_fraud_reports'),
+      },
+    },
+    async ({ reportId }) => {
+      try {
+        if (!/^\d+$/.test(reportId)) return text({ error: 'reportId must be numeric.' });
+        const investigation = await fetchInvestigation(db, reportId);
+        if (!investigation) return text({ error: 'This report has not been investigated yet.' });
+        return text(investigation);
       } catch (err) {
         return errorText(err);
       }

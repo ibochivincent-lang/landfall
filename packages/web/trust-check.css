@@ -203,3 +203,49 @@
   color: var(--muted); font-family: inherit; margin-bottom: 14px;
 }
 .dispute-copy:hover { border-color: #0b9c91; color: #0b9c91; }
+
+/* ─── AI Investigator ─────────────────────────────────────────────────────
+   citedFacts and relevantSignals are deterministic and always rendered;
+   the "no AI" tag next to them is deliberate, not decorative — it's the
+   visual half of the same separation buildCitedFacts/buildPrompt keep in
+   code. narrative gets its own visually distinct block, always labeled
+   with the model that wrote it, never presented as though Landfall itself
+   concluded anything. */
+.investigate-btn {
+  background: none; border: 1px solid var(--line); border-radius: 7px;
+  padding: 7px 12px; font-size: 11.5px; font-weight: 700; cursor: pointer;
+  color: var(--muted); font-family: inherit; margin-top: 10px; margin-left: 8px;
+}
+.investigate-btn:hover { border-color: #6d28d9; color: #6d28d9; }
+.investigate-btn:disabled { cursor: not-allowed; opacity: 0.6; }
+
+.investigation-box { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line); }
+.investigation-card { font-size: 12.5px; line-height: 1.55; }
+.investigation-head {
+  font-size: 11px; font-weight: 800; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.03em; margin: 10px 0 6px;
+}
+.investigation-head:first-child { margin-top: 0; }
+.investigation-tag {
+  display: inline-block; background: #ede9fe; color: #5b21b6;
+  border-radius: 999px; padding: 1px 8px; margin-left: 6px;
+  font-size: 10px; text-transform: none; letter-spacing: 0; font-weight: 700;
+}
+.investigation-facts { margin: 0; padding-left: 18px; color: var(--ink); }
+.investigation-facts li { margin-bottom: 5px; }
+.investigation-none { color: var(--muted); font-style: italic; }
+.investigation-sev {
+  display: inline-block; border-radius: 5px; padding: 0 6px; font-size: 10px;
+  font-weight: 800; text-transform: uppercase; margin-right: 4px;
+}
+.investigation-sev.is-warning { background: #fef3c7; color: #92400e; }
+.investigation-sev.is-high { background: #fee2e2; color: #991b1b; }
+.investigation-narrative {
+  margin-top: 10px; padding: 10px 12px; background: #f5f3ff;
+  border: 1px solid #ddd6fe; border-radius: 8px;
+}
+.investigation-narrative-label {
+  font-size: 10.5px; font-weight: 700; color: #6d28d9; margin-bottom: 5px;
+  text-transform: uppercase; letter-spacing: 0.02em;
+}
+.investigation-narrative-text { color: var(--ink); font-size: 12.5px; line-height: 1.6; }

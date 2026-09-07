@@ -19,6 +19,8 @@
 *   POST /api/v1/fraud-reports      -- file an evidence-anchored report about an address
 *   GET  /api/v1/fraud-reports/:subject -- reports filed about one address, with disclaimer attached
 *   POST /api/v1/fraud-reports/:id/dispute -- reported party responds, gated on a signature from that address
+*   POST /api/v1/fraud-reports/:id/investigate -- Sentinel's "Analyzed" stage: deterministic cited facts, plus an optional AI narrative of those same facts
+*   GET  /api/v1/fraud-reports/:id/investigation -- the most recent investigation of one report, if any
  *   GET  /health
  *
  * Admin routes (session-cookie gated, see requireSession()):
@@ -965,6 +967,29 @@ export async function fetchFraudReports(db, subject) {
 }
 
 /**
+ * Reads the stored investigation for one report, if any. Pulled out of the
+ * GET route for the same reason fetchFraudReports was: the MCP server needs
+ * the identical query and shaping.
+ */
+export async function fetchInvestigation(db, reportId) {
+  const { rows } = await db.query(
+    `SELECT report_id, cited_facts, relevant_signals, narrative, narrative_model, investigated_at
+     FROM fraud_report_investigations WHERE report_id = $1`,
+    [reportId],
+  );
+  const row = rows[0];
+  if (!row) return null;
+  return {
+    reportId: String(row.report_id),
+    investigatedAt: row.investigated_at.toISOString(),
+    citedFacts: row.cited_facts,
+    relevantSignals: row.relevant_signals,
+    narrative: row.narrative ?? null,
+    narrativeModel: row.narrative_model ?? null,
+  };
+}
+
+/**
  * Dispute responses — mirror of packages/fraud-reports/src/dispute.ts.
  *
  * A response is the reported party's own words attached to an accusation,
@@ -1226,6 +1251,175 @@ export async function fraudVerifyEvidence(txHash, subject) {
     };
   }
   return { ok: true };
+}
+
+/**
+ * Fetches the report's cited transaction fresh, for the one payment operation
+ * that actually involves the subject — mirrors fraudVerifyEvidence's lookup
+ * but returns the payment's real amount/asset/parties instead of a boolean,
+ * since an investigation needs to quote them, not just confirm they exist.
+ * Returns null (never throws for a missing/prunable tx) so the caller can
+ * fall back to citing only the evidence hash, matching
+ * packages/investigator/src/facts.ts's degrade path.
+ */
+async function investigatorFetchTransaction(txHash, subject) {
+  let ops;
+  try {
+    ops = await trustCheckGetJson(`${TRUST_CHECK_HORIZON}/transactions/${txHash}/operations?limit=200`);
+  } catch (err) {
+    return null;
+  }
+  const records = ops._embedded?.records ?? [];
+  for (const rec of records) {
+    const p = trustCheckNormalisePayment(rec);
+    if (p && (p.from === subject || p.to === subject)) {
+      return { hash: p.txHash || txHash, from: p.from, to: p.to, amount: p.amount, asset: p.asset, createdAt: p.createdAt };
+    }
+  }
+  return null;
+}
+
+/**
+ * ===========================================================
+ * AI Investigator — mirror of packages/investigator/src/*.
+ *
+ * Same reason as the Trust Check and Fraud Reports mirrors above: this file
+ * has no build step and cannot import the TS package at runtime, so the
+ * pure logic is hand-copied here. packages/investigator/test/parity.test.ts
+ * imports both this file (by dynamic import of its real path) and the real
+ * package, and asserts identical output across shared fixtures.
+ * ===========================================================
+ */
+
+const INVESTIGATOR_CATEGORY_LABEL = {
+  did_not_receive: 'the reporter says they did not receive an expected payment',
+  wrong_amount: 'the reporter says the amount received did not match what was expected',
+  impersonation: 'the reporter says this address impersonated another party',
+  unauthorized_debit: 'the reporter says funds moved without authorization',
+  other: 'the reporter describes a claim outside the standard categories',
+};
+
+function investigatorFormatTransaction(tx) {
+  return `The cited transaction ${tx.hash} moved ${tx.amount} ${tx.asset} from ${tx.from} to ${tx.to} on ${tx.createdAt}.`;
+}
+
+export function buildCitedFacts(input) {
+  const { report, transaction } = input;
+  const facts = [];
+
+  facts.push(
+    `A fraud report was filed against ${report.subject} on ${report.submittedAt}: ${INVESTIGATOR_CATEGORY_LABEL[report.category] ?? INVESTIGATOR_CATEGORY_LABEL.other}.`,
+  );
+
+  facts.push(
+    `Landfall verified that transaction ${report.evidenceTxHash} exists on the Stellar ledger and involves ${report.subject} before this report was stored.`,
+  );
+
+  if (transaction) {
+    facts.push(investigatorFormatTransaction(transaction));
+  } else {
+    facts.push(
+      `The cited transaction's full details could not be re-fetched at investigation time; only the evidence tx hash above is confirmed.`,
+    );
+  }
+
+  if (report.note.trim().length > 0) {
+    facts.push(`The reporter's own note, stored verbatim and unverified: "${report.note.trim()}"`);
+  }
+
+  if (report.disputedAt) {
+    const disputeNote = report.disputeNote?.trim();
+    facts.push(
+      disputeNote
+        ? `The reported address disputed this report on ${report.disputedAt}, with a signature proving control of the address: "${disputeNote}"`
+        : `The reported address disputed this report on ${report.disputedAt}, with a signature proving control of the address.`,
+    );
+  } else {
+    facts.push(`The reported address has not disputed this report.`);
+  }
+
+  return facts;
+}
+
+export function extractRelevantSignals(subjectFlags) {
+  return subjectFlags.filter((flag) => flag.severity === 'warning' || flag.severity === 'high');
+}
+
+const INVESTIGATOR_SYSTEM_PROMPT = `You are writing a short analysis for Landfall, a Stellar settlement-intelligence tool.
+
+You will be given a list of CITED FACTS and a list of RELEVANT SIGNALS about a fraud report and the address it was filed against. Every fact and signal was independently verified against the Stellar ledger before you saw it.
+
+Rules you must follow exactly:
+1. Use only the facts and signals given to you. Never state a fact, name, amount, date, or transaction hash that was not given to you.
+2. Never state or imply that the reported address committed fraud, is guilty, or is confirmed to have done anything wrong. A fraud report is an unproven accusation, not a finding.
+3. Never treat the number of reports, or anything not listed in the facts, as evidence. You were not told how many other reports exist about this address, and must not guess or assume a number.
+4. Explain in plain language what the given facts and signals could mean, and note anything that is missing or unverifiable — do not fill gaps with speculation.
+5. Keep it to two or three short sentences.`;
+
+function investigatorRenderSignal(signal) {
+  return `- [${signal.severity}] ${signal.summary} — ${signal.detail}`;
+}
+
+export function buildPrompt(citedFacts, relevantSignals) {
+  const factsBlock = citedFacts.map((fact) => `- ${fact}`).join('\n');
+  const signalsBlock =
+    relevantSignals.length > 0
+      ? relevantSignals.map(investigatorRenderSignal).join('\n')
+      : '- None. Trust Check found no warning- or high-severity signals for this address.';
+
+  const user = `CITED FACTS:\n${factsBlock}\n\nRELEVANT SIGNALS (from Trust Check, computed independently of this report):\n${signalsBlock}\n\nWrite the analysis now, following all the rules.`;
+
+  return { system: INVESTIGATOR_SYSTEM_PROMPT, user };
+}
+
+export function prepareInvestigation(input) {
+  const citedFacts = buildCitedFacts(input);
+  const relevantSignals = extractRelevantSignals(input.subjectFlags);
+  const prompt = buildPrompt(citedFacts, relevantSignals);
+  return { citedFacts, relevantSignals, prompt };
+}
+
+export function assembleInvestigation(reportId, investigatedAt, prepared, narrative, narrativeModel) {
+  return {
+    reportId,
+    investigatedAt,
+    citedFacts: prepared.citedFacts,
+    relevantSignals: prepared.relevantSignals,
+    narrative: narrative ?? null,
+    narrativeModel: narrative ? narrativeModel : null,
+  };
+}
+
+const INVESTIGATOR_MODEL = 'gpt-4o-mini';
+
+/**
+ * The only network call to an LLM in this file. Returns null (never throws
+ * out of the route) whenever no key is configured or the call fails —
+ * cited facts still compute and display either way, matching the
+ * STP-signing and Soroban-oracle degrade-without-config pattern used
+ * elsewhere in this codebase.
+ */
+async function investigatorCallModel(prompt) {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) return null;
+  try {
+    const { default: OpenAI } = await import('openai');
+    const client = new OpenAI({ apiKey });
+    const completion = await client.chat.completions.create({
+      model: INVESTIGATOR_MODEL,
+      messages: [
+        { role: 'system', content: prompt.system },
+        { role: 'user', content: prompt.user },
+      ],
+      temperature: 0.2,
+      max_tokens: 300,
+    });
+    const text = completion.choices?.[0]?.message?.content?.trim();
+    return text ? { text, model: INVESTIGATOR_MODEL } : null;
+  } catch (err) {
+    console.error('[investigator]', err.message);
+    return null;
+  }
 }
 
 /**
@@ -2144,7 +2338,10 @@ export default async function handler(req, res) {
     // route's own 400 ("Report id must be numeric") unreachable and
     // answered a malformed id with 405, which says the method was wrong
     // when the method was fine.
-    const POST_ROUTE_PATTERNS = [/^v1\/fraud-reports\/[^/]+\/dispute$/];
+    const POST_ROUTE_PATTERNS = [
+      /^v1\/fraud-reports\/[^/]+\/dispute$/,
+      /^v1\/fraud-reports\/[^/]+\/investigate$/,
+    ];
     const postAllowed = POST_ROUTES.has(joined) || POST_ROUTE_PATTERNS.some((re) => re.test(joined));
     if (req.method !== 'GET' && !(req.method === 'POST' && postAllowed)) {
       return json(res, 405, { error: 'Method not allowed' });
@@ -2388,6 +2585,91 @@ export default async function handler(req, res) {
           'Response recorded and attached to the report. It is shown alongside the accusation wherever that ' +
           'report appears — Landfall does not adjudicate between the two, and does not claim to know which is right.',
       }, 0);
+    }
+
+    // POST /api/v1/fraud-reports/:id/investigate
+    //
+    // Sentinel's "Analyzed" stage. Computes cited_facts and relevant_signals
+    // with no AI involved — those alone are the return value whenever no
+    // OPENAI_API_KEY is configured. When a key is configured, the same
+    // deterministic prompt is sent to the model and its prose is stored
+    // alongside the facts, explicitly labeled with the model name. Report
+    // volume about the subject is never fetched here and never enters the
+    // prompt — see packages/investigator/src/types.ts for why.
+    if (req.method === 'POST' && parts.length === 4 && parts[0] === 'v1' && parts[1] === 'fraud-reports' && parts[3] === 'investigate') {
+      if (await enforceAuthRateLimit(req, res, db, 'fraud-investigate', 10)) return;
+
+      const reportId = decodeURIComponent(parts[2]);
+      if (!/^\d+$/.test(reportId)) return json(res, 400, { error: 'Report id must be numeric.' }, 0);
+
+      const { rows } = await db.query(
+        `SELECT id, subject, evidence_tx_hash, category, note, status, submitted_at, disputed_at, dispute_note
+         FROM fraud_reports WHERE id = $1`,
+        [reportId],
+      );
+      const row = rows[0];
+      if (!row) return json(res, 404, { error: 'No report with that id.' }, 0);
+
+      const report = {
+        id: String(row.id),
+        subject: row.subject,
+        evidenceTxHash: row.evidence_tx_hash,
+        category: row.category,
+        note: row.note,
+        submittedAt: row.submitted_at.toISOString(),
+        status: row.status,
+        disputedAt: row.disputed_at ? row.disputed_at.toISOString() : null,
+        disputeNote: row.dispute_note ?? null,
+      };
+
+      let transaction;
+      let subjectFlags;
+      try {
+        const [tx, trustInput] = await Promise.all([
+          investigatorFetchTransaction(report.evidenceTxHash, report.subject),
+          trustCheckFetchInput(report.subject, new Date().toISOString()),
+        ]);
+        transaction = tx;
+        subjectFlags = analyzeTrustCheck(trustInput).flags;
+      } catch (err) {
+        console.error('[investigator]', err.message);
+        return json(res, 502, { error: 'Could not reach Horizon to gather facts for this investigation. Try again shortly.' }, 0);
+      }
+
+      const investigatedAt = new Date().toISOString();
+      const prepared = prepareInvestigation({ report, transaction, subjectFlags, investigatedAt });
+      const modelResult = await investigatorCallModel(prepared.prompt);
+      const investigation = assembleInvestigation(
+        report.id,
+        investigatedAt,
+        prepared,
+        modelResult?.text ?? null,
+        modelResult?.model ?? null,
+      );
+
+      await db.query(
+        `INSERT INTO fraud_report_investigations (report_id, cited_facts, relevant_signals, narrative, narrative_model, investigated_at)
+         VALUES ($1, $2, $3, $4, $5, $6)
+         ON CONFLICT (report_id) DO UPDATE SET
+           cited_facts = EXCLUDED.cited_facts,
+           relevant_signals = EXCLUDED.relevant_signals,
+           narrative = EXCLUDED.narrative,
+           narrative_model = EXCLUDED.narrative_model,
+           investigated_at = EXCLUDED.investigated_at`,
+        [reportId, JSON.stringify(investigation.citedFacts), JSON.stringify(investigation.relevantSignals), investigation.narrative, investigation.narrativeModel, investigatedAt],
+      );
+
+      return json(res, 200, investigation, 0);
+    }
+
+    // GET /api/v1/fraud-reports/:id/investigation
+    if (req.method === 'GET' && parts.length === 4 && parts[0] === 'v1' && parts[1] === 'fraud-reports' && parts[3] === 'investigation') {
+      const reportId = decodeURIComponent(parts[2]);
+      if (!/^\d+$/.test(reportId)) return json(res, 400, { error: 'Report id must be numeric.' }, 0);
+
+      const investigation = await fetchInvestigation(db, reportId);
+      if (!investigation) return json(res, 404, { error: 'This report has not been investigated yet.' }, 0);
+      return json(res, 200, investigation, 60);
     }
 
     // GET /api/v1/fraud-reports/:subject

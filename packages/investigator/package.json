@@ -1,0 +1,12 @@
+{
+  "name": "@landfall/investigator",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "The 'Analyzed' stage of the fraud-report pipeline: deterministic facts from the ledger, plus an optional AI-written plain-language summary of those same facts — never a verdict, never a new claim. See src/investigate.ts.",
+  "scripts": {
+    "test": "tsx --test test/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  }
+}
