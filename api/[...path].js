@@ -2447,9 +2447,25 @@ export default async function handler(req, res) {
         return adminJson(res, 200, { ok: true });
       }
 
-      // Everything else under /admin requires a live session.
+      // Everything else under /admin requires a live session AND the admin
+      // role.
+      //
+      // The role check is not redundant. requireSession() deliberately
+      // accepts a portal session as well as an admin one — it looks in
+      // portal_sessions FIRST — because the developer portal reuses the same
+      // cookie. Without the second line below, any member of the public could
+      // POST /api/v1/auth/register, receive a role:'developer' session, and
+      // then reach every route under /admin: the ops board, the raw payment
+      // browser, and — worse — POST/PATCH/DELETE /admin/anchors, which
+      // controls the tracked anchor set that every published figure derives
+      // from. SECURITY.md calls influencing a published figure the worst bug
+      // this project can have; this was a path to exactly that, open to
+      // anyone who could fill in a signup form.
       const session = await requireSession(req, db);
       if (!session) return adminJson(res, 401, { error: 'Not authenticated.' });
+      if (session.role !== 'admin') {
+        return adminJson(res, 403, { error: 'Administrator access required.' });
+      }
 
       if (req.method === 'GET' && sub.join('/') === 'me') {
         return adminJson(res, 200, { ok: true, username: session.username });
@@ -3164,7 +3180,24 @@ export default async function handler(req, res) {
     return json(res, 404, { error: `Unknown route: /api/${joined}` });
 
   } catch (err) {
-    console.error('[landfall-api]', err.message);
-    return json(res, 500, { error: err.message }, 0);
+    // The message goes to the log, never to the caller.
+    //
+    // This used to return err.message. Every deliberate 4xx above carries a
+    // message this file wrote on purpose; this catch is the opposite — it
+    // handles the errors nobody anticipated, which is exactly where the text
+    // is written by Postgres or a dependency rather than by us. A pg error
+    // names tables, columns and constraints ("duplicate key value violates
+    // unique constraint portal_users_email_key"); others carry file paths or
+    // internal hostnames. Handing that to an anonymous caller maps the
+    // schema for them one failed request at a time.
+    //
+    // The reference lets an operator tie a user's report to the log line
+    // without the response itself disclosing anything.
+    const reference = randomBytes(6).toString('hex');
+    console.error(`[landfall-api] ${reference}`, err?.stack || err?.message || err);
+    return json(res, 500, {
+      error: 'Internal error.',
+      reference,
+    }, 0);
   }
 }

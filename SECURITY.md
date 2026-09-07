@@ -77,6 +77,15 @@ code into published output.
   [docs/methodology.md](docs/methodology.md); the fiat leg in particular is
   invisible on-chain and openly stated as such.
 
+## Prior review
+
+[docs/SECURITY_ASSESSMENT.md](docs/SECURITY_ASSESSMENT.md) is a STRIDE and
+OWASP Top 10:2025 pass over the whole project, with findings cited to file and
+line. It records what was found and fixed — including a critical privilege
+escalation into the admin routes — and, just as usefully, what was checked and
+held up, so you are not re-treading covered ground. Trust assumptions live in
+[docs/TRUST.md](docs/TRUST.md).
+
 ## Disclosure
 
 We will credit reporters by name unless you ask otherwise, and we publish a

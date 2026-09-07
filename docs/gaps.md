@@ -484,9 +484,9 @@ whole problem. The alternative is deleting those sections until they're real.
 ## 3. Repo and process
 
 - ~~**The 20 issues are unfiled.**~~ Filed 13 August 2026, issues #4-#23.
-  **Not yet applied to the Wave** - that is now the open step.
 - **Not under an organisation.** Eight of ten approved Wave repos are.
-- **Not applied to the Stellar Wave.**
+- ~~**Not applied to the Stellar Wave.**~~ Applied August 2026. Drips Wave
+  review is in progress; outcome pending.
 - **No contributors, no PRs, no external commits.**
 - **No releases or tags.** No version has ever been cut.
 - **Nothing published to npm.**
@@ -495,9 +495,9 @@ whole problem. The alternative is deleting those sections until they're real.
 
 ## 4. Grant and business
 
-- **The SCF interest form is not submitted.** Deadline 16 August. This is the
-  only item in the entire project with a hard deadline, and it's the cheapest
-  one on this list.
+- ~~**The SCF interest form is not submitted.**~~ Submitted August 2026,
+  inside the window. The application is in review; the outcome is pending and
+  is not something this repo can move.
 - **Team backgrounds are unwritten.** Five names, no evidence behind any of them.
 - **Part-time vs full-time unstated**, which the $50k budget arithmetic depends on.
 - **No users. No wallet conversations. No revenue. No letters of support.**
@@ -531,10 +531,10 @@ whole problem. The alternative is deleting those sections until they're real.
 
 ## If you only do four things
 
-1. **Submit the SCF interest form.** Deadline 16 August. Part 1 of
-   `docs/scf-submission.md` is ready to paste. Nothing else here has a clock.
-2. **Apply the repo to the Stellar Wave in Drips.** The 20 issues are filed;
-   the application is not made.
+1. ~~**Submit the SCF interest form.**~~ ✅ Done — submitted August 2026,
+   now in review.
+2. ~~**Apply the repo to the Stellar Wave in Drips.**~~ ✅ Done — applied
+   August 2026, review in progress.
 3. **Actually deploy something.** The stack is deployable and not deployed; a
    Supabase project and one container turn "designed" into "running", and it is
    an afternoon. `docs/deployment.md`.

@@ -12,10 +12,10 @@ Every existing anchor monitor *interrogates* — pings an endpoint, validates a 
 
 **Live: [landfall-chi.vercel.app](https://landfall-chi.vercel.app)**
 
-> **Preparing for the Drips Stellar Wave Program** — the repo is not yet
-> applied. 20 issues are filed and labelled by complexity —
-> `trivial-100`, `medium-150`, `high-200` — and tagged `Stellar Wave`, ready
-> for when it is. No deadline on this one; see [docs/checklist.md](docs/checklist.md).
+> **Applied to the Drips Stellar Wave Program** — submitted August 2026,
+> review in progress, outcome pending. 20 issues are filed and labelled by
+> complexity — `trivial-100`, `medium-150`, `high-200` — and tagged
+> `Stellar Wave`. See [docs/checklist.md](docs/checklist.md).
 > New contributors should still start with `good first issue`, and
 > **wait to be assigned before writing code** — an unassigned issue is not
 > yours. See [CONTRIBUTING.md](CONTRIBUTING.md).
@@ -257,6 +257,7 @@ Copy `.env.example` to `.env` and adjust. Nothing in the example file is a secre
 | [docs/architecture/MULTICHAIN.md](docs/architecture/MULTICHAIN.md) | The cross-chain design: the STP attestation schema, the `ChainAdapter` interface, and the evidence-tier ladder that keeps a custodial guess from reading as ledger truth. |
 | [docs/methodology.md](docs/methodology.md) | Exactly how each published metric is computed, and where the method is weak. |
 | [docs/TRUST.md](docs/TRUST.md) | What you have to trust to rely on this, stated plainly — including the one place you must trust a key rather than check a computation, and why the oracle is not on mainnet yet. |
+| [docs/SECURITY_ASSESSMENT.md](docs/SECURITY_ASSESSMENT.md) | STRIDE and OWASP Top 10:2025 review, with findings cited to file and line — including one critical privilege escalation found and fixed, and what held up under review. |
 | [docs/gaps.md](docs/gaps.md) | Honest inventory of what isn't built yet, ordered by how much each gap could hurt. |
 | [docs/product-vision-status.md](docs/product-vision-status.md) | The product vision deck, module by module, checked against what's actually running. |
 | [ROADMAP.md](ROADMAP.md) | Milestones mapped to the Stellar Community Fund Build Award's three tranches. |

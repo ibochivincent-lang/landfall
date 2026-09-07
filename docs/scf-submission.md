@@ -1,8 +1,9 @@
 # SCF #45 — submission pack
 
-**Round closed 16 August 2026, unsubmitted.** This pack was prepared for that
-window and the window is gone — kept here as the ready pack for whenever a
-future SCF round opens, not as an active submission in progress.
+**Submitted August 2026; in review.** This is the pack prepared for that
+round. The outcome is pending, so nothing here is a claim of an award — it is
+the record of what was submitted, and the ready pack should a future round
+open.
 
 Everything below is written to one rule, the same rule the tool itself follows:
 **no claim we cannot show you.** Where a fact is missing it is marked `[FILL]`

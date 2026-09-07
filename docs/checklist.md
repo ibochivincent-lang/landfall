@@ -52,13 +52,14 @@ Repo: https://github.com/ibochivincent-lang/landfall (public)
 
 ---
 
-## SCF #45 — window closed, unsubmitted
+## SCF #45 — submitted, in review
 
-The interest form closed 16 August 2026. It was never submitted, so there is
-nothing left to act on for this round — leaving the checklist below would
-misread as an open task with a live clock, when the clock has already run
-out. `docs/scf-submission.md` stays as the prepared pack for whenever a
-future round opens; it just isn't this round.
+The interest form was submitted in August 2026, before the window closed.
+The application is now in review and the outcome is pending, so there is
+nothing to act on here until a decision comes back — this section stays as
+the record of where it stands, not as an open task.
+
+`docs/scf-submission.md` holds the pack that was prepared for it.
 
 If a future SCF round is worth targeting, the pack needs before submitting:
 
