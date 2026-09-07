@@ -62,12 +62,22 @@ inferred by a model.
 | Observed | ✅ The cited tx hash is verified against the ledger before the report is stored — fabricated or unrelated evidence is rejected, not filed |
 | Analyzed | ⚠️ `POST /api/v1/fraud-reports/:id/investigate` computes deterministic cited facts and relevant Trust Check signals for the report, with no AI. It also asks a model for a plain-language narrative of exactly those facts — but no `OPENROUTER_API_KEY` is configured in production yet, so the narrative half returns `null` until one is set |
 | Reviewed | ✅ Dispute path exists — `POST /api/v1/fraud-reports/:id/dispute`, gated on a signature from the reported address, per `DISPUTES.md` |
-| Attested | ⚠️ Reports are stored and disputable; no cryptographic attestation is generated over a report+dispute pair the way settlement events are |
+| Attested | ⚠️ Built, deliberately one-sided. Answering a report mints a signed **dispute-response** attestation (`packages/fraud-reports/src/attest.ts`, `GET /api/v1/fraud-reports/:id/attestation`): a portable proof that the account holder responded and proved control by signature. The **accusation is never signed** — see below for why. Signed when `STP_SIGNING_KEY` is set, otherwise a recomputable SHA-256 digest and `signed: false`; no production key is set yet |
 
-**Sentinel as named in the deck does not fully exist as one system yet.**
-Report, Observe, Analyze (its deterministic half) and Review are real and
-working; what's missing is a configured model key to turn Analyze's
-narrative half on, and the Attest stage.
+**All five Sentinel stages now exist**, though two are deliberately narrower
+than the deck implies. Report, Observe, Analyze and Review work end to end.
+Attest is built, but signs only the *response*, never the accusation.
+
+That asymmetry is the design, not a shortcut. A signature makes a claim
+portable and permanent, and a portable accusation travels stripped of
+everything that holds it honest — the disclaimer, the attached response, the
+rule that report volume is never scored. Those live in the API payload and
+the page, not in a signature, so signing the accusation would export the
+claim and leave its safeguards behind. Signing only the response inverts
+that: the reported party gets a portable, verifiable record that they
+answered and control the account, and it is worth nothing to anyone trying
+to spread an allegation. The payload carries no category, no reporter note
+and no evidence hash — enforced by a test, not just by intent.
 
 ---
 

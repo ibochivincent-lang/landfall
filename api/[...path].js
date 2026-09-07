@@ -19,6 +19,7 @@
 *   POST /api/v1/fraud-reports      -- file an evidence-anchored report about an address
 *   GET  /api/v1/fraud-reports/:subject -- reports filed about one address, with disclaimer attached
 *   POST /api/v1/fraud-reports/:id/dispute -- reported party responds, gated on a signature from that address
+*   GET  /api/v1/fraud-reports/:id/attestation -- signed proof the reported party responded and controls the address; never covers the accusation
 *   POST /api/v1/fraud-reports/:id/investigate -- Sentinel's "Analyzed" stage: deterministic cited facts, plus an optional AI narrative of those same facts
 *   GET  /api/v1/fraud-reports/:id/investigation -- the most recent investigation of one report, if any
 *   POST /api/v1/x402/check-payee    -- Trust Check every Stellar payee in an x402 402 response's `accepts` array, before an agent signs
@@ -44,7 +45,7 @@
  */
 
 import pg from 'pg';
-import { scrypt as scryptCb, randomBytes, timingSafeEqual, createHash, createPublicKey, verify as ed25519Verify } from 'node:crypto';
+import { scrypt as scryptCb, randomBytes, timingSafeEqual, createHash, createPrivateKey, createPublicKey, sign as ed25519Sign, verify as ed25519Verify } from 'node:crypto';
 import { promisify } from 'node:util';
 import { assertPublicHostname } from './_lib/net-guard.js';
 import { sendEmail } from './_lib/email.js';
@@ -1114,6 +1115,58 @@ export function verifyDispute(submission, now) {
   }
 
   return { ok: true };
+}
+
+/**
+ * ===========================================================
+ * Dispute-response attestations — mirror of
+ * packages/fraud-reports/src/attest.ts (and, for canonicalize(), of
+ * packages/stp/src/canonical.ts). Same no-build-step reason as the mirrors
+ * above; packages/fraud-reports/test/attest-parity.test.ts holds both to the
+ * same fixtures.
+ *
+ * Only the RESPONSE is signed, never the accusation — see the package file's
+ * header for why. Nothing in this payload can carry an allegation.
+ * ===========================================================
+ */
+
+function stpCanonicalize(value) {
+  return JSON.stringify(stpSortKeysDeep(value));
+}
+
+function stpSortKeysDeep(value) {
+  if (Array.isArray(value)) return value.map(stpSortKeysDeep);
+  if (value !== null && typeof value === 'object') {
+    const sorted = {};
+    for (const key of Object.keys(value).sort()) sorted[key] = stpSortKeysDeep(value[key]);
+    return sorted;
+  }
+  return value;
+}
+
+export function buildDisputeAttestation(input) {
+  return {
+    landfall_attestation: 'dispute-response',
+    version: '1',
+    subject: input.subject,
+    report_id: input.reportId,
+    responded_at: input.respondedAt,
+    control_proven: true,
+    response: input.response,
+    signer: input.signer,
+  };
+}
+
+export function disputeAttestationDigest(unsigned) {
+  return createHash('sha256').update(stpCanonicalize(unsigned), 'utf8').digest('hex');
+}
+
+export function attestDispute(unsigned, privateKeyB64) {
+  const digest = disputeAttestationDigest(unsigned);
+  if (!privateKeyB64) return { attestation: unsigned, digest, signed: false };
+  const key = createPrivateKey({ key: Buffer.from(privateKeyB64, 'base64'), format: 'der', type: 'pkcs8' });
+  const sig = ed25519Sign(null, Buffer.from(stpCanonicalize(unsigned), 'utf8'), key).toString('base64');
+  return { attestation: { ...unsigned, sig }, digest, signed: true };
 }
 
 const TRUST_CHECK_HORIZON = 'https://horizon.stellar.org';
@@ -2625,15 +2678,94 @@ export default async function handler(req, res) {
         return json(res, 409, { error: 'That report already carries a response.' }, 0);
       }
 
+      // Sentinel's "Attested" stage. Signs the RESPONSE only — never the
+      // accusation, which would make the claim portable while leaving its
+      // safeguards behind. See packages/fraud-reports/src/attest.ts.
+      //
+      // Best-effort: the response is already recorded and shown, so an
+      // attestation failure must not turn a successful reply into an error
+      // for the person answering an accusation about them. The attestation
+      // is fetchable later from GET .../attestation.
+      let attestation = null;
+      try {
+        const unsigned = buildDisputeAttestation({
+          subject: updated[0].subject,
+          reportId: String(updated[0].id),
+          respondedAt: updated[0].disputed_at.toISOString(),
+          response: updated[0].dispute_note ?? '',
+          signer: process.env.STP_SIGNER_ID || 'landfall-unattributed',
+        });
+        const result = attestDispute(unsigned, process.env.STP_SIGNING_KEY || undefined);
+        await db.query(
+          `INSERT INTO dispute_attestations (report_id, subject, body, digest, sig, signer)
+           VALUES ($1, $2, $3, $4, $5, $6)
+           ON CONFLICT (report_id) DO NOTHING`,
+          [
+            reportId,
+            updated[0].subject,
+            JSON.stringify(result.attestation),
+            result.digest,
+            result.signed ? result.attestation.sig : null,
+            unsigned.signer,
+          ],
+        );
+        attestation = { digest: result.digest, signed: result.signed };
+      } catch (err) {
+        console.error('[dispute-attestation]', err.message);
+      }
+
       return json(res, 200, {
         ok: true,
         id: String(updated[0].id),
         status: updated[0].status,
         disputedAt: updated[0].disputed_at.toISOString(),
+        attestation,
         note:
           'Response recorded and attached to the report. It is shown alongside the accusation wherever that ' +
-          'report appears — Landfall does not adjudicate between the two, and does not claim to know which is right.',
+          'report appears — Landfall does not adjudicate between the two, and does not claim to know which is right.' +
+          (attestation
+            ? ' A signed record of this response — and only this response, never the accusation — is available at ' +
+              `/api/v1/fraud-reports/${updated[0].id}/attestation for you to keep or publish.`
+            : ''),
       }, 0);
+    }
+
+    // GET /api/v1/fraud-reports/:id/attestation
+    //
+    // The reported party's portable proof that they answered and control the
+    // account. Public because it is the accused's own exculpatory record and
+    // is useless for spreading an allegation — it carries no category, no
+    // reporter note and no evidence hash.
+    if (req.method === 'GET' && parts.length === 4 && parts[0] === 'v1' && parts[1] === 'fraud-reports' && parts[3] === 'attestation') {
+      const reportId = decodeURIComponent(parts[2]);
+      if (!/^\d+$/.test(reportId)) return json(res, 400, { error: 'Report id must be numeric.' }, 0);
+
+      const { rows } = await db.query(
+        `SELECT report_id, subject, body, digest, sig, signer, attested_at
+         FROM dispute_attestations WHERE report_id = $1`,
+        [reportId],
+      );
+      const row = rows[0];
+      if (!row) {
+        return json(res, 404, { error: 'No response has been attested for that report.' }, 0);
+      }
+
+      return json(res, 200, {
+        reportId: String(row.report_id),
+        subject: row.subject,
+        attestation: row.body,
+        digest: row.digest,
+        signed: Boolean(row.sig),
+        signer: row.signer,
+        attestedAt: row.attested_at.toISOString(),
+        note: row.sig
+          ? 'Signed by Landfall. Verify the signature over the canonical serialization of `attestation` (keys sorted, sig excluded).'
+          : 'Unsigned: no attester key is configured, so this carries a reproducible SHA-256 digest of its canonical form instead. ' +
+            'Anyone can recompute the digest from the body; it just is not attributable to Landfall.',
+        covers:
+          'This attests only that the holder of this account responded, and proved control of it by signature. ' +
+          'It deliberately carries nothing about what was alleged.',
+      }, 60);
     }
 
     // POST /api/v1/fraud-reports/:id/investigate
