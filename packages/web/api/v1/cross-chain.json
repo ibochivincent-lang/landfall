@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-07T18:36:06.252Z",
+  "generatedAt": "2026-09-07T21:57:13.734Z",
   "stpVersion": "1",
   "window": {
-    "since": "2026-08-08T18:35:25.074Z",
+    "since": "2026-08-08T21:56:47.756Z",
     "days": 30,
     "maxRecordsPerAccount": 200
   },
@@ -55,7 +55,7 @@
     }
   ],
   "totals": {
-    "PROVEN": 1587,
+    "PROVEN": 1789,
     "ATTESTED": 0,
     "DERIVED": 0
   },
@@ -71,17 +71,17 @@
       "rationale": "Ranked on 400 ledger-proven settlement(s)."
     },
     {
-      "anchorId": "aps.money",
+      "anchorId": "ultracapital.xyz",
       "evidence": {
-        "PROVEN": 254,
+        "PROVEN": 255,
         "ATTESTED": 0,
         "DERIVED": 0
       },
-      "tierMix": "PROVEN 254 · ATTESTED 0 · DERIVED 0",
-      "rationale": "Ranked on 254 ledger-proven settlement(s)."
+      "tierMix": "PROVEN 255 · ATTESTED 0 · DERIVED 0",
+      "rationale": "Ranked on 255 ledger-proven settlement(s)."
     },
     {
-      "anchorId": "ultracapital.xyz",
+      "anchorId": "aps.money",
       "evidence": {
         "PROVEN": 254,
         "ATTESTED": 0,
@@ -93,12 +93,12 @@
     {
       "anchorId": "aqua.network",
       "evidence": {
-        "PROVEN": 242,
+        "PROVEN": 243,
         "ATTESTED": 0,
         "DERIVED": 0
       },
-      "tierMix": "PROVEN 242 · ATTESTED 0 · DERIVED 0",
-      "rationale": "Ranked on 242 ledger-proven settlement(s)."
+      "tierMix": "PROVEN 243 · ATTESTED 0 · DERIVED 0",
+      "rationale": "Ranked on 243 ledger-proven settlement(s)."
     },
     {
       "anchorId": "luxpayband.io",
@@ -111,14 +111,24 @@
       "rationale": "Ranked on 202 ledger-proven settlement(s)."
     },
     {
-      "anchorId": "anclap.com",
+      "anchorId": "ntokens.com",
       "evidence": {
-        "PROVEN": 55,
+        "PROVEN": 200,
         "ATTESTED": 0,
         "DERIVED": 0
       },
-      "tierMix": "PROVEN 55 · ATTESTED 0 · DERIVED 0",
-      "rationale": "Ranked on 55 ledger-proven settlement(s)."
+      "tierMix": "PROVEN 200 · ATTESTED 0 · DERIVED 0",
+      "rationale": "Ranked on 200 ledger-proven settlement(s)."
+    },
+    {
+      "anchorId": "anclap.com",
+      "evidence": {
+        "PROVEN": 56,
+        "ATTESTED": 0,
+        "DERIVED": 0
+      },
+      "tierMix": "PROVEN 56 · ATTESTED 0 · DERIVED 0",
+      "rationale": "Ranked on 56 ledger-proven settlement(s)."
     },
     {
       "anchorId": "ixinium.io",
@@ -203,12 +213,12 @@
     {
       "anchorId": "gratz.io",
       "evidence": {
-        "PROVEN": 4,
+        "PROVEN": 3,
         "ATTESTED": 0,
         "DERIVED": 0
       },
-      "tierMix": "PROVEN 4 · ATTESTED 0 · DERIVED 0",
-      "rationale": "Ranked on 4 ledger-proven settlement(s)."
+      "tierMix": "PROVEN 3 · ATTESTED 0 · DERIVED 0",
+      "rationale": "Ranked on 3 ledger-proven settlement(s)."
     },
     {
       "anchorId": "mobius.network",
@@ -302,16 +312,6 @@
     },
     {
       "anchorId": "nafuloo.com",
-      "evidence": {
-        "PROVEN": 0,
-        "ATTESTED": 0,
-        "DERIVED": 0
-      },
-      "tierMix": "PROVEN 0 · ATTESTED 0 · DERIVED 0",
-      "rationale": "No evidence yet: 7 chain(s) have no address curated."
-    },
-    {
-      "anchorId": "ntokens.com",
       "evidence": {
         "PROVEN": 0,
         "ATTESTED": 0,
@@ -573,12 +573,12 @@
         "tiers": [
           {
             "tier": "PROVEN",
-            "events": 55,
+            "events": 56,
             "byAsset": [
               {
                 "asset": "ARS",
-                "count": 54,
-                "volume": "13850868.2887438"
+                "count": 55,
+                "volume": "14048858.2887438"
               },
               {
                 "asset": "XLM",
@@ -603,7 +603,7 @@
             "chain": "stellar",
             "maxTier": "PROVEN",
             "state": "observed",
-            "events": 55,
+            "events": 56,
             "sourcesScanned": 3,
             "sourcesFailed": 0
           },
@@ -671,8 +671,8 @@
             "note": "no solana address curated for this anchor in registry/anchors.registry.json"
           }
         ],
-        "totalEvents": 55,
-        "tierMix": "PROVEN 55 · ATTESTED 0 · DERIVED 0"
+        "totalEvents": 56,
+        "tierMix": "PROVEN 56 · ATTESTED 0 · DERIVED 0"
       },
       "failures": [],
       "sampleAttestations": [
@@ -701,6 +701,25 @@
             "anchor_id": "anclap.com",
             "chain": "stellar",
             "asset": "ARS",
+            "direction": "withdrawal",
+            "amount": "197990.0000000",
+            "onchain_ref": "901a6d87d5ee2bc695965b7ee4dfb39e5504f4b861232bd8c14bdc2d46a41bb0",
+            "fiat_leg_ref": null,
+            "evidence_tier": "PROVEN",
+            "evidence_detail": "stellar_ledger",
+            "keystone_ref": null,
+            "observed_at": "2026-09-07T19:55:12Z",
+            "signer": "landfall-attester-dev"
+          },
+          "digest": "37ae4815062c7b9bf5a236a4edd28f275dbb211e2112e666667c12aae1f6a57d",
+          "signed": false
+        },
+        {
+          "attestation": {
+            "stp_version": "1",
+            "anchor_id": "anclap.com",
+            "chain": "stellar",
+            "asset": "ARS",
             "direction": "deposit",
             "amount": "300120.0000000",
             "onchain_ref": "22f832925e152354a6ac61ff25156572c8938020dd2cd951c712fab2ccd5945e",
@@ -712,25 +731,6 @@
             "signer": "landfall-attester-dev"
           },
           "digest": "9f62fb77d6efa7b2c4ae5f1c0d20035283a822d79556e485b90f66c8c08276ce",
-          "signed": false
-        },
-        {
-          "attestation": {
-            "stp_version": "1",
-            "anchor_id": "anclap.com",
-            "chain": "stellar",
-            "asset": "ARS",
-            "direction": "withdrawal",
-            "amount": "306069.2800000",
-            "onchain_ref": "45892006586b2afe885a61152042139ab941ee33882d8bba20f439f95ecc6951",
-            "fiat_leg_ref": null,
-            "evidence_tier": "PROVEN",
-            "evidence_detail": "stellar_ledger",
-            "keystone_ref": null,
-            "observed_at": "2026-09-07T14:40:14Z",
-            "signer": "landfall-attester-dev"
-          },
-          "digest": "4bbc99e43cb9c815771f3e145d1e94677c20abbbe0ec49b58c19a9f23fcafc4b",
           "signed": false
         }
       ]
@@ -900,23 +900,28 @@
             "byAsset": [
               {
                 "asset": "APSEURM",
-                "count": 85,
-                "volume": "1235775.29"
+                "count": 104,
+                "volume": "1234570.99"
               },
               {
                 "asset": "APSUSDM",
-                "count": 84,
-                "volume": "381601.66"
-              },
-              {
-                "asset": "APSBPOUSD",
-                "count": 34,
-                "volume": "18035.29"
+                "count": 70,
+                "volume": "383878.33"
               },
               {
                 "asset": "APSBPIUSD",
-                "count": 34,
-                "volume": "2573.257"
+                "count": 42,
+                "volume": "2572.28"
+              },
+              {
+                "asset": "APSBPOUSD",
+                "count": 15,
+                "volume": "17047.33"
+              },
+              {
+                "asset": "APSBPIEUR",
+                "count": 12,
+                "volume": "449.59"
               },
               {
                 "asset": "APSSARM",
@@ -924,14 +929,9 @@
                 "volume": "8010174.36"
               },
               {
-                "asset": "APSBPIEUR",
-                "count": 8,
-                "volume": "459.58"
-              },
-              {
                 "asset": "APSBPIGBP",
-                "count": 1,
-                "volume": "20.6000000"
+                "count": 3,
+                "volume": "226.58"
               }
             ]
           },
@@ -1095,37 +1095,37 @@
         "tiers": [
           {
             "tier": "PROVEN",
-            "events": 242,
+            "events": 243,
             "byAsset": [
               {
                 "asset": "upvoteICE",
-                "count": 49,
-                "volume": "149679097.2546925"
+                "count": 47,
+                "volume": "163762889.5138926"
               },
               {
                 "asset": "governICE",
-                "count": 49,
-                "volume": "149679097.2546925"
+                "count": 47,
+                "volume": "163762889.5138926"
               },
               {
                 "asset": "ICE",
-                "count": 49,
-                "volume": "149679097.2546925"
+                "count": 47,
+                "volume": "163762889.5138926"
               },
               {
                 "asset": "AQUA",
-                "count": 42,
-                "volume": "2800268.3499549"
+                "count": 43,
+                "volume": "2900268.3499549"
               },
               {
                 "asset": "dICE",
-                "count": 27,
-                "volume": "314581071.811899"
+                "count": 30,
+                "volume": "333365203.7653973"
               },
               {
                 "asset": "gdICE",
-                "count": 26,
-                "volume": "543001189.3802445"
+                "count": 29,
+                "volume": "562635197.1071781"
               }
             ]
           },
@@ -1145,7 +1145,7 @@
             "chain": "stellar",
             "maxTier": "PROVEN",
             "state": "observed",
-            "events": 242,
+            "events": 243,
             "sourcesScanned": 2,
             "sourcesFailed": 0
           },
@@ -1213,11 +1213,30 @@
             "note": "no solana address curated for this anchor in registry/anchors.registry.json"
           }
         ],
-        "totalEvents": 242,
-        "tierMix": "PROVEN 242 · ATTESTED 0 · DERIVED 0"
+        "totalEvents": 243,
+        "tierMix": "PROVEN 243 · ATTESTED 0 · DERIVED 0"
       },
       "failures": [],
       "sampleAttestations": [
+        {
+          "attestation": {
+            "stp_version": "1",
+            "anchor_id": "aqua.network",
+            "chain": "stellar",
+            "asset": "AQUA",
+            "direction": "deposit",
+            "amount": "100000.0000000",
+            "onchain_ref": "294450ddeb00544070cbde9171e7916edae9670751c09f287cbc19afdff9e35f",
+            "fiat_leg_ref": null,
+            "evidence_tier": "PROVEN",
+            "evidence_detail": "stellar_ledger",
+            "keystone_ref": null,
+            "observed_at": "2026-09-07T18:59:23Z",
+            "signer": "landfall-attester-dev"
+          },
+          "digest": "10ae175483557897e977ea922cb456c7e9900af7c0aea2fdd8f29b5e1b0ce4ce",
+          "signed": false
+        },
         {
           "attestation": {
             "stp_version": "1",
@@ -1254,25 +1273,6 @@
             "signer": "landfall-attester-dev"
           },
           "digest": "a2dc8dca4171a14108f4da517d9a34371c8e94d7c717948cdf50f609ac356544",
-          "signed": false
-        },
-        {
-          "attestation": {
-            "stp_version": "1",
-            "anchor_id": "aqua.network",
-            "chain": "stellar",
-            "asset": "AQUA",
-            "direction": "deposit",
-            "amount": "0.8793697",
-            "onchain_ref": "263504e7c8cbfa9c01db6ea3195c72cabd74391af87e1258f7c47f2a7c2d7de7",
-            "fiat_leg_ref": null,
-            "evidence_tier": "PROVEN",
-            "evidence_detail": "stellar_ledger",
-            "keystone_ref": null,
-            "observed_at": "2026-09-05T07:10:17Z",
-            "signer": "landfall-attester-dev"
-          },
-          "digest": "687ffd7eb3562eca4c5337dc19522b83d81407833268867781099f32d0520ccf",
           "signed": false
         }
       ]
@@ -1593,18 +1593,13 @@
             "byAsset": [
               {
                 "asset": "USDC",
-                "count": 391,
-                "volume": "773655114.5963582"
+                "count": 392,
+                "volume": "779263787.3463582"
               },
               {
                 "asset": "USDCAllow",
                 "count": 8,
                 "volume": "400000000"
-              },
-              {
-                "asset": "XLM",
-                "count": 1,
-                "volume": "2650.2000000"
               }
             ]
           },
@@ -1704,16 +1699,16 @@
             "chain": "stellar",
             "asset": "USDC",
             "direction": "deposit",
-            "amount": "15394674.6700000",
-            "onchain_ref": "454d0961563f21a9c35f11ceda358d64ad8b40fe5bb33318aed609776440c5b9",
+            "amount": "7988800.5600000",
+            "onchain_ref": "5ae4b09cd1fd6573d2163c4320bb8c14d1fd213536720bda9ef80503539b2a2b",
             "fiat_leg_ref": null,
             "evidence_tier": "PROVEN",
             "evidence_detail": "stellar_ledger",
             "keystone_ref": null,
-            "observed_at": "2026-09-07T17:39:36Z",
+            "observed_at": "2026-09-07T19:09:22Z",
             "signer": "landfall-attester-dev"
           },
-          "digest": "646a33a03ff033d6912ecb1c771127b1b560d162259c03819f4ca81e7c68aba7",
+          "digest": "0b1377856c79f210464ce67734f9f3566ce473731262575018e050c0ed15c05a",
           "signed": false
         },
         {
@@ -1723,16 +1718,16 @@
             "chain": "stellar",
             "asset": "USDC",
             "direction": "deposit",
-            "amount": "100772.6900000",
-            "onchain_ref": "ee2f5dafca811784dcaa15f69413abd33532006098a05dada2fcfca15a57adbb",
+            "amount": "4.1500000",
+            "onchain_ref": "e80c804fc8992c933162e1e2a49daab4ae947f9d276b3aee011b63c968786f07",
             "fiat_leg_ref": null,
             "evidence_tier": "PROVEN",
             "evidence_detail": "stellar_ledger",
             "keystone_ref": null,
-            "observed_at": "2026-09-07T17:12:14Z",
+            "observed_at": "2026-09-07T19:08:24Z",
             "signer": "landfall-attester-dev"
           },
-          "digest": "3c0944430e2eef9212b6cec87965397c3efd0c2fafb2ec5359828e70022ce2d1",
+          "digest": "fe40f2782eb0b22e9dc05a803d82aabf59b9bc98d7e8b3cf32c338f5b96bcb35",
           "signed": false
         },
         {
@@ -1742,16 +1737,16 @@
             "chain": "stellar",
             "asset": "USDC",
             "direction": "deposit",
-            "amount": "208485.8400000",
-            "onchain_ref": "907e28fa6a27593f34de73a0c98bf35b30e439bece97cd915874c306759114dd",
+            "amount": "1402177.0000000",
+            "onchain_ref": "52a999c0011ae7272a87928142a5197283db98de66959ba3399b8e5d730ac706",
             "fiat_leg_ref": null,
             "evidence_tier": "PROVEN",
             "evidence_detail": "stellar_ledger",
             "keystone_ref": null,
-            "observed_at": "2026-09-07T17:04:12Z",
+            "observed_at": "2026-09-07T19:07:22Z",
             "signer": "landfall-attester-dev"
           },
-          "digest": "07bdca234db486379210cd2d22e0a25b66dd2d0761de007f7fd89dd80a8e379b",
+          "digest": "925938a636d1f9c4cff8fc230c6e4bd3398054d9de8cb82a037e3ed4ef5de4ab",
           "signed": false
         }
       ]
@@ -2275,12 +2270,12 @@
         "tiers": [
           {
             "tier": "PROVEN",
-            "events": 4,
+            "events": 3,
             "byAsset": [
               {
                 "asset": "GRAT",
-                "count": 3,
-                "volume": "231.7858523"
+                "count": 2,
+                "volume": "61.7858523"
               },
               {
                 "asset": "XLM",
@@ -2305,7 +2300,7 @@
             "chain": "stellar",
             "maxTier": "PROVEN",
             "state": "observed",
-            "events": 4,
+            "events": 3,
             "sourcesScanned": 10,
             "sourcesFailed": 0
           },
@@ -2373,8 +2368,8 @@
             "note": "no solana address curated for this anchor in registry/anchors.registry.json"
           }
         ],
-        "totalEvents": 4,
-        "tierMix": "PROVEN 4 · ATTESTED 0 · DERIVED 0"
+        "totalEvents": 3,
+        "tierMix": "PROVEN 3 · ATTESTED 0 · DERIVED 0"
       },
       "failures": [],
       "sampleAttestations": [
@@ -2403,25 +2398,6 @@
             "anchor_id": "gratz.io",
             "chain": "stellar",
             "asset": "GRAT",
-            "direction": "deposit",
-            "amount": "170.0000000",
-            "onchain_ref": "a6a014cbd156e3e342630354b4288ea383e40598f19d07aa749952fde2eb58e9",
-            "fiat_leg_ref": null,
-            "evidence_tier": "PROVEN",
-            "evidence_detail": "stellar_ledger",
-            "keystone_ref": null,
-            "observed_at": "2026-08-08T18:59:58Z",
-            "signer": "landfall-attester-dev"
-          },
-          "digest": "fc4ff66555bd18bde26eeb0efd751d9de937c72698e98b6d335c451aeed29529",
-          "signed": false
-        },
-        {
-          "attestation": {
-            "stp_version": "1",
-            "anchor_id": "gratz.io",
-            "chain": "stellar",
-            "asset": "GRAT",
             "direction": "withdrawal",
             "amount": "3.0000000",
             "onchain_ref": "bd29ff3e55cb7ce001687f124824a9e5f925848b5c530315a23f4bca0be51aaf",
@@ -2433,6 +2409,25 @@
             "signer": "landfall-attester-dev"
           },
           "digest": "7fd21a26a9bb8ab79b06757816de09859b5d356818ed237c6ab25cd15606a5cb",
+          "signed": false
+        },
+        {
+          "attestation": {
+            "stp_version": "1",
+            "anchor_id": "gratz.io",
+            "chain": "stellar",
+            "asset": "XLM",
+            "direction": "withdrawal",
+            "amount": "0.0000000",
+            "onchain_ref": "bd29ff3e55cb7ce001687f124824a9e5f925848b5c530315a23f4bca0be51aaf",
+            "fiat_leg_ref": null,
+            "evidence_tier": "PROVEN",
+            "evidence_detail": "stellar_ledger",
+            "keystone_ref": null,
+            "observed_at": "2026-08-31T17:49:47Z",
+            "signer": "landfall-attester-dev"
+          },
+          "digest": "e5d45d5756bf72adc93846892ca65da4773840c57639a5ee076ccdc4e9576302",
           "signed": false
         }
       ]
@@ -2654,7 +2649,7 @@
               {
                 "asset": "XTAR",
                 "count": 181,
-                "volume": "0.0217115"
+                "volume": "0.0217112"
               },
               {
                 "asset": "AQUA",
@@ -2807,16 +2802,16 @@
             "chain": "stellar",
             "asset": "XTAR",
             "direction": "deposit",
-            "amount": "0.0001641",
-            "onchain_ref": "e4cabe634d75e460f23fbe90ccd9065515c7261f5115589c5c02a96a724db49d",
+            "amount": "0.0000753",
+            "onchain_ref": "eefa4d7f105aaa8b187a1300f64428b33fcace496b4dac054e469c067d665872",
             "fiat_leg_ref": null,
             "evidence_tier": "PROVEN",
             "evidence_detail": "stellar_ledger",
             "keystone_ref": null,
-            "observed_at": "2026-09-07T18:01:29Z",
+            "observed_at": "2026-09-07T21:01:13Z",
             "signer": "landfall-attester-dev"
           },
-          "digest": "694f7d2fda7e775714d8a3ece6627fcc1119311176fa7f1187466ccad7ab5702",
+          "digest": "8543d797f373a3fa4f31ea28d5caf1abd38dbbe88d7c736ad31ddd46dc645bfc",
           "signed": false
         }
       ]
@@ -3583,8 +3578,19 @@
         "tiers": [
           {
             "tier": "PROVEN",
-            "events": 0,
-            "byAsset": []
+            "events": 200,
+            "byAsset": [
+              {
+                "asset": "XLM",
+                "count": 197,
+                "volume": "301363.67634"
+              },
+              {
+                "asset": "BRL",
+                "count": 3,
+                "volume": "0.0016"
+              }
+            ]
           },
           {
             "tier": "ATTESTED",
@@ -3601,11 +3607,10 @@
           {
             "chain": "stellar",
             "maxTier": "PROVEN",
-            "state": "empty",
-            "events": 0,
+            "state": "observed",
+            "events": 200,
             "sourcesScanned": 3,
-            "sourcesFailed": 1,
-            "note": "1 of 3 address scans failed — this count is incomplete: Horizon 503 for https://horizon.stellar.org/accounts/GDVKY2GU2DRXWTBEYJJWSFXIGBZV6AZNBVVSUHEPZI54LIS6BA7DVVSP/payments?limit=200&order=desc"
+            "sourcesFailed": 0
           },
           {
             "chain": "ethereum",
@@ -3671,16 +3676,69 @@
             "note": "no solana address curated for this anchor in registry/anchors.registry.json"
           }
         ],
-        "totalEvents": 0,
-        "tierMix": "PROVEN 0 · ATTESTED 0 · DERIVED 0"
+        "totalEvents": 200,
+        "tierMix": "PROVEN 200 · ATTESTED 0 · DERIVED 0"
       },
-      "failures": [
+      "failures": [],
+      "sampleAttestations": [
         {
-          "chain": "stellar",
-          "error": "Horizon 503 for https://horizon.stellar.org/accounts/GDVKY2GU2DRXWTBEYJJWSFXIGBZV6AZNBVVSUHEPZI54LIS6BA7DVVSP/payments?limit=200&order=desc"
+          "attestation": {
+            "stp_version": "1",
+            "anchor_id": "ntokens.com",
+            "chain": "stellar",
+            "asset": "XLM",
+            "direction": "deposit",
+            "amount": "2.4780000",
+            "onchain_ref": "9a9f535f47895867c0a749373a571a0c98813bd4e7818ce122c277c11a65fd89",
+            "fiat_leg_ref": null,
+            "evidence_tier": "PROVEN",
+            "evidence_detail": "stellar_ledger",
+            "keystone_ref": null,
+            "observed_at": "2026-08-24T18:22:53Z",
+            "signer": "landfall-attester-dev"
+          },
+          "digest": "8012d3bbe1e51eae9702d4c4bd7e1cb39f406236a46cb4bd5c223f1caa60eb89",
+          "signed": false
+        },
+        {
+          "attestation": {
+            "stp_version": "1",
+            "anchor_id": "ntokens.com",
+            "chain": "stellar",
+            "asset": "XLM",
+            "direction": "deposit",
+            "amount": "2.4780000",
+            "onchain_ref": "00c65c33c83adfbf573843789c4f04943f12baea2ecc96f143adb1460ae86b0d",
+            "fiat_leg_ref": null,
+            "evidence_tier": "PROVEN",
+            "evidence_detail": "stellar_ledger",
+            "keystone_ref": null,
+            "observed_at": "2026-08-24T18:22:42Z",
+            "signer": "landfall-attester-dev"
+          },
+          "digest": "61ebb1ea52efa9d1d34e6ef29c816d9e04bed6069e8e78e64e596d080c86a478",
+          "signed": false
+        },
+        {
+          "attestation": {
+            "stp_version": "1",
+            "anchor_id": "ntokens.com",
+            "chain": "stellar",
+            "asset": "XLM",
+            "direction": "deposit",
+            "amount": "2.4780000",
+            "onchain_ref": "32ab822e3f7b166bb08b25897ff772993be874592b0dc474db394b017171c5a7",
+            "fiat_leg_ref": null,
+            "evidence_tier": "PROVEN",
+            "evidence_detail": "stellar_ledger",
+            "keystone_ref": null,
+            "observed_at": "2026-08-24T18:20:02Z",
+            "signer": "landfall-attester-dev"
+          },
+          "digest": "d3262aca43e8528d40f7ad3f43bf2479b193533912ed98941d2ddd240853029a",
+          "signed": false
         }
-      ],
-      "sampleAttestations": []
+      ]
     },
     {
       "anchorId": "pr.network",
@@ -4293,27 +4351,27 @@
         "tiers": [
           {
             "tier": "PROVEN",
-            "events": 254,
+            "events": 255,
             "byAsset": [
               {
-                "asset": "yETH",
-                "count": 114,
-                "volume": "34.2830773"
+                "asset": "yXLM",
+                "count": 225,
+                "volume": "533169.8436379"
               },
               {
                 "asset": "yUSDC",
-                "count": 103,
-                "volume": "75641.2147738"
-              },
-              {
-                "asset": "yXLM",
-                "count": 25,
-                "volume": "533141.9515873"
+                "count": 13,
+                "volume": "75641.0004439"
               },
               {
                 "asset": "XLM",
                 "count": 5,
                 "volume": "3.000426"
+              },
+              {
+                "asset": "yETH",
+                "count": 5,
+                "volume": "34.2823384"
               },
               {
                 "asset": "yBTC",
@@ -4348,7 +4406,7 @@
             "chain": "stellar",
             "maxTier": "PROVEN",
             "state": "observed",
-            "events": 254,
+            "events": 255,
             "sourcesScanned": 13,
             "sourcesFailed": 0
           },
@@ -4416,8 +4474,8 @@
             "note": "no solana address curated for this anchor in registry/anchors.registry.json"
           }
         ],
-        "totalEvents": 254,
-        "tierMix": "PROVEN 254 · ATTESTED 0 · DERIVED 0"
+        "totalEvents": 255,
+        "tierMix": "PROVEN 255 · ATTESTED 0 · DERIVED 0"
       },
       "failures": [],
       "sampleAttestations": [
