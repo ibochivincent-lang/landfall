@@ -84,7 +84,7 @@ But the question is now the ecosystem's, not just ours.
 | **Developer & Admin Portal** | ✅ **shipping** | `/portal.html` with self-serve auth, hashed API keys (`lf_live_...`), and webhooks |
 | **Interactive API Documentation** | ✅ **shipping** | `/docs.html` with live try-it playground and badge renderer |
 | **Model Context Protocol (MCP) Server** | ✅ **shipping** | `scripts/mcp/server.mjs` for AI agents (Claude, Cursor, Antigravity) |
-| **x402 payee check** | ✅ **shipping, no facilitator** | `POST /api/v1/x402/check-payee`, `landfall_x402_check_payee` MCP tool — Trust Check for every Stellar `payTo` in a real x402 `accepts` array before an agent signs. Deliberately doesn't verify or settle a payment; that's the facilitator's job. See `packages/x402` |
+| **x402 payee check** | ✅ **shipping, no facilitator** | `POST /api/v1/x402/check-payee`, `landfall_x402_check_payee` MCP tool — Trust Check for every Stellar `payTo` in a real x402 `accepts` array before an agent signs. Deliberately doesn't verify or settle a payment; that's the facilitator's job. Runnable worked example, no dependencies and no API key: [`examples/x402-payee-check`](examples/x402-payee-check). See `packages/x402` |
 | **GraphQL API** | ✅ **shipping** | `POST /api/v1/graphql` for structured queries |
 | Postgres persistence + REST API | ✅ **shipping** | Supabase Session Pooler + serverless Vercel function endpoints |
 | Live transactions dashboard | ✅ **shipping** | `/dashboard.html` with dark account indicators and counterparty breakdown |
