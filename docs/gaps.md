@@ -12,15 +12,19 @@ is that it can be checked against the repository.
 
 ## Closed since this list was written — 13 August 2026
 
+The **Was** column is the gap as it stood on 13 August and does not change.
+The **Now** column is present tense, so it is kept current rather than frozen
+at what was true the day the gap closed.
+
 | Was | Now |
 |---|---|
-| No database | Postgres schema, 27 tables, applied and verified. `--persist` writes to it. |
-| No API | Read-only HTTP API, eight endpoints, every response carrying `asOf` and `staleHours`. |
+| No database | Postgres schema, 27 tables across 13 migrations, applied and verified. `--persist` writes to it, and CI re-applies migrations on every push to `main`. |
+| No API | REST + GraphQL, **21 public endpoints** ([API_REFERENCE.md](API_REFERENCE.md)), every response carrying `asOf` and `staleHours`. Was eight when this line was written. |
 | Site data frozen, no freshness indicator | Both pages read the API live and stamp the scan age. |
 | No transaction-level view | `/dashboard` — every indexed payment per anchor, each row linked to its hash on a block explorer. |
-| No scheduled scanning | `docker-compose.prod.yml` runs the indexer on a loop; `docs/deployment.md` covers running it as a real cron job instead. |
-| No deployment path | Supabase, production compose, Vercel proxy, and a contract deploy script. `docs/deployment.md`. |
-| Site promised an API, pricing, login, SDK that did not exist | Marked planned. The API now exists; the rest is still labelled. |
+| No scheduled scanning | GitHub Actions hourly (`0 * * * *`), `$0/month`. The cron asks for hourly and GitHub delivers a **median 2.8 h gap** — see [BENCHMARKS.md](BENCHMARKS.md). `docker-compose.prod.yml` still runs the indexer on a loop for self-hosting. |
+| No deployment path | Live on Vercel + Supabase, with migrations applied by CI. `docs/deployment.md`. |
+| Site promised an API, pricing, login, SDK that did not exist | Three of the four are real: the API ships, [`@landfall/sdk`](https://www.npmjs.com/package/@landfall/sdk) is on npm, and login is genuine SEP-10 web auth against the account's medium threshold. **Only the $99/mo pricing is still invented** — no billing behind it, no buyer has seen it. |
 
 Two defects were found and published while doing this, in keeping with the
 rule that we hold ourselves to what we measure in others:

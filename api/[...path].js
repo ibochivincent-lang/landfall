@@ -22,6 +22,9 @@
 *   GET  /api/v1/fraud-reports/:id/attestation -- signed proof the reported party responded and controls the address; never covers the accusation
 *   POST /api/v1/fraud-reports/:id/investigate -- Sentinel's "Analyzed" stage: deterministic cited facts, plus an optional AI narrative of those same facts
 *   GET  /api/v1/fraud-reports/:id/investigation -- the most recent investigation of one report, if any
+*   GET  /api/v1/auth?account=G...  -- SEP-10 challenge to sign (503 until SEP10_SERVER_SECRET is set)
+*   POST /api/v1/auth              -- verify a signed SEP-10 challenge, mint a token
+*   POST /api/v1/graphql           -- GraphQL over the same resolvers as REST
 *   POST /api/v1/x402/check-payee    -- Trust Check every Stellar payee in an x402 402 response's `accepts` array, before an agent signs
  *   GET  /health
  *

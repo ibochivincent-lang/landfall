@@ -294,6 +294,10 @@ A SEP-10 challenge transaction to sign. See [SEP_COVERAGE.md](SEP_COVERAGE.md).
 Sequence number 0 — an account can never have it, so the challenge is
 unsubmittable. A challenge that could be submitted is a blank cheque.
 
+**Currently returns `503` in production.** `SEP10_SERVER_SECRET` is not set, and
+nothing is half-enabled: no challenge is issued and no token can be minted.
+The route is implemented and tested; it is switched off, not missing.
+
 ---
 
 ## Write endpoints

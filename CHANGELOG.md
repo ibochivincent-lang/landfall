@@ -24,9 +24,69 @@ Only the latest `main` is supported. Fixes are not backported; see
 
 ## [Unreleased]
 
-Nothing yet. The entries below cover the period before this file existed and
-were reconstructed from the commit history, which is exactly the weaker kind
-of record this file exists to replace going forward.
+Nothing yet.
+
+---
+
+## [0.1.0] — 2026-09-08
+
+The first tagged release. Everything below was already on `main`; this tag
+gives it a fixed point a consumer can pin to and diff from.
+
+Grouped by capability rather than by change, because there is no previous tag
+to diff against — the next release will be a normal changelog section.
+
+### ⚠️ Breaking
+
+- **The oracle's `MAX_BATCH` is 25, not 100.** A batch of 100 would have
+  failed on a real network: the binding limit is the 16 KiB cap on contract
+  event size, not CPU. Measured ceilings are 70 for an all-live batch (one
+  `ScoreSet` per account) and **35 for an all-dark batch**, which emits a
+  `WentDark` alongside each `ScoreSet`. A full batch therefore exceeded the
+  limit in every mix, and worst in the case that matters most — the scan
+  where an anchor's whole fleet goes dark at once.
+
+  25 is the worst case with roughly 30% headroom. The headroom is deliberate:
+  the contract has **no upgrade path**, so a future protocol version raising
+  per-event costs cannot be answered by patching a deployed contract.
+
+  Callers passing more than 25 accounts to `set_scores` now receive error
+  `5` (`TooManyAccounts`) instead of a transaction that would have failed
+  on-chain. `scripts/publish-oracle.mjs` is unaffected — it calls
+  `publish(digest)`, never `set_scores`.
+
+### Added
+
+- **Contract resource measurement.** `src/bench.rs` reports CPU and memory
+  for every entry point and runs in the normal suite; `src/bench_probe.rs`
+  re-derives the batch ceilings against the host and is `#[ignore]`, run on
+  demand. This is what found the `MAX_BATCH` defect above.
+- **`storage_version()`** — a compatibility declaration, not a migration
+  marker. The contract is immutable by design, so a new schema means a new
+  deployment at a new address rather than changed semantics at the old one.
+- **Webhook dead-letter replay** — migration `014` stores the delivery
+  payload so a failed delivery can be replayed at all;
+  `scripts/redeliver-webhooks.mjs` retries hourly for 48 hours, resending the
+  original event verbatim rather than rebuilding it from state that has since
+  moved on.
+- **Documentation** — `API_REFERENCE`, `WEBHOOKS`, `ORACLE_SPEC`,
+  `SEP_COVERAGE`, `CANONICAL_JSON`, `NON_CUSTODY`, `JURISDICTIONAL`,
+  `GOVERNANCE`, `VERSIONING`, `TERMS`, `WHY_NOT`, `FAQ`, `BENCHMARKS`,
+  `CONTRIBUTOR_LADDER`, `KEY_ROTATION`.
+
+### Fixed
+
+- **The wrong oracle contract ID** was published in three docs. The current
+  testnet contract is `CDPCH3UO…OX6B5LW`, verified responding at epoch 2; the
+  13 August deploy no longer responds, its state having expired past the ~30
+  day TTL.
+- **The handler's own route list omitted three live routes** —
+  `GET`/`POST /api/v1/auth` and `POST /api/v1/graphql`.
+- **`GET /api/v1/auth` returns 503 in production**, because
+  `SEP10_SERVER_SECRET` is unset. Implemented and tested, switched off rather
+  than missing — now stated in the API reference instead of implied working.
+- **Webhook scripts hardcoded TLS**, so neither could reach a local Postgres;
+  the delivery path could only ever be exercised against a hosted database.
 
 ---
 
@@ -34,8 +94,7 @@ of record this file exists to replace going forward.
 
 The repository's history was rewritten on 5 September 2026 to consolidate
 authorship, so `main` begins there. What follows is grouped by capability
-rather than by release, because no version has been tagged yet — the first
-tag will close this section off.
+rather than by release.
 
 ### Shipped
 
@@ -118,4 +177,5 @@ tag will close this section off.
   a different risk category from indexing a public ledger. See
   [`docs/architecture/VERIFIED_ROUTES.md`](docs/architecture/VERIFIED_ROUTES.md).
 
-[Unreleased]: https://github.com/ibochivincent-lang/landfall/commits/main
+[Unreleased]: https://github.com/ibochivincent-lang/landfall/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/ibochivincent-lang/landfall/releases/tag/v0.1.0
