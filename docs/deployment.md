@@ -210,7 +210,7 @@ Check it:
 
 ```bash
 curl -s http://localhost:8787/health
-curl -s http://localhost:8787/api/v1/summary | head -40
+curl -s http://localhost:8787/api/v1/anchors | head -40
 ```
 
 ### On a VPS
@@ -472,7 +472,7 @@ on-chain.
 curl -s https://api.your-domain.com/health
 
 # there is a scan, and it is not ancient
-curl -s https://api.your-domain.com/api/v1/summary | grep -E 'asOf|staleHours'
+curl -s https://api.your-domain.com/api/v1/anchors | grep -E 'asOf|staleHours'
 
 # the proxy resolves
 curl -s https://your-site.vercel.app/api/v1/anchors | head -20

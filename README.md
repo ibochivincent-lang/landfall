@@ -142,12 +142,15 @@ We would rather list this honestly than let a roadmap read as a changelog. Full 
 
 ## Current finding
 
-From the scheduled ledger scan, most recently 6 September 2026, across 108 declared
+From the scheduled ledger scan, most recently 8 September 2026, across 108 declared
 anchor accounts on 27 Stellar home domains:
 
-> **62 of 108 anchor accounts have processed no on-chain settlement in over 30 days.**
-> A further 26 are slow (nothing in 3–30 days); 19 are settling; 1 has no payment
+> **63 of 108 anchor accounts have processed no on-chain settlement in over 30 days.**
+> A further 27 are slow (nothing in 3–30 days); 17 are settling; 1 has no payment
 > history at all.
+
+Recomputable from [`data/scan-history.ndjson`](data/scan-history.ndjson), which
+carries every observation behind this figure rather than only the latest.
 
 Two things this is not. It is **not a census** — the scan covers accounts seeded in
 `packages/indexer/data/anchors.json` and discovered from their own SEP-1

@@ -59,7 +59,7 @@ than becoming a second changelog.
 - [x] Transactions dashboard at `/dashboard.html` — keyset-paginated, dark account highlights, live ledger feeds
 - [x] Soroban oracle written and **deployed to testnet** — 25 tests, publisher/admin roles split
 - [x] Real mainnet scan — 13 accounts across candidate home domains
-- [x] Headline finding cross-checked against stellar.expert: **6 of 13 accounts dark for 30+ days**
+- [x] Headline finding cross-checked against stellar.expert: **6 of 13 accounts dark for 30+ days** — the August figure, kept as the dated record of what was verified then. Coverage has since grown to 108 accounts across 27 domains, and the current figure lives in the README
 - [x] Automated **hourly scan via GitHub Actions** (`0 * * * *`), with `$0/month` hosting upkeep
 - [x] GraphQL API at `/api/v1/graphql` — reuses REST resolvers directly (`docs/GRAPHQL_API.md`)
 
@@ -70,13 +70,13 @@ than becoming a second changelog.
 ### Measurement — the highest-leverage engineering item open
 
 - [ ] **Memo-based leg correlation** (backlog M1, SEP-24) — turns refund detection from a heuristic into a measurement
-- [ ] **Persist the resume cursor between runs** (issue #13) — a fix exists and is unshipped; closing it stops every run re-paging history it already has
+- [x] ~~**Persist the resume cursor between runs** (issue #13).~~ Shipped — `packages/indexer/src/cli.ts` reads a stored cursor per account with `--persist` and writes it back after each run, so a scan resumes instead of re-paging history it already has
 - [ ] Investigate `vibrantapp.com` serving a TOML that parses to zero accounts — likely a parser gap, not an empty declaration
 
 ### Reconciling the site with reality
 
-- [ ] Label or remove every claim still ahead of what's built: invented $99/mo pricing, "Get API access" implying access control that doesn't exist, "Log in" with no accounts behind it, an advertised SDK/webhooks that aren't built yet
-- [ ] **Route Scout publishes invented rates and fees — highest-priority honesty fix.** `/compare.html` says it compares anchors by "payout, fees, speed, and verified on-chain settlement reliability" and footers "no anchor self-reporting", while `GET /api/v1/quotes/compare` serves a hardcoded catalogue: static FX rates, per-anchor `rateSpread`, `feePercent`, `feeFixedUsd` and payout speeds, none of them fetched from anywhere. The reliability column is real; every commercial figure beside it is invented and attributed to a named business. Either label the rate/fee columns as illustrative until SEP-38 ingestion lands, or drop those columns and ship the reliability comparison alone. See [docs/gaps.md](docs/gaps.md)
+- [ ] Label or remove every claim still ahead of what's built. Mostly done — the SDK is on npm, webhooks are real (`user_webhooks`, dispatched by `scripts/dispatch-webhooks.mjs`), API keys are enforced as a rate-limit tier, and "Log in" is genuine SEP-10 web auth against the account's medium threshold. **What is still ahead of reality is the $99/mo pricing**: there is no billing behind it and no buyer has seen the number
+- [x] ~~**Route Scout publishes invented rates and fees.**~~ Largely closed. The `GET /api/v1/quotes/compare` route — a second, server-side hardcoded catalogue, undocumented and unused by any page — was deleted outright rather than corrected. `scripts/fetch-anchor-fees.mjs` now reads each anchor's own published SEP-24 terms, and `scripts/fetch-anchor-quotes.mjs` asks every tracked anchor's SEP-38 quote server hourly. **What remains is a coverage problem, not an honesty one:** essentially no tracked anchor runs SEP-38 against a corridor Route Scout shows, so most rate cells are still a catalogue estimate — now labelled as such per anchor rather than presented as measured. See `/api/v1/anchor-quotes.json` for which anchor, if any, returned a real quote
 
 ---
 
@@ -101,10 +101,10 @@ than becoming a second changelog.
 - [ ] **Dark-anchor early warning** — an anchor rarely stops instantly: volume falls, counterparty concentration tightens, gaps between settlements stretch, then silence. Every scan is already stored, so the training data exists and nothing reads it back. A degradation signal 48–72h ahead is worth more to a wallet than an accurate post-mortem, Must ship with its false-positive rate published — an early warning that cries wolf about a named business is worse than none
 - [ ] **`pickAnchor()` multi-factor route scoring** — one weighted score over net payout, reliability grade, and degradation signal, with the caller choosing the emphasis (safest / cheapest / fastest) rather than the formula choosing for them. Blocked on live SEP-38 quotes: optimising over a hardcoded rate table produces a confident recommendation from invented inputs, which is worse than no recommendation
 - [ ] Talk to at least one wallet about embedding `pickAnchor()` — the roadmap's own infrastructure test is met by one external consumer, not by another shipped feature
-- [ ] Publish `@landfall/sdk` with `pickAnchor()` to npm (backlog H3)
+- [x] ~~Publish `@landfall/sdk` with `pickAnchor()` to npm~~ (backlog H3) — published 7 September 2026, verified against the live registry copy rather than the local build
 - [ ] **CAP-67 unified event ingestion** — replaces N per-account REST cursors with one ledger-wide stream, and makes mint/burn distinguishable from transfer instead of inferred
 - [ ] Multi-region indexing, to remove the single-vantage-point assumption
-- [ ] Expand anchor coverage past the current 8 candidate domains (5 resolving) — "6 of 13 dark" is a real finding about a small sample, not a census
+- [x] ~~Expand anchor coverage past the current 8 candidate domains (5 resolving).~~ Now **27 domains and 108 accounts** in the latest scan. Still a sample rather than a census, and reported as one — but no longer the handful the original finding rested on
 - [ ] Confidence intervals (Wilson score) on every published rate
 - [ ] Roll metrics up to the domain level, so a reader isn't aggregating by eye across an anchor's several accounts
 
@@ -112,10 +112,10 @@ than becoming a second changelog.
 
 ## 🎯 Horizon 3 — Layer 3: mainnet oracle and agent distribution (months 6–12+)
 
-- [ ] **Wire the indexer to publish digests to the oracle after every persisted scan** (issue #21) — the gap between "deployed contract" and "running oracle"
+- [x] ~~**Wire the indexer to publish digests to the oracle after every persisted scan**~~ (issue #21) — `scripts/publish-oracle.mjs` runs in the hourly workflow and was verified end to end in a dry run. It no-ops while `ORACLE_ADMIN_SECRET` is unset, which is deliberate: switching it on waits on installing a distinct publisher key and making the admin account multisig
 - [ ] Oracle to **mainnet**, once there is a real dataset worth publishing
 - [x] ~~MCP server exposing anchor quality to payment agents~~ (issue #23) — shipped in Horizon 0, ahead of schedule; what's still open is a real external agent actually calling it
-- [ ] Anchor dispute portal — promised by the code of conduct and security policy today; doesn't exist yet
+- [x] ~~Anchor dispute portal — doesn't exist yet.~~ Shipped: `POST /api/v1/fraud-reports/:id/dispute`, gated on an Ed25519 signature from the reported address rather than a password, with the response attached to the report wherever it appears. A signed attestation of that response is available at `GET /api/v1/fraud-reports/:id/attestation`. See `DISPUTES.md`
 - [ ] Paid API tier — sustainability
 - [ ] Move the repository to an organisation
 
@@ -139,11 +139,11 @@ ongoing work rather than a one-time checklist:
 ## ⚠️ Risks to actively retire
 
 - [ ] **Account attribution is unverified** — a TOML declares accounts; nothing proves the domain operates them. This is the single largest correctness risk in the project → retired by attestation (Horizon 2)
-- [ ] **Small sample** — 5 resolving domains is a real finding, not a census of the ecosystem → retired by coverage expansion (Horizon 2)
+- [ ] **Small sample** — 27 resolving domains is a real finding, not a census of the ecosystem. Materially better than the 5 this line was written against, and still not the whole ecosystem
 - [ ] **The fiat leg is invisible** without attestation — we can prove value moved on-chain, not that anyone was paid → retired by signed settlement receipts
 - [ ] **Anchors may object to being scored** → mitigated by publishing observations plus an open, recomputable formula, and by shipping the dispute portal rather than waiting for the first complaint (Horizon 3)
 - [ ] **No stated position on legal pushback** from a named anchor over a negative finding — the code of conduct covers tone, nothing covers what happens if a lawyer writes in
-- [ ] **Site claims ahead of reality** (invented pricing, login with no accounts, an advertised SDK/MCP that don't exist) → retired by the labelling pass in Horizon 1
+- [ ] **Site claims ahead of reality.** Mostly retired: the SDK and MCP server both exist now, and login is real SEP-10 web auth. What remains is the invented $99/mo pricing, which has no billing behind it and no buyer has seen
 
 ---
 

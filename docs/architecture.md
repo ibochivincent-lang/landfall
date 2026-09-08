@@ -319,15 +319,44 @@ The failure mode is stale, never wrong.
 
 ## The API
 
-`packages/api` — read-only, zero framework, Postgres and `node:http`.
+`api/[...path].js` is the deployed serverless function — REST and GraphQL in
+one file, no framework. `packages/api` is a thin `node:http` wrapper that
+imports that same handler for local development, so `npm run api` runs the
+exact code Vercel deploys rather than a second implementation that can drift.
+
+**Read**
 
 | Endpoint | Returns |
 |---|---|
 | `GET /health` | liveness |
-| `GET /api/v1/summary` | headline figures |
-| `GET /api/v1/anchors` | every account with metrics |
-| `GET /api/v1/anchors/{domain}` | one anchor |
-| `GET /api/v1/dark` | dormant accounts only |
+| `GET /api/v1/anchors` | every tracked account with metrics |
+| `GET /api/v1/anchors/:domain/payments` | a page of indexed payments |
+| `GET /api/v1/anchors/:domain/health-check` | pre-flight wallet health score (0–100) |
+| `GET /api/v1/badges/:domain.svg` | dynamic SVG status badge |
+| `GET /api/v1/assets` | payment counts grouped by asset |
+| `GET /api/v1/corridors` | cross-asset flow matrix |
+| `GET /api/v1/trust-check?address=…` | counterparty signals, live from Horizon, no database needed |
+| `GET /api/v1/fraud-reports/:subject` | reports about one address, disclaimer attached |
+| `GET /api/v1/fraud-reports/:id/investigation` | the Analyzed-stage result, if it has been run |
+| `GET /api/v1/fraud-reports/:id/attestation` | signed proof the reported party responded |
+| `GET /api/v1/fiat-confirmations/:chain/:reference` | status of one confirmation |
+| `GET /api/v1/auth` | SEP-10 challenge to sign |
+
+**Write** — each one explicitly allow-listed past the GET-only guard, enforced by `api/_lib/routes.test.mjs`
+
+| Endpoint | Does |
+|---|---|
+| `POST /api/v1/graphql` | GraphQL over the same resolvers |
+| `POST /api/v1/intent` | rank routes, return an executable plan |
+| `POST /api/v1/fraud-reports` | file an evidence-anchored report |
+| `POST /api/v1/fraud-reports/:id/dispute` | reported party responds, signature-gated |
+| `POST /api/v1/fraud-reports/:id/investigate` | run the Analyzed stage |
+| `POST /api/v1/x402/check-payee` | Trust Check every Stellar payee in a 402 response |
+| `POST /api/v1/fiat-confirmations` | recipient self-report that a fiat leg landed |
+| `POST /api/v1/auth` | verify a signed SEP-10 challenge, mint a token |
+
+Admin routes sit behind a session cookie (`requireSession()`) and are listed in
+the handler's own header comment.
 
 Every response carries `asOf` and `staleHours`, because a consumer must be able
 to see the data is a month old without reading our blog. Any response
