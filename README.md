@@ -2,7 +2,10 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![CI](https://github.com/ibochivincent-lang/landfall/actions/workflows/ci.yml/badge.svg)](https://github.com/ibochivincent-lang/landfall/actions/workflows/ci.yml)
+[![Tests](https://img.shields.io/badge/tests-431%20JS%20%2B%2025%20Rust-brightgreen)](https://github.com/ibochivincent-lang/landfall/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/@landfall/sdk?logo=npm&label=%40landfall%2Fsdk)](https://www.npmjs.com/package/@landfall/sdk)
 [![Deployed on Vercel](https://img.shields.io/badge/Deployed-Vercel-black?logo=vercel)](https://landfall-chi.vercel.app)
+[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-fe5196?logo=conventionalcommits)](https://www.conventionalcommits.org/en/v1.0.0/)
 
 **Did the money land?**
 
@@ -12,13 +15,10 @@ Every existing anchor monitor *interrogates* — pings an endpoint, validates a 
 
 **Live: [landfall-chi.vercel.app](https://landfall-chi.vercel.app)**
 
-> **Applied to the Drips Stellar Wave Program** — submitted August 2026,
-> review in progress, outcome pending. 20 issues are filed and labelled by
-> complexity — `trivial-100`, `medium-150`, `high-200` — and tagged
-> `Stellar Wave`. See [docs/checklist.md](docs/checklist.md).
-> New contributors should still start with `good first issue`, and
-> **wait to be assigned before writing code** — an unassigned issue is not
-> yours. See [CONTRIBUTING.md](CONTRIBUTING.md).
+> **Contributors welcome.** Issues are filed and labelled by complexity.
+> Start with `good first issue`, and **wait to be assigned before writing
+> code** — an unassigned issue is not yours. See
+> [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Table of contents
 
@@ -35,7 +35,25 @@ Every existing anchor monitor *interrogates* — pings an endpoint, validates a 
 
 ## Why this exists
 
-Someone sending money home through a Stellar anchor cannot tell whether that anchor is actually operating. Neither can the wallet that offered it to them. The anchor's own status endpoint says it is fine, because status endpoints say what the anchor decides they say.
+### The problem, stated plainly
+
+**Stellar's anchors are the bridge between the ledger and real money, and there is no independent record of whether any of them are actually settling.**
+
+An anchor is the on/off ramp: it takes fiat and issues a token, or takes the token and pays out fiat. A wallet routing a remittance has to pick one. Today that choice rests on three things, and all three are supplied by the anchor itself:
+
+| What a wallet can check today | Who controls the answer |
+|---|---|
+| The `stellar.toml` at the home domain | The anchor — editable in ten seconds |
+| The SEP-24 `/info` endpoint | The anchor — it returns what it chooses |
+| The anchor's own status page | The anchor |
+
+So the question *"is this anchor still paying people?"* has no answer a wallet can verify. When an anchor quietly stops settling, the ledger shows it immediately — but nobody was reading the ledger for that purpose, so the first signal reaching a user is their own payment not arriving.
+
+This has teeth on Stellar specifically because the network's whole value proposition is cross-border payments into markets where the recipient is least able to absorb a failure. A stalled remittance is not an inconvenience; and the party best placed to detect the stall — the anchor — is the party with the least incentive to announce it.
+
+**Landfall answers it from the ledger instead.** Anchor accounts are discovered from SEP-1, their SEP-24 settlement legs are already public and permanent, and liveness, volume, counterparty concentration and refund rate are computed from what those accounts *did*. No anchor grants access. No anchor can withhold it. A TOML file can be edited in ten seconds; two years of settlement history cannot.
+
+### Why it has to be Stellar
 
 This is answerable because of how Stellar itself works, not despite it:
 
@@ -135,7 +153,7 @@ site, and `/api/v1/anchors.json` for the raw records behind it.
 
 *(An earlier version of this section read "6 of 13 accounts", from the first scan on
 12 August 2026. That number was true of that scan and is preserved in
-[docs/gaps.md](docs/gaps.md) and [docs/scf-submission.md](docs/scf-submission.md) as
+[docs/gaps.md](docs/gaps.md) as
 the dated record it is — the network tracked here has since grown from 5 domains to
 27.)*
 
@@ -260,13 +278,12 @@ Copy `.env.example` to `.env` and adjust. Nothing in the example file is a secre
 | [docs/SECURITY_ASSESSMENT.md](docs/SECURITY_ASSESSMENT.md) | STRIDE and OWASP Top 10:2025 review, with findings cited to file and line — including one critical privilege escalation found and fixed, and what held up under review. |
 | [docs/gaps.md](docs/gaps.md) | Honest inventory of what isn't built yet, ordered by how much each gap could hurt. |
 | [docs/product-vision-status.md](docs/product-vision-status.md) | The product vision deck, module by module, checked against what's actually running. |
-| [ROADMAP.md](ROADMAP.md) | Milestones mapped to the Stellar Community Fund Build Award's three tranches. |
+| [ROADMAP.md](ROADMAP.md) | What is built, what is next, and what is deliberately not being built. |
 | [docs/deployment.md](docs/deployment.md) | Full deploy path: Supabase, production compose, Vercel, the oracle. |
 | [docs/GRAPHQL_API.md](docs/GRAPHQL_API.md) | The `/api/v1/graphql` schema, examples, and how it reuses the REST resolvers. |
 | [docs/MCP.md](docs/MCP.md) | Running the MCP server, its tools, and how to connect an agent to it. |
 | [docs/backlog.md](docs/backlog.md) | Summary of the scoped, complexity-tagged issues filed on the tracker. |
-| [docs/checklist.md](docs/checklist.md) | Current status snapshot against the Stellar Wave / SCF checklist. |
-| [docs/scf-submission.md](docs/scf-submission.md) | Interest-form answers and the full Build Award draft. |
+| [docs/checklist.md](docs/checklist.md) | Current status snapshot: what is done, what is open. |
 | [SECURITY.md](SECURITY.md) | Disclosure policy. |
 | [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | Includes a project-specific clause on discussing named anchors factually. |
 | [DISPUTES.md](DISPUTES.md) | For a graded anchor operator: what a grade is and isn't, and how to challenge a specific figure. |

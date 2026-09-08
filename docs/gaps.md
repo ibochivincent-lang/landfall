@@ -113,10 +113,9 @@ Three further things surfaced while fixing it:
   verified against a real database both before the fix (error) and after
   (correct aggregated rows from seeded path-payment data).
 - **Fixed, 6 September: `packages/api/src/server.ts` (local dev API) was
-  meaningfully behind `api/[...path].js` (the deployed API).** A teammate
-  shipped the Developer Portal, reliability scoring, health-check, badges,
-  and corridors straight to the deployed function without updating local
-  dev. The GraphQL layer and MCP server had already sidestepped this by
+  meaningfully behind `api/[...path].js` (the deployed API).** The Developer
+  Portal, reliability scoring, health-check, badges and corridors were
+  shipped straight to the deployed function without updating local dev. The GraphQL layer and MCP server had already sidestepped this by
   importing directly from `api/[...path].js`; `packages/api/src/server.ts`
   did not, and stayed a ~700-line independent reimplementation — its own
   Postgres pool, its own scrypt/session logic, its own subset of routes —
@@ -164,7 +163,7 @@ introduced by that work.
 **Fix:** the endpoint now returns the exact same generic message whether or
 not the account exists, and never returns the token. ~~There's no email
 sender wired up anywhere in this project yet, so for now the token is logged
-server-side only (readable by the team via Vercel logs, not returned to the
+server-side only (readable by the operator via Vercel logs, not returned to the
 caller) and an admin has to relay it to the account owner out-of-band~~ —
 ~~Self-serve reset is temporarily manual rather than fully automated.~~
 ~~Wiring up an actual transactional email sender (Resend, SES, or similar) is
@@ -484,23 +483,20 @@ whole problem. The alternative is deleting those sections until they're real.
 ## 3. Repo and process
 
 - ~~**The 20 issues are unfiled.**~~ Filed 13 August 2026, issues #4-#23.
-- **Not under an organisation.** Eight of ten approved Wave repos are.
-- ~~**Not applied to the Stellar Wave.**~~ Applied August 2026. Drips Wave
-  review is in progress; outcome pending.
+- **Not under an organisation.** Still a personal account.
 - **No contributors, no PRs, no external commits.**
-- **No releases or tags.** No version has ever been cut.
-- **Nothing published to npm.**
+- **No releases or tags.** No git tag has ever been cut, though the SDK is
+  versioned on npm.
+- ~~**Nothing published to npm.**~~ [`@landfall/sdk`](https://www.npmjs.com/package/@landfall/sdk)
+  published 7 September 2026, verified against the live registry copy.
 - **CI has never been proven green** on a real PR — it's configured, but no
   pull request has exercised it.
 
-## 4. Grant and business
+## 4. Adoption and commercial
 
-- ~~**The SCF interest form is not submitted.**~~ Submitted August 2026,
-  inside the window. The application is in review; the outcome is pending and
-  is not something this repo can move.
-- **Team backgrounds are unwritten.** Five names, no evidence behind any of them.
-- **Part-time vs full-time unstated**, which the $50k budget arithmetic depends on.
-- **No users. No wallet conversations. No revenue. No letters of support.**
+- **No users. No wallet conversations. No revenue.** This is the gap that
+  matters most and the one no amount of code closes — see the infrastructure
+  test in [ROADMAP.md](../ROADMAP.md).
 - **Pricing is invented.** $99/month is a plausible-sounding number nobody has
   tested against a real buyer.
 
@@ -529,15 +525,17 @@ whole problem. The alternative is deleting those sections until they're real.
 
 ---
 
-## If you only do four things
+## If you only do three things
 
-1. ~~**Submit the SCF interest form.**~~ ✅ Done — submitted August 2026,
-   now in review.
-2. ~~**Apply the repo to the Stellar Wave in Drips.**~~ ✅ Done — applied
-   August 2026, review in progress.
-3. **Actually deploy something.** The stack is deployable and not deployed; a
-   Supabase project and one container turn "designed" into "running", and it is
-   an afternoon. `docs/deployment.md`.
+1. **Get one external consumer** — a wallet calling `pickAnchor()`, an agent
+   calling the MCP server. The roadmap's own definition of infrastructure,
+   and the only item here that code cannot close.
+2. **Split the oracle keys in practice.** The contract now separates the
+   publisher from the admin; installing a distinct publisher key and making
+   the admin multisig is operational work still outstanding. `docs/TRUST.md`.
+3. **Back up the application tables.** The observation record is committed to
+   the repo (`data/scan-history.ndjson`); portal users, API keys, fraud
+   reports and disputes exist only in Supabase. `docs/deployment.md`.
 4. **Deploy the oracle to testnet.** Sixteen passing tests against a simulated
    environment is not the same claim as a contract that exists.
    `./scripts/deploy-contract.sh testnet`

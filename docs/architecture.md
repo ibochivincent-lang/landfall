@@ -1,12 +1,78 @@
 # Architecture
 
+Landfall is a layered distributed system organised into **three planes**. The
+split is not cosmetic: it follows the trust boundary. Each plane makes a
+strictly weaker claim than the one below it, and the boundary between planes
+is where "anyone can recompute this" turns into "you are trusting a key."
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│  PLANE 3 · CONSUMPTION            who reads the record                   │
+│                                                                          │
+│   REST + GraphQL API      SDK (@landfall/sdk)      MCP server (11 tools) │
+│   /trust-check.html       x402 payee check         webhooks              │
+│   /dashboard, /compare    badges (SVG)             portal (API keys)     │
+│                                                                          │
+│   Holds no keys. Moves no money. Every response carries asOf/staleHours  │
+│   so a stale answer is visible rather than silently served as current.   │
+└───────────────────────────────▲──────────────────────────────────────────┘
+                                │  read-only queries
+┌───────────────────────────────┴──────────────────────────────────────────┐
+│  PLANE 2 · DERIVATION             what the observations mean             │
+│                                                                          │
+│   trust-check    scoring, flags, confidence      ─┐                      │
+│   intents        route solving + plan actors      │  pure functions:     │
+│   adapters       per-chain evidence tiers         │  same input always   │
+│   stp            canonical form + Ed25519 sign    │  gives same output,  │
+│   anchoring      Merkle inclusion proofs          │  no I/O inside       │
+│   investigator   cited facts (+ optional AI)     ─┘                      │
+│                                                                          │
+│   Postgres  ·  Soroban oracle (digest + liveness, testnet)               │
+│                                                                          │
+│   ═══ TRUST BOUNDARY ════════════════════════════════════════════════    │
+│   Everything above this line is recomputable by a stranger from Plane 1. │
+│   The oracle is the one component you must trust a key for — see         │
+│   docs/TRUST.md. Its write key is deliberately NOT its admin key.        │
+└───────────────────────────────▲──────────────────────────────────────────┘
+                                │  persisted observations
+┌───────────────────────────────┴──────────────────────────────────────────┐
+│  PLANE 1 · OBSERVATION            what actually happened                 │
+│                                                                          │
+│   Stellar public ledger (Horizon)   ·   SEP-1 discovery                  │
+│   indexer: cursor-resumable paging, BigInt stroop arithmetic             │
+│   data/scan-history.ndjson: every observation ever taken, committed      │
+│                                                                          │
+│   Permissionless. No anchor grants access; none can withhold it.         │
+│   Nothing here is Landfall's opinion — it is the ledger's record.        │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+**Why the planes are ordered this way.** Plane 1 is the only source of
+authority. Plane 2 may *derive* but never *invent* — the reason evidence
+tiers (`PROVEN` > `ATTESTED` > `DERIVED`) are compared lexicographically and
+never blended into one number is that blending would let a Plane 2 inference
+outrank a Plane 1 fact. Plane 3 may *present* but never *decide*: the Intent
+Engine's `StepActor` type cannot assign a money-moving step to `landfall`, and
+the x402 check stops at a recommendation rather than signing.
+
+Read a plane boundary as a downgrade in certainty, and the whole design
+follows from it.
+
 ```
 packages/
-  contracts/   Rust + Soroban. The on-chain oracle.
-  db/          PostgreSQL schema and migrations.
-  indexer/     Reads the ledger, computes metrics, persists them.
-  api/         Read-only HTTP over the dataset.
-  web/         The public site.
+  contracts/   Rust + Soroban. The on-chain oracle.          (plane 2)
+  db/          PostgreSQL schema and migrations.             (plane 2)
+  indexer/     Reads the ledger, computes metrics, persists. (plane 1 → 2)
+  trust-check/ Counterparty signals from ledger history.     (plane 2)
+  intents/     Route solving and executable plans.           (plane 2)
+  stp/         Attestation schema, canonical form, signing.  (plane 2)
+  adapters/    Per-chain evidence, tiered.                   (plane 2)
+  anchoring/   Merkle inclusion proofs.                      (plane 2)
+  investigator/Cited facts, optional AI narrative.           (plane 2)
+  x402/        Payee safety check for agent payments.        (plane 3)
+  sdk/         Published client, pickAnchor().               (plane 3)
+  api/         Read-only HTTP over the dataset.              (plane 3)
+  web/         The public site.                              (plane 3)
 ```
 
 One command brings all of it up locally:

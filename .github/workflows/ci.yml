@@ -62,6 +62,32 @@ jobs:
       # builds the oracle contract — should stop everything until it is looked
       # at. Both advisories present when this step was added (a fast-uri SSRF
       # chain and a qs DoS) were fixed rather than grandfathered in.
+      # The contract's tests never ran here, which mattered little while it
+      # only had storage tests — and matters a lot now that nine of them are
+      # the proof that a leaked hourly publishing key cannot take the oracle
+      # (see the_publisher_cannot_take_the_contract). A privilege-escalation
+      # guard that no pipeline exercises is a comment, not a control.
+      #
+      # One Node version only: the Rust toolchain is unaffected by it.
+      - name: Install Rust toolchain
+        if: matrix.node == '20'
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        if: matrix.node == '20'
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            packages/contracts/landfall-oracle/target
+          key: cargo-${{ hashFiles('packages/contracts/landfall-oracle/Cargo.lock') }}
+
+      - name: Test the Soroban contract
+        if: matrix.node == '20'
+        working-directory: packages/contracts/landfall-oracle
+        run: cargo test
+
       - name: Audit dependencies
         if: matrix.node == '20'
         run: npm audit --audit-level=high

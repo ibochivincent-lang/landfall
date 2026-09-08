@@ -1,6 +1,6 @@
 # Landfall — status and checklist
 
-Last updated 13 August 2026.
+Last updated 8 September 2026.
 
 Repo: https://github.com/ibochivincent-lang/landfall (public)
 
@@ -39,7 +39,6 @@ Repo: https://github.com/ibochivincent-lang/landfall (public)
 
 - [x] README, methodology, roadmap, CONTRIBUTING, DEVELOPMENT.md
 - [x] 20 backlog items scoped and point-tagged
-- [x] SCF submission pack — `docs/scf-submission.md`, interest form ready to paste
 - [x] `docs/deployment.md` — Supabase, hosting, the RLS trap, and what is
       still not automated
 - [x] `docs/gaps.md` kept as a struck-through record rather than edited clean
@@ -48,75 +47,45 @@ Repo: https://github.com/ibochivincent-lang/landfall (public)
 **Publishing**
 
 - [x] Repo pushed public to `ibochivincent-lang/landfall`
-- [x] Drips GitHub App installed on the account
 
 ---
 
-## SCF #45 — submitted, in review
+## Deployment — live, with two things still off
 
-The interest form was submitted in August 2026, before the window closed.
-The application is now in review and the outcome is pending, so there is
-nothing to act on here until a decision comes back — this section stays as
-the record of where it stands, not as an open task.
+The stack is deployed. What follows is what is actually running, and the two
+switches deliberately left off.
 
-`docs/scf-submission.md` holds the pack that was prepared for it.
-
-If a future SCF round is worth targeting, the pack needs before submitting:
-
-- [ ] One line of real background per team member, with links
-- [ ] State part-time or full-time so the budget arithmetic holds
-- [ ] Re-run the scan on submission day and update the figures
-- [ ] Confirm 2028 appears nowhere as a delivery date, only as roadmap horizon
-- [ ] Read it once as a reviewer who has never heard of the project
-
----
-
-## Drips Wave — still no deadline
-
-- [ ] Read the 20 backlog items and cut or reword anything you don't want
-      contributors touching. Easier to edit a markdown file than to close
-      issues someone has already claimed.
-- [ ] Run `.\scripts\setup-issues.ps1 -WhatIf`, then without `-WhatIf`
-- [ ] Commit and push the script
-- [ ] Refresh in Drips → sync `landfall`
-- [ ] Apply the repo to the Stellar Wave
-- [ ] Wait for organiser approval
-- [ ] During sprint week: assign and review fast. Maintainers who go quiet
-      mid-wave are the main way this goes wrong.
-
----
-
-## Deployment — nothing is running anywhere yet
-
-The stack is deployable and not deployed. Until one of these is ticked, every
-"live" claim on the site is a claim about a local machine.
-
-- [ ] Create the Supabase project and run `.\scripts\migrate.ps1` against the
-      **direct** connection (5432, not the 6543 pooler)
-- [ ] Run the first mainnet scan with `--persist` so there is something to serve
-- [ ] Deploy the API somewhere with a persistent process; set `CORS_ORIGIN` to
-      the real site origin, not `*`
-- [ ] Set `LANDFALL_API_URL` in the Vercel project and redeploy, so
-      `/dashboard` stops showing its "no API connected" panel
-- [ ] Schedule the indexer — a real cron job on the host, not the compose loop
-- [x] `.\scripts\deploy-contract.ps1 -Network testnet` - **done 13 August 2026**
-      `CA2IYHFKTKSJWR5IICY6HFD55BJEGE7OMKISWMLMPFSHLESZYO3VICAG`
-      Four of my own bugs surfaced on the way: the wrong wasm target, a missing
-      host C linker, PowerShell treating stderr as failure, and three CLI flags
-      that do not exist. All fixed in the scripts, so the next person runs it
-      once.
-- [ ] Wire the indexer to publish digests to it. Deployed is not the same as
-      used - nothing writes to this contract yet
-- [ ] Mainnet, once there is something worth publishing
-- [ ] Take one `pg_dump` and put it somewhere that is not Supabase
+- [x] Supabase project created; migrations applied — and CI now re-applies
+      them on every push to `main`, so a new migration reaches production
+      without a manual step
+- [x] Mainnet scan running with `--persist`
+- [x] API deployed on Vercel, serving REST + GraphQL
+- [x] `/dashboard` reading the live API rather than the bundled snapshot
+- [x] Indexer scheduled — hourly GitHub Actions cron, `$0/month`
+- [x] Oracle **deployed to testnet** — `CA2IYHFKTKSJWR5IICY6HFD55BJEGE7OMKISWMLMPFSHLESZYO3VICAG`
+      (13 August 2026). Four bugs surfaced on the way: the wrong wasm target,
+      a missing host C linker, PowerShell treating stderr as failure, and
+      three CLI flags that do not exist — all fixed in the scripts
+- [x] `scripts/publish-oracle.mjs` wired into the hourly run, and verified
+      end to end in a dry run (6 September 2026)
+- [ ] **Oracle publishing is off in production** — `ORACLE_ADMIN_SECRET` is
+      unset, so the step no-ops by design. Before switching it on: install a
+      distinct publisher key (`set_publisher`) so CI never holds the admin
+      key, and make the admin account multisig. See `docs/TRUST.md`
+- [ ] **Mainnet oracle** — needs funded keys and a custody decision, plus an
+      external audit applied for
+- [ ] **Database backup beyond Supabase's default retention.** The
+      observation record is committed to the repo
+      (`data/scan-history.ndjson`, appended hourly), which covers the
+      measurements — but the application tables (portal users, API keys,
+      fraud reports and their disputes) have no backup outside Supabase
 
 ---
 
 ## Tool quality — no deadline, ordered by value
 
 - [ ] **M1: memo-based leg correlation.** Turns the return metric from a
-      heuristic into a measurement. Also Tranche 1 of the grant, so a
-      contributor picking this up is grant milestone work getting done.
+      heuristic into a measurement.
 - [ ] Investigate why `vibrantapp.com` served a TOML with no parseable
       accounts. Probably a parser gap, not an empty declaration.
 - [ ] Expand `data/anchors.json` beyond the current 8 candidate domains.

@@ -151,10 +151,10 @@ validation error itself rather than assumed.
 
 Building this against `packages/api/src/server.ts` (the local dev API) would
 have required either duplicating query logic or backporting a large amount of
-work a teammate had pushed straight to the deployed `api/[...path].js`
+work that had been pushed straight to the deployed `api/[...path].js`
 (developer portal auth, reliability scoring, corridors, badges — none of
 which existed in the local dev server at the time). Rather than rush that
-backport under the SCF deadline, this server and the GraphQL layer both
+backport under time pressure, this server and the GraphQL layer both
 imported directly from `api/[...path].js`, the file actually running in
 production.
 

@@ -133,10 +133,8 @@ later.
 
 The Soroban contract has **16 internal tests and no external audit.** Stellar
 runs the [Soroban Audit Bank](https://stellar.org/grants-and-funding/soroban-audit-bank)
-for exactly this situation — SCF-funded projects, with the SDF covering most
-of the cost and a 5% co-payment refundable on timely remediation. Shipping
-this oracle to mainnet without going through that pipeline would skip the
-standard Stellar itself set for contracts at this stage.
+for contracts at this stage. Shipping this oracle to mainnet on the strength
+of internal tests alone would skip the standard Stellar itself set.
 
 **Position: the oracle does not go to mainnet before (a) the admin account is
 multisig and (b) an external audit has been applied for.** Neither is done.

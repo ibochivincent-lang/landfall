@@ -201,7 +201,7 @@ silently converts every rate limit into a no-op. Recorded here and in
 16 internal tests, no third-party review, for a contract with authority over a
 published reputation record. Stellar runs the
 [Soroban Audit Bank](https://stellar.org/grants-and-funding/soroban-audit-bank)
-for exactly this: SCF-funded projects, SDF covering most of the cost, 5%
+for contracts at this stage: SDF covering most of the cost, 5%
 co-payment refundable on timely remediation. Position taken in TRUST.md: no
 mainnet oracle before this is applied for.
 

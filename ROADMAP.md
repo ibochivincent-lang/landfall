@@ -1,7 +1,7 @@
 # Landfall — Master Roadmap
 
 **Consolidated from:** [`docs/gaps.md`](docs/gaps.md) · [`docs/checklist.md`](docs/checklist.md) ·
-[`docs/backlog.md`](docs/backlog.md) · [`docs/scf-submission.md`](docs/scf-submission.md) ·
+[`docs/backlog.md`](docs/backlog.md) ·
 the 13 August audit · verified GitHub issue tracker state.
 
 **North star:** become the settlement-quality primitive Stellar wallets,
@@ -30,7 +30,7 @@ Every horizon below is ordered on the assumption that the consumer of this data
 is increasingly a program rather than a person — machine-readable first,
 dashboard second.
 
-**As of 13 August 2026.** Horizon 0 is what a stranger can verify against the
+**As of 8 September 2026.** Horizon 0 is what a stranger can verify against the
 repository and the live site today. Line items carry the backlog or issue
 number that tracks them where one exists, so this page stays checkable rather
 than becoming a second changelog.
@@ -69,7 +69,7 @@ than becoming a second changelog.
 
 ### Measurement — the highest-leverage engineering item open
 
-- [ ] **Memo-based leg correlation** (backlog M1, SEP-24) — turns refund detection from a heuristic into a measurement; also Tranche 1 of the grant, so this is milestone work either way
+- [ ] **Memo-based leg correlation** (backlog M1, SEP-24) — turns refund detection from a heuristic into a measurement
 - [ ] **Persist the resume cursor between runs** (issue #13) — a fix exists and is unshipped; closing it stops every run re-paging history it already has
 - [ ] Investigate `vibrantapp.com` serving a TOML that parses to zero accounts — likely a parser gap, not an empty declaration
 
@@ -77,7 +77,6 @@ than becoming a second changelog.
 
 - [ ] Label or remove every claim still ahead of what's built: invented $99/mo pricing, "Get API access" implying access control that doesn't exist, "Log in" with no accounts behind it, an advertised SDK/webhooks that aren't built yet
 - [ ] **Route Scout publishes invented rates and fees — highest-priority honesty fix.** `/compare.html` says it compares anchors by "payout, fees, speed, and verified on-chain settlement reliability" and footers "no anchor self-reporting", while `GET /api/v1/quotes/compare` serves a hardcoded catalogue: static FX rates, per-anchor `rateSpread`, `feePercent`, `feeFixedUsd` and payout speeds, none of them fetched from anywhere. The reliability column is real; every commercial figure beside it is invented and attributed to a named business. Either label the rate/fee columns as illustrative until SEP-38 ingestion lands, or drop those columns and ship the reliability comparison alone. See [docs/gaps.md](docs/gaps.md)
-- [ ] Make a deliberate call on the AI chat explorer feature that shipped outside this backlog — decide whether it belongs in the grant pitch or gets held back, since it cuts against the "infrastructure, not application" positioning the whole submission argues for
 
 ---
 
@@ -99,9 +98,9 @@ than becoming a second changelog.
   nothing at all rather than present a bare transfer as evidence it hasn't earned
 - [ ] **Signed settlement receipt ingest** (backlog H1) — an attestation format so an anchor or user can assert the fiat leg, which the ledger alone cannot show
 - [ ] **Slippage metric: quoted versus landed** (backlog H2) — depends on receipts; nothing in the ecosystem currently publishes this number. This is the number that makes Route Scout's rate column a measurement instead of a catalogue
-- [ ] **Dark-anchor early warning** — an anchor rarely stops instantly: volume falls, counterparty concentration tightens, gaps between settlements stretch, then silence. Every scan is already stored, so the training data exists and nothing reads it back. A degradation signal 48–72h ahead is worth more to a wallet than an accurate post-mortem, and it is the natural Tranche 2 milestone. Must ship with its false-positive rate published — an early warning that cries wolf about a named business is worse than none
+- [ ] **Dark-anchor early warning** — an anchor rarely stops instantly: volume falls, counterparty concentration tightens, gaps between settlements stretch, then silence. Every scan is already stored, so the training data exists and nothing reads it back. A degradation signal 48–72h ahead is worth more to a wallet than an accurate post-mortem, Must ship with its false-positive rate published — an early warning that cries wolf about a named business is worse than none
 - [ ] **`pickAnchor()` multi-factor route scoring** — one weighted score over net payout, reliability grade, and degradation signal, with the caller choosing the emphasis (safest / cheapest / fastest) rather than the formula choosing for them. Blocked on live SEP-38 quotes: optimising over a hardcoded rate table produces a confident recommendation from invented inputs, which is worse than no recommendation
-- [ ] Talk to at least one wallet about embedding `pickAnchor()` — one real conversation in progress outweighs three more shipped features in a grant application
+- [ ] Talk to at least one wallet about embedding `pickAnchor()` — the roadmap's own infrastructure test is met by one external consumer, not by another shipped feature
 - [ ] Publish `@landfall/sdk` with `pickAnchor()` to npm (backlog H3)
 - [ ] **CAP-67 unified event ingestion** — replaces N per-account REST cursors with one ledger-wide stream, and makes mint/burn distinguishable from transfer instead of inferred
 - [ ] Multi-region indexing, to remove the single-vantage-point assumption
@@ -117,7 +116,7 @@ than becoming a second changelog.
 - [ ] Oracle to **mainnet**, once there is a real dataset worth publishing
 - [x] ~~MCP server exposing anchor quality to payment agents~~ (issue #23) — shipped in Horizon 0, ahead of schedule; what's still open is a real external agent actually calling it
 - [ ] Anchor dispute portal — promised by the code of conduct and security policy today; doesn't exist yet
-- [ ] Paid API tier — sustainability without grant dependence
+- [ ] Paid API tier — sustainability
 - [ ] Move the repository to an organisation
 
 ---
@@ -150,7 +149,7 @@ ongoing work rather than a one-time checklist:
 
 ---
 
-## Dependencies and risks (from the original tranche plan)
+## Dependencies and risks
 
 **Wallet partnership is the critical path.** Layer 1 stands alone, but the
 most valuable metric — slippage — requires attestors. Pursue wallet
