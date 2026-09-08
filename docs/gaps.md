@@ -425,10 +425,20 @@ whole problem. The alternative is deleting those sections until they're real.
 - ~~**No trend history in the product.**~~ `scripts/build-trends.mjs` reads it
   back: `/api/v1/trends.json` and a Trend section on every anchor page, showing
   observed state changes with dates and how long each account has held its
-  current state. 23 transitions found across 14 anchors. **Still no alerting**
-  on state change — the data is published, nothing pushes it.
+  current state. 23 transitions found across 14 anchors. ~~**Still no alerting**
+  on state change.~~ Closed: `anchor.degraded` webhooks fire on any move to a
+  weaker state, signed and retried, with a dead-letter replay that retries a
+  failed delivery hourly for 48 hours (`scripts/redeliver-webhooks.mjs`, and
+  migration 014 which stores the payload so a replay is possible at all). The
+  original `anchor.dark` event was the one that had never fired — zero
+  transitions into dark have ever been observed — so subscribers were
+  backfilled onto the event that actually happens. See
+  [WEBHOOKS.md](WEBHOOKS.md).
 - ~~**No API**~~ — shipped. ~~**No MCP server.**~~ — shipped, unlinked from
-  the site, no external consumer yet. **Still no SDK.**
+  the site, no external consumer yet. ~~**Still no SDK.**~~
+  [`@landfall/sdk`](https://www.npmjs.com/package/@landfall/sdk) published
+  7 September, verified against the live registry copy rather than the local
+  build. Still no external consumer, which is the part that matters.
 - ~~**No live quote data.**~~ SEP-38 ingestion exists
   (`scripts/fetch-anchor-quotes.mjs`) and fees come from SEP-24 `/info`. But
   **near-zero coverage**: no tracked anchor currently answers with a usable
@@ -445,14 +455,29 @@ whole problem. The alternative is deleting those sections until they're real.
 - ~~**The Soroban oracle has never been deployed.**~~ Live on **testnet**,
   currently `CDPCH3UO4ORG6OMWH5B4RCPIHN7TS5NL5QATWRW6DHEN7UYIPOX6B5LW`
   (redeployed 6 September as a mainnet dry run; the 13 August contract
-  `CA2IYHF…VICAG` is still live but no longer referenced). ~~The indexer does not publish to it.~~ `scripts/publish-oracle.mjs`
+  `CA2IYHF…VICAG` no longer responds — its state expired past the ~30 day
+  TTL, which is the storage lifetime working as designed rather than a
+  fault: an oracle nobody writes to lets its state go, and stale data
+  disappearing is safer than stale data persisting silently). ~~The indexer does not publish to it.~~ `scripts/publish-oracle.mjs`
   now does, once configured — see the 14 August table above. Still **not on
   mainnet**.
-- **No attestation layer**, so no slippage metric. The most valuable number the
-  project could produce does not exist yet.
-- ~~**No dispute portal**~~ — [DISPUTES.md](../DISPUTES.md) documents the
-  route, and a dispute response attaches to the report it answers. Still a
-  documented process rather than a self-serve portal.
+- **No slippage metric.** The most valuable number the project could produce
+  still does not exist. The attestation *layer* is built — `packages/stp`
+  (canonical form, Ed25519 sign/verify, spec in
+  [CANONICAL_JSON.md](CANONICAL_JSON.md)) and `packages/anchoring` (Merkle
+  inclusion proofs) — and dispute responses are attested today. What is
+  missing is the **input**: nobody signs a receipt saying what fiat actually
+  landed, so quoted-versus-landed cannot be computed. That needs an anchor or
+  a user to attest the fiat leg, which is adoption, not code.
+- ~~**No dispute portal**~~ — ~~Still a documented process rather than a
+  self-serve portal.~~ Now self-serve: `POST /api/v1/fraud-reports/:id/dispute`
+  is gated on an Ed25519 signature from the reported address, driven from the
+  Trust Check page, and the response attaches to the report wherever it
+  appears. `GET /api/v1/fraud-reports/:id/attestation` returns a signed
+  attestation that the party responded and controls the address — never
+  covering the accusation itself. The subject is read from the stored report
+  rather than the request, so a caller cannot pass the check against someone
+  else's report. [DISPUTES.md](../DISPUTES.md).
 
 ## 2. Data quality — known weaknesses
 
@@ -527,6 +552,8 @@ whole problem. The alternative is deleting those sections until they're real.
 
 ## If you only do three things
 
+*(Four are listed; the fourth is struck through because it is done.)*
+
 1. **Get one external consumer** — a wallet calling `pickAnchor()`, an agent
    calling the MCP server. The roadmap's own definition of infrastructure,
    and the only item here that code cannot close.
@@ -536,8 +563,9 @@ whole problem. The alternative is deleting those sections until they're real.
 3. **Back up the application tables.** The observation record is committed to
    the repo (`data/scan-history.ndjson`); portal users, API keys, fraud
    reports and disputes exist only in Supabase. `docs/deployment.md`.
-4. **Deploy the oracle to testnet.** Sixteen passing tests against a simulated
-   environment is not the same claim as a contract that exists.
-   `./scripts/deploy-contract.sh testnet`
+~~4. **Deploy the oracle to testnet.**~~ Done — live at
+   `CDPCH3UO…OX6B5LW`, verified responding at epoch 2. Twenty-eight tests now,
+   and the publisher/admin roles are split in the contract. What remains is
+   operational and is item 2 above.
 
 Everything else can wait. The first two are the ones with a clock on them.

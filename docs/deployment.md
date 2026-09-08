@@ -316,10 +316,11 @@ for the same same-origin reason.
 mainnet dry run:
 [`CDPCH3UO4ORG6OMWH5B4RCPIHN7TS5NL5QATWRW6DHEN7UYIPOX6B5LW`](https://stellar.expert/explorer/testnet/contract/CDPCH3UO4ORG6OMWH5B4RCPIHN7TS5NL5QATWRW6DHEN7UYIPOX6B5LW).
 The first testnet deploy (13 August) was
-`CA2IYHFKTKSJWR5IICY6HFD55BJEGE7OMKISWMLMPFSHLESZYO3VICAG` and is still live
-but no longer the one this repo points at.
+`CA2IYHFKTKSJWR5IICY6HFD55BJEGE7OMKISWMLMPFSHLESZYO3VICAG`. It no longer
+responds: its state expired past the ~30 day TTL, which is the storage
+lifetime behaving as designed rather than a fault.
 
-Sixteen tests pass against the SDK's test environment. `scripts/publish-oracle.mjs`
+Twenty-eight tests pass against the SDK's test environment. `scripts/publish-oracle.mjs`
 **does** publish to it — verified end to end on 6 September: epoch 0 → 1 with
 `get_digest` matching the scan digest exactly. It is **not on mainnet**.
 

@@ -164,9 +164,30 @@ pub enum Error {
 /// is decoding, instead of discovering a mismatch as a malformed value.
 const STORAGE_VERSION: u32 = 1;
 
-/// Bounded so a single publication cannot exceed the resource limits and
-/// strand the oracle mid-update.
-const MAX_BATCH: u32 = 100;
+/// Bounded so a single publication cannot exceed the network's transaction
+/// resource limits and strand the oracle mid-update.
+///
+/// **Measured, not guessed — and the original 100 was wrong.** The binding
+/// limit is not CPU, it is the 16 KiB cap on contract event size. Each
+/// account emits a `ScoreSet`; an account transitioning into dark emits a
+/// `WentDark` as well. Measured against the host in `src/bench_probe.rs`:
+///
+///   all-live (1 event/account):  70 fits, 71 exceeds
+///   all-dark (2 events/account): 35 fits, 40 exceeds
+///
+/// So a full batch of 100 would have failed on a real network in every mix,
+/// and a batch sized for the average would fail exactly when it mattered
+/// most — the scan where a whole anchor's fleet goes dark at once is both
+/// the worst case for event size and the one nobody can afford to lose.
+///
+/// 25 is the worst case (35) with roughly 30% headroom. The headroom is not
+/// timidity: this contract has no upgrade path, so if a future protocol
+/// version raises per-event costs there is no way to lower this number on a
+/// deployed contract. Sizing for the worst case at the widest margin the
+/// throughput can absorb is the only correction available in advance.
+///
+/// Cost of the change: 108 tracked accounts become 5 batches rather than 2.
+const MAX_BATCH: u32 = 25;
 
 const TTL_THRESHOLD: u32 = 30 * 17_280; // ~30 days of ledgers
 const TTL_EXTEND: u32 = 90 * 17_280;    // extend to ~90 days
@@ -474,3 +495,7 @@ impl LandfallOracle {
 
 #[cfg(test)]
 mod test;
+
+mod bench;
+
+mod bench_probe;

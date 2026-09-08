@@ -62,7 +62,9 @@ switches deliberately left off.
 - [x] API deployed on Vercel, serving REST + GraphQL
 - [x] `/dashboard` reading the live API rather than the bundled snapshot
 - [x] Indexer scheduled — hourly GitHub Actions cron, `$0/month`
-- [x] Oracle **deployed to testnet** — `CA2IYHFKTKSJWR5IICY6HFD55BJEGE7OMKISWMLMPFSHLESZYO3VICAG`
+- [x] Oracle **deployed to testnet** — `CDPCH3UO4ORG6OMWH5B4RCPIHN7TS5NL5QATWRW6DHEN7UYIPOX6B5LW`
+      (redeployed 6 September as a mainnet dry run; the 13 August deploy
+      `CA2IYHF…VICAG` has since expired past its TTL and no longer responds)
       (13 August 2026). Four bugs surfaced on the way: the wrong wasm target,
       a missing host C linker, PowerShell treating stderr as failure, and
       three CLI flags that do not exist — all fixed in the scripts

@@ -8,9 +8,10 @@ data a wallet reads from the API.
 |---|---|
 | Source | [`packages/contracts/landfall-oracle`](../packages/contracts/landfall-oracle) |
 | SDK | soroban-sdk 27 |
-| Testnet | `CA2IYHFKTKSJWR5IICY6HFD55BJEGE7OMKISWMLMPFSHLESZYO3VICAG` |
+| Testnet | [`CDPCH3UO4ORG6OMWH5B4RCPIHN7TS5NL5QATWRW6DHEN7UYIPOX6B5LW`](https://stellar.expert/explorer/testnet/contract/CDPCH3UO4ORG6OMWH5B4RCPIHN7TS5NL5QATWRW6DHEN7UYIPOX6B5LW) — verified live, epoch 2 |
 | Mainnet | **Not deployed.** See [TRUST.md](TRUST.md) for what must happen first |
 | Schema version | `1` |
+| Superseded | `CA2IYHF…VICAG`, the 13 August deploy. **No longer responds** — its state expired past TTL |
 | Upgradeable | **No, deliberately** |
 
 ---
@@ -111,7 +112,7 @@ Two roles, and the split is the security model.
 |---|---|---|
 | `publish(digest) -> u64` | **publisher** | Bumps the epoch, emits `Published` |
 | `set_score(account, state, last_activity, sampled)` | **publisher** | Emits `ScoreSet`, plus `WentDark` on a transition into dark |
-| `set_scores(accounts, scores)` | **publisher** | Batch, max 100. Authorises once at the entry point |
+| `set_scores(accounts, scores)` | **publisher** | Batch, **max 25**. Authorises once at the entry point |
 | `set_admin(new_admin)` | **admin** | Emits `AdminChanged` |
 | `set_publisher(new_publisher)` | **admin** | Emits `PublisherChanged` |
 | `initialise(admin)` | — | One-time. Fails loudly if already initialised |
@@ -175,7 +176,7 @@ the event stream, and nothing currently watches for it — see
 | `2` | Not initialised |
 | `3` | Not authorised |
 | `4` | Empty batch, or mismatched batch lengths |
-| `5` | Batch exceeds 100 accounts |
+| `5` | Batch exceeds 25 accounts |
 
 A mismatched `accounts`/`scores` pair fails rather than assigning scores to
 the wrong accounts — on a reputation oracle, silently mis-assigning is worse
