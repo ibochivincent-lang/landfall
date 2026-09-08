@@ -289,6 +289,12 @@ Copy `.env.example` to `.env` and adjust. Nothing in the example file is a secre
 | [docs/KEY_ROTATION.md](docs/KEY_ROTATION.md) | What to do when a key is compromised or due for a change — different blast radius, different procedure, per secret. |
 | [docs/API_REFERENCE.md](docs/API_REFERENCE.md) | Every public endpoint: shapes, rate limits, caching, error semantics, and what is deliberately not offered. |
 | [docs/WEBHOOKS.md](docs/WEBHOOKS.md) | Event types, payload envelope, HMAC verification, retries and dead-letter replay. |
+| [docs/NON_CUSTODY.md](docs/NON_CUSTODY.md) | The constraint the rest of the design bends around, and where it is enforced rather than asserted. |
+| [docs/JURISDICTIONAL.md](docs/JURISDICTIONAL.md) | Regulatory and defamation posture for publishing findings about named businesses. |
+| [docs/GOVERNANCE.md](docs/GOVERNANCE.md) | Who decides what, key authority, and what changes if a second person joins. |
+| [docs/VERSIONING.md](docs/VERSIONING.md) | What is versioned, what breaks, and what will not break without warning. |
+| [docs/CANONICAL_JSON.md](docs/CANONICAL_JSON.md) | The exact bytes an attestation is signed over, so a verifier can be written in any language. |
+| [docs/TERMS.md](docs/TERMS.md) | Terms of use for the public API, site and SDK. |
 | [docs/WHY_NOT.md](docs/WHY_NOT.md) | Why not the anchor's own endpoint, the Anchor Platform, an explorer, Horizon directly, an AML vendor, or an LLM — including where one of those is the better choice. |
 | [docs/SEP_COVERAGE.md](docs/SEP_COVERAGE.md) | Which SEPs and CAPs Landfall uses, for what, and which it deliberately does not implement. |
 | [docs/PROPOSAL.md](docs/PROPOSAL.md) | Funding proposal: the problem, what has shipped, what is deliberately not built, and the roadmap. |
