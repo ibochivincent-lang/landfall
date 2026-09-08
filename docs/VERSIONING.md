@@ -100,10 +100,14 @@ does not drop or repurpose a column that shipped, because the deployed API and
 the database are updated by separate processes and a destructive migration
 breaks the running one between them.
 
-Where a column becomes obsolete it is left in place and documented as unused —
-`refund.spike` in `user_webhooks.events` is the standing example: subscribable,
-never fired, retained because deleting it would silently drop a subscription
-someone chose. See [WEBHOOKS.md](WEBHOOKS.md).
+Where a value becomes obsolete it is left in place and documented rather than
+deleted. `refund.spike` in `user_webhooks.events` was the standing example —
+subscribable since the portal shipped, never fired, retained because removing
+it would have silently dropped a subscription someone chose.
+
+It has since been given a producer rather than retired, which is the better
+outcome of the two and the reason the value was kept: the subscription that
+survived is now honoured. See [WEBHOOKS.md](WEBHOOKS.md).
 
 ---
 
@@ -113,8 +117,8 @@ someone chose. See [WEBHOOKS.md](WEBHOOKS.md).
   `Unreleased`, in the same change that makes them.
 - A release moves `Unreleased` into a dated, numbered section and tags
   `vX.Y.Z`.
-- **No tag has been cut yet.** `main` is the only supported line; fixes are
-  not backported.
+- **`v0.1.0` is the first and only tag**, cut 8 September 2026. `main` is the
+  only supported line; fixes are not backported.
 
 ---
 

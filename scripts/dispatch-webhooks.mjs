@@ -93,14 +93,15 @@ async function main() {
   const [currentScanId, previousScanId] = [scans[0].id, scans[1].id];
 
   const { rows: current } = await pool.query(
-    `SELECT account_id, state FROM account_metrics WHERE scan_id = $1`,
+    `SELECT account_id, state, refund_rate, inbound_count FROM account_metrics WHERE scan_id = $1`,
     [currentScanId],
   );
   const { rows: previous } = await pool.query(
-    `SELECT account_id, state FROM account_metrics WHERE scan_id = $1`,
+    `SELECT account_id, state, refund_rate, inbound_count FROM account_metrics WHERE scan_id = $1`,
     [previousScanId],
   );
   const previousState = new Map(previous.map((r) => [r.account_id, r.state]));
+  const previousMetrics = new Map(previous.map((r) => [r.account_id, r]));
 
   const { rows: accountDomains } = await pool.query(
     `SELECT account_id, domain FROM anchor_accounts`,
@@ -110,6 +111,54 @@ async function main() {
   // How states rank. A degradation is a move to a lower rank — not merely a
   // change, so a slow -> live recovery never fires an alert.
   const RANK = { live: 3, slow: 2, no_activity: 1, dark: 0 };
+
+  /* ── refund.spike ────────────────────────────────────────────────────────
+     This event has been subscribable since the developer portal shipped and
+     had no producer at all — see migration 010, which left it in place rather
+     than silently dropping a subscription someone had chosen. This is the
+     producer.
+
+     The gate is the whole design. Measured against the committed observation
+     record (data/scan-history.ndjson), only four accounts have ever had a
+     return at all, and an ungated rule fires three times: once on aps.money,
+     which genuinely moved from 3.6% to 15% across 3,352 inbound payments, and
+     twice on an account whose "16.7% return rate" is one return out of six
+     inbound payments.
+
+     Those two would have been alerts naming a real business on the strength
+     of a single event. So a rate is only considered at all once there is
+     enough inbound volume for it to mean something — the same reasoning
+     Trust Check's `confidence` applies, using the same threshold of 25 that
+     the indexer already uses for --min-inbound.
+
+     Both conditions must hold, because either alone misfires: a relative
+     jump alone fires on 0.1% -> 0.2%, and an absolute jump alone fires on an
+     account that was always high and moved slightly. */
+  const SPIKE_MIN_INBOUND = 25;
+  const SPIKE_MIN_ABSOLUTE_RISE = 0.02;   // +2 percentage points
+  const SPIKE_MIN_RELATIVE_RISE = 1.5;    // and at least 50% higher than before
+
+  const refundSpikes = current
+    .map((r) => {
+      const prev = previousMetrics.get(r.account_id);
+      if (!prev) return null;
+
+      const inbound = Number(r.inbound_count ?? 0);
+      if (inbound < SPIKE_MIN_INBOUND) return null;
+
+      // refund_rate is NULL, not 0, when there is no inbound traffic — a rate
+      // over nothing is unknown rather than zero, and must not read as a fall
+      // to zero or a rise from it.
+      if (r.refund_rate === null || prev.refund_rate === null) return null;
+
+      const from = Number(prev.refund_rate);
+      const to = Number(r.refund_rate);
+      if (to - from < SPIKE_MIN_ABSOLUTE_RISE) return null;
+      if (from > 0 && to < from * SPIKE_MIN_RELATIVE_RISE) return null;
+
+      return { account_id: r.account_id, event: 'refund.spike', from, to, inbound };
+    })
+    .filter(Boolean);
 
   // This used to look only for transitions INTO dark, which sounds right and
   // was in practice dead code: across every account and a month of stored
@@ -134,12 +183,16 @@ async function main() {
     })
     .filter(Boolean);
 
-  if (!transitions.length) {
-    console.log('No degradations this scan.');
+  // Both event families are delivered by the same loop below. They differ
+  // only in payload shape, which buildPayload handles.
+  const outgoing = [...transitions, ...refundSpikes];
+
+  if (!outgoing.length) {
+    console.log('No degradations or refund spikes this scan.');
     return;
   }
 
-  const eventsNeeded = [...new Set(transitions.map((t) => t.event))];
+  const eventsNeeded = [...new Set(outgoing.map((t) => t.event))];
   const { rows: webhooks } = await pool.query(
     `SELECT id, target_url, secret, events FROM user_webhooks
       WHERE active = true AND events && $1::text[]`,
@@ -149,7 +202,7 @@ async function main() {
   let delivered = 0;
   let failed = 0;
 
-  for (const t of transitions) {
+  for (const t of outgoing) {
     const domain = domainByAccount.get(t.account_id) || null;
     // Only deliver to subscribers of this specific event.
     for (const webhook of webhooks.filter((w) => (w.events || []).includes(t.event))) {
@@ -171,15 +224,28 @@ async function main() {
         continue;
       }
 
-      const payload = {
-        event: t.event,
-        account: t.account_id,
-        domain,
-        previousState: t.from,
-        currentState: t.to,
-        scanId: currentScanId,
-        occurredAt: new Date().toISOString(),
-      };
+      const payload = t.event === 'refund.spike'
+        ? {
+            event: t.event,
+            account: t.account_id,
+            domain,
+            previousRefundRate: t.from,
+            currentRefundRate: t.to,
+            // Shipped with the rate so a consumer can see the sample it rests
+            // on rather than reading a percentage in isolation.
+            inboundCount: t.inbound,
+            scanId: currentScanId,
+            occurredAt: new Date().toISOString(),
+          }
+        : {
+            event: t.event,
+            account: t.account_id,
+            domain,
+            previousState: t.from,
+            currentState: t.to,
+            scanId: currentScanId,
+            occurredAt: new Date().toISOString(),
+          };
 
       const result = await deliver(webhook, payload);
       if (result.status === 'delivered') delivered++; else failed++;
@@ -196,12 +262,12 @@ async function main() {
     }
   }
 
-  const byEvent = transitions.reduce((acc, t) => {
+  const byEvent = outgoing.reduce((acc, t) => {
     acc[t.event] = (acc[t.event] || 0) + 1;
     return acc;
   }, {});
   const summary = Object.entries(byEvent).map(([e, n]) => `${n} ${e}`).join(', ');
-  console.log(`Dispatched ${transitions.length} degradation webhook(s) (${summary}): ${delivered} delivered, ${failed} failed.`);
+  console.log(`Dispatched ${outgoing.length} webhook(s) (${summary}): ${delivered} delivered, ${failed} failed.`);
 }
 
 try {
