@@ -121,11 +121,22 @@ mainnet, not after.
 
 The distinction that matters, and that summaries usually blur:
 
-- **Multisig needs no contract change.** `require_auth()` on a `G...` account
-  delegates to that account's own signers and thresholds. Making the admin a
-  multisig Stellar account is native, requires no redeploy, and is the
-  cheapest meaningful hardening available.
-- **A timelock does need contract work.** Delaying `set_admin` so a handover
+- **Multisig on the admin account needs no contract change, but it breaks the
+  hourly publish.** `require_auth()` on a `G...` account delegates to that
+  account's own signers and thresholds — Soroban's built-in account contract
+  checks the **medium** threshold. So raising that threshold gives real
+  multisig with no redeploy. The catch, which a shorter version of this note
+  previously missed: `publish`, `set_score`, `set_scores` and `set_admin` all
+  go through the *same* `require_admin()`, and Soroban always checks medium,
+  so the account cannot give the hourly publisher a lower bar than a contract
+  takeover. Making the admin 2-of-N stops `scripts/publish-oracle.mjs`, which
+  signs with one key in CI.
+- **Separating the two needs a small contract change.** A distinct `publisher`
+  address for `publish`/`set_score`/`set_scores`, with `admin` retained for
+  `set_admin` and for rotating the publisher. Then the hot CI key can write
+  scores but cannot take the contract, and the admin can be cold multisig.
+  This is the shape to deploy to mainnet with — not a retrofit afterwards.
+- **A timelock also needs contract work.** Delaying `set_admin` so a handover
   is visible before it lands cannot be done from the account side.
 
 The contract emits `AdminChanged` on handover, so a takeover is publicly
