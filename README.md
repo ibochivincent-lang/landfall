@@ -287,6 +287,8 @@ Copy `.env.example` to `.env` and adjust. Nothing in the example file is a secre
 | [docs/architecture.md](docs/architecture.md) | The three-plane architecture, the scan lifecycle, SEP-10 auth and the x402 payee check — as rendered diagrams. |
 | [CHANGELOG.md](CHANGELOG.md) | Notable changes, Keep a Changelog format. Corrections are listed, not quietly dropped. |
 | [docs/KEY_ROTATION.md](docs/KEY_ROTATION.md) | What to do when a key is compromised or due for a change — different blast radius, different procedure, per secret. |
+| [docs/COOKBOOK.md](docs/COOKBOOK.md) | Nine working recipes, each one executed before it was written down. |
+| [docs/FOR_ANCHORS.md](docs/FOR_ANCHORS.md) | For anchor operators: how you ended up here, what each field does and does not mean, and how to correct one. |
 | [docs/API_REFERENCE.md](docs/API_REFERENCE.md) | Every public endpoint: shapes, rate limits, caching, error semantics, and what is deliberately not offered. |
 | [docs/WEBHOOKS.md](docs/WEBHOOKS.md) | Event types, payload envelope, HMAC verification, retries and dead-letter replay. |
 | [docs/FAQ.md](docs/FAQ.md) | Short answers to the questions the data actually provokes — starting with what `dark` does not mean. |

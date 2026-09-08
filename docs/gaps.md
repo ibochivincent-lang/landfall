@@ -485,6 +485,29 @@ whole problem. The alternative is deleting those sections until they're real.
 
 ## 2. Data quality — known weaknesses
 
+- **A domain dropping out of a scan is invisible in the published API.** Found
+  8 September 2026 while checking a doc's account count. Eleven consecutive
+  scans reported 27 domains / 108 accounts; the twelfth reported 26 / 93.
+  `zeam.money` and all fifteen of its accounts had vanished — while its
+  `stellar.toml` still resolved (HTTP 200) and it was still in
+  `packages/indexer/data/anchors.json`.
+
+  The scan console follows the doctrine — a domain that will not resolve
+  prints `FAIL` rather than being silently skipped. **`/api/v1/anchors` does
+  not.** It carries `asOf`, `staleHours`, `accounts` and `reliability`, and no
+  field of any kind for a domain that was tracked and not reached. A consumer
+  polling it sees fifteen fewer accounts with nothing to indicate why.
+
+  This is the project's own failure mode. A tracked anchor that silently
+  disappears is indistinguishable from one that was never tracked — the exact
+  ambiguity Landfall exists to remove from anchor self-reporting. It also
+  means an anchor could, in principle, drop off the record for a scan without
+  anyone being able to tell that it had.
+
+  Not yet fixed. The fix is a `coverage` block on the payload — tracked
+  versus reached, and which domains were missed — so a partial scan is
+  visibly partial rather than quietly smaller.
+
 - **Refund detection is still a heuristic.** Memo correlation (backlog M1) is
   the fix and it isn't done. Every return figure carries this caveat.
 - **The fiat leg is invisible.** We cannot tell whether money reached anyone.
