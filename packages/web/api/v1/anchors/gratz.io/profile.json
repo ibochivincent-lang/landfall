@@ -1,10 +1,10 @@
 {
   "anchorId": "gratz.io",
   "name": "Gratz",
-  "asOf": "2026-09-08T19:39:40.433Z",
+  "asOf": "2026-09-08T22:10:11.190Z",
   "verification": {
     "resolved": true,
-    "checkedAt": "2026-09-08T19:39:40.433Z",
+    "checkedAt": "2026-09-08T22:10:11.190Z",
     "source": "SEP-1 stellar.toml, resolved live; issuer attribution confirmed against each issuer account's own on-chain home_domain",
     "accounts": [
       {
@@ -68,7 +68,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 681.53,
+      "hoursSinceActivity": 684.04,
       "topCounterpartyShare": 0.7431
     },
     {
@@ -80,7 +80,7 @@
       "outbound": 7,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 2594.46,
+      "hoursSinceActivity": 2596.96,
       "topCounterpartyShare": null
     },
     {
@@ -92,7 +92,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 3042.46,
+      "hoursSinceActivity": 3044.97,
       "topCounterpartyShare": 1
     },
     {
@@ -104,7 +104,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 3042.42,
+      "hoursSinceActivity": 3044.93,
       "topCounterpartyShare": 1
     },
     {
@@ -116,7 +116,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 2766.32,
+      "hoursSinceActivity": 2768.83,
       "topCounterpartyShare": 1
     },
     {
@@ -128,7 +128,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 3042.1,
+      "hoursSinceActivity": 3044.61,
       "topCounterpartyShare": 1
     },
     {
@@ -140,7 +140,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 3042.41,
+      "hoursSinceActivity": 3044.92,
       "topCounterpartyShare": 1
     },
     {
@@ -152,7 +152,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 3042.07,
+      "hoursSinceActivity": 3044.58,
       "topCounterpartyShare": 1
     },
     {
@@ -164,7 +164,7 @@
       "outbound": 18,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 193.83,
+      "hoursSinceActivity": 196.34,
       "topCounterpartyShare": 1
     },
     {
@@ -176,7 +176,7 @@
       "outbound": 2,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 1478.06,
+      "hoursSinceActivity": 1480.57,
       "topCounterpartyShare": 1
     }
   ],
@@ -307,6 +307,13 @@
         "in": 2,
         "out": 0,
         "hours": 681.53
+      },
+      {
+        "t": "2026-09-08T22:10:11.190Z",
+        "state": "slow",
+        "in": 2,
+        "out": 0,
+        "hours": 684.04
       }
     ],
     "GAXQJANVLNXSLGXJZUHRXY2VD62E2JXK2ZFWUQZZNO7I2HESYIWLGRAT": [
@@ -435,6 +442,13 @@
         "in": 0,
         "out": 7,
         "hours": 2594.46
+      },
+      {
+        "t": "2026-09-08T22:10:11.190Z",
+        "state": "dark",
+        "in": 0,
+        "out": 7,
+        "hours": 2596.96
       }
     ],
     "GBVWQZITQY4PPGHJEOHDTKUPV56WQXQBTV2YMMUPYW7KEQI63LETZONE": [
@@ -563,6 +577,13 @@
         "in": 2,
         "out": 0,
         "hours": 3042.46
+      },
+      {
+        "t": "2026-09-08T22:10:11.190Z",
+        "state": "dark",
+        "in": 2,
+        "out": 0,
+        "hours": 3044.97
       }
     ],
     "GAU7MPFCR2VUXNEN474G5OY63EFVBU77F35OJDQ4WGG25XHT3VYWLIQD": [
@@ -691,6 +712,13 @@
         "in": 2,
         "out": 0,
         "hours": 3042.42
+      },
+      {
+        "t": "2026-09-08T22:10:11.190Z",
+        "state": "dark",
+        "in": 2,
+        "out": 0,
+        "hours": 3044.93
       }
     ],
     "GB6WD37NWIIY34A6HNIUVGSA7XXAHG6G6QEWNL54H62Y6SU7ESNGBRDG": [
@@ -819,6 +847,13 @@
         "in": 3,
         "out": 0,
         "hours": 2766.32
+      },
+      {
+        "t": "2026-09-08T22:10:11.190Z",
+        "state": "dark",
+        "in": 3,
+        "out": 0,
+        "hours": 2768.83
       }
     ],
     "GBEKGNPT3DC6HPSWUXSAQRU6GRIGXFQOY2DPK47MQA6MEGAZ755DTEAM": [
@@ -947,6 +982,13 @@
         "in": 2,
         "out": 0,
         "hours": 3042.1
+      },
+      {
+        "t": "2026-09-08T22:10:11.190Z",
+        "state": "dark",
+        "in": 2,
+        "out": 0,
+        "hours": 3044.61
       }
     ],
     "GAB4NHMAVPDCD7MRU7MRD6DV47KLGO24K7WR3VKITLKAPTFIBRRGGRNT": [
@@ -1075,6 +1117,13 @@
         "in": 2,
         "out": 0,
         "hours": 3042.41
+      },
+      {
+        "t": "2026-09-08T22:10:11.190Z",
+        "state": "dark",
+        "in": 2,
+        "out": 0,
+        "hours": 3044.92
       }
     ],
     "GDMXLK6HCJ6TWR7TSBCAR2QDQ5GOMPKRRHLN5SES3CMHEKSHNIRAONBD": [
@@ -1203,6 +1252,13 @@
         "in": 2,
         "out": 0,
         "hours": 3042.07
+      },
+      {
+        "t": "2026-09-08T22:10:11.190Z",
+        "state": "dark",
+        "in": 2,
+        "out": 0,
+        "hours": 3044.58
       }
     ],
     "GDLTEDSHH7EQQYSFLD5RRJVTTGEGGXDHMLWH6A5ATTMCE2AUDSK3FUND": [
@@ -1331,6 +1387,13 @@
         "in": 4,
         "out": 18,
         "hours": 193.83
+      },
+      {
+        "t": "2026-09-08T22:10:11.190Z",
+        "state": "slow",
+        "in": 4,
+        "out": 18,
+        "hours": 196.34
       }
     ],
     "GBSREZLYHRAKQXQM4OESVO7FFT2RGG3EQQRTXEPTRPS56UI3VAXBXMAP": [
@@ -1459,6 +1522,13 @@
         "in": 1,
         "out": 2,
         "hours": 1478.06
+      },
+      {
+        "t": "2026-09-08T22:10:11.190Z",
+        "state": "dark",
+        "in": 1,
+        "out": 2,
+        "hours": 1480.57
       }
     ]
   },
