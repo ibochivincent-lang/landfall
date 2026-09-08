@@ -83,6 +83,20 @@ mainnet, and it must be resolved *before* that, not after.
 The contract already emits `AdminChanged` on every handover, so a takeover is
 publicly visible in the event stream. **Nothing currently watches for it.**
 
+**The contract is immutable, and that is the point.** There is no
+`update_current_contract_wasm` entry point and there will not be one. An admin
+who can replace the bytecode can redefine what `publish` means — a strictly
+larger power than writing a wrong score, and one an outside observer cannot
+detect without diffing Wasm hashes. Upgradeability would hand back exactly the
+property a tamper-resistant record exists to provide.
+
+The cost of that choice is real and worth stating: a bug in the deployed
+contract cannot be patched in place. `storage_version()` exists so the
+alternative is orderly — a new schema means a **new deployment at a new
+address**, and consumers move to it deliberately rather than waking up to
+different semantics at the same one. A consumer can read the version and
+refuse to decode what it does not understand.
+
 ### 2. The scan pipeline's integrity
 
 Published JSON is written by an hourly GitHub Actions run. If that workflow

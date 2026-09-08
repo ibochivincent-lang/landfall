@@ -95,6 +95,11 @@ pub struct PublisherChanged {
 #[derive(Clone)]
 pub enum DataKey {
     Admin,
+    /// Schema version of this contract's stored data. Unset means version 1 —
+    /// what a contract deployed before this key existed reads as. See
+    /// `storage_version` for why this exists in a contract that cannot be
+    /// upgraded.
+    StorageVersion,
     /// The address allowed to write scores and digests, but NOT to change
     /// either role. Unset means "same as Admin", which is what a contract
     /// deployed before this key existed reads as — see `require_publisher`.
@@ -151,6 +156,14 @@ pub enum Error {
     TooManyAccounts = 5,
 }
 
+/// Schema version of the stored data.
+///
+/// Bumped when the *shape* of anything in storage changes — a new field on
+/// `Score`, a repurposed `DataKey` — never for a behaviour change that leaves
+/// storage alone. A consumer reads it to know whether it understands what it
+/// is decoding, instead of discovering a mismatch as a malformed value.
+const STORAGE_VERSION: u32 = 1;
+
 /// Bounded so a single publication cannot exceed the resource limits and
 /// strand the oracle mid-update.
 const MAX_BATCH: u32 = 100;
@@ -172,6 +185,7 @@ impl LandfallOracle {
             panic_with_error!(&env, Error::AlreadyInitialised);
         }
         env.storage().instance().set(&DataKey::Admin, &admin);
+        env.storage().instance().set(&DataKey::StorageVersion, &STORAGE_VERSION);
         env.storage().instance().set(&DataKey::Epoch, &0u64);
         env.storage()
             .instance()
@@ -347,6 +361,31 @@ impl LandfallOracle {
             .get(&DataKey::Publisher)
             .or_else(|| env.storage().instance().get(&DataKey::Admin))
             .unwrap_or_else(|| panic_with_error!(&env, Error::NotInitialised))
+    }
+
+    /// Schema version of the stored data.
+    ///
+    /// **This contract has no upgrade path, deliberately.** There is no
+    /// `update_current_contract_wasm` here and there is not going to be one.
+    /// An admin who can replace the bytecode can redefine what `publish`
+    /// means — a strictly larger power than writing a wrong score, and
+    /// undetectable from the outside without diffing Wasm hashes. For a
+    /// contract whose entire purpose is being a tamper-resistant reputation
+    /// record, upgradeability would hand back the property it exists to
+    /// provide. See docs/TRUST.md.
+    ///
+    /// So this version is not a migration marker. It is a compatibility
+    /// declaration: a new schema means a **new deployment at a new address**,
+    /// and consumers move to it deliberately rather than waking up to
+    /// different semantics at the same address. Reading it lets a consumer
+    /// refuse to decode a version it does not understand.
+    ///
+    /// Returns 1 for a contract deployed before this key existed.
+    pub fn storage_version(env: Env) -> u32 {
+        env.storage()
+            .instance()
+            .get(&DataKey::StorageVersion)
+            .unwrap_or(1)
     }
 
     /// Hand the oracle to a new admin. Emits so the change is publicly visible

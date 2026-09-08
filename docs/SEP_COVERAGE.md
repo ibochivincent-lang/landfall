@@ -57,7 +57,7 @@ reported as exactly that, not silently dropped and not treated as absent.
 | Primitive | Use |
 |---|---|
 | **Horizon** | The only ingestion path today: `/accounts/:id/payments`, paged with resumable cursors |
-| **Soroban** | The on-chain oracle — publishes a digest per scan plus a liveness state per account, so a contract routes on the same data a wallet reads. Deployed to testnet; not on mainnet |
+| **Soroban** | The on-chain oracle — publishes a digest per scan plus a liveness state per account, so a contract routes on the same data a wallet reads. Deployed to testnet; not on mainnet. **Immutable by design** — no upgrade entry point, and `storage_version()` declares the schema so a new version means a new address rather than changed semantics at the old one |
 | **Account thresholds & signers** | Both SEP-10 login and the oracle's authority model check the account's **medium** threshold — the same bar Soroban's built-in account contract applies to `require_auth()`, so an account that is multisig for contract calls is multisig for logging in too |
 | **Ed25519 signatures** | Fraud-report disputes are gated on a signature from the reported address. A dispute proves control of an account; it never asks for a key |
 | **Stroops (BigInt)** | All money arithmetic. `toStroops`/`fromStroops` are the only conversion path, so no aggregate volume figure can drift through float rounding |

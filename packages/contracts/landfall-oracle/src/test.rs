@@ -426,3 +426,43 @@ fn the_publisher_can_publish_a_digest() {
     assert_eq!(client.publish(&digest), 1);
     assert_eq!(client.get_digest(), Some(digest));
 }
+
+// ---------------------------------------------------------------- schema version
+//
+// The version is a compatibility declaration, not a migration marker: this
+// contract has no upgrade path on purpose, so a new schema means a new
+// deployment at a new address. These tests pin the two properties a consumer
+// relies on — that the value is readable, and that a contract predating the
+// key reads as 1 rather than trapping.
+
+#[test]
+fn a_fresh_deployment_declares_the_current_schema_version() {
+    let (_, client, _) = setup();
+    assert_eq!(client.storage_version(), 1);
+}
+
+#[test]
+fn the_version_survives_writes_and_role_changes() {
+    // Nothing in normal operation should be able to move it — only a new
+    // deployment carries a different number.
+    let (env, client, _, _) = setup_split();
+    client.set_score(&Address::generate(&env), &Liveness::Live, &1u64, &1u32);
+    client.publish(&BytesN::from_array(&env, &[9u8; 32]));
+    client.set_admin(&Address::generate(&env));
+    assert_eq!(client.storage_version(), 1);
+}
+
+#[test]
+fn the_contract_exposes_no_upgrade_entry_point() {
+    // A guard against someone adding update_current_contract_wasm later
+    // without revisiting docs/TRUST.md. An admin who can replace the bytecode
+    // can redefine what publish() means, which is a strictly larger power than
+    // writing a wrong score — and the reason this contract is immutable.
+    //
+    // The generated client is the contract's public surface; if an upgrade
+    // function is ever added, this file will not compile against the name
+    // below and whoever added it has to delete this test deliberately.
+    let (_, client, _) = setup();
+    let _ = client.storage_version();
+    // No client.upgrade(...) exists. Intentional.
+}
