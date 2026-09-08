@@ -5,47 +5,49 @@ split is not cosmetic: it follows the trust boundary. Each plane makes a
 strictly weaker claim than the one below it, and the boundary between planes
 is where "anyone can recompute this" turns into "you are trusting a key."
 
+```mermaid
+flowchart TB
+    subgraph P1["① OBSERVATION — what happened (permissionless, recomputable)"]
+        SEP1["SEP-1 discovery<br/>home domain → accounts"] --> IDX
+        HOR["Stellar ledger · Horizon"] --> IDX["indexer<br/>resumable cursors · BigInt stroops"]
+        IDX --> HIST[("scan-history.ndjson<br/>every observation, committed")]
+    end
+
+    subgraph P2["② DERIVATION — what it means (pure functions over Plane 1)"]
+        PG[("Postgres")]
+        PURE["trust-check · intents · adapters<br/>investigator · stp · anchoring"]
+        ORC["Soroban oracle<br/>digest + liveness"]
+        PG --> PURE
+        PG --> ORC
+    end
+
+    subgraph P3["③ CONSUMPTION — who reads it (holds no keys, moves no money)"]
+        SURF["REST · GraphQL · Web app<br/>@landfall/sdk · MCP (11 tools) · x402 check"]
+    end
+
+    EXT["Third-party consumers<br/>wallets · contracts · agents"]
+
+    IDX ==>|"persist"| PG
+    PURE ==> SURF
+    SURF ==> EXT
+    ORC -.->|"digest, read permissionlessly"| EXT
+
+    classDef p1 fill:#e8f5e9,stroke:#2e7d32,color:#1b5e20
+    classDef p2 fill:#fff8e1,stroke:#ef6c00,color:#e65100
+    classDef p3 fill:#e3f2fd,stroke:#1565c0,color:#0d47a1
+    classDef ext fill:#f3e5f5,stroke:#6a1b9a,color:#4a148c
+    class SEP1,HOR,IDX,HIST p1
+    class PG,PURE,ORC p2
+    class SURF p3
+    class EXT ext
 ```
-┌──────────────────────────────────────────────────────────────────────────┐
-│  PLANE 3 · CONSUMPTION            who reads the record                   │
-│                                                                          │
-│   REST + GraphQL API      SDK (@landfall/sdk)      MCP server (11 tools) │
-│   /trust-check.html       x402 payee check         webhooks              │
-│   /dashboard, /compare    badges (SVG)             portal (API keys)     │
-│                                                                          │
-│   Holds no keys. Moves no money. Every response carries asOf/staleHours  │
-│   so a stale answer is visible rather than silently served as current.   │
-└───────────────────────────────▲──────────────────────────────────────────┘
-                                │  read-only queries
-┌───────────────────────────────┴──────────────────────────────────────────┐
-│  PLANE 2 · DERIVATION             what the observations mean             │
-│                                                                          │
-│   trust-check    scoring, flags, confidence      ─┐                      │
-│   intents        route solving + plan actors      │  pure functions:     │
-│   adapters       per-chain evidence tiers         │  same input always   │
-│   stp            canonical form + Ed25519 sign    │  gives same output,  │
-│   anchoring      Merkle inclusion proofs          │  no I/O inside       │
-│   investigator   cited facts (+ optional AI)     ─┘                      │
-│                                                                          │
-│   Postgres  ·  Soroban oracle (digest + liveness, testnet)               │
-│                                                                          │
-│   ═══ TRUST BOUNDARY ════════════════════════════════════════════════    │
-│   Everything above this line is recomputable by a stranger from Plane 1. │
-│   The oracle is the one component you must trust a key for — see         │
-│   docs/TRUST.md. Its write key is deliberately NOT its admin key.        │
-└───────────────────────────────▲──────────────────────────────────────────┘
-                                │  persisted observations
-┌───────────────────────────────┴──────────────────────────────────────────┐
-│  PLANE 1 · OBSERVATION            what actually happened                 │
-│                                                                          │
-│   Stellar public ledger (Horizon)   ·   SEP-1 discovery                  │
-│   indexer: cursor-resumable paging, BigInt stroop arithmetic             │
-│   data/scan-history.ndjson: every observation ever taken, committed      │
-│                                                                          │
-│   Permissionless. No anchor grants access; none can withhold it.         │
-│   Nothing here is Landfall's opinion — it is the ledger's record.        │
-└──────────────────────────────────────────────────────────────────────────┘
-```
+
+**The trust boundary sits between Plane 1 and Plane 2.** Everything in Plane 1
+is the ledger's record, not Landfall's opinion, and a stranger can re-derive
+all of it from Horizon without asking permission. The Soroban oracle in
+Plane 2 is the one component whose output you must trust a key for — which is
+why its write key is deliberately *not* its admin key. See
+[TRUST.md](TRUST.md).
 
 **Why the planes are ordered this way.** Plane 1 is the only source of
 authority. Plane 2 may *derive* but never *invent* — the reason evidence
@@ -116,20 +118,120 @@ that asks you to trust it has missed what an oracle is for.
 
 ---
 
-## Data flow
+## Lifecycle
 
+One full turn of the system, from a cron tick to a third party acting on the
+result. Steps 1–8 run hourly today; step 9 is gated on a publisher key being
+installed (see [TRUST.md](TRUST.md)).
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant CRON as Hourly cron<br/>(GitHub Actions)
+    participant IDX as Indexer
+    participant HOR as Horizon<br/>(mainnet)
+    participant PG as Postgres
+    participant REPO as Repository<br/>scan-history.ndjson
+    participant ORC as Soroban oracle
+    participant C as Consumer<br/>wallet · agent · contract
+
+    CRON->>IDX: start scan
+    IDX->>HOR: GET home_domain/.well-known/stellar.toml
+    HOR-->>IDX: declared accounts (SEP-1)
+    IDX->>HOR: GET /accounts/{id}/payments (resumable cursor)
+    HOR-->>IDX: settlement legs (SEP-24 and classic)
+    IDX->>IDX: classify liveness, sum volume<br/>BigInt stroops, never floats
+    IDX->>PG: persist scan + per-account metrics
+    IDX->>REPO: append observations, commit
+    opt publisher key configured
+        IDX->>ORC: publish(digest) signed by PUBLISHER<br/>(cannot call set_admin)
+        ORC-->>C: event: Published{epoch, digest}
+    end
+    C->>PG: read via API / SDK / MCP
+    PG-->>C: record + asOf / staleHours
+    C->>ORC: read digest
+    C->>C: re-derive digest from published data<br/>and check the two agree
 ```
-Stellar ledger
-      │
-      │  (a) Horizon /payments — paged, resumable cursors
-      │  (b) CAP-67 unified events — transfer / mint / burn / clawback
-      ▼
-  indexer ──────────► postgres ──────────► api ──────────► web / wallets
-      │                                                       agents
-      │  publishes a digest + liveness per account
-      ▼
-  soroban oracle ────► other contracts route on-chain
+
+**Step 8 is the one that makes this checkable.** The consumer does not have to
+trust the API's answer: it re-derives the digest from the published dataset
+and compares. An oracle you cannot audit is just a database with extra steps.
+
+---
+
+## Authentication — SEP-10
+
+Landfall's portal authenticates anchor operators by **proving control of a
+Stellar account**, not by storing a password. The implementation is
+`api/_lib/sep10.js`; the route is `GET|POST /api/v1/auth`.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant W as Wallet<br/>(Freighter, Lab, cold signer)
+    participant L as Landfall<br/>/api/v1/auth
+    participant H as Horizon
+
+    W->>L: GET /api/v1/auth?account=G...
+    L->>L: build challenge transaction<br/>sequence 0 · source = server account<br/>ManageData: home_domain + web_auth_domain<br/>15-minute time bounds · 48-byte nonce
+    L-->>W: unsigned challenge (XDR)
+    Note over L: Sequence 0 is deliberate — an account<br/>can never have it, so the challenge is<br/>unsubmittable. A challenge that could be<br/>submitted is a blank cheque.
+    W->>W: sign with the account's key
+    W->>L: POST /api/v1/auth { transaction }
+    L->>L: verify sequence 0, server is source,<br/>time bounds live, home domain matches
+    L->>H: GET /accounts/{id} — signers + thresholds
+    H-->>L: signer set, medium threshold
+    L->>L: signature weight ≥ MEDIUM threshold?
+    alt weight sufficient
+        L-->>W: JWT
+    else insufficient or expired
+        L-->>W: rejected, with the reason
+    end
 ```
+
+**Why the medium threshold.** It is the same bar Soroban's built-in account
+contract applies to `require_auth()`, so an account that is multisig for
+contract calls is multisig for logging in here too — no second, weaker door.
+
+The dispute path (`packages/fraud-reports/src/dispute.ts`) uses the same
+principle: a reported party proves control of the reported address by
+signature. Neither path ever asks for a secret key.
+
+---
+
+## Checking a payee before an agent pays — x402
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant A as Agent
+    participant R as Paid resource
+    participant L as Landfall<br/>/api/v1/x402/check-payee
+    participant H as Horizon
+
+    A->>R: GET /resource
+    R-->>A: 402 + PAYMENT-REQUIRED<br/>(base64 PaymentRequired)
+    A->>A: decode accepts[]
+    A->>L: POST accepts[]
+    loop each payment option
+        alt network is stellar:pubnet/testnet AND payTo is G...
+            L->>H: fetch payment history for payTo
+            H-->>L: observed settlement
+            L->>L: Trust Check: age, concentration, forwarding
+        else other chain, or a C.../M... address
+            L->>L: supported:false + stated reason<br/>never silently dropped
+        end
+    end
+    L-->>A: one assessment per option, input order
+    A->>A: apply spending policy<br/>unverifiable ⇒ refuse, not "assume safe"
+    A->>R: retry with PAYMENT-SIGNATURE<br/>signed by the agent's own wallet
+
+    Note over L: Landfall never signs, never settles,<br/>and holds no keys. It answers who has<br/>settled before — the agent does the paying.
+```
+
+---
+
+## Data flow
 
 ### Why CAP-67 changes this
 

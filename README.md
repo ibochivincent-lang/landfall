@@ -91,7 +91,7 @@ But the question is now the ecosystem's, not just ours.
 
 | Capability | Status | Description |
 |---|---|---|
-| SEP-1 discovery | ✅ **shipping** | Permissionless domain $\rightarrow$ declared issuer/distribution accounts |
+| SEP-1 discovery | ✅ **shipping** | Permissionless domain → declared issuer/distribution accounts |
 | Horizon indexing & incremental sync | ✅ **shipping** | Scheduled scan with fast `order=asc` cursor pagination (sub-minute runtime) |
 | Liveness, volume, concentration, returns | ✅ **shipping** | Deterministic settlement metrics without requesting data from anchors |
 | **Path payments (cross-asset flows)** | ✅ **shipping** | Extracts source & delivered asset pairs (`USD ➔ NGN`, `EUR ➔ BRL`) |
@@ -271,7 +271,8 @@ Copy `.env.example` to `.env` and adjust. Nothing in the example file is a secre
 
 | Document | What it covers |
 |---|---|
-| [docs/architecture.md](docs/architecture.md) | Package layout, the request/scan flow, and where each piece runs. |
+| [docs/architecture.md](docs/architecture.md) | The three-plane architecture, the scan lifecycle, SEP-10 auth and the x402 payee check — as rendered diagrams. |
+| [docs/PROPOSAL.md](docs/PROPOSAL.md) | Funding proposal: the problem, what has shipped, what is deliberately not built, and the roadmap. |
 | [docs/architecture/MULTICHAIN.md](docs/architecture/MULTICHAIN.md) | The cross-chain design: the STP attestation schema, the `ChainAdapter` interface, and the evidence-tier ladder that keeps a custodial guess from reading as ledger truth. |
 | [docs/methodology.md](docs/methodology.md) | Exactly how each published metric is computed, and where the method is weak. |
 | [docs/TRUST.md](docs/TRUST.md) | What you have to trust to rely on this, stated plainly — including the one place you must trust a key rather than check a computation, and why the oracle is not on mainnet yet. |
