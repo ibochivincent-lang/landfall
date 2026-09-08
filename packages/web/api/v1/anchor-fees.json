@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-08T07:36:21.578Z",
+  "generatedAt": "2026-09-08T12:28:33.104Z",
   "source": "each anchor's own SEP-24 /info endpoint, reached via its stellar.toml",
   "note": "Withdrawal terms as the operator publishes them, not as we estimate them. `pricing` is \"published\" when the anchor states fee_fixed/fee_percent, \"dynamic\" when it says fees exist but are quoted per transaction, and the anchor is omitted entirely when /info could not be reached — which is not the same as free, and not the same as declining to say.",
   "caveat": "These are the fees the anchor advertises. The binding number is the one quoted inside its own withdrawal flow, which may differ; nothing here is a quote.",
@@ -14,7 +14,7 @@
       "domain": "anclap.com",
       "status": "ok",
       "endpoint": "https://api.anclap.com/transfer24",
-      "fetchedAt": "2026-09-08T07:36:09.713Z",
+      "fetchedAt": "2026-09-08T12:28:21.149Z",
       "withdraw": {
         "ARS": {
           "enabled": true,
@@ -39,7 +39,7 @@
       "domain": "clpx.finance",
       "status": "ok",
       "endpoint": "https://kbtrading.org/sep24",
-      "fetchedAt": "2026-09-08T07:36:11.207Z",
+      "fetchedAt": "2026-09-08T12:28:22.729Z",
       "withdraw": {
         "CLPX": {
           "enabled": false
@@ -59,7 +59,7 @@
       "domain": "finclusive.com",
       "status": "ok",
       "endpoint": "https://api.finclusive.com/stellar/transfer",
-      "fetchedAt": "2026-09-08T07:36:10.264Z",
+      "fetchedAt": "2026-09-08T12:28:21.943Z",
       "withdraw": {
         "XLM": {
           "enabled": true,
@@ -82,7 +82,7 @@
       "domain": "ntokens.com",
       "status": "ok",
       "endpoint": "https://ntokens-box.bpventures.us/sep24",
-      "fetchedAt": "2026-09-08T07:36:10.560Z",
+      "fetchedAt": "2026-09-08T12:28:22.229Z",
       "withdraw": {
         "BRL": {
           "enabled": true,
@@ -99,7 +99,7 @@
       "domain": "stellar.moneygram.com",
       "status": "ok",
       "endpoint": "https://stellar.moneygram.com/stellaradapterservice/sep24",
-      "fetchedAt": "2026-09-08T07:36:09.705Z",
+      "fetchedAt": "2026-09-08T12:28:21.095Z",
       "withdraw": {
         "USDC": {
           "enabled": true,
@@ -116,18 +116,12 @@
       "domain": "ultracapital.xyz",
       "status": "ok",
       "endpoint": "https://ultracapital.xyz/sep24",
-      "fetchedAt": "2026-09-08T07:36:11.992Z",
+      "fetchedAt": "2026-09-08T12:28:24.085Z",
       "withdraw": {
-        "BTC": {
-          "enabled": false
-        },
-        "yUSDC": {
+        "yBTC": {
           "enabled": false
         },
         "yXLM": {
-          "enabled": false
-        },
-        "yBTC": {
           "enabled": false
         },
         "ETH": {
@@ -140,6 +134,12 @@
           "feePercent": 0,
           "minAmount": 0.005,
           "maxAmount": 20
+        },
+        "BTC": {
+          "enabled": false
+        },
+        "yUSDC": {
+          "enabled": false
         }
       },
       "pricing": "published"
@@ -148,7 +148,7 @@
       "domain": "zeam.money",
       "status": "ok",
       "endpoint": "https://anchor.zeam.money/sep24",
-      "fetchedAt": "2026-09-08T07:36:11.903Z",
+      "fetchedAt": "2026-09-08T12:28:23.948Z",
       "withdraw": {
         "USDC": {
           "enabled": true,

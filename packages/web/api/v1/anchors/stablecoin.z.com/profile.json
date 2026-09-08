@@ -1,10 +1,10 @@
 {
   "anchorId": "stablecoin.z.com",
   "name": "GMO-Z.com Trust Company, Inc.",
-  "asOf": "2026-09-08T07:32:43.098Z",
+  "asOf": "2026-09-08T12:23:20.818Z",
   "verification": {
     "resolved": true,
-    "checkedAt": "2026-09-08T07:32:43.098Z",
+    "checkedAt": "2026-09-08T12:23:20.818Z",
     "source": "SEP-1 stellar.toml, resolved live; issuer attribution confirmed against each issuer account's own on-chain home_domain",
     "accounts": [
       {
@@ -32,7 +32,7 @@
       "outbound": 1,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 132.9,
+      "hoursSinceActivity": 137.74,
       "topCounterpartyShare": 0.883
     }
   ],
@@ -128,6 +128,13 @@
         "in": 15,
         "out": 1,
         "hours": 132.9
+      },
+      {
+        "t": "2026-09-08T12:23:20.818Z",
+        "state": "slow",
+        "in": 15,
+        "out": 1,
+        "hours": 137.74
       }
     ]
   },
