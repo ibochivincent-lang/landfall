@@ -10,7 +10,11 @@
  * error severity, which stops the workflow before scan-to-api.mjs overwrites
  * anything.
  *
- * Manual run:  npx tsx scripts/verify-scan.ts
+ * Manual run:  npx tsx scripts/verify-scan.ts            (checks only)
+ * In CI:       npx tsx scripts/verify-scan.ts --publish  (also writes the artifact)
+ *
+ * The artifact is served publicly, so writing it is opt-in — see the comment
+ * above the write.
  *
  * Exit codes are distinct so a workflow can tell the cases apart, because
  * they call for different responses. A blocked scan (2) means the pipeline
@@ -135,6 +139,26 @@ async function main(): Promise<void> {
      Blocked runs matter most here. The scan output stays on disk and the site
      keeps the previous figures, so without this artifact the only public
      evidence that anything happened is an hour of unchanged numbers.        */
+  /* Writing is opt-in, because this file is *served* at
+     /api/v1/scan-verification.json — it is a public claim about what
+     production verified, not a local scratch output. A developer running
+     this in a working tree, typically without DATABASE_URL and against
+     whatever scan happens to be newest on disk, would otherwise publish a
+     blocked result asserting something untrue about production. That
+     happened once; hence the flag. CI passes --publish; nothing else should. */
+  const publishArtifact = process.argv.includes("--publish");
+
+  if (!publishArtifact) {
+    console.log(
+      `
+Skipping the audit artifact — pass --publish to write ${VERIFICATION_FILE}.
+` +
+        "A local run's findings say nothing about production and must not be served as if they did.",
+    );
+    if (blocked) process.exit(EXIT_BLOCKED);
+    return;
+  }
+
   await writeFile(
     VERIFICATION_FILE,
     JSON.stringify(

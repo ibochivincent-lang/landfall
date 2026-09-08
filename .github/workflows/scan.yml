@@ -103,7 +103,7 @@ jobs:
         continue-on-error: true
         run: |
           set +e
-          npx tsx scripts/verify-scan.ts
+          npx tsx scripts/verify-scan.ts --publish
           code=$?
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
           exit $code
