@@ -78,6 +78,13 @@ code into published output.
 
 ## What does not count
 
+**A demand to remove an accurate published finding is not a security
+report.** That has its own route and its own answer — see
+[docs/TAKEDOWN.md](docs/TAKEDOWN.md). A claim that a *figure is wrong*
+is welcome, but it is a correction rather than a vulnerability unless
+the mechanism lets a third party influence what gets published.
+
+
 - Rate limiting from Horizon. That is expected; the indexer backs off.
 - Findings you disagree with. Those are data disputes — open a normal issue with
   the account, the scan timestamp, and the transaction hashes from the JSON

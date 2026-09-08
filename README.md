@@ -294,6 +294,7 @@ Copy `.env.example` to `.env` and adjust. Nothing in the example file is a secre
 | [docs/BENCHMARKS.md](docs/BENCHMARKS.md) | Measured latency, test and cadence figures, with the method and what is not measured. |
 | [docs/CONTRIBUTOR_LADDER.md](docs/CONTRIBUTOR_LADDER.md) | Contributor → Triager → Reviewer → Maintainer, and what each rung grants. |
 | [docs/NON_CUSTODY.md](docs/NON_CUSTODY.md) | The constraint the rest of the design bends around, and where it is enforced rather than asserted. |
+| [docs/TAKEDOWN.md](docs/TAKEDOWN.md) | What happens when someone demands a finding be removed — corrections are welcome, accurate findings are not withdrawn on request. |
 | [docs/JURISDICTIONAL.md](docs/JURISDICTIONAL.md) | Regulatory and defamation posture for publishing findings about named businesses. |
 | [docs/GOVERNANCE.md](docs/GOVERNANCE.md) | Who decides what, key authority, and what changes if a second person joins. |
 | [docs/VERSIONING.md](docs/VERSIONING.md) | What is versioned, what breaks, and what will not break without warning. |

@@ -146,11 +146,14 @@ Stated because a legal page listing only comfortable conclusions is not one.
   contract.
 - **No legal review has been obtained.** Nothing here has been checked by a
   qualified lawyer in any jurisdiction.
-- **No policy for a takedown demand.** The code of conduct covers tone and
-  DISPUTES.md covers factual correction, but there is no written process for
-  what happens if a company's counsel demands removal of an accurate finding.
-  **This is the most likely legal event to actually occur**, and the project
-  has no rehearsed answer.
+- ~~**No policy for a takedown demand.**~~ Written:
+  [TAKEDOWN.md](TAKEDOWN.md). It separates a correction (the figure is wrong —
+  treated as a bug, always welcome) from a takedown (the figure is right and
+  someone would rather it were not visible — declined, with reasons), states
+  that a court order with jurisdiction would be complied with, and commits to
+  recording *that* a compelled removal happened even where the content cannot
+  be restated. **Untested** — no takedown has ever been received, which is
+  exactly why it was written in advance.
 - **Account attribution is unverified.** A TOML declares accounts; nothing
   proves the domain operates them. A wrong attribution means a finding about
   the wrong business — the one error that happens *before* the arithmetic and

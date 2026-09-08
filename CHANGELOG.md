@@ -24,7 +24,28 @@ Only the latest `main` is supported. Fixes are not backported; see
 
 ## [Unreleased]
 
-Nothing yet.
+### Added
+
+- **`refund.spike` has a producer.** Subscribable since the developer portal
+  shipped with nothing emitting it; migration 010 kept the value rather than
+  dropping a subscription someone had chosen, and it is now honoured instead
+  of retired. Gated on at least 25 inbound payments before a rate is
+  considered at all — derived from the record, where an ungated rule fires
+  twice on an account whose "16.7% return rate" is one return out of six
+  payments. Payload carries `inboundCount` so the sample travels with the
+  percentage.
+- **[`docs/TAKEDOWN.md`](docs/TAKEDOWN.md)** — what happens when someone
+  demands a finding be removed. Separates a correction (always welcome,
+  treated as a bug) from a takedown (declined, with reasons), commits to
+  complying with a court order from a jurisdiction that has one, and to
+  recording *that* a compelled removal happened even where the content cannot
+  be restated. `JURISDICTIONAL.md` had listed this as the most likely legal
+  event with no rehearsed answer.
+
+### Fixed
+
+- `VERSIONING.md` described `refund.spike` in the present tense as an
+  obsolete-but-retained value, and still said no tag had been cut.
 
 ---
 
