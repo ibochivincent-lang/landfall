@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-08T12:29:02.900Z",
+  "generatedAt": "2026-09-08T17:00:35.877Z",
   "note": "Changes to each anchor's SEP-1 declaration over time. A stellar.toml is mutable and unsigned: an anchor can rotate declared accounts, repoint a transfer server, or change the issuer behind a currency code at any time, and wallets follow by design. Nothing else records that it changed.",
   "limits": "A diff cannot tell a legitimate rotation from a hostile one, and this file never claims to. It records what changed and what the ledger says about the new values. Severity reflects what a change could cost a user who follows it, not a judgement about the operator. An unreachable domain keeps its previous snapshot rather than being recorded as having withdrawn everything.",
   "watchedDomains": 30,
@@ -181,7 +181,7 @@
         },
         "orgName": "Afreum DAO"
       },
-      "lastCheckedAt": "2026-09-08T12:28:51.200Z"
+      "lastCheckedAt": "2026-09-08T17:00:24.287Z"
     },
     "anclap.com": {
       "fingerprint": {
@@ -203,7 +203,7 @@
         },
         "orgName": "Grupo Anchor S.A."
       },
-      "lastCheckedAt": "2026-09-08T12:28:50.898Z"
+      "lastCheckedAt": "2026-09-08T17:00:23.875Z"
     },
     "app.phoenix-hub.io": {
       "fingerprint": {
@@ -217,7 +217,7 @@
         },
         "orgName": "Phoenix Protocol Group"
       },
-      "lastCheckedAt": "2026-09-08T12:28:51.294Z"
+      "lastCheckedAt": "2026-09-08T17:00:24.275Z"
     },
     "aps.money": {
       "fingerprint": {
@@ -244,7 +244,7 @@
         },
         "orgName": "Advanced Payment Solutions Ltd."
       },
-      "lastCheckedAt": "2026-09-08T12:28:51.216Z"
+      "lastCheckedAt": "2026-09-08T17:00:24.206Z"
     },
     "aqua.network": {
       "fingerprint": {
@@ -262,7 +262,7 @@
         },
         "orgName": "Aquarius"
       },
-      "lastCheckedAt": "2026-09-08T12:28:51.354Z"
+      "lastCheckedAt": "2026-09-08T17:00:24.278Z"
     },
     "audd.digital": {
       "fingerprint": {
@@ -277,7 +277,7 @@
         },
         "orgName": "AUDC PTY LTD"
       },
-      "lastCheckedAt": "2026-09-08T12:28:52.960Z"
+      "lastCheckedAt": "2026-09-08T17:00:26.032Z"
     },
     "bitbondsto.com": {
       "fingerprint": {
@@ -292,7 +292,7 @@
         },
         "orgName": "Bitbond Finance GmbH"
       },
-      "lastCheckedAt": "2026-09-08T12:28:51.898Z"
+      "lastCheckedAt": "2026-09-08T17:00:24.538Z"
     },
     "centre.io": {
       "fingerprint": {
@@ -307,7 +307,7 @@
         },
         "orgName": "Centre Consortium LLC"
       },
-      "lastCheckedAt": "2026-09-08T12:28:51.558Z"
+      "lastCheckedAt": "2026-09-08T17:00:24.364Z"
     },
     "clpx.finance": {
       "fingerprint": {
@@ -327,7 +327,7 @@
         },
         "orgName": "CLPX S.A."
       },
-      "lastCheckedAt": "2026-09-08T12:28:51.834Z"
+      "lastCheckedAt": "2026-09-08T17:00:24.468Z"
     },
     "cowrie.exchange": {
       "fingerprint": {
@@ -349,7 +349,7 @@
         },
         "orgName": "Cowrie Integrated Systems"
       },
-      "lastCheckedAt": "2026-09-08T12:28:51.086Z"
+      "lastCheckedAt": "2026-09-08T17:00:23.878Z"
     },
     "dcm.systems": {
       "fingerprint": {
@@ -364,7 +364,7 @@
         },
         "orgName": "Transparent Network"
       },
-      "lastCheckedAt": "2026-09-08T12:28:52.925Z"
+      "lastCheckedAt": "2026-09-08T17:00:25.633Z"
     },
     "finclusive.com": {
       "fingerprint": {
@@ -383,7 +383,7 @@
         },
         "orgName": "FinClusive Capital, Inc."
       },
-      "lastCheckedAt": "2026-09-08T12:28:51.148Z"
+      "lastCheckedAt": "2026-09-08T17:00:24.092Z"
     },
     "funtracker.site": {
       "fingerprint": {
@@ -401,7 +401,7 @@
         },
         "orgName": null
       },
-      "lastCheckedAt": "2026-09-08T12:28:51.924Z"
+      "lastCheckedAt": "2026-09-08T17:00:24.849Z"
     },
     "gratz.io": {
       "fingerprint": {
@@ -424,7 +424,7 @@
         },
         "orgName": "Gratz"
       },
-      "lastCheckedAt": "2026-09-08T12:28:51.612Z"
+      "lastCheckedAt": "2026-09-08T17:00:24.578Z"
     },
     "ixinium.io": {
       "fingerprint": {
@@ -448,7 +448,7 @@
         },
         "orgName": "Baltic Representative Office"
       },
-      "lastCheckedAt": "2026-09-08T12:28:52.065Z"
+      "lastCheckedAt": "2026-09-08T17:00:24.921Z"
     },
     "luxpayband.io": {
       "fingerprint": {
@@ -470,7 +470,7 @@
         },
         "orgName": "LUX Payband, LLC"
       },
-      "lastCheckedAt": "2026-09-08T12:28:51.918Z"
+      "lastCheckedAt": "2026-09-08T17:00:24.629Z"
     },
     "mgusd.moneygram.com": {
       "fingerprint": {
@@ -486,7 +486,7 @@
         },
         "orgName": "MoneyGram Payment Systems, Inc."
       },
-      "lastCheckedAt": "2026-09-08T12:28:52.090Z"
+      "lastCheckedAt": "2026-09-08T17:00:24.765Z"
     },
     "mobius.network": {
       "fingerprint": {
@@ -501,7 +501,7 @@
         },
         "orgName": "Mochi, Inc."
       },
-      "lastCheckedAt": "2026-09-08T12:28:52.140Z"
+      "lastCheckedAt": "2026-09-08T17:00:24.817Z"
     },
     "mykobo.co": {
       "fingerprint": {
@@ -522,7 +522,7 @@
         },
         "orgName": "MYKOBO"
       },
-      "lastCheckedAt": "2026-09-08T12:28:50.801Z"
+      "lastCheckedAt": "2026-09-08T17:00:23.738Z"
     },
     "nafuloo.com": {
       "fingerprint": {
@@ -540,7 +540,7 @@
         },
         "orgName": "No one person or group owns or controls Nafuloo, and anyone can participate."
       },
-      "lastCheckedAt": "2026-09-08T12:28:52.063Z"
+      "lastCheckedAt": "2026-09-08T17:00:24.845Z"
     },
     "ngnc.online": {
       "fingerprint": {
@@ -560,7 +560,7 @@
         },
         "orgName": "LINK.IO LTD."
       },
-      "lastCheckedAt": "2026-09-08T12:28:52.148Z"
+      "lastCheckedAt": "2026-09-08T17:00:24.994Z"
     },
     "ntokens.com": {
       "fingerprint": {
@@ -581,7 +581,7 @@
         },
         "orgName": "nTokens Serviços Digitais Ltda"
       },
-      "lastCheckedAt": "2026-09-08T12:28:51.060Z"
+      "lastCheckedAt": "2026-09-08T17:00:24.027Z"
     },
     "pr.network": {
       "fingerprint": {
@@ -663,7 +663,7 @@
         },
         "orgName": "PR.network LLC"
       },
-      "lastCheckedAt": "2026-09-08T12:28:52.461Z"
+      "lastCheckedAt": "2026-09-08T17:00:25.585Z"
     },
     "stablecoin.z.com": {
       "fingerprint": {
@@ -685,7 +685,7 @@
         },
         "orgName": "GMO-Z.com Trust Company, Inc."
       },
-      "lastCheckedAt": "2026-09-08T12:28:52.389Z"
+      "lastCheckedAt": "2026-09-08T17:00:25.104Z"
     },
     "stellar.moneygram.com": {
       "fingerprint": {
@@ -700,7 +700,7 @@
         },
         "orgName": "MoneyGram"
       },
-      "lastCheckedAt": "2026-09-08T12:28:50.850Z"
+      "lastCheckedAt": "2026-09-08T17:00:23.742Z"
     },
     "stellarport.io": {
       "fingerprint": {
@@ -723,7 +723,7 @@
         },
         "orgName": "Stellarport"
       },
-      "lastCheckedAt": "2026-09-08T12:28:52.240Z"
+      "lastCheckedAt": "2026-09-08T17:00:24.914Z"
     },
     "ultracapital.xyz": {
       "fingerprint": {
@@ -756,7 +756,7 @@
         },
         "orgName": "Ultra Capital LLC"
       },
-      "lastCheckedAt": "2026-09-08T12:28:52.669Z"
+      "lastCheckedAt": "2026-09-08T17:00:25.830Z"
     },
     "vibrantapp.com": {
       "fingerprint": {
@@ -766,7 +766,7 @@
         "currencies": {},
         "orgName": null
       },
-      "lastCheckedAt": "2026-09-08T12:28:50.965Z"
+      "lastCheckedAt": "2026-09-08T17:00:24.133Z"
     },
     "vnx.io": {
       "fingerprint": {
@@ -783,7 +783,7 @@
         },
         "orgName": "VNX Global Ltd."
       },
-      "lastCheckedAt": "2026-09-08T12:28:52.287Z"
+      "lastCheckedAt": "2026-09-08T17:00:25.013Z"
     },
     "zeam.money": {
       "fingerprint": {
@@ -820,7 +820,7 @@
         },
         "orgName": "ZEAM LIMITED"
       },
-      "lastCheckedAt": "2026-09-08T12:28:52.304Z"
+      "lastCheckedAt": "2026-09-08T17:00:25.059Z"
     }
   }
 }

@@ -1,10 +1,10 @@
 {
   "anchorId": "anclap.com",
   "name": "Grupo Anchor S.A.",
-  "asOf": "2026-09-08T12:23:20.818Z",
+  "asOf": "2026-09-08T16:54:54.852Z",
   "verification": {
     "resolved": true,
-    "checkedAt": "2026-09-08T12:23:20.818Z",
+    "checkedAt": "2026-09-08T16:54:54.852Z",
     "source": "SEP-1 stellar.toml, resolved live; issuer attribution confirmed against each issuer account's own on-chain home_domain",
     "accounts": [
       {
@@ -40,7 +40,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 674.26,
+      "hoursSinceActivity": 678.78,
       "topCounterpartyShare": 0.9401
     },
     {
@@ -52,7 +52,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 2042.34,
+      "hoursSinceActivity": 2046.86,
       "topCounterpartyShare": 0.9999
     },
     {
@@ -64,7 +64,7 @@
       "outbound": 694,
       "returns": 1,
       "returnRate": 0.0008,
-      "hoursSinceActivity": 16.47,
+      "hoursSinceActivity": 20.99,
       "topCounterpartyShare": 0.1007
     }
   ],
@@ -2512,6 +2512,13 @@
         "in": 9,
         "out": 0,
         "hours": 674.26
+      },
+      {
+        "t": "2026-09-08T16:54:54.852Z",
+        "state": "slow",
+        "in": 9,
+        "out": 0,
+        "hours": 678.78
       }
     ],
     "GA4TDPNUCZPTOHB3TKUYMDCRVATXKEADH7ZEYEBWJKQKE2UBFCYNBPEN": [
@@ -4957,6 +4964,13 @@
         "in": 5,
         "out": 0,
         "hours": 2042.34
+      },
+      {
+        "t": "2026-09-08T16:54:54.852Z",
+        "state": "dark",
+        "in": 5,
+        "out": 0,
+        "hours": 2046.86
       }
     ],
     "GARDJZ33FTTLVKGABXDS22SYNTP4VCLYARIEWKMZKYHX3RRLPMNR3HOT": [
@@ -7402,6 +7416,13 @@
         "in": 1276,
         "out": 694,
         "hours": 16.47
+      },
+      {
+        "t": "2026-09-08T16:54:54.852Z",
+        "state": "live",
+        "in": 1276,
+        "out": 694,
+        "hours": 20.99
       }
     ]
   },
