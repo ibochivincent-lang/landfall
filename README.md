@@ -289,6 +289,10 @@ Copy `.env.example` to `.env` and adjust. Nothing in the example file is a secre
 | [docs/KEY_ROTATION.md](docs/KEY_ROTATION.md) | What to do when a key is compromised or due for a change — different blast radius, different procedure, per secret. |
 | [docs/API_REFERENCE.md](docs/API_REFERENCE.md) | Every public endpoint: shapes, rate limits, caching, error semantics, and what is deliberately not offered. |
 | [docs/WEBHOOKS.md](docs/WEBHOOKS.md) | Event types, payload envelope, HMAC verification, retries and dead-letter replay. |
+| [docs/FAQ.md](docs/FAQ.md) | Short answers to the questions the data actually provokes — starting with what `dark` does not mean. |
+| [docs/ORACLE_SPEC.md](docs/ORACLE_SPEC.md) | The Soroban contract's full interface, events, errors and authority model. |
+| [docs/BENCHMARKS.md](docs/BENCHMARKS.md) | Measured latency, test and cadence figures, with the method and what is not measured. |
+| [docs/CONTRIBUTOR_LADDER.md](docs/CONTRIBUTOR_LADDER.md) | Contributor → Triager → Reviewer → Maintainer, and what each rung grants. |
 | [docs/NON_CUSTODY.md](docs/NON_CUSTODY.md) | The constraint the rest of the design bends around, and where it is enforced rather than asserted. |
 | [docs/JURISDICTIONAL.md](docs/JURISDICTIONAL.md) | Regulatory and defamation posture for publishing findings about named businesses. |
 | [docs/GOVERNANCE.md](docs/GOVERNANCE.md) | Who decides what, key authority, and what changes if a second person joins. |
