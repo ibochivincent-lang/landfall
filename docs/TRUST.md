@@ -122,6 +122,9 @@ guessed.
 | `OPENROUTER_API_KEY` | Vercel env | Spend against the model account. Generates narrative text only; cannot alter cited facts | Manual, via OpenRouter |
 | Portal API keys (`lf_live_…`) | Hashed at rest in Postgres | Read-only API access under a rate limit | User-revocable in the portal |
 
+Rotation procedures, which differ per secret because the blast radii differ,
+are in [KEY_ROTATION.md](KEY_ROTATION.md).
+
 **Not hardware-backed. Not rotated on a schedule. No anomaly monitoring.** If
 you are assessing this project for a role where that is unacceptable, it is
 unacceptable today, and saying so here is more useful than discovering it

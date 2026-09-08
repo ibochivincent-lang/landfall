@@ -285,6 +285,8 @@ Copy `.env.example` to `.env` and adjust. Nothing in the example file is a secre
 | Document | What it covers |
 |---|---|
 | [docs/architecture.md](docs/architecture.md) | The three-plane architecture, the scan lifecycle, SEP-10 auth and the x402 payee check — as rendered diagrams. |
+| [CHANGELOG.md](CHANGELOG.md) | Notable changes, Keep a Changelog format. Corrections are listed, not quietly dropped. |
+| [docs/KEY_ROTATION.md](docs/KEY_ROTATION.md) | What to do when a key is compromised or due for a change — different blast radius, different procedure, per secret. |
 | [docs/WHY_NOT.md](docs/WHY_NOT.md) | Why not the anchor's own endpoint, the Anchor Platform, an explorer, Horizon directly, an AML vendor, or an LLM — including where one of those is the better choice. |
 | [docs/SEP_COVERAGE.md](docs/SEP_COVERAGE.md) | Which SEPs and CAPs Landfall uses, for what, and which it deliberately does not implement. |
 | [docs/PROPOSAL.md](docs/PROPOSAL.md) | Funding proposal: the problem, what has shipped, what is deliberately not built, and the roadmap. |

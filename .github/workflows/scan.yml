@@ -95,10 +95,32 @@ jobs:
       #
       # See packages/indexer/src/invariants.ts for what each check asserts and
       # why some findings only warn.
+      # `continue-on-error` alone loses the exit code, so it is captured here
+      # and published as a step output. Without this the classification below
+      # can only ever report "unknown".
       - name: Verify scan invariants
         id: verify
         continue-on-error: true
-        run: npx tsx scripts/verify-scan.ts
+        run: |
+          set +e
+          npx tsx scripts/verify-scan.ts
+          code=$?
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          exit $code
+
+      # The gate's exit code carries which kind of failure this was, and the
+      # two call for different responses. Both still block publishing — that
+      # is the outcome check on the next step — but an operator reading a red
+      # run should not have to open the log to find out whether the data is
+      # wrong or the checker fell over.
+      - name: Say which kind of failure blocked publishing
+        if: steps.verify.outcome == 'failure'
+        run: |
+          case "${{ steps.verify.outputs.exit_code || 'unknown' }}" in
+            2) echo "::error::Scan BLOCKED — an invariant failed at error severity. The pipeline worked; the data is wrong. Read the findings in the audit artifact." ;;
+            3) echo "::error::Verification COULD NOT RUN — unreadable scan or a crash in the gate. The scan is neither verified nor refuted, and is not published either way." ;;
+            *) echo "::error::Verification failed. See the step log for the exit code and findings." ;;
+          esac
 
       # ── 5. Convert scan output → static API JSON ──────────────────────────────
       # This runs regardless of whether --persist succeeded, so the static JSON

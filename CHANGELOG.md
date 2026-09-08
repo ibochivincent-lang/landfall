@@ -1,0 +1,121 @@
+# Changelog
+
+All notable changes to this project are recorded here, in
+[Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format, following
+[Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+**Pre-1.0, minor versions may contain breaking changes.** Pin exact versions
+of [`@landfall/sdk`](https://www.npmjs.com/package/@landfall/sdk).
+
+Two conventions this file is held to, because a changelog nobody trusts is
+worse than none:
+
+- **Every behaviour change updates `Unreleased` in the same commit.** A
+  changelog written from `git log` at release time records what was easy to
+  reconstruct, not what mattered.
+- **Corrections are listed, not quietly dropped.** Where a published claim
+  turned out to be wrong, it appears under **Fixed** naming what was wrong —
+  the same rule [`docs/gaps.md`](docs/gaps.md) follows.
+
+Only the latest `main` is supported. Fixes are not backported; see
+[SECURITY.md](SECURITY.md).
+
+---
+
+## [Unreleased]
+
+Nothing yet. The entries below cover the period before this file existed and
+were reconstructed from the commit history, which is exactly the weaker kind
+of record this file exists to replace going forward.
+
+---
+
+## Before this changelog
+
+The repository's history was rewritten on 5 September 2026 to consolidate
+authorship, so `main` begins there. What follows is grouped by capability
+rather than by release, because no version has been tagged yet — the first
+tag will close this section off.
+
+### Shipped
+
+- **Ledger indexing** — SEP-1 discovery, resumable Horizon cursors, BigInt
+  stroop arithmetic, hourly scans via GitHub Actions.
+- **Trust Check** — ledger-only counterparty signals for any Stellar address:
+  observed history, counterparty concentration, forwarding patterns, a
+  transparent 0–100 score, and a confidence rating that overrides the score
+  when history is too thin.
+- **Fraud Reports** — every report must cite a transaction verified to exist
+  *and* involve the subject before it is stored. Report volume is never
+  scored.
+- **Disputes** — the reported party responds by proving control of the
+  address with an Ed25519 signature, never a password. A signed attestation
+  of that response is available, and it deliberately never covers the
+  accusation.
+- **AI Investigator** — deterministic cited facts computed with no model at
+  all, plus an optional narrative over exactly those facts, labelled with the
+  model that wrote it and `null` when no key is configured.
+- **Intent and Route Engine** — routes ranked with evidence ahead of price;
+  plans where every step names its actor, and `landfall` never appears on one
+  that moves value.
+- **Cross-chain evidence** — Stellar `PROVEN`, EVM/CCTP `ATTESTED`, Tron and
+  Solana `DERIVED`, compared lexicographically and never blended.
+- **Soroban oracle** — dataset digest and per-account liveness, deployed to
+  testnet.
+- **`@landfall/sdk` 0.1.0** — published to npm 7 September 2026, verified
+  against the registry copy rather than the local build.
+- **MCP server** — 11 read-only tools over stdio.
+- **x402 payee check** — Trust Check for every Stellar payee named in a real
+  402 response, before an agent signs.
+- **SEP-10 web authentication** — anchor operators prove control of an
+  account instead of registering a password.
+
+### Security
+
+- **Oracle write authority split from admin authority.** `publish`,
+  `set_score` and `set_scores` now gate on a **publisher** address, while
+  `set_admin` and `set_publisher` gate on the **admin**. The hourly key held
+  by CI can write scores but cannot take the contract. This could not be
+  fixed with Stellar account multisig alone: Soroban's built-in account
+  contract always checks the *medium* threshold, so one address cannot have a
+  lower bar for writing a score than for handing over the contract — making
+  the admin 2-of-N would have stopped the hourly publish instead.
+- **Contract tests raised from 16 to 25**, nine of them covering that split.
+  They use `mock_auths` rather than `mock_all_auths` on purpose: under
+  `mock_all_auths` every `require_auth` passes, so a privilege-escalation
+  test would pass whether or not the split worked.
+- **CI now runs `cargo test`.** It never had, which meant those nine
+  regression tests would not have run on any push.
+
+### Fixed
+
+- **Three POST routes were unreachable in production** — `v1/intent`,
+  `v1/fraud-reports` and `v1/fiat-confirmations` all returned 405 from the
+  day they shipped, stranded below a blanket GET-only guard. Now
+  allow-listed, with `api/_lib/routes.test.mjs` reconstructing each route's
+  runtime path so the next one cannot be forgotten the same way.
+- **Documented routes that never existed** — `GET /api/v1/summary` and
+  `GET /api/v1/dark` appeared in the architecture doc, and the deployment
+  runbook used `/v1/summary` for its health check. Both return 404.
+- **Scan history was orphaned by the history rewrite.** 26 days of hourly
+  observations survived only on two local-only branches; they are now
+  committed as [`data/scan-history.ndjson`](data/scan-history.ndjson) and
+  appended hourly. `hoursSinceActivity` and `topCounterpartyShare` are
+  point-in-time readings Horizon cannot be asked for retroactively.
+- **Test and table counts across the docs** had drifted to 35, 37, 42 and 342
+  in different files, against a real figure of 431 JS and 25 Rust; table
+  counts said 12 and 15+ against a real 27.
+- **Docs credited work to "a teammate"** on a single-author repository.
+
+### Measured, and deliberately not built
+
+- **Dark-anchor early warning.** Against the committed observation record,
+  exactly one account went dark in 26 days (`slow` → `dark`, n=1) against 17
+  `live` → `slow` degradations. The roadmap requires a published
+  false-positive rate, and one positive example cannot produce one that means
+  anything. Revisited on a count of events, not a date.
+- **Payment execution.** Holding a key or a session with one is custody, and
+  a different risk category from indexing a public ledger. See
+  [`docs/architecture/VERIFIED_ROUTES.md`](docs/architecture/VERIFIED_ROUTES.md).
+
+[Unreleased]: https://github.com/ibochivincent-lang/landfall/commits/main

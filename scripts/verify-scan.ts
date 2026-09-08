@@ -12,6 +12,19 @@
  *
  * Manual run:  npx tsx scripts/verify-scan.ts
  *
+ * Exit codes are distinct so a workflow can tell the cases apart, because
+ * they call for different responses. A blocked scan (2) means the pipeline
+ * worked and the data is wrong — look at the findings. A gate that could not
+ * run (3) means the pipeline itself is broken and says nothing either way
+ * about the data. Collapsing both to 1 makes an infrastructure fault
+ * indistinguishable from a data fault, which is the one thing an operator
+ * reading a red build most needs to know:
+ *
+ *   0  every invariant passed; safe to publish
+ *   2  an invariant failed at error severity; publishing is blocked
+ *   3  the gate could not complete (unreadable scan, crash) — the scan is
+ *      neither verified nor refuted, and must not be published either way
+ *
  * Why this is a separate step rather than a check inside scan-to-api.mjs: the
  * publish script's job is to transform and write, and a transformer that
  * sometimes silently declines to write is harder to reason about than a gate
@@ -30,6 +43,11 @@ import {
   runInvariants,
   type CheckableAccount,
 } from "../packages/indexer/src/invariants.js";
+
+/** An invariant failed at error severity. The pipeline worked; the data is wrong. */
+const EXIT_BLOCKED = 2;
+/** The gate itself could not complete. Says nothing about the data either way. */
+const EXIT_CANNOT_RUN = 3;
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
@@ -157,12 +175,14 @@ async function main(): Promise<void> {
   );
   console.log(`\nAudit artifact: ${VERIFICATION_FILE}`);
 
-  if (blocked) process.exit(1);
+  if (blocked) process.exit(EXIT_BLOCKED);
 }
 
 main().catch((err) => {
   // A gate that cannot run must not wave the scan through: an unreadable scan
-  // file or a crash here is itself a reason not to publish.
+  // file or a crash here is itself a reason not to publish. Distinct from
+  // EXIT_BLOCKED because this says nothing about whether the data was sound —
+  // it says the check never happened.
   console.error("verify-scan failed to complete:", err);
-  process.exit(1);
+  process.exit(EXIT_CANNOT_RUN);
 });
