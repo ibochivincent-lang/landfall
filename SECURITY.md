@@ -39,12 +39,22 @@ server never issued accepted, defeat the signer-weight check against an
 account's medium threshold so that one key authenticates a multisig account,
 or forge or extend a JWT.
 
-**Admin and oracle authority.** The Soroban oracle's admin key can rewrite
-every published score, and its trust assumptions are documented plainly in
-[docs/TRUST.md](docs/TRUST.md). Weaknesses in how that authority is held,
-used, or could be escalated are in scope. So is anything letting a fraud
-report, a dispute, or an investigation be created or altered by someone who
-should not be able to.
+**Admin and oracle authority.** The Soroban oracle now separates two roles.
+A **publisher** address writes scores and digests; an **admin** address
+handles `set_admin` and rotates the publisher. The hourly key held by CI is
+the publisher, so a leak lets an attacker write bad scores — visible in the
+event stream, recomputable from Horizon, revocable by rotation — but not take
+the contract. Anything that defeats that separation is in scope, and is the
+single highest-value bug in this repository: in particular any path by which
+a publisher-authorised call reaches `set_admin` or `set_publisher`, or by
+which the fallback that treats an unset publisher as the admin can be
+induced on a contract where one *is* set. The contract's own regression
+tests for this are `the_publisher_cannot_take_the_contract` and
+`a_rotated_out_publisher_can_no_longer_write`. Trust assumptions are
+documented plainly in [docs/TRUST.md](docs/TRUST.md).
+
+So is anything letting a fraud report, a dispute, or an investigation be
+created or altered by someone who should not be able to.
 
 What matters most for this project, beyond the above:
 
