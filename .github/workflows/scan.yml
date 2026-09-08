@@ -277,6 +277,19 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: node scripts/dispatch-webhooks.mjs
 
+      # ── 6b. Drain the webhook dead-letter queue ────────────────────────────────
+      # Runs after dispatch so a delivery that fails this hour is retried next
+      # hour rather than being lost. Three attempts over four seconds is a
+      # narrow window; a subscriber restarting during it used to lose the
+      # notification permanently. Bounded and idempotent — see
+      # scripts/redeliver-webhooks.mjs for why it never rebuilds an event.
+      - name: Redeliver failed webhooks
+        id: webhooks_redeliver
+        continue-on-error: true   # same reasoning as dispatch above
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: node scripts/redeliver-webhooks.mjs
+
       # ── 7. Publish scan digest to the Soroban oracle ───────────────────────────
       # No-ops cleanly until ORACLE_CONTRACT_ID/ORACLE_ADMIN_SECRET are set —
       # see scripts/publish-oracle.mjs and docs/gaps.md.

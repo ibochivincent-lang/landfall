@@ -30,11 +30,20 @@ const { Pool } = pg;
 // Mirrors api/[...path].js's pool() — see the comment there for why sslmode
 // is stripped and rejectUnauthorized is false (Supabase pooler TLS).
 const poolConnectionString = DATABASE_URL.replace(/([?&])sslmode=[^&]*&?/, '$1').replace(/[?&]$/, '');
+// Mirrors the host detection in api/[...path].js's pool(). Hardcoding
+// `ssl` made these scripts unable to talk to a local Postgres at all — it
+// refuses TLS — so the delivery path could only ever be exercised against a
+// hosted database. A dead-letter worker that cannot be run locally is one
+// that gets tested in production.
+const needsTls = /sslmode=require|neon\.tech|supabase\.|railway\.app|render\.com|rds\.amazonaws/.test(DATABASE_URL);
+
 const pool = new Pool({
   connectionString: poolConnectionString,
   max: 2,
   connectionTimeoutMillis: 8_000,
-  ssl: { rejectUnauthorized: false },
+  // rejectUnauthorized: false because hosted poolers present certs issued by
+  // intermediaries Node does not ship. Encrypted; chain unverified.
+  ssl: needsTls ? { rejectUnauthorized: false } : false,
 });
 
 const RETRY_DELAYS_MS = [0, 1000, 3000];
@@ -175,10 +184,14 @@ async function main() {
       const result = await deliver(webhook, payload);
       if (result.status === 'delivered') delivered++; else failed++;
 
+      // The payload is stored so a failed delivery can be replayed with the
+      // event that actually occurred, rather than one rebuilt later from
+      // state that has since moved on. See migration 014 and
+      // scripts/redeliver-webhooks.mjs.
       await pool.query(
-        `INSERT INTO webhook_deliveries (webhook_id, event, account_id, domain, status, attempts, response_status)
-         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-        [webhook.id, t.event, t.account_id, domain, result.status, result.attempts, result.responseStatus],
+        `INSERT INTO webhook_deliveries (webhook_id, event, account_id, domain, status, attempts, response_status, payload)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+        [webhook.id, t.event, t.account_id, domain, result.status, result.attempts, result.responseStatus, JSON.stringify(payload)],
       ).catch(() => {});
     }
   }
