@@ -10,8 +10,8 @@
 > | 3 | STP schema, canonical serialization, sign/verify (`packages/stp`) | ✅ built |
 > | 4 | EVM CCTP adapter, `ATTESTED` (`packages/adapters/evm-cctp`) | ✅ built |
 > | 5 | SEP-1 identity + `anchors.registry.json` (`packages/registry`) | ✅ built |
-> | 6 | Soroban score oracle (SEP-40 shaped) | 🔨 not built |
-> | 7 | `pickAnchor()` + cross-chain scan (`packages/sdk`) | ✅ built; public API/MCP surface still to come |
+> | 6 | Soroban score oracle (SEP-40 shaped) | ✅ built, **deployed to testnet** — 25 tests; publisher/admin roles split so the hourly key cannot take the contract. Not on mainnet |
+> | 7 | `pickAnchor()` + cross-chain scan (`packages/sdk`) | ✅ built; [published to npm](https://www.npmjs.com/package/@landfall/sdk), REST + GraphQL + an 11-tool MCP server all live |
 > | 8 | Tron and Solana adapters, `DERIVED` | ✅ built; zkTLS/PoR proof binder not built |
 >
 > The cross-chain view is live at
@@ -66,20 +66,38 @@ This keeps the "can't fake it" promise: on Stellar it's proven; on other chains 
 attestation states *exactly* what class of evidence backs it, and anchors that trust back
 to Stellar wherever a cross-chain settlement touches Stellar (CCTP burn↔mint, bridge msg).
 
+```mermaid
+flowchart BT
+    subgraph STP["Landfall STP — one signed settlement-attestation shape"]
+        SCHEMA["packages/stp<br/>canonical serialization · Ed25519 sign/verify"]
+    end
+
+    ST["Stellar adapter<br/><b>keystone</b><br/>ledger truth<br/><b>PROVEN</b>"]
+    EVM["EVM adapter<br/>CCTP mint/burn + attestation<br/><b>ATTESTED</b>"]
+    TRX["Tron adapter<br/>transfer + proof binder<br/><b>DERIVED</b>"]
+    SOL["Solana adapter<br/>transfer + proof binder<br/><b>DERIVED</b>"]
+
+    ST ==>|"ledger-proven"| SCHEMA
+    EVM -->|"third-party attested"| SCHEMA
+    TRX -.->|"emits nothing until a<br/>proof binder exists"| SCHEMA
+    SOL -.->|"emits nothing until a<br/>proof binder exists"| SCHEMA
+
+    classDef proven fill:#e8f5e9,stroke:#2e7d32,color:#1b5e20
+    classDef attested fill:#fff8e1,stroke:#ef6c00,color:#e65100
+    classDef derived fill:#fafafa,stroke:#9e9e9e,color:#616161,stroke-dasharray:4 3
+    classDef schema fill:#e3f2fd,stroke:#1565c0,color:#0d47a1
+    class ST proven
+    class EVM attested
+    class TRX,SOL derived
+    class SCHEMA schema
 ```
-                 ┌─────────────────────────────────────────────┐
-                 │            Landfall STP (schema)             │
-                 │   one signed "settlement attestation" shape  │
-                 └─────────────────────────────────────────────┘
-                          ▲                 ▲               ▲
-             ┌────────────┘        ┌────────┘      ┌────────┘
-   ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐
-   │ Stellar adapter  │  │  EVM adapter     │  │  Tron / Solana   │
-   │  (KEYSTONE)      │  │ (CCTP / LZ DVN)  │  │   adapters       │
-   │ ledger truth     │  │ mint/burn+attest │  │ transfer+zkTLS   │
-   │ Tier: PROVEN     │  │ Tier: ATTESTED   │  │ Tier: DERIVED    │
-   └──────────────────┘  └──────────────────┘  └──────────────────┘
-```
+
+**Tiers are compared lexicographically, never blended.** `PROVEN` > `ATTESTED`
+> `DERIVED`, so no quantity of derived observations can outrank one
+ledger-proven settlement — the moment those collapse into a single weighted
+number, enough weak evidence buys a strong-looking claim. The dashed edges are
+literal: the `DERIVED` adapters emit **no events at all** rather than present a
+bare transfer as evidence it has not earned.
 
 ---
 
@@ -245,21 +263,32 @@ store.
 
 ---
 
-## 9. Proposed package layout
+## 9. Package layout
 
 ```
 landfall/
 ├─ packages/
-│  ├─ core/            # existing L1 metrics, refactored
+│  ├─ indexer/         # L1 ledger metrics  (the doc originally called this core/)
 │  ├─ stp/             # STP schema, canonical serialization, signing/verify
 │  ├─ adapters/
 │  │  ├─ stellar/      # keystone (PROVEN)
 │  │  ├─ evm-cctp/     # ATTESTED
 │  │  ├─ tron/         # DERIVED
 │  │  └─ solana/       # DERIVED
-│  ├─ oracle-soroban/  # L3 Rust/Soroban contract (SEP-40 shaped, SEP-48 events)
+│  ├─ contracts/
+│  │  └─ landfall-oracle/   # Rust/Soroban  (the doc originally called this oracle-soroban/)
 │  ├─ sdk/             # pickAnchor(), reads oracle + attestation store
-│  └─ api/             # public API + MCP server
+│  ├─ trust-check/     # counterparty signals   ┐
+│  ├─ intents/         # routing + plans        │ built after this
+│  ├─ fraud-reports/   # reports + disputes     │ document was written
+│  ├─ investigator/    # cited facts + AI       │
+│  ├─ anchoring/       # Merkle inclusion       │
+│  ├─ x402/            # agent payee check      ┘
+│  ├─ db/              # schema + migrations
+│  ├─ api/             # local dev wrapper over api/[...path].js
+│  └─ web/             # the public site
+├─ api/[...path].js    # the deployed serverless function (REST + GraphQL)
+├─ scripts/mcp/        # MCP server, 11 tools
 ├─ registry/
 │  ├─ anchors.registry.json
 │  └─ stp.schema.json

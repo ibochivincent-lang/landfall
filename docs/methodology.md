@@ -10,7 +10,7 @@ number cannot be reproduced from these rules, it is a bug.
 
 Landfall does not ship a trusted list of anchor accounts. It resolves them:
 
-1. Read candidate home domains from `data/anchors.json` (or `--domains`)
+1. Read candidate home domains from `packages/indexer/data/anchors.json` (or `--domains`)
 2. Fetch `https://<domain>/.well-known/stellar.toml` (SEP-1)
 3. Extract every account in the `ACCOUNTS` array, plus the `issuer` of each
    `[[CURRENCIES]]` block

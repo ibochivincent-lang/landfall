@@ -17,7 +17,7 @@ design questions resolve by asking: *are we observing, or are we asking?*
 
 ```bash
 npm install
-npm test            # 37 tests, no network required
+npm test            # 431 tests, no network required
 npm run typecheck   # tsc --noEmit, must stay clean
 npm run discover    # resolve domains → accounts
 npm run scan        # index and report

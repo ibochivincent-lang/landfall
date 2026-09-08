@@ -14,7 +14,7 @@ is that it can be checked against the repository.
 
 | Was | Now |
 |---|---|
-| No database | Postgres schema, 12 tables, applied and verified. `--persist` writes to it. |
+| No database | Postgres schema, 27 tables, applied and verified. `--persist` writes to it. |
 | No API | Read-only HTTP API, eight endpoints, every response carrying `asOf` and `staleHours`. |
 | Site data frozen, no freshness indicator | Both pages read the API live and stamp the scan age. |
 | No transaction-level view | `/dashboard` — every indexed payment per anchor, each row linked to its hash on a block explorer. |

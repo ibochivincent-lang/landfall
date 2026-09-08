@@ -53,11 +53,11 @@ than becoming a second changelog.
 - [x] **Developer & Admin Portal (`/portal.html`)** — multi-user auth, API key hashing (`lf_live_...`), token-bucket rate limits, and webhooks
 - [x] **Interactive Public API Docs (`/docs.html`)** — live interactive testing playground and badge previewer
 - [x] **Model Context Protocol (MCP) Server (`scripts/mcp/server.mjs`)** — native AI agent stdio integration
-- [x] 35 offline tests including a mock Horizon server; 16 Rust tests on the contract
-- [x] Postgres schema — 15+ tables including `portal_users`, `api_keys`, `user_webhooks`, applied and verified on Supabase
+- [x] 431 offline tests including a mock Horizon server; 25 Rust tests on the contract
+- [x] Postgres schema — 27 tables including `portal_users`, `api_keys`, `user_webhooks`, applied and verified on Supabase
 - [x] Read-only HTTP API — live, backed by Supabase pooler, deployed on Vercel
 - [x] Transactions dashboard at `/dashboard.html` — keyset-paginated, dark account highlights, live ledger feeds
-- [x] Soroban oracle written and **deployed to testnet** — 16 tests, admin key set
+- [x] Soroban oracle written and **deployed to testnet** — 25 tests, publisher/admin roles split
 - [x] Real mainnet scan — 13 accounts across candidate home domains
 - [x] Headline finding cross-checked against stellar.expert: **6 of 13 accounts dark for 30+ days**
 - [x] Automated **hourly scan via GitHub Actions** (`0 * * * *`), with `$0/month` hosting upkeep

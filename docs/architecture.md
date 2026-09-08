@@ -355,9 +355,9 @@ site's own CSP is `script-src 'self'`, so a CDN copy would be blocked.
 ## Running pieces individually
 
 ```bash
-npm test                  # indexer: 35 tests, offline
+npm test                  # 431 tests, offline
 npm run typecheck         # indexer + api
-npm run contracts:test    # oracle: 16 tests
+npm run contracts:test    # oracle: 25 tests
 npm run contracts:build   # wasm
 
 npm run discover          # resolve domains to accounts

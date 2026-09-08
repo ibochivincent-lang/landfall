@@ -17,14 +17,14 @@ Repo: https://github.com/ibochivincent-lang/landfall (public)
 - [x] Refund detection heuristic with documented limits
 - [x] Liveness classification (live / slow / dark / no-activity)
 - [x] Dust filtering
-- [x] 37 tests passing offline, including a mock Horizon server
-- [x] Postgres schema — 12 tables, verified on real Postgres 16
+- [x] 431 tests passing offline, including a mock Horizon server
+- [x] Postgres schema — 27 tables across 13 migrations, verified on real Postgres 16
 - [x] `--persist`, cursors and scan bookkeeping wired end to end
 - [x] Read-only HTTP API, eight endpoints, caveats in every payload
 - [x] Transactions dashboard at `/dashboard`, keyset-paginated
-- [x] Soroban oracle, 16 tests, **deployed to testnet**
+- [x] Soroban oracle, 25 tests, **deployed to testnet**
 - [x] Deployment path: Supabase, production compose, Vercel API proxy
-- [x] 42 tests passing (37 offline + 5 integration against real Postgres)
+- [x] 431 tests passing offline, plus integration against real Postgres
 
 **The evidence**
 
@@ -88,7 +88,7 @@ switches deliberately left off.
       heuristic into a measurement.
 - [ ] Investigate why `vibrantapp.com` served a TOML with no parseable
       accounts. Probably a parser gap, not an empty declaration.
-- [ ] Expand `data/anchors.json` beyond the current 8 candidate domains.
+- [ ] Expand `packages/indexer/data/anchors.json` beyond the current 8 candidate domains.
       More coverage makes the dark-account census stronger.
 - [ ] Multi-region indexing, to remove the single-vantage assumption
 - [ ] Talk to one wallet about embedding the SDK. Layer 2 needs attestors,

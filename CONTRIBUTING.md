@@ -51,14 +51,14 @@ database at all:
 
 ```bash
 npm install
-npm test                # 37 tests offline; 42 with TEST_DATABASE_URL set
+npm test                # 431 tests, offline
 npm run scan            # scan mainnet anchors and print the report
 ```
 
 For the contract:
 
 ```bash
-npm run contracts:test  # 16 tests
+npm run contracts:test  # 25 Rust tests
 npm run contracts:build # wasm
 ```
 

@@ -7,13 +7,23 @@
 [![Deployed on Vercel](https://img.shields.io/badge/Deployed-Vercel-black?logo=vercel)](https://landfall-chi.vercel.app)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-fe5196?logo=conventionalcommits)](https://www.conventionalcommits.org/en/v1.0.0/)
 
-**Did the money land?**
+## Who are you about to pay?
 
-A settlement-quality record for Stellar anchors, computed entirely from the public ledger — not from asking the anchor.
+**Independent settlement intelligence for Stellar** — evidence about a counterparty, computed from the public ledger rather than supplied by the counterparty.
 
-Every existing anchor monitor *interrogates* — pings an endpoint, validates a `stellar.toml`, records the answer the anchor chose to give. Landfall *observes* — it reads what anchor accounts actually did on-chain under SEP-24, and turns that into liveness, settlement volume, counterparty concentration, and refund rate. A TOML file can be edited in ten seconds. Two years of settlement history cannot.
+Every answer to that question available today comes from the party being assessed: their `stellar.toml`, their `/info` endpoint, their status page. Each is editable in ten seconds. Landfall does not ask them. It reads what their accounts actually did on-chain, and publishes the result permissionlessly — for anchors, for arbitrary addresses, and for the payee an autonomous agent is about to sign a payment to.
 
-**Live: [landfall-chi.vercel.app](https://landfall-chi.vercel.app)**
+| Ask | Landfall answers with |
+|---|---|
+| **Is this anchor still settling?** | Liveness, volume, counterparty concentration and refund rate, from SEP-24 legs already on the ledger |
+| **Is this address safe to pay?** | [Trust Check](https://landfall-chi.vercel.app/trust-check.html) — account age, concentration and pass-through signals, a 0–100 score where every deduction names its evidence, and a confidence rating that overrides the score when history is too thin |
+| **Has anyone reported them?** | Evidence-anchored fraud reports — every one cites a transaction verified to exist *and* involve the subject — each answerable by the reported party through a signature, never a password |
+| **Which route should this take?** | Intent + Route Engine: routes ranked with evidence ahead of price, returning a step-by-step plan where every step names who performs it |
+| **Who should an agent pay?** | [x402](https://x402.org) payee checks, an 11-tool MCP server, and [`@landfall/sdk`](https://www.npmjs.com/package/@landfall/sdk) on npm |
+
+**What it will not do:** move your money. Landfall holds no keys, signs no payments, and takes no custody — every step that moves value belongs to the wallet or the anchor. That is a standing design decision, not a missing feature ([why](docs/architecture/VERIFIED_ROUTES.md)).
+
+**Live: [landfall-chi.vercel.app](https://landfall-chi.vercel.app)** · **Architecture: [three planes](docs/architecture.md)** · **Trust assumptions: [what you must trust](docs/TRUST.md)**
 
 > **Contributors welcome.** Issues are filed and labelled by complexity.
 > Start with `good first issue`, and **wait to be assigned before writing
@@ -201,7 +211,7 @@ npm run anchors:discover  # propose new anchor domains from an independent direc
 npm run discover          # resolve tracked anchor domains to on-chain accounts
 npm run scan              # index payment history and print the finding
 npm run scan:verify       # check the newest scan before it could be published
-npm test                  # 342 tests, no network required
+npm test                  # 431 tests, no network required
 npm run typecheck
 ```
 
@@ -309,7 +319,7 @@ Issues are scoped and labelled by complexity. Start with `good first issue`; lar
 See [CONTRIBUTING.md](CONTRIBUTING.md), [DEVELOPMENT.md](DEVELOPMENT.md), and [docs/backlog.md](docs/backlog.md) for the full backlog. All contributors are expected to follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ```bash
-npm run contracts:test   # oracle: 16 Rust tests
+npm run contracts:test   # oracle: 25 Rust tests
 ```
 
 ## Contributors
