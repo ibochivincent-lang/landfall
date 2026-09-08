@@ -139,9 +139,10 @@ count moves between scans, so
 [`/api/v1/anchors`](https://landfall-chi.vercel.app/api/v1/anchors) is the
 live answer rather than any number written here.
 
-**Absence means untracked, not nonexistent** — and, today, it can also mean a
-scan failed to reach a domain it does track. That ambiguity is a known defect,
-not a design choice; see [gaps.md](gaps.md).
+**Absence means untracked, not nonexistent** — or that a scan failed to reach
+a domain it does track. The response tells you which: check `coverage.complete`
+and the `coverage.missing` list, which names any tracked domain that dropped
+out and why. See [API_REFERENCE.md](API_REFERENCE.md).
 
 To be added: [open an issue](https://github.com/ibochivincent-lang/landfall/issues)
 with your home domain. The requirement is a `stellar.toml` that resolves and

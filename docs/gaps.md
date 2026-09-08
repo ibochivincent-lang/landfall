@@ -485,7 +485,9 @@ whole problem. The alternative is deleting those sections until they're real.
 
 ## 2. Data quality — known weaknesses
 
-- **A domain dropping out of a scan is invisible in the published API.** Found
+- ~~**A domain dropping out of a scan is invisible in the published API.**~~ **Fixed 9 September** — `/api/v1/anchors` now carries a `coverage` block: tracked versus reached, `complete`, and a `missing` list naming each dropped domain with its resolve error or an explicit `null` where the cause is unknown. Original finding, kept as the record:
+
+  Found
   8 September 2026 while checking a doc's account count. Eleven consecutive
   scans reported 27 domains / 108 accounts; the twelfth reported 26 / 93.
   `zeam.money` and all fifteen of its accounts had vanished — while its
@@ -504,9 +506,10 @@ whole problem. The alternative is deleting those sections until they're real.
   means an anchor could, in principle, drop off the record for a scan without
   anyone being able to tell that it had.
 
-  Not yet fixed. The fix is a `coverage` block on the payload — tracked
-  versus reached, and which domains were missed — so a partial scan is
-  visibly partial rather than quietly smaller.
+  The data was always there: `anchors.resolve_error` has carried a comment
+  since migration 001 saying a domain that fails to resolve is a finding
+  rather than a gap, and that the reason is kept so a report can say why. The
+  API simply never read it.
 
 - **Refund detection is still a heuristic.** Memo correlation (backlog M1) is
   the fix and it isn't done. Every return figure carries this caveat.

@@ -360,6 +360,72 @@ export async function latestScan(db) {
   };
 }
 
+/**
+ * What the latest scan actually covered, against what is tracked.
+ *
+ * Without this the payload is silently smaller when a scan misses a domain. On
+ * 8 September eleven consecutive scans reported 27 domains and 108 accounts;
+ * the twelfth reported 26 and 93, because zeam.money and its fifteen accounts
+ * were not reached — while its TOML still resolved and it was still tracked.
+ * Nothing in the response said so, which makes a tracked anchor that vanishes
+ * indistinguishable from one that was never tracked. That is the exact
+ * ambiguity this project exists to remove from anchor self-reporting, and it
+ * had been reproduced in our own output.
+ *
+ * The data was always there. `anchors.resolve_error` has carried a note since
+ * migration 001 saying a domain that fails to resolve is a finding rather than
+ * a gap, and that the reason is kept so a report can say why. The API simply
+ * never read it.
+ *
+ * `missing` therefore distinguishes two cases a consumer must not conflate:
+ * a domain whose TOML failed, which reports why, and a domain that was tracked
+ * and resolvable but absent from this scan anyway — reported with a null
+ * reason, because "we do not know why" is the honest answer and is more useful
+ * than an invented one.
+ */
+export async function scanCoverage(db) {
+  const { rows } = await db.query(`
+    SELECT a.domain,
+           an.resolve_error,
+           an.last_resolved_at,
+           count(*)                              AS tracked_accounts,
+           count(m.account_id)                   AS reached_accounts
+      FROM anchor_accounts a
+      JOIN anchors an ON an.domain = a.domain
+      LEFT JOIN account_metrics m
+             ON m.account_id = a.account_id
+            AND m.scan_id = (SELECT id FROM latest_scan)
+     GROUP BY a.domain, an.resolve_error, an.last_resolved_at
+     ORDER BY a.domain
+  `);
+
+  const missing = rows
+    .filter((r) => Number(r.reached_accounts) === 0)
+    .map((r) => ({
+      domain: r.domain,
+      trackedAccounts: Number(r.tracked_accounts),
+      // Null means tracked, resolvable, and absent anyway. Not an excuse — a
+      // statement that the cause is unknown.
+      reason: r.resolve_error ?? null,
+      lastResolvedAt: r.last_resolved_at ? r.last_resolved_at.toISOString() : null,
+    }));
+
+  const trackedDomains = rows.length;
+  const trackedAccounts = rows.reduce((n, r) => n + Number(r.tracked_accounts), 0);
+  const reachedAccounts = rows.reduce((n, r) => n + Number(r.reached_accounts), 0);
+
+  return {
+    trackedDomains,
+    reachedDomains: trackedDomains - missing.length,
+    trackedAccounts,
+    reachedAccounts,
+    // Present and empty on a complete scan, so a consumer can check one field
+    // rather than inferring completeness from two counts matching.
+    missing,
+    complete: missing.length === 0,
+  };
+}
+
 export async function accountRows(db) {
   const { rows } = await db.query(`
     SELECT account_id, domain, role, org_name, state,
@@ -2631,7 +2697,17 @@ export default async function handler(req, res) {
         summaries[domain] = computeDomainReliability(dAccounts);
       }
 
-      return json(res, 200, { asOf: scan.finishedAt, staleHours: scan.staleHours, accounts, reliability: summaries });
+      // Coverage travels with the data, not in a separate endpoint nobody
+      // calls — a partial scan has to be visibly partial at the point of use.
+      const coverage = await scanCoverage(db);
+
+      return json(res, 200, {
+        asOf: scan.finishedAt,
+        staleHours: scan.staleHours,
+        coverage,
+        accounts,
+        reliability: summaries,
+      });
     }
 
     // GET /api/v1/anchors/:domain/health-check

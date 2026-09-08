@@ -44,6 +44,16 @@ Only the latest `main` is supported. Fixes are not backported; see
 
 ### Fixed
 
+- **A domain dropping out of a scan was invisible in `/api/v1/anchors`.** On
+  8 September eleven consecutive scans reported 27 domains and 108 accounts;
+  the twelfth reported 26 and 93, because `zeam.money` and its fifteen
+  accounts were not reached — while its TOML still resolved and it was still
+  tracked. Nothing in the response said so, making a tracked anchor that
+  vanishes indistinguishable from one that was never tracked. The response now
+  carries a `coverage` block: tracked versus reached, `complete`, and a
+  `missing` list naming each dropped domain with its resolve error, or an
+  explicit `null` where the cause is genuinely unknown rather than a guess.
+  Adding a field, so not breaking.
 - `VERSIONING.md` described `refund.spike` in the present tense as an
   obsolete-but-retained value, and still said no tag had been cut.
 

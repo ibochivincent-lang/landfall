@@ -130,6 +130,40 @@ accounts roll up to one grade. `factors` breaks the score into the three
 components it is summed from, so the number can be checked rather than
 trusted.
 
+### `coverage` — read this before trusting an absence
+
+```json
+"coverage": {
+  "trackedDomains": 27, "reachedDomains": 26,
+  "trackedAccounts": 108, "reachedAccounts": 93,
+  "complete": false,
+  "missing": [
+    { "domain": "zeam.money", "trackedAccounts": 15,
+      "reason": null, "lastResolvedAt": "2026-09-08T19:39:40.433Z" }
+  ]
+}
+```
+
+**An account absent from `accounts` is not necessarily untracked.** It may be
+tracked and simply not reached by this scan. Without `coverage` those two are
+indistinguishable — which is the ambiguity Landfall exists to remove from
+anchor self-reporting, and which this response used to reproduce.
+
+| Field | Meaning |
+|---|---|
+| `complete` | `true` when every tracked domain was reached. Check this, rather than comparing counts |
+| `missing[].reason` | The resolve error, or **`null` meaning the cause is unknown** — tracked, resolvable, absent anyway. Never a guess |
+| `missing[].lastResolvedAt` | When the domain's TOML last resolved |
+| `missing[].trackedAccounts` | How many accounts dropped out with it |
+
+A domain only appears in `missing` when **none** of its accounts were reached.
+A partially-reached domain is not "missing" — the shortfall shows in
+`trackedAccounts` versus `reachedAccounts`, because reaching some of a
+domain's accounts is a different failure from reaching none.
+
+**If `complete` is `false`, treat a missing anchor as unknown rather than
+gone.**
+
 | Field | Meaning |
 |---|---|
 | `state` | `live` · `slow` · `dark` · `no_activity` — see [methodology.md](methodology.md) for thresholds |
