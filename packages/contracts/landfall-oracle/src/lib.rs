@@ -44,7 +44,11 @@ pub struct Published {
     #[topic]
     pub epoch: u64,
     pub digest: BytesN<32>,
-    pub admin: Address,
+    /// The address that signed this publication. Named `publisher` rather
+    /// than `admin` since the write path split from the admin path — the
+    /// hourly key that signs this is deliberately NOT the key that can
+    /// hand over the contract.
+    pub publisher: Address,
 }
 
 /// Emitted on every score write.
@@ -76,12 +80,25 @@ pub struct AdminChanged {
     pub next: Address,
 }
 
+/// Publisher handover, emitted for the same reason as `AdminChanged`: the
+/// hot key that writes scores hourly is the one most likely to be rotated
+/// after a leak, and that rotation should be publicly visible.
+#[contractevent(topics = ["set_publisher"])]
+pub struct PublisherChanged {
+    pub previous: Address,
+    pub next: Address,
+}
+
 // ---------------------------------------------------------------- storage
 
 #[contracttype]
 #[derive(Clone)]
 pub enum DataKey {
     Admin,
+    /// The address allowed to write scores and digests, but NOT to change
+    /// either role. Unset means "same as Admin", which is what a contract
+    /// deployed before this key existed reads as — see `require_publisher`.
+    Publisher,
     /// sha256 of the most recently published dataset.
     Digest,
     /// Monotonic publication counter, so consumers can detect a missed update.
@@ -168,7 +185,7 @@ impl LandfallOracle {
     /// Emits `("publish", epoch)` with the digest, so an indexer can notice a
     /// new dataset without polling the API.
     pub fn publish(env: Env, digest: BytesN<32>) -> u64 {
-        let admin = Self::require_admin(&env);
+        let publisher = Self::require_publisher(&env);
 
         let epoch: u64 = env
             .storage()
@@ -181,7 +198,7 @@ impl LandfallOracle {
         env.storage().instance().set(&DataKey::Epoch, &epoch);
         Self::bump(&env);
 
-        Published { epoch, digest, admin }.publish(&env);
+        Published { epoch, digest, publisher }.publish(&env);
 
         epoch
     }
@@ -199,7 +216,7 @@ impl LandfallOracle {
         last_activity: u64,
         sampled: u32,
     ) {
-        Self::require_admin(&env);
+        Self::require_publisher(&env);
         Self::write_score(&env, &account, state, last_activity, sampled);
     }
 
@@ -259,7 +276,7 @@ impl LandfallOracle {
 
     /// Write a batch in one transaction. Same events as `set_score`.
     pub fn set_scores(env: Env, accounts: Vec<Address>, scores: Vec<Score>) {
-        Self::require_admin(&env);
+        Self::require_publisher(&env);
         if accounts.is_empty() {
             panic_with_error!(&env, Error::EmptyBatch);
         }
@@ -321,6 +338,17 @@ impl LandfallOracle {
             .unwrap_or_else(|| panic_with_error!(&env, Error::NotInitialised))
     }
 
+    /// The address currently allowed to write scores and digests. Falls back
+    /// to the admin when no publisher has been set, matching
+    /// `require_publisher`, so this getter never disagrees with the gate.
+    pub fn publisher(env: Env) -> Address {
+        env.storage()
+            .instance()
+            .get(&DataKey::Publisher)
+            .or_else(|| env.storage().instance().get(&DataKey::Admin))
+            .unwrap_or_else(|| panic_with_error!(&env, Error::NotInitialised))
+    }
+
     /// Hand the oracle to a new admin. Emits so the change is publicly visible
     /// in the event stream rather than only in contract state.
     pub fn set_admin(env: Env, new_admin: Address) {
@@ -329,8 +357,24 @@ impl LandfallOracle {
         AdminChanged { previous: current, next: new_admin }.publish(&env);
     }
 
+    /// Rotate the publishing key. **Admin only** — a publisher that could
+    /// reassign its own role would be an admin wearing a different name, and
+    /// the split would buy nothing.
+    ///
+    /// This is the recovery path for the hot key: if the CI secret leaks, the
+    /// cold admin rotates it here, and the attacker's window closes without
+    /// the contract ever changing hands.
+    pub fn set_publisher(env: Env, new_publisher: Address) {
+        Self::require_admin(&env);
+        let previous = Self::publisher(env.clone());
+        env.storage().instance().set(&DataKey::Publisher, &new_publisher);
+        PublisherChanged { previous, next: new_publisher }.publish(&env);
+    }
+
     // ------------------------------------------------------------ internal
 
+    /// Authorises a role change. Deliberately separate from
+    /// `require_publisher` — see that function for why the split exists.
     fn require_admin(env: &Env) -> Address {
         let admin: Address = env
             .storage()
@@ -339,6 +383,35 @@ impl LandfallOracle {
             .unwrap_or_else(|| panic_with_error!(env, Error::NotInitialised));
         admin.require_auth();
         admin
+    }
+
+    /// Authorises a data write.
+    ///
+    /// This split is the whole point of the two-role design. Soroban's
+    /// built-in account contract always checks a Stellar account's **medium**
+    /// threshold, so one address cannot have a lower bar for "write a score"
+    /// than for "hand the contract to someone else". While `publish`,
+    /// `set_scores` and `set_admin` shared a gate, the hourly CI key
+    /// necessarily also held takeover authority — and making that key
+    /// multisig to fix it would have stopped the hourly publish, since CI
+    /// signs with one key.
+    ///
+    /// Splitting the roles lets the publisher stay a single hot key whose
+    /// worst case is writing bad scores (visible in the event stream,
+    /// recomputable from Horizon, correctable by the admin) while the admin
+    /// becomes a cold multisig account that never has to sign hourly.
+    ///
+    /// Falls back to the admin when no publisher is set, so a contract
+    /// deployed before this key existed keeps working exactly as it did.
+    fn require_publisher(env: &Env) -> Address {
+        let publisher: Address = env
+            .storage()
+            .instance()
+            .get(&DataKey::Publisher)
+            .or_else(|| env.storage().instance().get(&DataKey::Admin))
+            .unwrap_or_else(|| panic_with_error!(env, Error::NotInitialised));
+        publisher.require_auth();
+        publisher
     }
 
     fn track(env: &Env, account: &Address) {

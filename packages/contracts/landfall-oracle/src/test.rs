@@ -239,3 +239,190 @@ fn count_topic(env: &Env, name: &str) -> u32 {
         })
         .count() as u32
 }
+
+// ---------------------------------------------------------------- roles
+//
+// The publisher/admin split exists because Soroban's built-in account
+// contract always checks a Stellar account's MEDIUM threshold, so one
+// address cannot have a lower bar for "write a score" than for "hand over
+// the contract". While both shared a gate, the hourly CI key necessarily
+// also held takeover authority.
+//
+// These tests use mock_auths rather than mock_all_auths on purpose:
+// mock_all_auths makes every require_auth pass, which would make a
+// privilege-escalation test silently vacuous — it would pass whether or not
+// the split works.
+
+use soroban_sdk::{testutils::MockAuth, testutils::MockAuthInvoke, IntoVal};
+
+/// Admin and a separate publisher, with the publisher already installed.
+fn setup_split() -> (Env, LandfallOracleClient<'static>, Address, Address) {
+    let env = Env::default();
+    env.mock_all_auths();
+    let id = env.register(LandfallOracle, ());
+    let client = LandfallOracleClient::new(&env, &id);
+    let admin = Address::generate(&env);
+    let publisher = Address::generate(&env);
+    client.initialise(&admin);
+    client.set_publisher(&publisher);
+    (env, client, admin, publisher)
+}
+
+#[test]
+fn publisher_defaults_to_the_admin_when_never_set() {
+    // A contract deployed before DataKey::Publisher existed has no publisher
+    // stored. It must keep working exactly as it did, not brick.
+    let (_, client, admin) = setup();
+    assert_eq!(client.publisher(), admin);
+}
+
+#[test]
+fn admin_can_install_a_separate_publisher() {
+    let (_, client, admin, publisher) = setup_split();
+    assert_eq!(client.publisher(), publisher);
+    assert_eq!(client.admin(), admin, "installing a publisher must not move admin");
+}
+
+#[test]
+fn rotating_the_publisher_emits_the_handover() {
+    // count_topic reports the most recent invocation's events, not a running
+    // total — see recovering_then_going_dark_again_emits_a_second_event, which
+    // asserts 1 / 0 / 1 for the same reason. So each rotation is checked for
+    // its own event rather than for a cumulative count.
+    let (env, client, _, _) = setup_split();
+    assert_eq!(count_topic(&env, "set_publisher"), 1, "installing a publisher emits");
+
+    client.set_publisher(&Address::generate(&env));
+    assert_eq!(count_topic(&env, "set_publisher"), 1, "every rotation must be publicly visible");
+
+    // A write must not masquerade as a role change.
+    client.set_score(&Address::generate(&env), &Liveness::Live, &1u64, &1u32);
+    assert_eq!(count_topic(&env, "set_publisher"), 0, "a score write is not a handover");
+}
+
+#[test]
+fn the_publisher_alone_can_write_scores() {
+    // The point of the split: a hot key that writes hourly, authorised by
+    // nothing but itself.
+    let (env, client, _, publisher) = setup_split();
+    let account = Address::generate(&env);
+
+    env.mock_auths(&[MockAuth {
+        address: &publisher,
+        invoke: &MockAuthInvoke {
+            contract: &client.address,
+            fn_name: "set_score",
+            args: (account.clone(), Liveness::Live, 100u64, 5u32).into_val(&env),
+            sub_invokes: &[],
+        },
+    }]);
+    client.set_score(&account, &Liveness::Live, &100u64, &5u32);
+    assert_eq!(client.get_score(&account).unwrap().sampled, 5);
+}
+
+#[test]
+fn the_publisher_cannot_take_the_contract() {
+    // The escalation this whole change exists to prevent. With only the
+    // publisher's signature available, set_admin must fail.
+    let (env, client, _, publisher) = setup_split();
+    let attacker = Address::generate(&env);
+
+    env.mock_auths(&[MockAuth {
+        address: &publisher,
+        invoke: &MockAuthInvoke {
+            contract: &client.address,
+            fn_name: "set_admin",
+            args: (attacker.clone(),).into_val(&env),
+            sub_invokes: &[],
+        },
+    }]);
+
+    assert!(
+        client.try_set_admin(&attacker).is_err(),
+        "a leaked hourly publishing key must never be able to hand over the oracle",
+    );
+}
+
+#[test]
+fn the_publisher_cannot_rotate_itself() {
+    // A publisher that could reassign its own role would be an admin wearing
+    // a different name, and the split would buy nothing.
+    let (env, client, _, publisher) = setup_split();
+    let attacker = Address::generate(&env);
+
+    env.mock_auths(&[MockAuth {
+        address: &publisher,
+        invoke: &MockAuthInvoke {
+            contract: &client.address,
+            fn_name: "set_publisher",
+            args: (attacker.clone(),).into_val(&env),
+            sub_invokes: &[],
+        },
+    }]);
+
+    assert!(client.try_set_publisher(&attacker).is_err());
+}
+
+#[test]
+fn the_admin_can_rotate_a_leaked_publisher() {
+    // The recovery path. If the CI secret leaks, the cold admin closes the
+    // window without the contract ever changing hands.
+    let (env, client, admin, leaked) = setup_split();
+    let fresh = Address::generate(&env);
+
+    env.mock_auths(&[MockAuth {
+        address: &admin,
+        invoke: &MockAuthInvoke {
+            contract: &client.address,
+            fn_name: "set_publisher",
+            args: (fresh.clone(),).into_val(&env),
+            sub_invokes: &[],
+        },
+    }]);
+    client.set_publisher(&fresh);
+
+    assert_eq!(client.publisher(), fresh);
+    assert_ne!(client.publisher(), leaked, "the leaked key must no longer be the publisher");
+}
+
+#[test]
+fn a_rotated_out_publisher_can_no_longer_write() {
+    let (env, client, _, leaked) = setup_split();
+    let fresh = Address::generate(&env);
+    client.set_publisher(&fresh); // still under mock_all_auths from setup_split
+
+    let account = Address::generate(&env);
+    env.mock_auths(&[MockAuth {
+        address: &leaked,
+        invoke: &MockAuthInvoke {
+            contract: &client.address,
+            fn_name: "set_score",
+            args: (account.clone(), Liveness::Live, 1u64, 1u32).into_val(&env),
+            sub_invokes: &[],
+        },
+    }]);
+
+    assert!(
+        client.try_set_score(&account, &Liveness::Live, &1u64, &1u32).is_err(),
+        "rotation must actually revoke the old key, not merely add a new one",
+    );
+}
+
+#[test]
+fn the_publisher_can_publish_a_digest() {
+    let (env, client, _, publisher) = setup_split();
+    let digest = BytesN::from_array(&env, &[3u8; 32]);
+
+    env.mock_auths(&[MockAuth {
+        address: &publisher,
+        invoke: &MockAuthInvoke {
+            contract: &client.address,
+            fn_name: "publish",
+            args: (digest.clone(),).into_val(&env),
+            sub_invokes: &[],
+        },
+    }]);
+
+    assert_eq!(client.publish(&digest), 1);
+    assert_eq!(client.get_digest(), Some(digest));
+}

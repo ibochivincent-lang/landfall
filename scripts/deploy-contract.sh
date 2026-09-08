@@ -230,13 +230,46 @@ Deployed.
   network      $NETWORK
   contract     $CONTRACT_ID
   admin        $ADDRESS
+  publisher    $ADDRESS  (defaults to admin until you split them)
   rpc          $RPC
 
 The admin secret lives in the stellar CLI keystore under the identity
-'$IDENTITY'. It is not in this repo and must not be. To publish scores from a
-server, export it into that server's secret store:
+'$IDENTITY'. It is not in this repo and must not be.
 
-  stellar keys show $IDENTITY
+NEXT, BEFORE MAINNET — split the two roles. Right now one key both writes
+scores hourly and can hand over the contract, which is the escalation the
+two-role design exists to remove. Soroban always checks a Stellar account's
+MEDIUM threshold, so you cannot fix this with account thresholds alone: making
+the admin multisig would also stop the hourly publish, since CI signs with one
+key.
+
+  1. Make a publishing key — the hot key CI will hold:
+
+       stellar keys generate landfall-publisher --network $NETWORK
+       PUB=\$(stellar keys address landfall-publisher)
+       stellar contract invoke --id $CONTRACT_ID --source-account $IDENTITY --network $NETWORK -- set_publisher --new_publisher \$PUB
+
+  2. Put ONLY the publisher secret in CI (ORACLE_ADMIN_SECRET):
+
+       stellar keys show landfall-publisher
+
+     Worst case if it leaks: bad scores, visible in the event stream,
+     recomputable from Horizon, revocable by rotating this key. It cannot
+     take the contract.
+
+  3. Take the admin key cold and make it multisig. It never signs hourly, so
+     extra signatures cost nothing operationally. Add the signer FIRST, then
+     raise the threshold — the reverse order is unrecoverable:
+
+       stellar tx new set-options --source-account $IDENTITY --signer GSECOND_SIGNER --signer-weight 1 --network $NETWORK
+       stellar tx new set-options --source-account $IDENTITY --master-weight 1 --low-threshold 2 --med-threshold 2 --high-threshold 2 --network $NETWORK
+
+  4. Verify the split holds before trusting it:
+
+       stellar contract invoke --id $CONTRACT_ID --network $NETWORK -- admin
+       stellar contract invoke --id $CONTRACT_ID --network $NETWORK -- publisher
+
+See docs/TRUST.md for why this split is the shape to deploy mainnet with.
 
 EOF
 

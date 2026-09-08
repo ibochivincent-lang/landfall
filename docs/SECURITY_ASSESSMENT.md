@@ -121,22 +121,26 @@ mainnet, not after.
 
 The distinction that matters, and that summaries usually blur:
 
-- **Multisig on the admin account needs no contract change, but it breaks the
-  hourly publish.** `require_auth()` on a `G...` account delegates to that
-  account's own signers and thresholds — Soroban's built-in account contract
-  checks the **medium** threshold. So raising that threshold gives real
-  multisig with no redeploy. The catch, which a shorter version of this note
-  previously missed: `publish`, `set_score`, `set_scores` and `set_admin` all
-  go through the *same* `require_admin()`, and Soroban always checks medium,
-  so the account cannot give the hourly publisher a lower bar than a contract
-  takeover. Making the admin 2-of-N stops `scripts/publish-oracle.mjs`, which
-  signs with one key in CI.
-- **Separating the two needs a small contract change.** A distinct `publisher`
-  address for `publish`/`set_score`/`set_scores`, with `admin` retained for
-  `set_admin` and for rotating the publisher. Then the hot CI key can write
-  scores but cannot take the contract, and the admin can be cold multisig.
-  This is the shape to deploy to mainnet with — not a retrofit afterwards.
-- **A timelock also needs contract work.** Delaying `set_admin` so a handover
+- **The contract now separates the two roles.** `publish`, `set_score` and
+  `set_scores` gate on a **publisher** address; `set_admin` and
+  `set_publisher` gate on the **admin**. So the hourly CI key can write
+  scores but cannot hand over the contract, and the admin can be a cold
+  multisig account that never signs hourly. Proven by
+  `the_publisher_cannot_take_the_contract` and
+  `a_rotated_out_publisher_can_no_longer_write` in the contract's tests,
+  which use `mock_auths` rather than `mock_all_auths` so the escalation
+  check cannot pass vacuously.
+- **Why the split was necessary rather than just using account multisig.**
+  Soroban's built-in account contract always checks a Stellar account's
+  **medium** threshold, so one address cannot have a lower bar for "write a
+  score" than for "hand over the contract". Raising the admin account's
+  threshold to 2-of-N would therefore also have stopped
+  `scripts/publish-oracle.mjs`, which signs with one key in CI.
+- **Still to do before mainnet, and both are operational, not code:** install
+  a distinct publisher key (`set_publisher`) so CI stops holding the admin
+  key, and make the admin account itself multisig. The runbook is printed by
+  `scripts/deploy-contract.sh` after every deploy.
+- **A timelock still needs contract work.** Delaying `set_admin` so a handover
   is visible before it lands cannot be done from the account side.
 
 The contract emits `AdminChanged` on handover, so a takeover is publicly
