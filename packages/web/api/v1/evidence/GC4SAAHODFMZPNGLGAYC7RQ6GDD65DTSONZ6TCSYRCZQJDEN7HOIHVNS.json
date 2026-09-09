@@ -1,7 +1,7 @@
 {
-  "asOf": "2026-09-09T00:51:22.836Z",
-  "scanFile": "scan-2026-09-09T00-51-22-836Z.json",
-  "datasetRoot": "ab852a6f3dae8746f3515e37ade23bf5d83f991ed2343b91476a535a4882b6d5",
+  "asOf": "2026-09-09T05:32:34.683Z",
+  "scanFile": "scan-2026-09-09T05-32-34-683Z.json",
+  "datasetRoot": "47744b1a3daaeccbc9c4e2da9ca83a9685896aaae2ec8e2d72e6a7b49f7b66d1",
   "methodology": {
     "id": "11a4c3a9bfd0c485",
     "parameters": {
@@ -23,7 +23,7 @@
     "outbound": 0,
     "returns": 0,
     "returnRate": 0,
-    "hoursSinceActivity": 7576.81,
+    "hoursSinceActivity": 7581.5,
     "sampled": 2,
     "windowStart": "2025-09-01T02:37:56.000Z",
     "windowEnd": "2025-09-01T02:43:55.000Z"
@@ -34,31 +34,31 @@
     "path": [
       {
         "position": "left",
-        "hash": "a0e160d66cfafcc18b31732a4be2face34fc1c38f46677f552b91a44ba524120"
+        "hash": "a7ec9c354fdc4e065d33222cf380c3ea69c55d3268ab841d9a533587203ccca3"
       },
       {
         "position": "left",
-        "hash": "3549b8195d4b0c2c90ff20c7257545941c50cc151c4faf42fe90a76949526478"
+        "hash": "e348529be8fe5ad6941c7c3a8a0b9898cf2ba6a41cfbbe2a90ab9e12bde477cf"
       },
       {
         "position": "right",
-        "hash": "85e590dace66f892adc25a403023746969031e7970ce8ad7755f85bcead6fa54"
+        "hash": "d927f7cba3dfe12e500b45b432081741b25cb82a926d377a707fb320c0a89468"
       },
       {
         "position": "left",
-        "hash": "3a4d6ae71855c7208f4efd0c623b5a89531cf10c9dee67200d6046de3e9650c3"
+        "hash": "2d29f6ef484a6b41050bb5378b35766f2cdc4e463ba510f6a8c23f0dd5debb19"
       },
       {
         "position": "left",
-        "hash": "1138c360841869c4b5ab02a4a56aaf7d575f2256d92818ef55d496ba81807614"
+        "hash": "a4691a84663c912f05812fc3789cab4634ff61e7eb9fa7295c67bbb1a9008b25"
       },
       {
         "position": "left",
-        "hash": "149c59ec63f7308eb869275b4773d1e9fc7d2ebda7734bb7a582efcd8747b7b1"
+        "hash": "bf9576003ee1b857a951dbc6bd7dccefc512902557f1e18a53c4a93272d9664a"
       },
       {
         "position": "right",
-        "hash": "f724b2f6cdf3bde8432f316f7f863e946044f9b62c2ed475f6e928ddd732e030"
+        "hash": "d2ebdae98815fc8cefcfaadbc820565b15842c1148faff83390c1361d02a8bc5"
       }
     ],
     "namespace": "landfall-settlement-v1",

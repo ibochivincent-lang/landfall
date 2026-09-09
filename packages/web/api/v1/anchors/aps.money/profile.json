@@ -1,10 +1,10 @@
 {
   "anchorId": "aps.money",
   "name": "Advanced Payment Solutions Ltd.",
-  "asOf": "2026-09-09T00:51:22.836Z",
+  "asOf": "2026-09-09T05:32:34.683Z",
   "verification": {
     "resolved": true,
-    "checkedAt": "2026-09-09T00:51:22.836Z",
+    "checkedAt": "2026-09-09T05:32:34.683Z",
     "source": "SEP-1 stellar.toml, resolved live; issuer attribution confirmed against each issuer account's own on-chain home_domain",
     "accounts": [
       {
@@ -23,8 +23,8 @@
     "slow": 0,
     "dark": 0,
     "noActivity": 0,
-    "inbound": 3588,
-    "outbound": 9227
+    "inbound": 3735,
+    "outbound": 9563
   },
   "accounts": [
     {
@@ -36,7 +36,7 @@
       "outbound": 423,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 13.13,
+      "hoursSinceActivity": 17.82,
       "topCounterpartyShare": 1
     },
     {
@@ -44,12 +44,12 @@
       "domain": "aps.money",
       "name": "Advanced Payment Solutions Ltd.",
       "state": "live",
-      "inbound": 3586,
-      "outbound": 8804,
-      "returns": 567,
-      "returnRate": 0.1581,
-      "hoursSinceActivity": 0.01,
-      "topCounterpartyShare": 0.8565
+      "inbound": 3733,
+      "outbound": 9140,
+      "returns": 592,
+      "returnRate": 0.1586,
+      "hoursSinceActivity": 0,
+      "topCounterpartyShare": 0.8555
     }
   ],
   "history": {
@@ -193,6 +193,13 @@
         "in": 2,
         "out": 423,
         "hours": 13.13
+      },
+      {
+        "t": "2026-09-09T05:32:34.683Z",
+        "state": "live",
+        "in": 2,
+        "out": 423,
+        "hours": 17.82
       }
     ],
     "GBN32NH6TMWE4ZD4G245CF3UVOQRXD4FK3FDCLZ4DE5642HWFKSLLRMB": [
@@ -335,6 +342,13 @@
         "in": 3586,
         "out": 8804,
         "hours": 0.01
+      },
+      {
+        "t": "2026-09-09T05:32:34.683Z",
+        "state": "live",
+        "in": 3733,
+        "out": 9140,
+        "hours": 0
       }
     ]
   },

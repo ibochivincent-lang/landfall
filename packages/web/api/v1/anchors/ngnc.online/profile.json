@@ -1,10 +1,10 @@
 {
   "anchorId": "ngnc.online",
   "name": "LINK.IO LTD.",
-  "asOf": "2026-09-09T00:51:22.836Z",
+  "asOf": "2026-09-09T05:32:34.683Z",
   "verification": {
     "resolved": true,
-    "checkedAt": "2026-09-09T00:51:22.836Z",
+    "checkedAt": "2026-09-09T05:32:34.683Z",
     "source": "SEP-1 stellar.toml, resolved live; issuer attribution confirmed against each issuer account's own on-chain home_domain",
     "accounts": [
       {
@@ -36,7 +36,7 @@
       "outbound": 8,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 508.93,
+      "hoursSinceActivity": 513.62,
       "topCounterpartyShare": 0.1982
     },
     {
@@ -48,7 +48,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 19.57,
+      "hoursSinceActivity": 24.26,
       "topCounterpartyShare": 1
     }
   ],
@@ -193,6 +193,13 @@
         "in": 108,
         "out": 8,
         "hours": 508.93
+      },
+      {
+        "t": "2026-09-09T05:32:34.683Z",
+        "state": "slow",
+        "in": 108,
+        "out": 8,
+        "hours": 513.62
       }
     ],
     "GCQLPBWOQ5PAJYEEQBE7GDSY7X3LCYKFEBKOCNF3OUA6F74ORK74HVSQ": [
@@ -335,6 +342,13 @@
         "in": 4,
         "out": 0,
         "hours": 19.57
+      },
+      {
+        "t": "2026-09-09T05:32:34.683Z",
+        "state": "live",
+        "in": 4,
+        "out": 0,
+        "hours": 24.26
       }
     ]
   },
