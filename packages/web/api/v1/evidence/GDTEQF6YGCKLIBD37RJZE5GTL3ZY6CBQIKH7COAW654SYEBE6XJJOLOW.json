@@ -1,7 +1,7 @@
 {
-  "asOf": "2026-09-09T21:22:28.290Z",
-  "scanFile": "scan-2026-09-09T21-22-28-290Z.json",
-  "datasetRoot": "1693fb04d9e010becd5152d9b48da925705251a497208336b0841b99e7c0a830",
+  "asOf": "2026-09-09T23:40:21.752Z",
+  "scanFile": "scan-2026-09-09T23-40-21-752Z.json",
+  "datasetRoot": "b1abcbeabb322f25c5ca590d6d95dddd7cf34d9b44f37386a3579904048e6bc9",
   "methodology": {
     "id": "11a4c3a9bfd0c485",
     "parameters": {
@@ -23,7 +23,7 @@
     "outbound": 1,
     "returns": 0,
     "returnRate": null,
-    "hoursSinceActivity": 1483.14,
+    "hoursSinceActivity": 1485.44,
     "sampled": 1,
     "windowStart": "2026-01-17T12:50:21.000Z",
     "windowEnd": "2026-01-17T12:50:21.000Z"
@@ -34,27 +34,27 @@
     "path": [
       {
         "position": "left",
-        "hash": "306d2abe59442ab44b2a0c069f74eb1007ddf23e9a9fd847e8d543775092d1d1"
+        "hash": "346274fc69d25dbcf0f2ecb879380fb6dfc001e1071fec81364fd444179bddd0"
       },
       {
         "position": "right",
-        "hash": "5504e4b57a2479390dbf1434113788e297f81d5abec2edd267e2655120e43f10"
+        "hash": "9c4ce1ef33e40db8d5744f3c4f83a4ed0ca721fd297effcd80e4b09099c2cbe3"
       },
       {
         "position": "right",
-        "hash": "d4c25393a84ded266947869f79893ca5c72c39a5e89d10554ab23db57da368a5"
+        "hash": "a28f6d15671b0f0899d5c1158201e2539f82a31ca7ba8f563b037ced6e8dc3c0"
       },
       {
         "position": "right",
-        "hash": "511798c51f56f61c1d44385b6611fb61fd92b56dfd928f722d6a5a716988c3af"
+        "hash": "7cf506385109aa6776db0692403e80b0b727523c03dbc4f510dfda3fc48b2348"
       },
       {
         "position": "left",
-        "hash": "fdab371044c2e182111fb5c27fd786064057c8c47115da7541799da9de40fdd4"
+        "hash": "3beec9fefc65a1ea68fe8e393190935eadfadcc9a1ed2949fbdb5d73cd59033d"
       },
       {
         "position": "left",
-        "hash": "e9770c9e89294b14fadfd4a4f524de6446158723ac98d878bd11f0eb36161345"
+        "hash": "91f33133c447a7b318e8c71ff63f955632bb19d8faa60e86000a1d3ee7c81978"
       }
     ],
     "namespace": "landfall-settlement-v1",
