@@ -1,10 +1,10 @@
 {
   "anchorId": "ultracapital.xyz",
   "name": "Ultra Capital LLC",
-  "asOf": "2026-09-09T05:32:34.683Z",
+  "asOf": "2026-09-09T10:22:26.169Z",
   "verification": {
     "resolved": true,
-    "checkedAt": "2026-09-09T05:32:34.683Z",
+    "checkedAt": "2026-09-09T10:22:26.169Z",
     "source": "SEP-1 stellar.toml, resolved live; issuer attribution confirmed against each issuer account's own on-chain home_domain",
     "accounts": [
       {
@@ -68,7 +68,7 @@
     "dark": 4,
     "noActivity": 0,
     "inbound": 638,
-    "outbound": 3616
+    "outbound": 3757
   },
   "accounts": [
     {
@@ -80,7 +80,7 @@
       "outbound": 72,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 471.79,
+      "hoursSinceActivity": 476.62,
       "topCounterpartyShare": 1
     },
     {
@@ -92,7 +92,7 @@
       "outbound": 3,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 439.91,
+      "hoursSinceActivity": 444.74,
       "topCounterpartyShare": null
     },
     {
@@ -104,7 +104,7 @@
       "outbound": 204,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 32.31,
+      "hoursSinceActivity": 37.14,
       "topCounterpartyShare": 1
     },
     {
@@ -116,7 +116,7 @@
       "outbound": 17,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1160.94,
+      "hoursSinceActivity": 1165.77,
       "topCounterpartyShare": null
     },
     {
@@ -128,7 +128,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1488.73,
+      "hoursSinceActivity": 1493.56,
       "topCounterpartyShare": null
     },
     {
@@ -140,7 +140,7 @@
       "outbound": 9,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 159.88,
+      "hoursSinceActivity": 164.71,
       "topCounterpartyShare": 1
     },
     {
@@ -152,7 +152,7 @@
       "outbound": 1,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 1246.98,
+      "hoursSinceActivity": 1251.81,
       "topCounterpartyShare": 1
     },
     {
@@ -164,7 +164,7 @@
       "outbound": 3,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 446.01,
+      "hoursSinceActivity": 450.84,
       "topCounterpartyShare": 0.9997
     },
     {
@@ -176,7 +176,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 756.69,
+      "hoursSinceActivity": 761.52,
       "topCounterpartyShare": 1
     },
     {
@@ -188,7 +188,7 @@
       "outbound": 48,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 234.63,
+      "hoursSinceActivity": 239.46,
       "topCounterpartyShare": 0.3604
     },
     {
@@ -197,10 +197,10 @@
       "name": "Ultra Capital LLC",
       "state": "live",
       "inbound": 5,
-      "outbound": 3256,
+      "outbound": 3397,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 0.28,
+      "hoursSinceActivity": 0.36,
       "topCounterpartyShare": 0.92
     },
     {
@@ -212,7 +212,7 @@
       "outbound": 1,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 256.1,
+      "hoursSinceActivity": 260.94,
       "topCounterpartyShare": 0.9295
     },
     {
@@ -224,7 +224,7 @@
       "outbound": 2,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 161.32,
+      "hoursSinceActivity": 166.15,
       "topCounterpartyShare": 0.529
     }
   ],
@@ -376,6 +376,13 @@
         "in": 1,
         "out": 72,
         "hours": 471.79
+      },
+      {
+        "t": "2026-09-09T10:22:26.169Z",
+        "state": "slow",
+        "in": 1,
+        "out": 72,
+        "hours": 476.62
       }
     ],
     "GCBPMB2VK3POXU3QL2IPOUYKEDNZYRCYPFQGLLYVX6D2OLLRO7SWTTBO": [
@@ -525,6 +532,13 @@
         "in": 0,
         "out": 3,
         "hours": 439.91
+      },
+      {
+        "t": "2026-09-09T10:22:26.169Z",
+        "state": "slow",
+        "in": 0,
+        "out": 3,
+        "hours": 444.74
       }
     ],
     "GADFXROGGR74V3MSWU2SUKCEUPQFZEIIF3IUHLRN3NKZ4JN2IPBMCODA": [
@@ -674,6 +688,13 @@
         "in": 1,
         "out": 204,
         "hours": 32.31
+      },
+      {
+        "t": "2026-09-09T10:22:26.169Z",
+        "state": "live",
+        "in": 1,
+        "out": 204,
+        "hours": 37.14
       }
     ],
     "GD7G6G56JHGQ3LY37ZYHALJRSAJYXWMYMKAF5G2GBXD5ETRPY4U5XS33": [
@@ -823,6 +844,13 @@
         "in": 0,
         "out": 17,
         "hours": 1160.94
+      },
+      {
+        "t": "2026-09-09T10:22:26.169Z",
+        "state": "dark",
+        "in": 0,
+        "out": 17,
+        "hours": 1165.77
       }
     ],
     "GA3UK3JHOYYD3TAUH5C7NDOUDWBRF5FC4MECXFA2VRPEHIDQUOJIVOAJ": [
@@ -972,6 +1000,13 @@
         "in": 0,
         "out": 0,
         "hours": 1488.73
+      },
+      {
+        "t": "2026-09-09T10:22:26.169Z",
+        "state": "dark",
+        "in": 0,
+        "out": 0,
+        "hours": 1493.56
       }
     ],
     "GDGTVWSM4MGS4T7Z6W4RPWOCHE2I6RDFCIFZGS3DOA63LWQTRNZNTTFF": [
@@ -1121,6 +1156,13 @@
         "in": 29,
         "out": 9,
         "hours": 159.88
+      },
+      {
+        "t": "2026-09-09T10:22:26.169Z",
+        "state": "slow",
+        "in": 29,
+        "out": 9,
+        "hours": 164.71
       }
     ],
     "GDYQNEF2UWTK4L6HITMT53MZ6F5QWO3Q4UVE6SCGC4OMEQIZQQDERQFD": [
@@ -1270,6 +1312,13 @@
         "in": 8,
         "out": 1,
         "hours": 1246.98
+      },
+      {
+        "t": "2026-09-09T10:22:26.169Z",
+        "state": "dark",
+        "in": 8,
+        "out": 1,
+        "hours": 1251.81
       }
     ],
     "GARDNV3Q7YGT4AKSDF25LT32YSCCW4EV22Y2TV3I2PU2MMXJTEDL5T55": [
@@ -1419,6 +1468,13 @@
         "in": 135,
         "out": 3,
         "hours": 446.01
+      },
+      {
+        "t": "2026-09-09T10:22:26.169Z",
+        "state": "slow",
+        "in": 135,
+        "out": 3,
+        "hours": 450.84
       }
     ],
     "GBUVRNH4RW4VLHP4C5MOF46RRIRZLAVHYGX45MVSTKA2F6TMR7E7L6NW": [
@@ -1568,6 +1624,13 @@
         "in": 8,
         "out": 0,
         "hours": 756.69
+      },
+      {
+        "t": "2026-09-09T10:22:26.169Z",
+        "state": "dark",
+        "in": 8,
+        "out": 0,
+        "hours": 761.52
       }
     ],
     "GDVKAVKZDKMLPEXXFXPVKARRO4BNFJXRRPKENEDERK5PBYIWCJ2GQOOF": [
@@ -1717,6 +1780,13 @@
         "in": 407,
         "out": 48,
         "hours": 234.63
+      },
+      {
+        "t": "2026-09-09T10:22:26.169Z",
+        "state": "slow",
+        "in": 407,
+        "out": 48,
+        "hours": 239.46
       }
     ],
     "GANESLOXBZWPLB5ZM2KFUTBGSBGISB7JTWFXO67G4TGQINWRMI6766GV": [
@@ -1866,6 +1936,13 @@
         "in": 5,
         "out": 3256,
         "hours": 0.28
+      },
+      {
+        "t": "2026-09-09T10:22:26.169Z",
+        "state": "live",
+        "in": 5,
+        "out": 3397,
+        "hours": 0.36
       }
     ],
     "GBFXOHVAS43OIWNIO7XLRJAHT3BICFEIKOJLZVXNT572MISM4CMGSOCC": [
@@ -2015,6 +2092,13 @@
         "in": 35,
         "out": 1,
         "hours": 256.1
+      },
+      {
+        "t": "2026-09-09T10:22:26.169Z",
+        "state": "slow",
+        "in": 35,
+        "out": 1,
+        "hours": 260.94
       }
     ],
     "GDPJALI4AZKUU2W426U5WKMAT6CN3AJRPIIRYR2YM54TL2GDWO5O2MZM": [
@@ -2164,6 +2248,13 @@
         "in": 9,
         "out": 2,
         "hours": 161.32
+      },
+      {
+        "t": "2026-09-09T10:22:26.169Z",
+        "state": "slow",
+        "in": 9,
+        "out": 2,
+        "hours": 166.15
       }
     ]
   },
