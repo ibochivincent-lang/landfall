@@ -58,14 +58,40 @@ async function loadDomains(explicit?: string[]): Promise<string[]> {
   // rather than a table nobody reads. Any failure here (no DATABASE_URL, DB
   // unreachable) falls back to the seed list alone; a scan must never fail
   // because the admin-additions lookup did.
+  //
+  // That fallback used to be silent, and it cost a real anchor its record.
+  // On 8 September zeam.money — admin-added, so present only in
+  // tracked_anchors — vanished from a scan along with all fifteen of its
+  // accounts. Its TOML resolved fine and it was still tracked; it had simply
+  // never been asked, because this lookup failed and the catch swallowed it.
+  // No log line, no resolve_error, nothing to distinguish it from an anchor
+  // that was never tracked at all.
+  //
+  // Two changes. The timeout was 3s while every other caller in this
+  // repository — including Store's own default — uses 8s against the same
+  // pooled database, which made this the most likely lookup to time out and
+  // the only one that hid it. And the failure now prints, because this
+  // project's own rule is that a domain we cannot reach is a finding rather
+  // than a gap.
   const connectionString = connectionStringFromEnv();
   if (!connectionString) return seed;
   let store: Store | undefined;
   try {
-    store = new Store({ connectionString, connectionTimeoutMillis: 3_000 });
+    store = new Store({ connectionString, connectionTimeoutMillis: 8_000 });
     const extra = await store.trackedDomains();
     return Array.from(new Set([...seed, ...extra]));
-  } catch {
+  } catch (err) {
+    const reason = err instanceof Error ? err.message : String(err);
+    process.stderr.write(
+      `FAIL  admin-added domains could not be read (${reason}).
+` +
+        `      Scanning the ${seed.length} seed domain(s) only. Any anchor added through
+` +
+        `      the admin board is NOT in this scan, and its absence from the published
+` +
+        `      record does not mean it stopped settling.
+`,
+    );
     return seed;
   } finally {
     await store?.close().catch(() => {});

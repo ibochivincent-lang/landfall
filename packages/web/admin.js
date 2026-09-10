@@ -267,4 +267,34 @@ $('#addAnchorForm').addEventListener('submit', async (e) => {
   }
 });
 
+// ── Webhook operations ──────────────────────────────────────────────────────
+const btnRedeliver = $('#btnRedeliverWebhooks');
+if (btnRedeliver) {
+  btnRedeliver.addEventListener('click', async () => {
+    const statusEl = $('#webhookRedeliverStatus');
+    const resultGrid = $('#webhookRedeliverResult');
+    btnRedeliver.disabled = true;
+    statusEl.textContent = 'Replaying failed deliveries...';
+    try {
+      const res = await api('/api/v1/admin/webhooks/redeliver', { method: 'POST', body: JSON.stringify({}) });
+      statusEl.textContent = res.message || 'Complete.';
+      if (resultGrid) {
+        resultGrid.hidden = false;
+        const cReplayed = $('#countReplayed');
+        const cDelivered = $('#countDelivered');
+        const cFailed = $('#countFailed');
+        const cSkipped = $('#countSkipped');
+        if (cReplayed) cReplayed.textContent = res.replayed ?? 0;
+        if (cDelivered) cDelivered.textContent = res.delivered ?? 0;
+        if (cFailed) cFailed.textContent = res.failed ?? 0;
+        if (cSkipped) cSkipped.textContent = res.skipped ?? 0;
+      }
+    } catch (err) {
+      statusEl.textContent = 'Failed: ' + err.message;
+    } finally {
+      btnRedeliver.disabled = false;
+    }
+  });
+}
+
 checkSession();

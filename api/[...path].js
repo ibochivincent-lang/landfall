@@ -53,6 +53,8 @@ import { promisify } from 'node:util';
 import { assertPublicHostname } from './_lib/net-guard.js';
 import { sendEmail } from './_lib/email.js';
 import { graphql, buildSchema } from 'graphql';
+import { StrKey } from '@stellar/stellar-base';
+import { buildPaymentRequiredResponse, verifyX402Payment } from './_lib/x402-server.js';
 // Side-effect import: packages/web/intent.js is a plain script that assigns
 // its API to globalThis. Imported rather than mirrored a third time — the
 // browser already ships that exact file, and packages/intents/test/parity.test.ts
@@ -67,6 +69,12 @@ import {
   sep10Config,
   verifyChallenge,
 } from './_lib/sep10.js';
+import { handleAnchorsRoute } from './routes/anchors.js';
+import { handleTrustCheckRoute } from './routes/trust-check.js';
+import { handleX402Route } from './routes/x402.js';
+import { handleAdminRoute } from './routes/admin.js';
+import { handleFraudReportsRoute } from './routes/fraud-reports.js';
+import { handleFiatRoute } from './routes/fiat.js';
 
 const { Pool } = pg;
 const scrypt = promisify(scryptCb);
@@ -1287,17 +1295,26 @@ async function trustCheckGetJson(url) {
 }
 
 const G_ADDRESS = /^G[A-Z2-7]{55}$/;
+const M_ADDRESS = /^M[A-Z2-7]{68}$/;
+const C_ADDRESS = /^C[A-Z2-7]{55}$/;
 const TX_HASH = /^[0-9a-fA-F]{64}$/;
 
 /**
  * Resolves whatever the user pasted to a Stellar account: a G... address is
- * used directly, a transaction hash is resolved to its source account. This
- * is the only place this route makes a guess about intent — everything
- * downstream is a straight ledger read on the resolved address.
+ * used directly, an M... muxed account is unwrapped to its base G... account,
+ * a transaction hash is resolved to its source account.
  */
 export async function trustCheckResolveAddress(raw) {
   const value = String(raw ?? '').trim();
   if (G_ADDRESS.test(value)) return value;
+  if (M_ADDRESS.test(value)) {
+    try {
+      if (StrKey.isValidMed25519PublicKey(value)) {
+        const rawBytes = StrKey.decodeMed25519PublicKey(value);
+        return StrKey.encodeEd25519PublicKey(rawBytes.subarray(0, 32));
+      }
+    } catch {}
+  }
   if (TX_HASH.test(value)) {
     const tx = await trustCheckGetJson(`${TRUST_CHECK_HORIZON}/transactions/${value}`);
     if (typeof tx.source_account === 'string') return tx.source_account;
@@ -1577,6 +1594,26 @@ async function investigatorCallModel(prompt) {
 
 const X402_STELLAR_NETWORKS = new Set(['stellar:pubnet', 'stellar:testnet']);
 
+export function unwrapStellarAddress(payTo) {
+  const clean = String(payTo ?? '').trim();
+  if (G_ADDRESS.test(clean)) {
+    return { address: clean, isMuxed: false, isContract: false, isValid: true };
+  }
+  if (M_ADDRESS.test(clean)) {
+    try {
+      if (StrKey.isValidMed25519PublicKey(clean)) {
+        const raw = StrKey.decodeMed25519PublicKey(clean);
+        const ed25519Raw = raw.subarray(0, 32);
+        const memoId = raw.readBigUInt64BE(32).toString();
+        const baseAccount = StrKey.encodeEd25519PublicKey(ed25519Raw);
+        return { address: baseAccount, isMuxed: true, memoId, isContract: false, isValid: true };
+      }
+    } catch {}
+  }
+  const isContract = C_ADDRESS.test(clean) || (typeof StrKey.isValidContract === 'function' && StrKey.isValidContract(clean));
+  return { address: clean, isMuxed: false, isContract, isValid: false };
+}
+
 export async function evaluatePaymentRequirements(accepts, runTrustCheck) {
   return Promise.all(
     accepts.map(async (requirement) => {
@@ -1587,18 +1624,41 @@ export async function evaluatePaymentRequirements(accepts, runTrustCheck) {
           reason: `network "${requirement.network}" is not Stellar — Trust Check reads Stellar ledger history only.`,
         };
       }
-      if (!G_ADDRESS.test(requirement.payTo)) {
+
+      const unwrapped = unwrapStellarAddress(requirement.payTo);
+      if (unwrapped.isContract) {
         return {
           requirement,
           supported: false,
-          reason: `payTo "${requirement.payTo}" is not a classic Stellar account (G...) — likely a Soroban contract or muxed address, which Trust Check cannot attribute to an operator.`,
+          isContract: true,
+          reason: `payTo "${requirement.payTo}" is a Soroban contract (C...) — Trust Check evaluates entity payment history on ledger accounts (G.../M...), not contract bytecode.`,
         };
       }
-      const outcome = await runTrustCheck(requirement.payTo);
+
+      if (!unwrapped.isValid) {
+        return {
+          requirement,
+          supported: false,
+          reason: `payTo "${requirement.payTo}" is not a valid classic or muxed Stellar account (G... or M...).`,
+        };
+      }
+
+      const outcome = await runTrustCheck(unwrapped.address);
       if (!outcome.ok) {
         return { requirement, supported: false, reason: outcome.reason, retryable: outcome.retryable };
       }
-      return { requirement, supported: true, trustCheck: outcome.trustCheck };
+
+      const res = {
+        requirement,
+        supported: true,
+        trustCheck: outcome.trustCheck,
+      };
+      if (unwrapped.isMuxed) {
+        res.isMuxed = true;
+        res.baseAccount = unwrapped.address;
+        if (unwrapped.memoId) res.memoId = unwrapped.memoId;
+      }
+      return res;
     }),
   );
 }
@@ -2125,31 +2185,11 @@ export default async function handler(req, res) {
   // app's own Postgres, so it has no reason to fail just because that
   // database happens to be unreachable.
   if (req.method === 'GET' && joined === 'v1/trust-check') {
-    try {
-      const url = new URL(req.url, `https://${req.headers.host}`);
-      const raw = url.searchParams.get('address') || '';
-
-      const address = await trustCheckResolveAddress(raw);
-      if (!address) {
-        return json(res, 400, { error: 'address must be a Stellar public key (G...) or a transaction hash.' }, 0);
-      }
-
-      const db = pool();
-      if (db) {
-        const bucket = `trustcheck:${clientIp(req)}`;
-        const { allowed } = await rateLimit(db, bucket, 20);
-        if (!allowed) return json(res, 429, { error: 'Too many checks. Try again in a minute.' }, 0);
-      }
-
-      const input = await trustCheckFetchInput(address, new Date().toISOString());
-      return json(res, 200, analyzeTrustCheck(input), 60);
-    } catch (err) {
-      if (err.status === 404) {
-        return json(res, 404, { error: 'That address has no account on the Stellar network.' }, 0);
-      }
-      console.error('[trust-check]', err.message);
-      return json(res, 502, { error: 'Could not reach Horizon to check that address. Try again shortly.' }, 0);
-    }
+    return handleTrustCheckRoute(req, res, pool(), parts, joined, {
+      trustCheckResolveAddress,
+      trustCheckFetchInput,
+      analyzeTrustCheck,
+    });
   }
 
   const db = pool();
@@ -2483,37 +2523,11 @@ export default async function handler(req, res) {
       const sub = parts.slice(2);
 
       if (req.method === 'POST' && sub.join('/') === 'login') {
-        if (await enforceAuthRateLimit(req, res, db, 'admin-login')) return;
-
-        const body = await readJsonBody(req);
-        const username = String(body.username || '').trim().toLowerCase();
-        const password = String(body.password || '');
-        if (!username || !password) return adminJson(res, 400, { error: 'Username and password are required.' });
-
-        const { rows } = await db.query('SELECT id, password_hash FROM admin_users WHERE username = $1', [username]);
-        const user = rows[0];
-        const ok = user
-          ? await verifyPassword(password, user.password_hash)
-          : await verifyPassword(password, 'scrypt$00$00').catch(() => false);
-        if (!user || !ok) return adminJson(res, 401, { error: 'Invalid username or password.' });
-
-        const token = randomBytes(32).toString('hex');
-        const expiresAt = new Date(Date.now() + SESSION_TTL_MS);
-        await db.query(
-          `INSERT INTO admin_sessions (token_hash, user_id, expires_at, user_agent)
-           VALUES ($1, $2, $3, $4)`,
-          [sha256Hex(token), user.id, expiresAt.toISOString(), String(req.headers['user-agent'] || '').slice(0, 300)],
-        );
-        await db.query('UPDATE admin_users SET last_login_at = now() WHERE id = $1', [user.id]);
-        setSessionCookie(res, token, SESSION_TTL_MS / 1000);
-        return adminJson(res, 200, { ok: true, username });
+        return handleAdminRoute(req, res, db, parts, joined, { enforceAuthRateLimit });
       }
 
       if (req.method === 'POST' && sub.join('/') === 'logout') {
-        const token = parseCookies(req)[SESSION_COOKIE];
-        if (token) await db.query('DELETE FROM admin_sessions WHERE token_hash = $1', [sha256Hex(token)]);
-        clearSessionCookie(res);
-        return adminJson(res, 200, { ok: true });
+        return handleAdminRoute(req, res, db, parts, joined);
       }
 
       // Everything else under /admin requires a live session AND the admin
@@ -2536,62 +2550,12 @@ export default async function handler(req, res) {
         return adminJson(res, 403, { error: 'Administrator access required.' });
       }
 
-      if (req.method === 'GET' && sub.join('/') === 'me') {
-        return adminJson(res, 200, { ok: true, username: session.username });
-      }
-
-      if (req.method === 'GET' && sub.join('/') === 'health') {
-        return adminJson(res, 200, await adminHealth(db));
-      }
-
-      if (req.method === 'GET' && sub.join('/') === 'payments') {
-        const url = new URL(req.url, `https://${req.headers.host}`);
-        const limit = Math.min(Math.max(Number(url.searchParams.get('limit') || 100), 1), 1000);
-        const page = await paymentsPage(db, {
-          direction: url.searchParams.get('direction') || null,
-          asset: url.searchParams.get('asset') || null,
-          before: url.searchParams.get('before') || null,
-          limit,
-          includeRaw: true,
-        });
-        return adminJson(res, 200, page);
-      }
-
-      if (req.method === 'GET' && sub.join('/') === 'anchors') {
-        return adminJson(res, 200, { anchors: await listTrackedAnchors(db) });
-      }
-
-      if (req.method === 'POST' && sub.join('/') === 'anchors') {
-        const body = await readJsonBody(req);
-        const domain = String(body.domain || '').trim().toLowerCase();
-        if (!domain || !/^[a-z0-9.-]+\.[a-z]{2,}$/.test(domain)) {
-          return adminJson(res, 400, { error: 'A valid domain is required, e.g. example.com.' });
-        }
-        await db.query(
-          `INSERT INTO tracked_anchors (domain, active, added_by, notes)
-           VALUES ($1, true, $2, $3)
-           ON CONFLICT (domain) DO UPDATE
-             SET active = true, updated_at = now(), notes = COALESCE(EXCLUDED.notes, tracked_anchors.notes)`,
-          [domain, session.username, body.notes ? String(body.notes).slice(0, 500) : null],
-        );
-        return adminJson(res, 200, { ok: true, anchors: await listTrackedAnchors(db) });
-      }
-
-      if ((req.method === 'PATCH' || req.method === 'DELETE') && sub[0] === 'anchors' && sub[1]) {
-        const domain = decodeURIComponent(sub[1]).toLowerCase();
-        if (req.method === 'DELETE') {
-          await db.query('DELETE FROM tracked_anchors WHERE domain = $1', [domain]);
-        } else {
-          const body = await readJsonBody(req);
-          await db.query(
-            'UPDATE tracked_anchors SET active = $2, updated_at = now() WHERE domain = $1',
-            [domain, Boolean(body.active)],
-          );
-        }
-        return adminJson(res, 200, { ok: true, anchors: await listTrackedAnchors(db) });
-      }
-
-      return adminJson(res, 404, { error: `Unknown admin route: /${joined}` });
+      return handleAdminRoute(req, res, db, parts, joined, {
+        session,
+        adminHealth,
+        paymentsPage,
+        listTrackedAnchors,
+      });
     }
 
     // ── GraphQL — POST { query, variables }, or GET ?query=... for quick
@@ -2646,7 +2610,7 @@ export default async function handler(req, res) {
     // v1/auth is listed even though it is handled above this guard and never
     // reaches it — belt and braces, so that moving the route down here later
     // does not silently strand it the way three routes were stranded before.
-    const POST_ROUTES = new Set(['v1/intent', 'v1/fraud-reports', 'v1/fiat-confirmations', 'v1/x402/check-payee', 'v1/auth']);
+    const POST_ROUTES = new Set(['v1/intent', 'v1/fraud-reports', 'v1/fiat-confirmations', 'v1/x402/check-payee', 'v1/auth', 'v1/corridors/export']);
     /* Parameterised write paths, which an exact set cannot express. Kept as
        a separate list rather than loosening POST_ROUTES to prefixes: a
        prefix would also admit v1/fraud-reports/anything, and the point of
@@ -2681,87 +2645,72 @@ export default async function handler(req, res) {
 
     // GET /api/v1/anchors
     if (joined === 'v1/anchors') {
-      const scan = await latestScan(db);
-      if (!scan) return json(res, 503, { error: 'No completed scan yet.' }, 0);
-      const accounts = await accountRows(db);
-
-      // Group by domain and attach reliability
-      const byDomain = new Map();
-      for (const a of accounts) {
-        if (!byDomain.has(a.domain)) byDomain.set(a.domain, []);
-        byDomain.get(a.domain).push(a);
-      }
-
-      const summaries = {};
-      for (const [domain, dAccounts] of byDomain.entries()) {
-        summaries[domain] = computeDomainReliability(dAccounts);
-      }
-
-      // Coverage travels with the data, not in a separate endpoint nobody
-      // calls — a partial scan has to be visibly partial at the point of use.
-      const coverage = await scanCoverage(db);
-
-      return json(res, 200, {
-        asOf: scan.finishedAt,
-        staleHours: scan.staleHours,
-        coverage,
-        accounts,
-        reliability: summaries,
+      return handleAnchorsRoute(req, res, db, parts, joined, {
+        latestScan,
+        accountRows,
+        computeDomainReliability,
+        scanCoverage,
       });
     }
 
     // GET /api/v1/anchors/:domain/health-check
     if (parts.length === 4 && parts[0] === 'v1' && parts[1] === 'anchors' && parts[3] === 'health-check') {
-      const domain = decodeURIComponent(parts[2]).toLowerCase();
-      const accounts = (await accountRows(db)).filter(a => a.domain.toLowerCase() === domain);
-      if (!accounts.length) return json(res, 404, { error: `No accounts tracked for ${domain}` });
-
-      const rel = computeDomainReliability(accounts);
-      return json(res, 200, {
-        domain,
-        healthy: rel.score >= 55,
-        ...rel
-      }, 120);
+      return handleAnchorsRoute(req, res, db, parts, joined, {
+        accountRows,
+        computeDomainReliability,
+      });
     }
 
     // GET /api/v1/badges/:domain.svg
     if (parts.length === 3 && parts[0] === 'v1' && parts[1] === 'badges') {
-      const rawDomain = parts[2].replace(/\.svg$/i, '').toLowerCase();
-      const domain = decodeURIComponent(rawDomain);
-      const accounts = (await accountRows(db)).filter(a => a.domain.toLowerCase() === domain);
-      const rel = computeDomainReliability(accounts);
-
-      const svg = renderBadgeSvg(domain, rel.score, rel.grade);
-      res.setHeader('Content-Type', 'image/svg+xml; charset=utf-8');
-      res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=600');
-      res.setHeader('Access-Control-Allow-Origin', '*');
-      return res.status(200).send(svg);
+      return handleAnchorsRoute(req, res, db, parts, joined, {
+        accountRows,
+        computeDomainReliability,
+        renderBadgeSvg,
+      });
     }
 
     // GET /api/v1/assets
     if (joined === 'v1/assets') {
-      return json(res, 200, { assets: await assetRows(db) });
+      return handleAnchorsRoute(req, res, db, parts, joined, { assetRows });
     }
 
     // GET /api/v1/corridors
     if (joined === 'v1/corridors') {
-      const corridors = await corridorRows(db);
-      return json(res, 200, { corridors }, 300);
+      return handleAnchorsRoute(req, res, db, parts, joined, { corridorRows });
+    }
+
+    // POST /api/v1/corridors/export -- x402 protected premium corridor export
+    if (req.method === 'POST' && joined === 'v1/corridors/export') {
+      return handleX402Route(req, res, db, parts, joined, { corridorRows });
+    }
+
+    // GET /api/v1/dump/ndjson -- x402 protected bulk settlement dump
+    if (req.method === 'GET' && joined === 'v1/dump/ndjson') {
+      return handleX402Route(req, res, db, parts, joined, { accountRows });
+    }
+
+    // GET /api/v1/anchors/synthetic-health
+    if (req.method === 'GET' && joined === 'v1/anchors/synthetic-health') {
+      return handleAnchorsRoute(req, res, db, parts, joined);
+    }
+
+    // GET /api/v1/anchors/:domain/synthetic-health
+    if (req.method === 'GET' && parts.length === 4 && parts[0] === 'v1' && parts[1] === 'anchors' && parts[3] === 'synthetic-health') {
+      return handleAnchorsRoute(req, res, db, parts, joined);
     }
 
     // GET /api/v1/anchors/:domain/payments
     if (parts.length === 4 && parts[0] === 'v1' && parts[1] === 'anchors' && parts[3] === 'payments') {
-      const domain    = decodeURIComponent(parts[2]);
-      const url       = new URL(req.url, `https://${req.headers.host}`);
-      const limit     = Math.min(Math.max(Number(url.searchParams.get('limit') || 50), 1), 500);
-      const direction = url.searchParams.get('direction') || null;
-      const asset     = url.searchParams.get('asset')     || null;
-      const before    = url.searchParams.get('before')    || null;
+      return handleAnchorsRoute(req, res, db, parts, joined, {
+        domainAccounts,
+        paymentsPage,
+      });
+    }
 
-      const accounts = await domainAccounts(db, domain);
-      if (!accounts.length) return json(res, 404, { error: `No accounts for ${domain}` });
-
-      return json(res, 200, await paymentsPage(db, { accounts, direction, asset, before, limit }));
+    // GET /api/v1/anchors/:domain/slippage
+    if (parts.length === 4 && parts[0] === 'v1' && parts[1] === 'anchors' && parts[3] === 'slippage') {
+      return handleAnchorsRoute(req, res, db, parts, joined);
     }
 
     // POST /api/v1/intent
@@ -2787,286 +2736,35 @@ export default async function handler(req, res) {
     }
 
     // POST /api/v1/fraud-reports
-    //
-    // A stranger publishing an allegation about a named party. Treated with
-    // more suspicion than anything else in this file: the cited transaction
-    // is verified against the ledger BEFORE a row is written, and a report
-    // that fails that check is rejected rather than stored at low weight.
     if (req.method === 'POST' && joined === 'v1/fraud-reports') {
-      if (await enforceAuthRateLimit(req, res, db, 'fraud-report', 5)) return;
-
-      const body = await readJsonBody(req);
-      const draft = {
-        subject: body.subject,
-        evidenceTxHash: body.evidenceTxHash,
-        category: body.category,
-        note: body.note,
-        reporterAddress: body.reporterAddress,
-      };
-
-      const shape = validateFraudSubmission(draft);
-      if (!shape.ok) return json(res, 400, { error: shape.message, reason: shape.reason }, 0);
-
-      const subject = String(draft.subject).trim();
-      const txHash = String(draft.evidenceTxHash).trim().toLowerCase();
-
-      let evidence;
-      try {
-        evidence = await fraudVerifyEvidence(txHash, subject);
-      } catch (err) {
-        console.error('[fraud-reports]', err.message);
-        return json(res, 502, { error: 'Could not reach Horizon to verify that transaction. Try again shortly.' }, 0);
-      }
-      if (!evidence.ok) return json(res, 400, { error: evidence.message, reason: 'evidence-not-verified' }, 0);
-
-      try {
-        const { rows } = await db.query(
-          `INSERT INTO fraud_reports (subject, evidence_tx_hash, category, note, reporter_ip_hash)
-           VALUES ($1, $2, $3, $4, $5)
-           RETURNING id, subject, evidence_tx_hash, category, note, status, submitted_at`,
-          [subject, txHash, String(draft.category).trim(), String(draft.note).trim(), sha256Hex(clientIp(req))],
-        );
-        const row = rows[0];
-        return json(res, 201, {
-          ok: true,
-          id: String(row.id),
-          subject: row.subject,
-          status: row.status,
-          submittedAt: row.submitted_at.toISOString(),
-          note:
-            'Recorded as a claim, and shown as one. Landfall verified only that the cited transaction exists ' +
-            'and involves this address — it has not established what happened between you and them, and will ' +
-            'not say that it has. The reported party can attach a response.',
-        }, 0);
-      } catch (err) {
-        if (err.message?.includes('unique') || err.message?.includes('duplicate')) {
-          return json(res, 409, { error: 'You have already filed a report citing this transaction for this address.' }, 0);
-        }
-        throw err;
-      }
+      return handleFraudReportsRoute(req, res, db, parts, joined, {
+        enforceAuthRateLimit,
+        validateFraudSubmission,
+        fraudVerifyEvidence,
+        verifyDispute,
+        reportRowsForSubject: fetchFraudReports,
+        investigateReport: fetchInvestigation,
+      });
     }
 
     // POST /api/v1/fraud-reports/:id/dispute
-    //
-    // The reported party answering back. Gated on a signature from the
-    // reported address's own key — see verifyDispute above for why that is
-    // the only thing that makes a response more than another anonymous
-    // claim, and why DISPUTES.md's human path stays for cold-key accounts
-    // that cannot sign a web form.
     if (req.method === 'POST' && parts.length === 4 && parts[0] === 'v1' && parts[1] === 'fraud-reports' && parts[3] === 'dispute') {
-      if (await enforceAuthRateLimit(req, res, db, 'fraud-dispute', 10)) return;
-
-      const reportId = decodeURIComponent(parts[2]);
-      if (!/^\d+$/.test(reportId)) return json(res, 400, { error: 'Report id must be numeric.' }, 0);
-
-      const body = await readJsonBody(req);
-
-      const { rows } = await db.query(
-        `SELECT id, subject, status, disputed_at FROM fraud_reports WHERE id = $1`,
-        [reportId],
-      );
-      const report = rows[0];
-      if (!report) return json(res, 404, { error: 'No report with that id.' }, 0);
-      if (report.disputed_at) {
-        return json(res, 409, {
-          error: 'That report already carries a response. A report takes one, so a later signature cannot overwrite an earlier answer.',
-        }, 0);
-      }
-
-      // The subject comes from the stored report, never from the request —
-      // otherwise a caller could name an address they do control and have
-      // the signature check pass against a report about someone else.
-      const verification = verifyDispute(
-        {
-          reportId: String(report.id),
-          subject: report.subject,
-          issuedAt: body.issuedAt,
-          signature: body.signature,
-          note: body.note,
-        },
-        new Date(),
-      );
-      if (!verification.ok) {
-        return json(res, verification.reason === 'signature-mismatch' ? 403 : 400, {
-          error: verification.message,
-          reason: verification.reason,
-        }, 0);
-      }
-
-      const { rows: updated } = await db.query(
-        `UPDATE fraud_reports
-            SET status = 'disputed', disputed_at = now(), dispute_note = $2
-          WHERE id = $1 AND disputed_at IS NULL
-        RETURNING id, subject, status, disputed_at, dispute_note`,
-        [reportId, String(body.note).trim()],
-      );
-      if (!updated[0]) {
-        return json(res, 409, { error: 'That report already carries a response.' }, 0);
-      }
-
-      // Sentinel's "Attested" stage. Signs the RESPONSE only — never the
-      // accusation, which would make the claim portable while leaving its
-      // safeguards behind. See packages/fraud-reports/src/attest.ts.
-      //
-      // Best-effort: the response is already recorded and shown, so an
-      // attestation failure must not turn a successful reply into an error
-      // for the person answering an accusation about them. The attestation
-      // is fetchable later from GET .../attestation.
-      let attestation = null;
-      try {
-        const unsigned = buildDisputeAttestation({
-          subject: updated[0].subject,
-          reportId: String(updated[0].id),
-          respondedAt: updated[0].disputed_at.toISOString(),
-          response: updated[0].dispute_note ?? '',
-          signer: process.env.STP_SIGNER_ID || 'landfall-unattributed',
-        });
-        const result = attestDispute(unsigned, process.env.STP_SIGNING_KEY || undefined);
-        await db.query(
-          `INSERT INTO dispute_attestations (report_id, subject, body, digest, sig, signer)
-           VALUES ($1, $2, $3, $4, $5, $6)
-           ON CONFLICT (report_id) DO NOTHING`,
-          [
-            reportId,
-            updated[0].subject,
-            JSON.stringify(result.attestation),
-            result.digest,
-            result.signed ? result.attestation.sig : null,
-            unsigned.signer,
-          ],
-        );
-        attestation = { digest: result.digest, signed: result.signed };
-      } catch (err) {
-        console.error('[dispute-attestation]', err.message);
-      }
-
-      return json(res, 200, {
-        ok: true,
-        id: String(updated[0].id),
-        status: updated[0].status,
-        disputedAt: updated[0].disputed_at.toISOString(),
-        attestation,
-        note:
-          'Response recorded and attached to the report. It is shown alongside the accusation wherever that ' +
-          'report appears — Landfall does not adjudicate between the two, and does not claim to know which is right.' +
-          (attestation
-            ? ' A signed record of this response — and only this response, never the accusation — is available at ' +
-              `/api/v1/fraud-reports/${updated[0].id}/attestation for you to keep or publish.`
-            : ''),
-      }, 0);
+      return handleFraudReportsRoute(req, res, db, parts, joined, {
+        enforceAuthRateLimit,
+        verifyDispute,
+      });
     }
 
     // GET /api/v1/fraud-reports/:id/attestation
-    //
-    // The reported party's portable proof that they answered and control the
-    // account. Public because it is the accused's own exculpatory record and
-    // is useless for spreading an allegation — it carries no category, no
-    // reporter note and no evidence hash.
     if (req.method === 'GET' && parts.length === 4 && parts[0] === 'v1' && parts[1] === 'fraud-reports' && parts[3] === 'attestation') {
-      const reportId = decodeURIComponent(parts[2]);
-      if (!/^\d+$/.test(reportId)) return json(res, 400, { error: 'Report id must be numeric.' }, 0);
-
-      const { rows } = await db.query(
-        `SELECT report_id, subject, body, digest, sig, signer, attested_at
-         FROM dispute_attestations WHERE report_id = $1`,
-        [reportId],
-      );
-      const row = rows[0];
-      if (!row) {
-        return json(res, 404, { error: 'No response has been attested for that report.' }, 0);
-      }
-
-      return json(res, 200, {
-        reportId: String(row.report_id),
-        subject: row.subject,
-        attestation: row.body,
-        digest: row.digest,
-        signed: Boolean(row.sig),
-        signer: row.signer,
-        attestedAt: row.attested_at.toISOString(),
-        note: row.sig
-          ? 'Signed by Landfall. Verify the signature over the canonical serialization of `attestation` (keys sorted, sig excluded).'
-          : 'Unsigned: no attester key is configured, so this carries a reproducible SHA-256 digest of its canonical form instead. ' +
-            'Anyone can recompute the digest from the body; it just is not attributable to Landfall.',
-        covers:
-          'This attests only that the holder of this account responded, and proved control of it by signature. ' +
-          'It deliberately carries nothing about what was alleged.',
-      }, 60);
+      return handleFraudReportsRoute(req, res, db, parts, joined);
     }
 
     // POST /api/v1/fraud-reports/:id/investigate
-    //
-    // Sentinel's "Analyzed" stage. Computes cited_facts and relevant_signals
-    // with no AI involved — those alone are the return value whenever no
-    // OPENROUTER_API_KEY is configured. When a key is configured, the same
-    // deterministic prompt is sent to the model and its prose is stored
-    // alongside the facts, explicitly labeled with the model name. Report
-    // volume about the subject is never fetched here and never enters the
-    // prompt — see packages/investigator/src/types.ts for why.
     if (req.method === 'POST' && parts.length === 4 && parts[0] === 'v1' && parts[1] === 'fraud-reports' && parts[3] === 'investigate') {
-      if (await enforceAuthRateLimit(req, res, db, 'fraud-investigate', 10)) return;
-
-      const reportId = decodeURIComponent(parts[2]);
-      if (!/^\d+$/.test(reportId)) return json(res, 400, { error: 'Report id must be numeric.' }, 0);
-
-      const { rows } = await db.query(
-        `SELECT id, subject, evidence_tx_hash, category, note, status, submitted_at, disputed_at, dispute_note
-         FROM fraud_reports WHERE id = $1`,
-        [reportId],
-      );
-      const row = rows[0];
-      if (!row) return json(res, 404, { error: 'No report with that id.' }, 0);
-
-      const report = {
-        id: String(row.id),
-        subject: row.subject,
-        evidenceTxHash: row.evidence_tx_hash,
-        category: row.category,
-        note: row.note,
-        submittedAt: row.submitted_at.toISOString(),
-        status: row.status,
-        disputedAt: row.disputed_at ? row.disputed_at.toISOString() : null,
-        disputeNote: row.dispute_note ?? null,
-      };
-
-      let transaction;
-      let subjectFlags;
-      try {
-        const [tx, trustInput] = await Promise.all([
-          investigatorFetchTransaction(report.evidenceTxHash, report.subject),
-          trustCheckFetchInput(report.subject, new Date().toISOString()),
-        ]);
-        transaction = tx;
-        subjectFlags = analyzeTrustCheck(trustInput).flags;
-      } catch (err) {
-        console.error('[investigator]', err.message);
-        return json(res, 502, { error: 'Could not reach Horizon to gather facts for this investigation. Try again shortly.' }, 0);
-      }
-
-      const investigatedAt = new Date().toISOString();
-      const prepared = prepareInvestigation({ report, transaction, subjectFlags, investigatedAt });
-      const modelResult = await investigatorCallModel(prepared.prompt);
-      const investigation = assembleInvestigation(
-        report.id,
-        investigatedAt,
-        prepared,
-        modelResult?.text ?? null,
-        modelResult?.model ?? null,
-      );
-
-      await db.query(
-        `INSERT INTO fraud_report_investigations (report_id, cited_facts, relevant_signals, narrative, narrative_model, investigated_at)
-         VALUES ($1, $2, $3, $4, $5, $6)
-         ON CONFLICT (report_id) DO UPDATE SET
-           cited_facts = EXCLUDED.cited_facts,
-           relevant_signals = EXCLUDED.relevant_signals,
-           narrative = EXCLUDED.narrative,
-           narrative_model = EXCLUDED.narrative_model,
-           investigated_at = EXCLUDED.investigated_at`,
-        [reportId, JSON.stringify(investigation.citedFacts), JSON.stringify(investigation.relevantSignals), investigation.narrative, investigation.narrativeModel, investigatedAt],
-      );
-
-      return json(res, 200, investigation, 0);
+      return handleFraudReportsRoute(req, res, db, parts, joined, {
+        enforceAuthRateLimit,
+      });
     }
 
     // GET /api/v1/fraud-reports/:id/investigation
@@ -3090,170 +2788,23 @@ export default async function handler(req, res) {
 
     // POST /api/v1/x402/check-payee
     //
-    // Given the `accepts` array from an x402 402 response (the exact
-    // PaymentRequirements shape from x402-foundation/x402), runs Trust
-    // Check against every Stellar G-account payee before an agent
-    // authorizes a signature. Read-only and stateless — this never
-    // verifies or settles a payment, and holds no rate limit of its own
-    // beyond the same per-IP bucket trust-check itself uses, since it's
-    // the same Horizon calls under a different entry point.
+    // POST /api/v1/x402/check-payee
     if (req.method === 'POST' && joined === 'v1/x402/check-payee') {
-      const body = await readJsonBody(req);
-      const accepts = Array.isArray(body.accepts) ? body.accepts : null;
-      if (!accepts || accepts.length === 0) {
-        return json(res, 400, { error: 'Body must include a non-empty "accepts" array — the same shape as an x402 PaymentRequired response.' }, 0);
-      }
-      if (accepts.length > 20) {
-        return json(res, 400, { error: 'At most 20 payment requirements per call.' }, 0);
-      }
-      for (const r of accepts) {
-        if (typeof r?.network !== 'string' || typeof r?.payTo !== 'string') {
-          return json(res, 400, { error: 'Every entry in "accepts" must have at least "network" and "payTo" fields.' }, 0);
-        }
-      }
-
-      const bucket = `x402check:${clientIp(req)}`;
-      const { allowed } = await rateLimit(db, bucket, 20);
-      if (!allowed) return json(res, 429, { error: 'Too many checks. Try again in a minute.' }, 0);
-
-      // Failures are classified per payee, never batch-wide. One payee that
-      // Horizon cannot resolve used to fail the whole request with a 502,
-      // which threw away every other payee's answer and — worse — made "that
-      // account does not exist on the ledger", the most damning finding this
-      // route can return, look identical to Horizon being down.
-      const results = await evaluatePaymentRequirements(accepts, async (address) => {
-        try {
-          const input = await trustCheckFetchInput(address, new Date().toISOString());
-          return { ok: true, trustCheck: analyzeTrustCheck(input) };
-        } catch (err) {
-          if (err.status === 404 || err.status === 400) {
-            return {
-              ok: false,
-              retryable: false,
-              reason:
-                'no account for this address exists on the Stellar network. An address that has never been ' +
-                'funded has no settlement history at all — treat this as a reason not to pay, not as a missing check.',
-            };
-          }
-          console.error('[x402]', address, err.message);
-          return {
-            ok: false,
-            retryable: true,
-            reason: 'could not reach Horizon to check this payee. This is a temporary failure, not a finding about the address — retry before drawing any conclusion.',
-          };
-        }
+      return handleX402Route(req, res, db, parts, joined, {
+        evaluatePaymentRequirements,
+        trustCheckFetchInput,
+        analyzeTrustCheck,
       });
-      return json(res, 200, { results }, 0);
     }
 
     // POST /api/v1/fiat-confirmations
-    //
-    // Recipient self-report that a DERIVED-tier transfer's fiat leg landed —
-    // see packages/adapters/src/fiatConfirmation.ts for what this can and
-    // cannot prove. This endpoint only ever stores the claim; whether it
-    // actually binds as evidence is decided later, at scan time, by
-    // scripts/cross-chain-scan.ts — which is the only place that also has
-    // the on-chain transfer's own timestamp to check it against. What is
-    // checked here (`eligible` in the response) is only the two rules that
-    // do not depend on that timestamp, so a submitter finds out immediately
-    // if their own claim can never bind, without this endpoint pretending to
-    // know more than it does.
     if (req.method === 'POST' && parts.length === 2 && parts[0] === 'v1' && parts[1] === 'fiat-confirmations') {
-      const bucket = `fiatconfirm:submit:${clientIp(req)}`;
-      const { allowed } = await rateLimit(db, bucket, 10);
-      if (!allowed) return json(res, 429, { error: 'Too many submissions. Try again in a minute.' }, 0);
-
-      const body = await readJsonBody(req);
-      const chain = String(body.chain || '').trim().toLowerCase();
-      const reference = String(body.reference || '').trim();
-      const respondent = String(body.respondent || '').trim();
-      const outcome = String(body.outcome || '').trim();
-      const reportedAmount = body.reportedAmount != null ? String(body.reportedAmount).trim().slice(0, 64) : null;
-      const reportedCurrency = body.reportedCurrency != null ? String(body.reportedCurrency).trim().slice(0, 10) : null;
-      const note = body.note != null ? String(body.note).trim().slice(0, 500) : null;
-
-      if (!chain || chain.length > 40 || !/^[a-z0-9-]+$/.test(chain)) {
-        return json(res, 400, { error: 'chain is required (lowercase letters, digits, hyphens, max 40 chars).' }, 0);
-      }
-      if (!reference || reference.length > 128) {
-        return json(res, 400, { error: 'reference is required (the on-chain transfer id/signature, max 128 chars).' }, 0);
-      }
-      if (respondent !== 'recipient' && respondent !== 'sender') {
-        return json(res, 400, { error: 'respondent must be "recipient" or "sender".' }, 0);
-      }
-      if (outcome !== 'received' && outcome !== 'not_received' && outcome !== 'partial') {
-        return json(res, 400, { error: 'outcome must be "received", "not_received", or "partial".' }, 0);
-      }
-
-      let row;
-      try {
-        const submittedIpHash = sha256Hex(clientIp(req));
-        const { rows } = await db.query(
-          `INSERT INTO fiat_confirmations
-             (chain, reference, respondent, outcome, reported_amount, reported_currency, note, submitted_ip_hash)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-           RETURNING chain, reference, respondent, outcome, submitted_at`,
-          [chain, reference, respondent, outcome, reportedAmount, reportedCurrency, note, submittedIpHash],
-        );
-        row = rows[0];
-      } catch (err) {
-        if (err.message?.includes('unique') || err.message?.includes('duplicate')) {
-          // First submission wins, permanently — see 008_fiat_confirmations.sql
-          // for why there is deliberately no update path.
-          return json(res, 409, { error: 'A confirmation has already been submitted for this transfer.' }, 0);
-        }
-        throw err;
-      }
-
-      // pg returns TIMESTAMPTZ as a JS Date. evaluateFiatConfirmation calls
-      // Date.parse() on these, which expects a string — pass one explicitly
-      // rather than relying on the implicit toString() coercion.
-      const submittedAtIso = row.submitted_at.toISOString();
-
-      // Chain-independent eligibility only — see the comment above this route.
-      const claim = { chain: row.chain, reference: row.reference, respondent: row.respondent, outcome: row.outcome, submittedAt: submittedAtIso };
-      const preview = evaluateFiatConfirmation(claim, { reference: row.reference, observedAt: submittedAtIso });
-
-      return json(res, 201, {
-        ok: true,
-        chain: row.chain,
-        reference: row.reference,
-        submittedAt: submittedAtIso,
-        eligible: preview.ok,
-        ineligibleReason: preview.ok ? null : preview.reason,
-        note: 'Recorded. Whether this counts as settlement evidence is decided when the next cross-chain scan processes this transfer, which is the only place that knows when the transfer itself happened.',
-      }, 0);
+      return handleFiatRoute(req, res, db, parts, joined, { evaluateFiatConfirmation });
     }
 
     // GET /api/v1/fiat-confirmations/:chain/:reference
     if (req.method === 'GET' && parts.length === 4 && parts[0] === 'v1' && parts[1] === 'fiat-confirmations') {
-      const chain = decodeURIComponent(parts[2]).toLowerCase();
-      const reference = decodeURIComponent(parts[3]);
-
-      const { rows } = await db.query(
-        `SELECT chain, reference, respondent, outcome, reported_amount, reported_currency, submitted_at
-         FROM fiat_confirmations WHERE chain = $1 AND reference = $2`,
-        [chain, reference],
-      );
-      const row = rows[0];
-      if (!row) return json(res, 404, { error: 'No confirmation submitted for this reference.' });
-
-      const submittedAtIso = row.submitted_at.toISOString();
-      const claim = { chain: row.chain, reference: row.reference, respondent: row.respondent, outcome: row.outcome, submittedAt: submittedAtIso };
-      const preview = evaluateFiatConfirmation(claim, { reference: row.reference, observedAt: submittedAtIso });
-
-      return json(res, 200, {
-        chain: row.chain,
-        reference: row.reference,
-        respondent: row.respondent,
-        outcome: row.outcome,
-        reportedAmount: row.reported_amount,
-        reportedCurrency: row.reported_currency,
-        submittedAt: submittedAtIso,
-        eligible: preview.ok,
-        ineligibleReason: preview.ok ? null : preview.reason,
-        note: 'eligible reflects only the checks that do not depend on the on-chain transfer\'s own timestamp. The binding decision happens at scan time — see packages/adapters/src/fiatConfirmation.ts.',
-      });
+      return handleFiatRoute(req, res, db, parts, joined, { evaluateFiatConfirmation });
     }
 
     return json(res, 404, { error: `Unknown route: /api/${joined}` });

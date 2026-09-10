@@ -34,13 +34,13 @@ const ROOT = resolve(__dirname, '..');
 const OUT_DIR = join(ROOT, 'out');
 
 const CONTRACT_ID = process.env.ORACLE_CONTRACT_ID;
-const ADMIN_SECRET = process.env.ORACLE_ADMIN_SECRET;
+const PUBLISHER_SECRET = process.env.ORACLE_PUBLISHER_SECRET || process.env.ORACLE_ADMIN_SECRET;
 const RPC_URL = process.env.SOROBAN_RPC_URL || 'https://soroban-testnet.stellar.org';
 const NETWORK_PASSPHRASE = process.env.ORACLE_NETWORK_PASSPHRASE || 'Test SDF Network ; September 2015';
-const IDENTITY = 'landfall-ci-admin';
+const IDENTITY = 'landfall-ci-publisher';
 
-if (!CONTRACT_ID || !ADMIN_SECRET) {
-  console.log('Oracle publish skipped — ORACLE_CONTRACT_ID/ORACLE_ADMIN_SECRET not configured.');
+if (!CONTRACT_ID || !PUBLISHER_SECRET) {
+  console.log('Oracle publish skipped — ORACLE_CONTRACT_ID or ORACLE_PUBLISHER_SECRET/ORACLE_ADMIN_SECRET not configured.');
   process.exit(0);
 }
 
@@ -63,7 +63,7 @@ if (rpcLooksMainnet && passphraseIsTestnet) {
   process.exit(1);
 }
 
-/** Imports ADMIN_SECRET into a scratch CLI identity, via stdin — never argv, so it never lands in CI logs or process listings. */
+/** Imports PUBLISHER_SECRET into a scratch CLI identity, via stdin — never argv, so it never lands in CI logs or process listings. */
 async function importIdentity() {
   await new Promise((resolvePromise, reject) => {
     const child = execFile(
@@ -71,7 +71,7 @@ async function importIdentity() {
       ['keys', 'add', IDENTITY, '--secret-key', '--overwrite'],
       (err, stdout, stderr) => (err ? reject(new Error(stderr || err.message)) : resolvePromise(stdout)),
     );
-    child.stdin.write(ADMIN_SECRET.trim() + '\n');
+    child.stdin.write(PUBLISHER_SECRET.trim() + '\n');
     child.stdin.end();
   });
 }

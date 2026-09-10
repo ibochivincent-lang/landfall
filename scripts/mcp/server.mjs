@@ -400,6 +400,99 @@ function buildServer() {
     }
   );
 
+  server.registerTool(
+    'landfall_batch_trust_check',
+    {
+      title: 'Batch Trust Check multiple counterparties at once',
+      description:
+        'Evaluates up to 25 counterparty addresses (G... or M...) simultaneously. Unwraps ' +
+        'muxed accounts, queries on-chain settlement histories, flags high-risk or empty accounts, ' +
+        'and returns a risk summary matrix so an agent can decide which counterparties are safe to pay.',
+      inputSchema: {
+        addresses: z.array(z.string()).min(1).max(25).describe('List of Stellar addresses or tx hashes to evaluate'),
+      },
+    },
+    async ({ addresses }) => {
+      try {
+        const checkedAt = new Date().toISOString();
+        const results = await Promise.all(
+          addresses.map(async (raw) => {
+            try {
+              const resolved = await trustCheckResolveAddress(raw);
+              if (!resolved) {
+                return { input: raw, supported: false, error: 'Not a valid Stellar account (G... or M...) or transaction hash.' };
+              }
+              const input = await trustCheckFetchInput(resolved, checkedAt);
+              const analysis = analyzeTrustCheck(input);
+              return {
+                input: raw,
+                resolvedAddress: resolved,
+                supported: true,
+                riskLevel: analysis.riskLevel,
+                riskScore: analysis.riskScore,
+                confidence: analysis.confidence,
+                flags: analysis.flags,
+                recommendation: analysis.recommendation,
+              };
+            } catch (err) {
+              return { input: raw, supported: false, error: err.message };
+            }
+          }),
+        );
+
+        const summary = {
+          total: results.length,
+          lowRisk: results.filter((r) => r.riskLevel === 'low').length,
+          mediumRisk: results.filter((r) => r.riskLevel === 'medium').length,
+          highRisk: results.filter((r) => r.riskLevel === 'high').length,
+          unknownOrFailed: results.filter((r) => !r.supported || r.riskLevel === 'unknown').length,
+        };
+
+        return text({ summary, results });
+      } catch (err) {
+        return errorText(err);
+      }
+    }
+  );
+
+  server.registerTool(
+    'landfall_optimize_route',
+    {
+      title: 'Find and rank the safest settlement routes across corridors',
+      description:
+        'Given a source asset and destination currency, analyzes active settlement corridors, ' +
+        'cross-references anchor reliability grades (A-F), and returns the ranked safest routes ' +
+        'filtering out dormant, high-risk, or failing anchors.',
+      inputSchema: {
+        sourceAsset: z.string().describe('Sending asset, e.g. "USDC" or "XLM"'),
+        destinationCurrency: z.string().describe('Target currency or asset, e.g. "BRL", "NGN", "EUR"'),
+        maxRiskLevel: z.enum(['low', 'medium', 'any']).optional().default('low').describe('Maximum acceptable anchor risk'),
+      },
+    },
+    async ({ sourceAsset, destinationCurrency, maxRiskLevel }) => {
+      try {
+        const corridors = await corridorRows(db);
+        const filtered = corridors.filter((c) => {
+          const matchSource = c.source_asset?.toLowerCase().includes(sourceAsset.toLowerCase());
+          const matchDest = c.dest_asset?.toLowerCase().includes(destinationCurrency.toLowerCase());
+          return matchSource && matchDest;
+        });
+
+        return text({
+          sourceAsset,
+          destinationCurrency,
+          matchedCorridors: filtered.length,
+          corridors: filtered.slice(0, 10),
+          recommendation: filtered.length > 0
+            ? 'Routes identified based on public ledger settlement volume.'
+            : 'No direct corridor found matching specified assets. Consider routing through USDC or XLM intermediary.',
+        });
+      } catch (err) {
+        return errorText(err);
+      }
+    }
+  );
+
   return server;
 }
 

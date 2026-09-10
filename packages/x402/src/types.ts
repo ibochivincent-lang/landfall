@@ -53,6 +53,8 @@ export interface UnsupportedPayee {
   supported: false;
   /** Always says exactly what Landfall couldn't check and why — never a silent drop. */
   reason: string;
+  /** True when payTo was identified as a Soroban smart contract address (C...). */
+  isContract?: boolean;
   /**
    * True when the check failed for a transient reason (Horizon unreachable)
    * rather than a structural one (wrong chain, contract address, no such
@@ -78,6 +80,12 @@ export interface SupportedPayee<TrustCheckResult> {
   requirement: PaymentRequirements;
   supported: true;
   trustCheck: TrustCheckResult;
+  /** True when payTo was a muxed account (M...) unwrapped to its base G... account. */
+  isMuxed?: boolean;
+  /** The underlying base G... account that was evaluated if payTo was muxed. */
+  baseAccount?: string;
+  /** The 64-bit memo ID embedded in the muxed account, if applicable. */
+  memoId?: string;
 }
 
 export type PayeeAssessment<TrustCheckResult> = SupportedPayee<TrustCheckResult> | UnsupportedPayee;

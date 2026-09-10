@@ -88,10 +88,25 @@ switches deliberately left off.
 
 - [ ] **M1: memo-based leg correlation.** Turns the return metric from a
       heuristic into a measurement.
-- [ ] Investigate why `vibrantapp.com` served a TOML with no parseable
-      accounts. Probably a parser gap, not an empty declaration.
-- [ ] Expand `packages/indexer/data/anchors.json` beyond the current 8 candidate domains.
-      More coverage makes the dark-account census stronger.
+- [x] ~~Investigate why `vibrantapp.com` served a TOML with no parseable
+      accounts. Probably a parser gap, not an empty declaration.~~ **Closed
+      9 September, and the guess was backwards.** It is an empty declaration:
+      the domain serves 196 bytes containing `NETWORK_PASSPHRASE`,
+      `FEDERATION_SERVER` and `SIGNING_KEY`, with no `ACCOUNTS` and no
+      `[[CURRENCIES]]` at all. The parser is right and there is nothing to
+      fix — a domain that declares no accounts is correctly reported as
+      declaring none.
+- [x] ~~Expand `packages/indexer/data/anchors.json` beyond the current 8
+      candidate domains.~~ The seed list now carries **32 domains**, and the
+      scan merges admin-added ones on top. Still a curated set rather than a
+      census, and said so wherever a figure appears.
+- [ ] **Find out why the admin-domains lookup was failing at all.** The
+      silent fallback is fixed — it now prints `FAIL` and uses the same 8s
+      timeout as every other caller, and `/api/v1/anchors` carries a
+      `coverage` block so a partial scan reads as partial. What is still
+      unknown is the underlying cause: a pooler cold start, a connection
+      limit, or something else. The next occurrence will now say so in the
+      scan log rather than passing unnoticed.
 - [ ] Multi-region indexing, to remove the single-vantage assumption
 - [ ] Talk to one wallet about embedding the SDK. Layer 2 needs attestors,
       and one conversation in progress is worth more in an application than

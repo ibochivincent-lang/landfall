@@ -71,6 +71,7 @@
         <button class="admin-tab is-on" data-tab="health" role="tab">Backend health</button>
         <button class="admin-tab" data-tab="payments" role="tab">Payment browser</button>
         <button class="admin-tab" data-tab="anchors" role="tab">Anchor management</button>
+        <button class="admin-tab" data-tab="webhooks" role="tab">Webhook operations</button>
       </div>
 
       <!-- Backend health -->
@@ -167,6 +168,27 @@
               <thead><tr><th>Domain</th><th>Active</th><th>Added by</th><th>Notes</th><th>Updated</th><th></th></tr></thead>
               <tbody></tbody>
             </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Webhook operations -->
+      <section class="admin-panel" id="tab-webhooks" hidden>
+        <div class="panel">
+          <h2 class="admin-h2">Dead-letter webhook redelivery</h2>
+          <p class="dash-sub">
+            Replays failed deliveries from <code>webhook_deliveries</code> within the 48-hour window
+            to active subscriber endpoints. Replays are logged as new rows with HMAC verification.
+          </p>
+          <div style="display: flex; gap: 12px; align-items: center; margin-top: 16px;">
+            <button class="dash-btn dash-btn--primary" id="btnRedeliverWebhooks">Redeliver Failed Webhooks</button>
+            <span id="webhookRedeliverStatus" class="mono" style="font-size: 13px; color: var(--text-muted, #8b949e);"></span>
+          </div>
+          <div id="webhookRedeliverResult" class="admin-grid" style="margin-top: 16px;" hidden>
+            <div class="metric"><span class="metric-val" id="countReplayed">0</span><span class="metric-lbl">Total Replayed</span></div>
+            <div class="metric"><span class="metric-val" id="countDelivered" style="color: #2ea043;">0</span><span class="metric-lbl">Delivered</span></div>
+            <div class="metric"><span class="metric-val" id="countFailed" style="color: #da3633;">0</span><span class="metric-lbl">Still Failing</span></div>
+            <div class="metric"><span class="metric-val" id="countSkipped" style="color: #d29922;">0</span><span class="metric-lbl">Skipped</span></div>
           </div>
         </div>
       </section>

@@ -1,10 +1,45 @@
-import type { PayeeAssessment, PayeeCheckOutcome, PaymentRequirements } from "./types.js";
+import { StrKey } from "@stellar/stellar-base";
+import type { PayeeAssessment, PayeeCheckOutcome, PaymentRequirements, SupportedPayee } from "./types.js";
 
 /** CAIP-2 ids x402's own Stellar mechanism package defines — mirrors x402-foundation/x402's packages/mechanisms/stellar/src/constants.ts. */
 const STELLAR_NETWORKS = new Set(["stellar:pubnet", "stellar:testnet"]);
 
-/** Classic Stellar account only — mirrors the G-account branch of x402's STELLAR_DESTINATION_ADDRESS_REGEX. Trust Check reads G-account payment history; it has no way to attribute a Soroban contract (C...) or muxed account (M...) to an operator. */
 const G_ADDRESS = /^G[A-Z2-7]{55}$/;
+const M_ADDRESS = /^M[A-Z2-7]{68}$/;
+const C_ADDRESS = /^C[A-Z2-7]{55}$/;
+
+/**
+ * Resolves a Stellar address to its inspectable base account.
+ * Unwraps Muxed Accounts (M...) into their base Ed25519 public key (G...) and extracts
+ * the 64-bit memo ID. Identifies Soroban contract addresses (C...).
+ */
+export function unwrapStellarAddress(payTo: string): {
+  address: string;
+  isMuxed: boolean;
+  memoId?: string;
+  isContract: boolean;
+  isValid: boolean;
+} {
+  const clean = String(payTo ?? "").trim();
+  if (G_ADDRESS.test(clean)) {
+    return { address: clean, isMuxed: false, isContract: false, isValid: true };
+  }
+  if (M_ADDRESS.test(clean)) {
+    try {
+      if (StrKey.isValidMed25519PublicKey(clean)) {
+        const raw = StrKey.decodeMed25519PublicKey(clean);
+        const ed25519Raw = raw.subarray(0, 32);
+        const memoId = raw.readBigUInt64BE(32).toString();
+        const baseAccount = StrKey.encodeEd25519PublicKey(ed25519Raw);
+        return { address: baseAccount, isMuxed: true, memoId, isContract: false, isValid: true };
+      }
+    } catch {
+      // Fall through if parsing fails
+    }
+  }
+  const isContract = C_ADDRESS.test(clean) || (typeof StrKey.isValidContract === "function" && StrKey.isValidContract(clean));
+  return { address: clean, isMuxed: false, isContract, isValid: false };
+}
 
 /**
  * Runs `runTrustCheck` against every `payTo` this module can actually
@@ -14,10 +49,7 @@ const G_ADDRESS = /^G[A-Z2-7]{55}$/;
  * `trustCheckFetchInput` + `analyzeTrustCheck` pair.
  *
  * Every requirement always gets exactly one assessment, in input order, and
- * one payee's failure never removes another's answer. That is the contract:
- * an agent checking three payees must not lose the two good answers because
- * the third address does not exist — least of all because "that account is
- * not on the ledger" is the most useful thing this check can tell it.
+ * one payee's failure never removes another's answer.
  */
 export async function evaluatePaymentRequirements<TrustCheckResult>(
   accepts: PaymentRequirements[],
@@ -32,19 +64,41 @@ export async function evaluatePaymentRequirements<TrustCheckResult>(
           reason: `network "${requirement.network}" is not Stellar — Trust Check reads Stellar ledger history only.`,
         };
       }
-      if (!G_ADDRESS.test(requirement.payTo)) {
+
+      const unwrapped = unwrapStellarAddress(requirement.payTo);
+      if (unwrapped.isContract) {
         return {
           requirement,
           supported: false,
-          reason: `payTo "${requirement.payTo}" is not a classic Stellar account (G...) — likely a Soroban contract or muxed address, which Trust Check cannot attribute to an operator.`,
+          isContract: true,
+          reason: `payTo "${requirement.payTo}" is a Soroban contract (C...) — Trust Check evaluates entity payment history on ledger accounts (G.../M...), not contract bytecode.`,
         };
       }
 
-      const outcome = await runTrustCheck(requirement.payTo);
+      if (!unwrapped.isValid) {
+        return {
+          requirement,
+          supported: false,
+          reason: `payTo "${requirement.payTo}" is not a valid classic or muxed Stellar account (G... or M...).`,
+        };
+      }
+
+      const outcome = await runTrustCheck(unwrapped.address);
       if (!outcome.ok) {
         return { requirement, supported: false, reason: outcome.reason, retryable: outcome.retryable };
       }
-      return { requirement, supported: true, trustCheck: outcome.trustCheck };
+
+      const res: SupportedPayee<TrustCheckResult> = {
+        requirement,
+        supported: true,
+        trustCheck: outcome.trustCheck,
+      };
+      if (unwrapped.isMuxed) {
+        res.isMuxed = true;
+        res.baseAccount = unwrapped.address;
+        if (unwrapped.memoId) res.memoId = unwrapped.memoId;
+      }
+      return res;
     }),
   );
 }

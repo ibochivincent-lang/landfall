@@ -60,14 +60,34 @@ test("a non-Stellar network is reported unsupported, never silently dropped, and
   }
 });
 
-test("a Soroban contract payTo on a Stellar network is unsupported, not guessed at", async () => {
+test("a Soroban contract payTo on a Stellar network is unsupported with isContract: true", async () => {
   const results = await evaluatePaymentRequirements(
     [requirement({ payTo: C_ADDR })],
     async () => ({ ok: true as const, trustCheck: { riskLevel: "low" } }),
   );
   assert.equal(results[0]?.supported, false);
   if (!results[0]?.supported) {
-    assert.match(results[0].reason, /not a classic Stellar account/);
+    assert.match(results[0].reason, /Soroban contract/);
+    assert.equal(results[0].isContract, true);
+  }
+});
+
+test("a muxed account (M...) is unwrapped to its base G... account and evaluated with memo preserved", async () => {
+  const MUXED_ADDR = "MA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KAAAAAAAAABQHGNKE";
+  let evaluatedAddress: string | null = null;
+  const results = await evaluatePaymentRequirements(
+    [requirement({ payTo: MUXED_ADDR })],
+    async (address) => {
+      evaluatedAddress = address;
+      return { ok: true as const, trustCheck: { riskLevel: "low" } };
+    },
+  );
+  assert.equal(evaluatedAddress, G_ADDR);
+  assert.equal(results[0]?.supported, true);
+  if (results[0]?.supported) {
+    assert.equal(results[0].isMuxed, true);
+    assert.equal(results[0].baseAccount, G_ADDR);
+    assert.equal(results[0].memoId, "12345");
   }
 });
 

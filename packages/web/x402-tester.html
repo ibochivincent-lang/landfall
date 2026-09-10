@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>x402 Pre-Flight Inspector — Landfall · Stellar</title>
+  <meta name="description" content="Interactive x402 payment inspector and tester. Evaluate counterparty safety on the Stellar ledger before authorizing an agentic micropayment.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="dashboard.css">
+  <link rel="stylesheet" href="trust-check.css">
+  <style>
+    .tester-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 24px;
+    }
+    @media (max-width: 900px) {
+      .tester-grid { grid-template-columns: 1fr; }
+    }
+    .panel-card {
+      background: #092635;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+    .panel-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .preset-selector {
+      background: #0d384e;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #eaf4ef;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-family: 'DM Mono', monospace;
+      width: 100%;
+      margin-bottom: 16px;
+    }
+    .code-editor {
+      width: 100%;
+      height: 320px;
+      background: #051923;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: #79c0ff;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.85rem;
+      padding: 14px;
+      box-sizing: border-box;
+      resize: vertical;
+      line-height: 1.45;
+    }
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      margin-top: 16px;
+      padding: 12px 20px;
+      background: #2dd4bf;
+      color: #041f2d;
+      font-weight: 700;
+      font-size: 0.95rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-action:hover {
+      background: #5eead4;
+      transform: translateY(-1px);
+    }
+    .badge-muxed {
+      display: inline-block;
+      background: rgba(147, 51, 234, 0.2);
+      color: #c084fc;
+      border: 1px solid rgba(147, 51, 234, 0.4);
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-family: 'DM Mono', monospace;
+      margin-left: 6px;
+    }
+    .badge-verdict {
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      display: inline-block;
+    }
+    .verdict-approved {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid #10b981;
+      color: #34d399;
+    }
+    .verdict-flagged {
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid #f59e0b;
+      color: #fbbf24;
+    }
+    .verdict-rejected {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid #ef4444;
+      color: #f87171;
+    }
+    .snippet-tabs {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 8px;
+    }
+    .snippet-tab {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 4px 8px;
+    }
+    .snippet-tab.active {
+      color: #2dd4bf;
+      border-bottom: 2px solid #2dd4bf;
+    }
+    .snippet-code {
+      background: #051923;
+      padding: 12px;
+      border-radius: 6px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.8rem;
+      color: #cbd5e1;
+      overflow-x: auto;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body class="dash-body">
+
+<header class="topnav" id="topnav">
+  <div class="wrap topnav__in">
+    <a href="index.html" class="topnav__logo" aria-label="Landfall home">
+      <svg viewBox="0 0 40 40" class="topnav__logo-mark" aria-hidden="true">
+        <path d="M20 3 35 29H5L20 3Z" fill="currentColor"/>
+        <path d="M20 12 28 26H12l8-14Z" fill="#eaf4ef"/>
+        <path d="M20 29v7" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <span>landfall<em>.stellar</em></span>
+    </a>
+    <nav class="topnav__pill" aria-label="Site navigation">
+      <a class="topnav__link" href="index.html">Overview</a>
+      <a class="topnav__link" href="dashboard.html">Payments</a>
+      <a class="topnav__link" href="anchors.html">Anchors</a>
+      <a class="topnav__link" href="cross-chain.html">Cross-chain</a>
+      <a class="topnav__link" href="compare.html">Route Scout</a>
+      <a class="topnav__link" href="trust-check.html">Trust Check</a>
+      <a class="topnav__link is-active" href="x402-tester.html" aria-current="page">x402 Tester</a>
+      <a class="topnav__link" href="docs.html">Docs</a>
+    </nav>
+    <div class="topnav__actions">
+      <a class="dash-btn dash-btn--primary" href="portal.html">Developer Portal →</a>
+      <a class="dash-btn dash-btn--ghost" href="https://github.com/ibochivincent-lang/landfall" target="_blank" rel="noopener">GitHub ↗</a>
+    </div>
+  </div>
+</header>
+
+<main class="trust-wrap">
+  <div class="dash-head">
+    <div>
+      <h1 class="dash-title">x402 Pre-Flight Inspector</h1>
+      <p class="dash-sub">
+        Test and simulate HTTP 402 Payment Requirements on Stellar before an AI agent signs.
+        Verifies classic accounts, unwraps muxed accounts (<code>MED...</code>), and evaluates ledger evidence.
+      </p>
+    </div>
+  </div>
+
+  <div class="disclosure">
+    <strong>Agentic Pre-Flight Gate.</strong>
+    The x402 protocol standardizes <em>how</em> an agent pays; Landfall answers <em>who</em> is safe to pay.
+    Paste an x402 <code>accepts</code> array or <code>402 Payment Required</code> JSON payload below. Landfall will
+    inspect every counterparty against the public ledger and render the pre-flight authorization decision.
+  </div>
+
+  <div class="tester-grid">
+    <!-- Left Column: Input and Presets -->
+    <div class="panel-card">
+      <div class="panel-title">
+        <span>Payment Requirements Payload</span>
+        <span style="font-size: 0.75rem; color: #94a3b8;">x402 v0.1.0</span>
+      </div>
+
+      <label for="presetSelect" style="display:block; font-size: 0.8rem; color: #94a3b8; margin-bottom: 6px;">Load Realistic Scenario Preset:</label>
+      <select id="presetSelect" class="preset-selector">
+        <option value="testnet_usdc">Stellar Testnet USDC Micropayment (API Query)</option>
+        <option value="muxed_account">Muxed Account Payee (Exchange Deposit MED...)</option>
+        <option value="multi_payee">Multi-Payee Redundant Rail (Pubnet & Testnet)</option>
+        <option value="contract_payee">Soroban Contract Payee (C... Contract Diagnostic)</option>
+      </select>
+
+      <label for="x402Input" style="display:block; font-size: 0.8rem; color: #94a3b8; margin-bottom: 6px;">x402 JSON Body (accepts array):</label>
+      <textarea id="x402Input" class="code-editor" spellcheck="false"></textarea>
+
+      <button id="inspectBtn" class="btn-action">
+        Inspect Counterparties <span>→</span>
+      </button>
+    </div>
+
+    <!-- Right Column: Verification Results -->
+    <div class="panel-card">
+      <div class="panel-title">
+        <span>Pre-Flight Decision</span>
+        <div id="verdictBadge" class="badge-verdict verdict-approved">READY</div>
+      </div>
+
+      <div id="resultsContainer" style="min-height: 280px;">
+        <div style="color: #94a3b8; font-size: 0.9rem; text-align: center; margin-top: 80px;">
+          Click <strong>Inspect Counterparties</strong> to run live verification against the Stellar ledger.
+        </div>
+      </div>
+
+      <div class="snippet-tabs">
+        <button class="snippet-tab active" data-lang="curl">cURL</button>
+        <button class="snippet-tab" data-lang="js">TypeScript SDK</button>
+        <button class="snippet-tab" data-lang="mcp">Agent MCP</button>
+      </div>
+      <pre id="snippetCode" class="snippet-code">curl -X POST https://landfall.stellar.org/api/v1/x402/check-payee \
+  -H "Content-Type: application/json" \
+  -d '{"accepts": [...]}'</pre>
+    </div>
+  </div>
+</main>
+
+<script src="x402-tester.js"></script>
+</body>
+</html>

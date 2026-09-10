@@ -1,4 +1,45 @@
 {
   "version": 1,
-  "anchors": {}
+  "anchors": {
+    "circle.com": {
+      "chains": {
+        "ethereum": {
+          "addresses": [
+            "0xBd3afb0bb06656320f61889372d579e647275968",
+            "0x0a992d141deec9e72150bf37dd308299d2127d72"
+          ]
+        },
+        "arbitrum": {
+          "addresses": [
+            "0x19330d10D9Cc875121533311454997cf500E0616"
+          ]
+        },
+        "base": {
+          "addresses": [
+            "0x1682Ae6375C4E4A97e4B583BC394c861A46D8962"
+          ]
+        },
+        "solana": {
+          "addresses": [
+            "CCTPmbSD7gX1bxKPAmg77w8oFzNFpaQiQUWD43TKaecd",
+            "CCTPiPYPc6AsJuwueEnWgSgucamXDmtynEWdhxndBmBo"
+          ]
+        }
+      }
+    },
+    "moneygram.com": {
+      "chains": {
+        "ethereum": {
+          "addresses": [
+            "0x716ec50630b91d90f23d8c114cb91276061320ef"
+          ]
+        },
+        "tron": {
+          "addresses": [
+            "TXLAQ63Xg1NAzckPwKHvzw7CSEmLMEqcdj"
+          ]
+        }
+      }
+    }
+  }
 }

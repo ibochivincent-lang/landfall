@@ -4,8 +4,22 @@
   "private": true,
   "type": "module",
   "license": "MIT",
+  "author": "ibochivincent-lang",
   "description": "Payment intents: a declarative target ('deliver ₦500,000 to a Nigerian bank account') and the solver that ranks routes against it. See docs/architecture/INTENTS.md.",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
+    "build": "tsc -p tsconfig.build.json",
     "test": "tsx --test test/*.test.ts",
     "typecheck": "tsc --noEmit"
   }

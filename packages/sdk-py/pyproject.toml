@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "landfall-sdk"
+version = "0.1.0"
+description = "Python client for Landfall: independent settlement intelligence, Trust Check, and Route Scout for Stellar and AI agents."
+readme = "README.md"
+authors = [
+  { name = "ibochivincent-lang", email = "ibochivincent-lang@users.noreply.github.com" }
+]
+license = { text = "MIT" }
+keywords = ["stellar", "soroban", "anchor", "settlement", "trust-check", "x402", "langchain", "crewai"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+]
+requires-python = ">=3.9"
+dependencies = []
+
+[project.optional-dependencies]
+langchain = ["langchain-core>=0.1.0"]
+crewai = ["crewai-tools>=0.1.0"]
+
+[project.urls]
+Homepage = "https://landfall-chi.vercel.app"
+Repository = "https://github.com/ibochivincent-lang/landfall.git"
+Issues = "https://github.com/ibochivincent-lang/landfall/issues"
