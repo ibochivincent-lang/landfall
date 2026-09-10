@@ -1,5 +1,7 @@
 node_modules/
 dist/
+!packages/intents/dist/
+!packages/intents/dist/**
 .cache/
 out/
 *.log

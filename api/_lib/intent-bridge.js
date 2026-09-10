@@ -5,10 +5,20 @@
  * Author: ibochivincent-lang
  */
 
-import { LandfallIntent } from '@landfall/intents';
+let LandfallIntent;
+
+try {
+  const mod = await import('@landfall/intents');
+  LandfallIntent = mod.LandfallIntent || mod.default || mod;
+} catch {
+  // Defensive fallback: if @landfall/intents build is missing in serverless runtime,
+  // load packages/web/intent.js mirror to prevent total API outage
+  await import('../../packages/web/intent.js');
+  LandfallIntent = globalThis.LandfallIntent;
+}
 
 if (!LandfallIntent || typeof LandfallIntent.solveIntent !== 'function') {
-  throw new Error('@landfall/intents did not export LandfallIntent.solveIntent');
+  throw new Error('Failed to resolve LandfallIntent.solveIntent from @landfall/intents or fallback');
 }
 
 export { LandfallIntent };

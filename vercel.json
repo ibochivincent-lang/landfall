@@ -1,7 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "buildCommand": "npm install --legacy-peer-deps",
+  "buildCommand": "npm install --legacy-peer-deps && npm run build -w @landfall/intents",
   "installCommand": null,
   "outputDirectory": "packages/web",
   "cleanUrls": true,
