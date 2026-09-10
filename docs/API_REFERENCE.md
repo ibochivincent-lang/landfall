@@ -2,13 +2,13 @@
 
 Base URL: `https://landfall-chi.vercel.app`
 
-Everything here is served by one file, [`api/[...path].js`](../api/%5B...path%5D.js).
+Everything here is routed through [`api/[...path].js`](../api/%5B...path%5D.js) and modularized in `api/_routes/*.js`.
 The interactive playground at [`/docs.html`](https://landfall-chi.vercel.app/docs.html)
 runs the same routes; this page is the written reference.
 
 **Reads need no key.** An API key raises your *rate*, never your access —
 there is no login wall in front of public data, which would defeat the point
-of publishing a permissionless record.
+of publishing a permissionless record. Premium bulk exports are protected by standard x402 payment requirements.
 
 ---
 
@@ -33,7 +33,7 @@ Every error is JSON with an `error` string, and where useful a machine-readable
 `reason`:
 
 ```json
-{ "error": "address must be a Stellar public key (G...) or a transaction hash." }
+{ "error": "address must be a valid classic (G...) or muxed (M...) Stellar public key or a transaction hash." }
 ```
 
 | Status | Meaning |
@@ -396,10 +396,24 @@ for a narrative only when one is configured.
 Recipient self-report that a fiat leg landed — a `DERIVED`-tier evidence
 input. Sender reports never bind; see [FIAT_CONFIRMATION.md](architecture/FIAT_CONFIRMATION.md).
 
+### `POST /api/v1/corridors/export` (x402 Paid)
+
+Premium, full unredacted settlement flow matrix across all tracked currency pairs and anchors. Protected by standard **HTTP 402 Payment Required** (0.01 USDC on Stellar Testnet / Pubnet).
+
+Returns `402` with an `accepts` array if unpaid; returns `200` with the complete matrix upon valid payment proof (`x-payment-signature` or authorized testnet token).
+
+### `GET /api/v1/dump/ndjson` (x402 Paid)
+
+Bulk historical streaming ledger snapshot of tracked anchor accounts and reliability metrics in `.ndjson` format. Protected by **HTTP 402** (0.05 USDC).
+
 ### `POST /api/v1/auth`
 
 Verify a signed SEP-10 challenge and mint a token. The signature must meet the
 account's **medium** threshold, so a multisig account is multisig here too.
+
+### `POST /api/v1/admin/webhooks/redeliver` (Admin only)
+
+Replays dead-letter webhook deliveries recorded in `webhook_delivery_attempts` that previously failed or timed out. Accepts optional `{ maxAgeHours: 48, maxPerRun: 100, dryRun: false }`.
 
 ---
 

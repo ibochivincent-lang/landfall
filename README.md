@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![CI](https://github.com/ibochivincent-lang/landfall/actions/workflows/ci.yml/badge.svg)](https://github.com/ibochivincent-lang/landfall/actions/workflows/ci.yml)
-[![Tests](https://img.shields.io/badge/tests-441%20JS%20%2B%2025%20Rust-brightgreen)](https://github.com/ibochivincent-lang/landfall/actions/workflows/ci.yml)
+[![Tests](https://img.shields.io/badge/tests-460%2B%20JS%20%2B%205%20Python%20%2B%2025%20Rust-brightgreen)](https://github.com/ibochivincent-lang/landfall/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/@landfall/sdk?logo=npm&label=%40landfall%2Fsdk)](https://www.npmjs.com/package/@landfall/sdk)
 [![Deployed on Vercel](https://img.shields.io/badge/Deployed-Vercel-black?logo=vercel)](https://landfall-chi.vercel.app)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-fe5196?logo=conventionalcommits)](https://www.conventionalcommits.org/en/v1.0.0/)
@@ -112,13 +112,13 @@ But the question is now the ecosystem's, not just ours.
 | **Developer & Admin Portal** | ✅ **shipping** | `/portal.html` with self-serve auth, hashed API keys (`lf_live_...`), and webhooks |
 | **Interactive API Documentation** | ✅ **shipping** | `/docs.html` with live try-it playground and badge renderer |
 | **Model Context Protocol (MCP) Server** | ✅ **shipping** | `scripts/mcp/server.mjs` for AI agents (Claude, Cursor, Antigravity) |
-| **x402 payee check** | ✅ **shipping, no facilitator** | `POST /api/v1/x402/check-payee`, `landfall_x402_check_payee` MCP tool — Trust Check for every Stellar `payTo` in a real x402 `accepts` array before an agent signs. Deliberately doesn't verify or settle a payment; that's the facilitator's job. Runnable worked example, no dependencies and no API key: [`examples/x402-payee-check`](examples/x402-payee-check). See `packages/x402` |
+| **x402 payee check & paid API** | ✅ **shipping, testnet paywall live** | `POST /api/v1/x402/check-payee`, `landfall_x402_check_payee` MCP tool, and native HTTP 402 paywall on premium exports (`POST /api/v1/corridors/export`). Includes interactive in-browser tester at [`/x402-tester.html`](https://landfall-chi.vercel.app/x402-tester.html). Supports both classic (`G...`) and muxed (`M...`) accounts. See `packages/x402` |
 | **GraphQL API** | ✅ **shipping** | `POST /api/v1/graphql` for structured queries |
 | Postgres persistence + REST API | ✅ **shipping** | Supabase Session Pooler + serverless Vercel function endpoints |
 | Live transactions dashboard | ✅ **shipping** | `/dashboard.html` with dark account indicators and counterparty breakdown |
 | Scheduled ledger scan (GitHub Actions) | ✅ **shipping** | Cron asks for hourly (`0 * * * *`); GitHub runs scheduled workflows best-effort, so the measured cadence over 24h is a **median 2.8h gap** (range 1.7–4.8h), starting a median 38 minutes past the hour. Every payload carries `asOf`/`staleHours` so a consumer reads the real age rather than trusting a schedule. `$0/month` hosting upkeep |
 | **Anchor Route Scout** (`/compare.html`) | ⚠️ **partly real** | Reliability grades are ledger-derived. Fees are live where an anchor publishes SEP-24 terms, hardcoded catalogue otherwise. FX rates now check every anchor's SEP-38 quote server too — but as of this writing SEP-38 adoption among tracked anchors is close to zero, so the rate column is still mostly the catalogue spread. See [docs/gaps.md](docs/gaps.md) and `/api/v1/anchor-quotes.json` for exactly which anchor, if any |
-| **Trust Check** (`/trust-check.html`) | ✅ **shipping** | Paste a Stellar address or transaction hash — live, ledger-only counterparty signals (observed history, counterparty concentration, pass-through/forwarding pattern), a transparent 0–100 score with every deduction traceable to a named flag, and a confidence rating that overrides the score when there isn't enough history to say anything. No external fraud database — none exists that this project can independently verify, and fabricating one would be the exact failure mode Landfall exists to catch elsewhere. See `packages/trust-check/src/analyze.ts` |
+| **Trust Check** (`/trust-check.html`) | ✅ **shipping** | Paste a Stellar address (classic `G...` or muxed `M...`) or transaction hash — live, ledger-only counterparty signals (observed history, counterparty concentration, pass-through/forwarding pattern), a transparent 0–100 score with every deduction traceable to a named flag, and a confidence rating that overrides the score when there isn't enough history to say anything. No external fraud database — none exists that this project can independently verify, and fabricating one would be the exact failure mode Landfall exists to catch elsewhere. See `packages/trust-check/src/analyze.ts` |
 | **Fraud Reports** | ✅ **shipping** | `POST /api/v1/fraud-reports` — every report must cite a transaction Landfall verifies exists *and* involves the reported address before it is stored; unverifiable reports are rejected, not filed quietly at low weight. Shown on the Trust Check page in their own card, never blended into the score, and **report volume is never counted toward anything** — three reports is three strangers, which may be three victims or one person with three browsers. See `packages/fraud-reports` |
 | **Dispute response** | ✅ **shipping** | `POST /api/v1/fraud-reports/:id/dispute` — the reported party answers, gated on an Ed25519 signature from that account's own key. Landfall never asks for or receives a secret key: the page shows the message to sign and takes back only the signature. The response travels with the accusation everywhere the report appears |
 | **AI Investigator** (Sentinel's "Analyzed" stage) | ✅ **shipping, narrative needs a key** | `POST /api/v1/fraud-reports/:id/investigate` — splits into two strictly separate halves. **Cited facts** (the report's fields, the cited transaction re-fetched from Horizon, the subject's Trust Check flags) are deterministic and computed with **no AI at all**. The **narrative** is optional model-written prose over exactly those facts, labelled with the model that wrote it, and `null` whenever no key is configured. The model is never told how many other reports exist — feeding it a count risks it reading volume as corroboration, which is the one thing fraud reports must never become. See `packages/investigator` |
@@ -128,15 +128,16 @@ But the question is now the ecosystem's, not just ours.
 | **STP attestation schema + signing** | ✅ **shipping** | `packages/stp` — one portable settlement-attestation shape, canonical serialization, Ed25519 sign/verify |
 | **`ChainAdapter` layer** | ✅ **shipping** | Stellar (`PROVEN`), EVM/CCTP (`ATTESTED`), Tron + Solana (`DERIVED`) behind one interface — see [docs/architecture/MULTICHAIN.md](docs/architecture/MULTICHAIN.md) |
 | **`pickAnchor()` evidence ranking** | ✅ **shipping, on npm** | `npm install @landfall/sdk` — ranks PROVEN → ATTESTED → DERIVED, so derived evidence can never outrank ledger-proven settlement. Deliberately no blended score. See `packages/sdk/README.md` |
-| Non-Stellar anchor addresses | **not curated** | Every non-Stellar chain reports `unresolved`, not zero: no anchor has a verified address in `registry/anchors.registry.json` yet, and a guessed one would misattribute settlement |
+| **Python SDK (`landfall-sdk`)** | ✅ **shipping** | Python package with native LangChain and CrewAI agent tool integrations. See `packages/sdk-py` |
+| Non-Stellar anchor addresses | ⚠️ **curation in progress** | Curated verified gateway addresses for MoneyGram and Circle in `registry/anchors.registry.json`; other anchors report `unresolved` |
 | Recipient-confirmation proof binder | ✅ **shipping** | The weakest of three ways to bind DERIVED evidence, and the only one needing no anchor cooperation — a recipient's own report, tightly scoped (once per transfer, timed server-side, sender reports never bind). See `packages/adapters/src/fiatConfirmation.ts` |
 | zkTLS / Proof-of-Reserve proof binder | **designed, not built** | The two stronger options — need a counterparty's cooperation or hard engineering. Until either exists the `DERIVED` adapters lean on recipient confirmation or emit nothing |
 | Soroban smart contract oracle | **deployed to testnet** | Rust Soroban contract with 16 test cases, digest verification |
-| CAP-67 event stream ingestion | schema ready | Ingestion pipeline planned |
+| **CAP-67 event stream ingestion** | ✅ **shipping** | Protocol 23 event streaming via Stellar RPC in `packages/indexer/src/rpc-events.ts` and continuous sub-minute `stream-daemon.ts` |
 | Live SEP-38 quote ingestion | ✅ **shipping, near-zero coverage** | `scripts/fetch-anchor-quotes.mjs` asks every tracked anchor's own quote server hourly. The mechanism is real; today essentially no tracked anchor runs SEP-38 against a corridor Route Scout shows for it, so most rates are still the catalogue estimate — stated per anchor, not hidden |
 | Dark-anchor early warning (predictive) | **measured as not yet buildable** | The scan history now exists as a committed record (`data/scan-history.ndjson`, 5,900+ observations from 12 August, extended hourly). Measured against it, **exactly one account went dark in 26 days** (`slow → dark`, n=1) against 17 `live → slow` degradations. This roadmap item requires the false-positive rate be published, and one positive example cannot produce a rate that means anything — any threshold fits n=1 perfectly and generalises to nothing. Revisited on a count of going-dark events, not on a date. Full transition table in [data/README.md](data/README.md) |
 | `pickAnchor()` multi-factor route scoring | **designed, not built** | Weighted score over payout, reliability, and degradation signal; needs real quotes first |
-| Slippage: quoted versus landed | **designed, not built** | Depends on attestation (Horizon 2). Nothing in the ecosystem publishes this today |
+| **Slippage: quoted versus landed** | ✅ **shipping** | Deterministic basis-point calculation comparing SEP-38 firm quotes against on-chain delivery amounts (`packages/stp/src/slippage.ts`) |
 
 We would rather list this honestly than let a roadmap read as a changelog. Full detail in [docs/gaps.md](docs/gaps.md) and [ROADMAP.md](ROADMAP.md).
 
@@ -174,11 +175,11 @@ the dated record it is — the network tracked here has since grown from 5 domai
 
 | Layer | Technology |
 |---|---|
-| Indexer | TypeScript, Node.js 20+, `tsx`, `node:test` (zero-dep SEP-1/TOML parser, incremental cursor syncing) |
-| API | Node.js serverless functions, read-only HTTP over `pg` with Supabase pooler |
+| Indexer | TypeScript, Node.js 20+, `tsx`, `node:test` (zero-dep SEP-1/TOML parser, CAP-67 RPC streaming, incremental cursor syncing) |
+| API | Node.js serverless functions, read-only HTTP & x402 payment routes over `pg` with Supabase pooler |
 | Web Portal | Vanilla HTML/CSS/JS (no framework bloat), responsive for mobile, GSAP loader |
 | Oracle | Rust, Soroban SDK — deployed to testnet |
-| AI Integration | Model Context Protocol (MCP) stdio server (`@modelcontextprotocol/sdk`) |
+| AI Integration | Model Context Protocol (MCP) stdio server (`@modelcontextprotocol/sdk`) + Python SDK (`landfall-sdk` with LangChain & CrewAI) |
 | Database | PostgreSQL (Supabase Session Pooler or local via Docker) |
 | Deployment | Vercel (frontend + API proxy), GitHub Actions (scheduled ledger scan cron) |
 
@@ -201,7 +202,6 @@ Brings up a local Stellar Quickstart node, Postgres with the schema applied, the
 If you already run Postgres natively, port 5432 is taken and both servers will bind it — host
 connections then reach the wrong one and fail with a password error against credentials that are
 correct. Publish the container somewhere else instead:
-
 ```bash
 POSTGRES_PORT=55432 docker compose up
 ```
@@ -214,7 +214,7 @@ npm run anchors:discover  # propose new anchor domains from an independent direc
 npm run discover          # resolve tracked anchor domains to on-chain accounts
 npm run scan              # index payment history and print the finding
 npm run scan:verify       # check the newest scan before it could be published
-npm test                  # 431 tests, no network required
+npm test                  # 460+ JS + 5 Python + 25 Rust tests
 npm run typecheck
 ```
 
@@ -229,9 +229,13 @@ Layout:
 ```
 packages/contracts   Rust + Soroban oracle
 packages/db          PostgreSQL schema
-packages/indexer     ledger reader and metrics
-packages/api         read-only HTTP API
-packages/web         the public site and dashboard
+packages/indexer     ledger reader, CAP-67 RPC streaming, and metrics
+packages/api         read-only HTTP API & x402 payment routes
+packages/web         the public site, dashboard, and x402 tester
+packages/sdk         @landfall/sdk TypeScript client
+packages/sdk-py      landfall-sdk Python client (LangChain & CrewAI)
+packages/x402        payee risk evaluation & muxed account unwrapping
+packages/stp         settlement attestation schema & slippage tracking
 ```
 
 Scan flags, deployment steps (Supabase, prod compose, Vercel, oracle), and the transactions dashboard are covered in [docs/architecture.md](docs/architecture.md) and [docs/deployment.md](docs/deployment.md).

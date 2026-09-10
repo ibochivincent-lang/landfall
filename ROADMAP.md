@@ -97,12 +97,14 @@ than becoming a second changelog.
 - [ ] **zkTLS / Proof-of-Reserve proof binder** — until it exists the `DERIVED` adapters emit
   nothing at all rather than present a bare transfer as evidence it hasn't earned
 - [ ] **Signed settlement receipt ingest** (backlog H1) — an attestation format so an anchor or user can assert the fiat leg, which the ledger alone cannot show
-- [ ] **Slippage metric: quoted versus landed** (backlog H2) — depends on receipts; nothing in the ecosystem currently publishes this number. This is the number that makes Route Scout's rate column a measurement instead of a catalogue
+- [x] ~~**Slippage metric: quoted versus landed**~~ (backlog H2) — Shipped. Deterministic basis-point slippage engine comparing SEP-38 firm quotes against on-chain delivery amounts (`packages/stp/src/slippage.ts`)
+- [x] ~~**CAP-67 unified event ingestion & streaming daemon**~~ — Shipped. Protocol 23 event ingestion via Stellar RPC (`packages/indexer/src/rpc-events.ts`) and sub-minute stream daemon (`packages/indexer/src/stream-daemon.ts`)
+- [x] ~~**Python SDK (`landfall-sdk`) for AI Agents**~~ — Shipped. Native Python client with LangChain and CrewAI tools for autonomous agents (`packages/sdk-py`)
+- [x] ~~**x402 Paid Rails & Interactive Tester**~~ — Shipped. HTTP 402 paywall on premium data exports and browser playground at `/x402-tester.html`
 - [ ] **Dark-anchor early warning** — an anchor rarely stops instantly: volume falls, counterparty concentration tightens, gaps between settlements stretch, then silence. Every scan is already stored, so the training data exists and nothing reads it back. A degradation signal 48–72h ahead is worth more to a wallet than an accurate post-mortem, Must ship with its false-positive rate published — an early warning that cries wolf about a named business is worse than none
 - [ ] **`pickAnchor()` multi-factor route scoring** — one weighted score over net payout, reliability grade, and degradation signal, with the caller choosing the emphasis (safest / cheapest / fastest) rather than the formula choosing for them. Blocked on live SEP-38 quotes: optimising over a hardcoded rate table produces a confident recommendation from invented inputs, which is worse than no recommendation
 - [ ] Talk to at least one wallet about embedding `pickAnchor()` — the roadmap's own infrastructure test is met by one external consumer, not by another shipped feature
 - [x] ~~Publish `@landfall/sdk` with `pickAnchor()` to npm~~ (backlog H3) — published 7 September 2026, verified against the live registry copy rather than the local build
-- [ ] **CAP-67 unified event ingestion** — replaces N per-account REST cursors with one ledger-wide stream, and makes mint/burn distinguishable from transfer instead of inferred
 - [ ] Multi-region indexing, to remove the single-vantage-point assumption
 - [x] ~~Expand anchor coverage past the current 8 candidate domains (5 resolving).~~ Now **27 domains and 108 accounts** in the latest scan. Still a sample rather than a census, and reported as one — but no longer the handful the original finding rested on
 - [ ] Confidence intervals (Wilson score) on every published rate
