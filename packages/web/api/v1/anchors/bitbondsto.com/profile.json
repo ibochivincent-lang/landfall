@@ -1,10 +1,10 @@
 {
   "anchorId": "bitbondsto.com",
   "name": "Bitbond Finance GmbH",
-  "asOf": "2026-09-10T12:29:13.959Z",
+  "asOf": "2026-09-10T16:45:27.688Z",
   "verification": {
     "resolved": true,
-    "checkedAt": "2026-09-10T12:29:13.959Z",
+    "checkedAt": "2026-09-10T16:45:27.688Z",
     "source": "SEP-1 stellar.toml, resolved live; issuer attribution confirmed against each issuer account's own on-chain home_domain",
     "accounts": [
       {
@@ -36,7 +36,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 191.34,
+      "hoursSinceActivity": 195.61,
       "topCounterpartyShare": null
     },
     {
@@ -48,7 +48,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1516.69,
+      "hoursSinceActivity": 1520.96,
       "topCounterpartyShare": null
     }
   ],
@@ -256,6 +256,13 @@
         "in": 0,
         "out": 0,
         "hours": 191.34
+      },
+      {
+        "t": "2026-09-10T16:45:27.688Z",
+        "state": "slow",
+        "in": 0,
+        "out": 0,
+        "hours": 195.61
       }
     ],
     "GDDNUTFMGY4FSFD2I2WZNWGRU2WLJEA2YEY5IGNXS6ZBCZYOVOXGCZHX": [
@@ -461,6 +468,13 @@
         "in": 0,
         "out": 0,
         "hours": 1516.69
+      },
+      {
+        "t": "2026-09-10T16:45:27.688Z",
+        "state": "dark",
+        "in": 0,
+        "out": 0,
+        "hours": 1520.96
       }
     ]
   },

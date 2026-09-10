@@ -1,10 +1,10 @@
 {
   "anchorId": "vnx.io",
   "name": "VNX Global Ltd.",
-  "asOf": "2026-09-10T12:29:13.959Z",
+  "asOf": "2026-09-10T16:45:27.688Z",
   "verification": {
     "resolved": true,
-    "checkedAt": "2026-09-10T12:29:13.959Z",
+    "checkedAt": "2026-09-10T16:45:27.688Z",
     "source": "SEP-1 stellar.toml, resolved live; issuer attribution confirmed against each issuer account's own on-chain home_domain",
     "accounts": [
       {
@@ -44,7 +44,7 @@
       "outbound": 18,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 1418.64,
+      "hoursSinceActivity": 1422.91,
       "topCounterpartyShare": 1
     },
     {
@@ -56,7 +56,7 @@
       "outbound": 11,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 1867.52,
+      "hoursSinceActivity": 1871.79,
       "topCounterpartyShare": 1
     },
     {
@@ -68,7 +68,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 2830.88,
+      "hoursSinceActivity": 2835.15,
       "topCounterpartyShare": 1
     },
     {
@@ -80,7 +80,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 1226.39,
+      "hoursSinceActivity": 1230.66,
       "topCounterpartyShare": 0.9963
     }
   ],
@@ -288,6 +288,13 @@
         "in": 56,
         "out": 18,
         "hours": 1418.64
+      },
+      {
+        "t": "2026-09-10T16:45:27.688Z",
+        "state": "dark",
+        "in": 56,
+        "out": 18,
+        "hours": 1422.91
       }
     ],
     "GAYTNWDWDIKMN7JXSSO4MXDLQTVJ4A7UZVW7XWECAPBUNXRMEA2SGX74": [
@@ -493,6 +500,13 @@
         "in": 11,
         "out": 11,
         "hours": 1867.52
+      },
+      {
+        "t": "2026-09-10T16:45:27.688Z",
+        "state": "dark",
+        "in": 11,
+        "out": 11,
+        "hours": 1871.79
       }
     ],
     "GDYKVJVWRTERUUOU6Z4ZN3LFMNOI7YGJNATNLPGF6R5YFYGMCRKXSEVA": [
@@ -698,6 +712,13 @@
         "in": 1,
         "out": 0,
         "hours": 2830.88
+      },
+      {
+        "t": "2026-09-10T16:45:27.688Z",
+        "state": "dark",
+        "in": 1,
+        "out": 0,
+        "hours": 2835.15
       }
     ],
     "GA5TCQVISVBFKLEVHEXPOTDUHZMDOF4TJM7NEJC3RE45OB2QZBK36442": [
@@ -903,6 +924,13 @@
         "in": 2,
         "out": 0,
         "hours": 1226.39
+      },
+      {
+        "t": "2026-09-10T16:45:27.688Z",
+        "state": "dark",
+        "in": 2,
+        "out": 0,
+        "hours": 1230.66
       }
     ]
   },
