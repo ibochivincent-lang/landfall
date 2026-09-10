@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Grupo Anchor S.A. — settlement record | Landfall</title>
-<meta name="description" content="Independent, ledger-derived settlement record for anclap.com: 3 declared Stellar account(s), 1 settling, 1 dark. Every figure traces to a transaction hash.">
+<meta name="description" content="Independent, ledger-derived settlement record for anclap.com: 3 declared Stellar account(s), 1 settling, 2 dark. Every figure traces to a transaction hash.">
 <link rel="canonical" href="https://landfall-chi.vercel.app/anchor/anclap.com">
 <meta property="og:title" content="Grupo Anchor S.A. — settlement record">
 <meta property="og:description" content="1 of 3 accounts settling. Read from the public Stellar ledger, not self-reported.">
@@ -35,7 +35,7 @@
   <div class="anchor-summary">
     <div class="sum"><b>3</b><span>declared accounts</span></div>
     <div class="sum"><b>1</b><span>settling now</span></div>
-    <div class="sum"><b class="is-dark">1</b><span>dark &gt; 30 days</span></div>
+    <div class="sum"><b class="is-dark">2</b><span>dark &gt; 30 days</span></div>
     <div class="sum"><b>1,291</b><span>inbound indexed</span></div>
     <div class="sum"><b>696</b><span>outbound indexed</span></div>
   </div>
@@ -51,7 +51,7 @@
       domain's own is how a shared stablecoin issuer once got credited to a single business here.
     </p>
     <ul class="verify-list"><li class="mono">GCYE7C77EB…52DARS — <strong>declared</strong></li><li class="mono">GA4TDPNUCZ…YNBPEN — <strong>declared</strong></li><li class="mono">GARDJZ33FT…NR3HOT — <strong>declared</strong></li></ul>
-    <p class="muted small">SEP-1 resolved successfully at 2026-09-10T07:37:15.804Z.</p>
+    <p class="muted small">SEP-1 resolved successfully at 2026-09-10T12:29:13.959Z.</p>
   </section>
 
   <section class="anchor-block">
@@ -61,27 +61,27 @@
       <tbody>
       <tr>
         <td class="mono"><a href="https://stellar.expert/explorer/public/account/GCYE7C77EB5AWAA25R5XMWNI2EDOKTTFTTPZKM2SR5DI4B4WFD52DARS" target="_blank" rel="noopener">GCYE7C77…52DARS</a></td>
-        <td><span class="state state--slow">slow</span></td>
+        <td><span class="state state--dark">dark</span></td>
         <td class="num">9</td>
         <td class="num">0</td>
-        <td class="num">29.9d</td>
-        <td class="num">361 obs</td>
+        <td class="num">30.1d</td>
+        <td class="num">362 obs</td>
       </tr>
       <tr>
         <td class="mono"><a href="https://stellar.expert/explorer/public/account/GA4TDPNUCZPTOHB3TKUYMDCRVATXKEADH7ZEYEBWJKQKE2UBFCYNBPEN" target="_blank" rel="noopener">GA4TDPNU…YNBPEN</a></td>
         <td><span class="state state--dark">dark</span></td>
         <td class="num">5</td>
         <td class="num">0</td>
-        <td class="num">86.9d</td>
-        <td class="num">361 obs</td>
+        <td class="num">87.1d</td>
+        <td class="num">362 obs</td>
       </tr>
       <tr>
         <td class="mono"><a href="https://stellar.expert/explorer/public/account/GARDJZ33FTTLVKGABXDS22SYNTP4VCLYARIEWKMZKYHX3RRLPMNR3HOT" target="_blank" rel="noopener">GARDJZ33…NR3HOT</a></td>
         <td><span class="state state--live">live</span></td>
         <td class="num">1277</td>
         <td class="num">696</td>
-        <td class="num">4.0h</td>
-        <td class="num">361 obs</td>
+        <td class="num">8.8h</td>
+        <td class="num">362 obs</td>
       </tr></tbody>
     </table>
     <p class="muted small">
@@ -95,10 +95,14 @@
   <section class="anchor-block">
     <h2>Trend</h2>
     <p class="muted small">
-      1 state change(s) observed across this anchor's accounts,
-      1 of them to a weaker state.
+      2 state change(s) observed across this anchor's accounts,
+      2 of them to a weaker state.
     </p>
     <ul class="trend-list"><li>
+        <span class="mono">GCYE7C77…52DARS</span>
+        went <strong class="trend-down">slow → dark</strong>
+        on 2026-09-10
+      </li><li>
         <span class="mono">GCYE7C77…52DARS</span>
         went <strong class="trend-down">live → slow</strong>
         on 2026-08-14
@@ -117,7 +121,7 @@
     <p>
       A <code>stellar.toml</code> entry is a claim that an endpoint exists. Directories publish that claim
       and nothing checks it. These are the results of asking each declared endpoint directly, at
-      2026-09-10T02:09:59.663Z.
+      2026-09-10T07:40:54.541Z.
       Every declared and probeable capability answered.
     </p>
     <table class="anchor-table">
@@ -127,14 +131,14 @@
         <td><strong>SEP-6</strong><div class="muted small">Programmatic deposit &amp; withdrawal</div></td>
         <td><span class="cap cap--yes">declared</span></td>
         <td><span class="cap cap--yes">answering</span></td>
-        <td class="num">310ms</td>
+        <td class="num">242ms</td>
         <td class="muted small">2 depositable, 2 withdrawable asset(s).</td>
       </tr>
       <tr>
         <td><strong>SEP-24</strong><div class="muted small">Hosted deposit &amp; withdrawal</div></td>
         <td><span class="cap cap--yes">declared</span></td>
         <td><span class="cap cap--yes">answering</span></td>
-        <td class="num">213ms</td>
+        <td class="num">156ms</td>
         <td class="muted small">2 depositable, 2 withdrawable asset(s).</td>
       </tr>
       <tr>
@@ -148,7 +152,7 @@
         <td><strong>SEP-10</strong><div class="muted small">Web authentication</div></td>
         <td><span class="cap cap--yes">declared</span></td>
         <td><span class="cap cap--yes">answering</span></td>
-        <td class="num">71ms</td>
+        <td class="num">16ms</td>
         <td class="muted small">Answered a bare challenge request, which is the expected behaviour.</td>
       </tr></tbody>
     </table>
@@ -166,7 +170,7 @@
   </section>
 
   <p class="muted small asof">
-    Scan of 2026-09-10T07:37:15.804Z · verified against stellar.expert · <a href="../docs.html">methodology</a> ·
+    Scan of 2026-09-10T12:29:13.959Z · verified against stellar.expert · <a href="../docs.html">methodology</a> ·
     <a href="https://github.com/ibochivincent-lang/landfall/blob/main/DISPUTES.md">dispute a figure on this page</a>
   </p>
 </main>

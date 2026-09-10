@@ -1,10 +1,10 @@
 {
   "anchorId": "funtracker.site",
   "name": "funtracker.site",
-  "asOf": "2026-09-10T07:37:15.804Z",
+  "asOf": "2026-09-10T12:29:13.959Z",
   "verification": {
     "resolved": true,
-    "checkedAt": "2026-09-10T07:37:15.804Z",
+    "checkedAt": "2026-09-10T12:29:13.959Z",
     "source": "SEP-1 stellar.toml, resolved live; issuer attribution confirmed against each issuer account's own on-chain home_domain",
     "accounts": [
       {
@@ -20,8 +20,8 @@
   "summary": {
     "accounts": 2,
     "live": 0,
-    "slow": 1,
-    "dark": 1,
+    "slow": 0,
+    "dark": 2,
     "noActivity": 0,
     "inbound": 2,
     "outbound": 8
@@ -36,19 +36,19 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 1265.85,
+      "hoursSinceActivity": 1270.72,
       "topCounterpartyShare": 1
     },
     {
       "account": "GDW3CNKSP5AOTDQ2YCKNGC6L65CE4JDX3JS5BV427OB54HCF2J4PUEVG",
       "domain": "funtracker.site",
       "name": "funtracker.site",
-      "state": "slow",
+      "state": "dark",
       "inbound": 0,
       "outbound": 8,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 717.49,
+      "hoursSinceActivity": 722.36,
       "topCounterpartyShare": null
     }
   ],
@@ -249,6 +249,13 @@
         "in": 2,
         "out": 0,
         "hours": 1265.85
+      },
+      {
+        "t": "2026-09-10T12:29:13.959Z",
+        "state": "dark",
+        "in": 2,
+        "out": 0,
+        "hours": 1270.72
       }
     ],
     "GDW3CNKSP5AOTDQ2YCKNGC6L65CE4JDX3JS5BV427OB54HCF2J4PUEVG": [
@@ -447,6 +454,13 @@
         "in": 0,
         "out": 8,
         "hours": 717.49
+      },
+      {
+        "t": "2026-09-10T12:29:13.959Z",
+        "state": "dark",
+        "in": 0,
+        "out": 8,
+        "hours": 722.36
       }
     ]
   },

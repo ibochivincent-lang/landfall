@@ -1,10 +1,10 @@
 {
   "anchorId": "mobius.network",
   "name": "Mochi, Inc.",
-  "asOf": "2026-09-10T07:37:15.804Z",
+  "asOf": "2026-09-10T12:29:13.959Z",
   "verification": {
     "resolved": true,
-    "checkedAt": "2026-09-10T07:37:15.804Z",
+    "checkedAt": "2026-09-10T12:29:13.959Z",
     "source": "SEP-1 stellar.toml, resolved live; issuer attribution confirmed against each issuer account's own on-chain home_domain",
     "accounts": [
       {
@@ -36,7 +36,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 2450.1,
+      "hoursSinceActivity": 2454.97,
       "topCounterpartyShare": null
     },
     {
@@ -48,7 +48,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 184.95,
+      "hoursSinceActivity": 189.82,
       "topCounterpartyShare": 0.3847
     }
   ],
@@ -249,6 +249,13 @@
         "in": 0,
         "out": 0,
         "hours": 2450.1
+      },
+      {
+        "t": "2026-09-10T12:29:13.959Z",
+        "state": "dark",
+        "in": 0,
+        "out": 0,
+        "hours": 2454.97
       }
     ],
     "GA6HCMBLTZS5VYYBCATRBRZ3BZJMAFUDKYYF6AH6MVCMGWMRDNSWJPIH": [
@@ -447,6 +454,13 @@
         "in": 32,
         "out": 0,
         "hours": 184.95
+      },
+      {
+        "t": "2026-09-10T12:29:13.959Z",
+        "state": "slow",
+        "in": 32,
+        "out": 0,
+        "hours": 189.82
       }
     ]
   },
