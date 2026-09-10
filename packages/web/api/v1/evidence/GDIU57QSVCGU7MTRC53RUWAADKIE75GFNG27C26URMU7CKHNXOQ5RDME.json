@@ -1,7 +1,7 @@
 {
-  "asOf": "2026-09-10T16:45:27.688Z",
-  "scanFile": "scan-2026-09-10T16-45-27-688Z.json",
-  "datasetRoot": "c97f565466d236e3c0d62c22a3b5b7f263fdd8f807d44cd71e9dc6dd56244978",
+  "asOf": "2026-09-10T19:21:10.624Z",
+  "scanFile": "scan-2026-09-10T19-21-10-624Z.json",
+  "datasetRoot": "a60e821354f9395b5c53b217e1acfbc6ba138fa55381e0363eae8434e9e63756",
   "methodology": {
     "id": "11a4c3a9bfd0c485",
     "parameters": {
@@ -23,7 +23,7 @@
     "outbound": 0,
     "returns": 0,
     "returnRate": 0,
-    "hoursSinceActivity": 0.74,
+    "hoursSinceActivity": 0.33,
     "sampled": 15,
     "windowStart": "2026-08-27T18:03:54.000Z",
     "windowEnd": "2026-09-10T14:09:43.000Z"
@@ -38,27 +38,27 @@
       },
       {
         "position": "left",
-        "hash": "1cf4587987e141b20f4abd1e6416de6ce1c62b5ac7a3948696f1c0bed0cc19e0"
+        "hash": "75abb4608ae96603007edabdad28f0dc2a084a2b41ace4fb4222945732860e0d"
       },
       {
         "position": "right",
-        "hash": "ea86269ead1ee074dc90e1f8b6ea93dcd3053983f0570bda0e44da9f4f5b2324"
+        "hash": "de054530cc1eff75341f50327c702ffcb8bbf56cfaa402ff943c88bf0fdeea71"
       },
       {
         "position": "left",
-        "hash": "97252afcf8d7fca83e9735e2d4f4ababed6b5cb7a79b8e4532c27d04c5131385"
+        "hash": "ed850f82872a72531ce023496d4c1bb871d2a4225e8d52502c4f147a677488f8"
       },
       {
         "position": "left",
-        "hash": "1d428db0dff10f378c9ac5cd3bc223c5753602839230587e6ee7c9cede3261bf"
+        "hash": "87045985305bf7a456295be7f96f30ccf70fd4dee43f5ecf2eee4fcb934e0fe1"
       },
       {
         "position": "right",
-        "hash": "28b3d82f6ae4e4688668b6d0e99d366f7ef3a73adee2e1496e5183578ad32a43"
+        "hash": "218b3567be6952ff6b9bb187791e32032edde37a0f2922352c8ddf06b6357395"
       },
       {
         "position": "left",
-        "hash": "8409695b63336af038b9c4c8e13c5dc5ba6008c979846e957d8439930439173b"
+        "hash": "54411525feb1254fd039ebae3dcabd44cdfe627335c00646edbb7df808f67226"
       }
     ],
     "namespace": "landfall-settlement-v1",
