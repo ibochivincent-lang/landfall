@@ -69,12 +69,12 @@ import {
   sep10Config,
   verifyChallenge,
 } from './_lib/sep10.js';
-import { handleAnchorsRoute } from './routes/anchors.js';
-import { handleTrustCheckRoute } from './routes/trust-check.js';
-import { handleX402Route } from './routes/x402.js';
-import { handleAdminRoute } from './routes/admin.js';
-import { handleFraudReportsRoute } from './routes/fraud-reports.js';
-import { handleFiatRoute } from './routes/fiat.js';
+import { handleAnchorsRoute } from './_routes/anchors.js';
+import { handleTrustCheckRoute } from './_routes/trust-check.js';
+import { handleX402Route } from './_routes/x402.js';
+import { handleAdminRoute } from './_routes/admin.js';
+import { handleFraudReportsRoute } from './_routes/fraud-reports.js';
+import { handleFiatRoute } from './_routes/fiat.js';
 
 const { Pool } = pg;
 const scrypt = promisify(scryptCb);

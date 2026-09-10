@@ -49,22 +49,18 @@ export async function rateLimit(db, key, limitPerMin) {
   if (!db) return { allowed: true };
   try {
     const { rows } = await db.query(
-      `INSERT INTO rate_limits (key, count, reset_at)
-       VALUES ($1, 1, now() + interval '1 minute')
-       ON CONFLICT (key) DO UPDATE
-       SET count = CASE
-         WHEN rate_limits.reset_at < now() THEN 1
-         ELSE rate_limits.count + 1
-       END,
-       reset_at = CASE
-         WHEN rate_limits.reset_at < now() THEN now() + interval '1 minute'
-         ELSE rate_limits.reset_at
-       END
+      `INSERT INTO rate_limit_counters (bucket_key, window_start, count)
+       VALUES ($1, date_trunc('minute', now()), 1)
+       ON CONFLICT (bucket_key, window_start)
+       DO UPDATE SET count = rate_limit_counters.count + 1
        RETURNING count`,
-      [key]
+      [key],
     );
-    const count = rows[0]?.count || 1;
-    return { allowed: count <= limitPerMin };
+    if (Math.random() < 0.02) {
+      db.query(`DELETE FROM rate_limit_counters WHERE window_start < now() - interval '1 hour'`).catch(() => {});
+    }
+    const count = rows[0]?.count ?? 1;
+    return { allowed: count <= limitPerMin, count };
   } catch {
     return { allowed: true };
   }
