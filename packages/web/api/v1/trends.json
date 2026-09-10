@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-09T23:46:14.648Z",
+  "generatedAt": "2026-09-10T02:10:23.958Z",
   "note": "State changes observed per account across every stored scan. Reads back the history the scan has been writing since 12 August 2026, which until now nothing consumed.",
   "whatThisIsNot": "1 transition(s) into dark have now been observed. That is the first evidence a degradation signal could ever be built on, and it is still far too few to forecast from.",
   "limits": "A transition is only visible if two scans straddle it, and scan cadence is irregular — GitHub Actions schedules hourly and delivers roughly every 2.8 hours. A state that flipped and flipped back between two scans is invisible here. Run lengths measured in days are bounded below by how long this project has been observing, which for the oldest accounts is 12 August 2026.",
@@ -286,9 +286,9 @@
           "account": "GBX6YI45VU7WNAAKA3RBFDR3I3UKNFHTJPQ5F6KOOKSGYIAM4TRQN54W",
           "current": {
             "state": "slow",
-            "observations": 4,
+            "observations": 5,
             "since": "2026-09-09T14:55:00.813Z",
-            "days": 0.4,
+            "days": 0.5,
             "everChanged": true
           },
           "transitions": [
@@ -307,16 +307,16 @@
             "earlierGrowth": 2,
             "recentGrowth": 0,
             "direction": "stopped",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GDNUVPUOMWOF2ML5FA5E4HQDX7EHV3VCJTLLTO563PUMZKMHJUJIJSYI",
           "current": {
             "state": "slow",
-            "observations": 4,
+            "observations": 5,
             "since": "2026-09-09T14:55:00.813Z",
-            "days": 0.4,
+            "days": 0.5,
             "everChanged": true
           },
           "transitions": [
@@ -335,16 +335,16 @@
             "earlierGrowth": 1,
             "recentGrowth": 0,
             "direction": "stopped",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GCJFH6HI5UPQVTUUOAS7JPOEPCQZCNGM63GWMBL6ULGUL4XUXRIXXIEQ",
           "current": {
             "state": "live",
-            "observations": 5,
+            "observations": 6,
             "since": "2026-09-09T10:22:26.169Z",
-            "days": 0.6,
+            "days": 0.7,
             "everChanged": true
           },
           "transitions": [
@@ -363,16 +363,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 1,
             "direction": "accelerating",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GBDTAQDRSX3QOEAQQKYWRGOTFE5FHQTLIH5YAF2HGUY3PBKRXWDKBLHN",
           "current": {
             "state": "slow",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -380,16 +380,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GDDGTHJFW66SQYV2GRWRNL3AFWEHLI2IO7LTY7X743U4TUFI7VLKKZFG",
           "current": {
             "state": "dark",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -397,16 +397,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GAGCE4AKZ55YGF4OHIODN7M3HXKZLHUDZLTLWHCGSUNWUBO7LX7UKKQY",
           "current": {
             "state": "dark",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -414,7 +414,7 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         }
       ]
@@ -437,9 +437,9 @@
           "account": "GAX5TXB5RYJNLBUR477PEXM4X75APK2PGMTN6KEFQSESGWFXEAKFSXJO",
           "current": {
             "state": "slow",
-            "observations": 16,
+            "observations": 17,
             "since": "2026-09-07T06:47:20.730Z",
-            "days": 2.7,
+            "days": 2.8,
             "everChanged": true
           },
           "transitions": [
@@ -453,7 +453,7 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         }
       ]
@@ -476,9 +476,9 @@
           "account": "GD5J6HLF5666X4AZLTFTXLY46J5SW7EXRKBLEYPJP33S33MXZGV6CWFN",
           "current": {
             "state": "slow",
-            "observations": 23,
+            "observations": 24,
             "since": "2026-09-05T15:48:32.076Z",
-            "days": 4.3,
+            "days": 4.4,
             "everChanged": true
           },
           "transitions": [
@@ -492,16 +492,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GDDNUTFMGY4FSFD2I2WZNWGRU2WLJEA2YEY5IGNXS6ZBCZYOVOXGCZHX",
           "current": {
             "state": "dark",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -509,7 +509,7 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         }
       ]
@@ -532,9 +532,9 @@
           "account": "GAWODAROMJ33V5YDFY3NPYTHVYQG7MJXVJ2ND3AOGIHYRWINES6ACCPD",
           "current": {
             "state": "slow",
-            "observations": 69,
+            "observations": 70,
             "since": "2026-08-27T16:06:49.310Z",
-            "days": 13.3,
+            "days": 13.4,
             "everChanged": true
           },
           "transitions": [
@@ -558,16 +558,16 @@
             "earlierGrowth": 8,
             "recentGrowth": 1,
             "direction": "slowing",
-            "basis": "359 observations"
+            "basis": "360 observations"
           }
         },
         {
           "account": "GBQZOJE2GWJU5VBT6NBLD2F3IOVOYUBDAXYUU32XMHDF4RMDOURWV3GT",
           "current": {
             "state": "dark",
-            "observations": 359,
+            "observations": 360,
             "since": "2026-08-12T13:23:00.436Z",
-            "days": 28.4,
+            "days": 28.5,
             "everChanged": false
           },
           "transitions": [],
@@ -575,16 +575,16 @@
             "earlierGrowth": 6,
             "recentGrowth": 0,
             "direction": "stopped",
-            "basis": "359 observations"
+            "basis": "360 observations"
           }
         },
         {
           "account": "GDI5EK4HNMBHJJQGP3GUXQJIIOHU2CJO3LABPWD6WYSPJZP5NP67TMNN",
           "current": {
             "state": "dark",
-            "observations": 359,
+            "observations": 360,
             "since": "2026-08-12T13:23:00.436Z",
-            "days": 28.4,
+            "days": 28.5,
             "everChanged": false
           },
           "transitions": [],
@@ -592,16 +592,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "359 observations"
+            "basis": "360 observations"
           }
         },
         {
           "account": "GBSKKRM7RRDHC33O6KFNLUSPS3577F7GYSFFVBVV5J5PDWGY4XWERE3W",
           "current": {
             "state": "dark",
-            "observations": 359,
+            "observations": 360,
             "since": "2026-08-12T13:23:00.436Z",
-            "days": 28.4,
+            "days": 28.5,
             "everChanged": false
           },
           "transitions": [],
@@ -609,7 +609,7 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "359 observations"
+            "basis": "360 observations"
           }
         }
       ]
@@ -632,9 +632,9 @@
           "account": "GC4HS4CQCZULIOTGLLPGRAAMSBDLFRR6Y7HCUQG66LNQDISXKIXXADIM",
           "current": {
             "state": "slow",
-            "observations": 4,
+            "observations": 5,
             "since": "2026-09-09T14:55:00.813Z",
-            "days": 0.4,
+            "days": 0.5,
             "everChanged": true
           },
           "transitions": [
@@ -653,16 +653,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GBQU526F73OALRTDRUI4F2DXKJOHLW2PCS6G53SPRQVKAALM7TFCLAAO",
           "current": {
             "state": "dark",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -670,16 +670,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GC4O3BHXHQWSBFYSJP2HMAAHWDDHRJDM6X5CX7LK3C5O4ZX4E4MA54RQ",
           "current": {
             "state": "dark",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -687,16 +687,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GDRNVZRLMWGK6YITXIPEYNRTRYWRWVJN5SFXXQK4RPF5CXIDZGTBLFM7",
           "current": {
             "state": "dark",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -704,16 +704,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GCRX6MPZ4YUGEPRS7Z427T3LMTQXVZ5T24C5IXT6JBKG77PR72S5P5TI",
           "current": {
             "state": "dark",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -721,16 +721,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GBMBDOEUIOBTABN5SLP623NPEEBR4TKLXOTQ7JWOVZMKJZU74IXODER4",
           "current": {
             "state": "live",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -738,16 +738,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GDFHYYZNM5RQRTHL6DX3RTFFL6LZJOCI6MYMHHOIXB766RXG3NSVNWGF",
           "current": {
             "state": "dark",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -755,16 +755,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GCSECMDTZDHAUCTZJO4Z3BGAGDKKV77TBGPBWPOAJUE6Z5N5JEU4CY4R",
           "current": {
             "state": "dark",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -772,7 +772,7 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         }
       ]
@@ -795,9 +795,9 @@
           "account": "GBVB43NLVIP2USHXSKI7QQCZKZU2Z6U6A5PAHMIW7LLNVMQJTOX2BZI5",
           "current": {
             "state": "slow",
-            "observations": 11,
+            "observations": 12,
             "since": "2026-09-08T12:23:20.818Z",
-            "days": 1.5,
+            "days": 1.6,
             "everChanged": true
           },
           "transitions": [
@@ -816,16 +816,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GDTEQF6YGCKLIBD37RJZE5GTL3ZY6CBQIKH7COAW654SYEBE6XJJOLOW",
           "current": {
             "state": "dark",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -833,16 +833,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GDARCVAHFMA7GCCULAPCRAV7VXSFFMNOP3X6ZONDJU4SCJULZ6IJ77QD",
           "current": {
             "state": "dark",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -850,16 +850,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GBYYKQYUY2XWVMM4VFCBJJVCCQC3QJ3BCLV4276DWHY4BQ7V5AB4U5VA",
           "current": {
             "state": "dark",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -867,16 +867,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GDIU57QSVCGU7MTRC53RUWAADKIE75GFNG27C26URMU7CKHNXOQ5RDME",
           "current": {
             "state": "live",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -884,7 +884,7 @@
             "earlierGrowth": 3,
             "recentGrowth": 2,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         }
       ]
@@ -907,9 +907,9 @@
           "account": "GA6HCMBLTZS5VYYBCATRBRZ3BZJMAFUDKYYF6AH6MVCMGWMRDNSWJPIH",
           "current": {
             "state": "slow",
-            "observations": 23,
+            "observations": 24,
             "since": "2026-09-05T15:48:32.076Z",
-            "days": 4.3,
+            "days": 4.4,
             "everChanged": true
           },
           "transitions": [
@@ -923,16 +923,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GASQH4XYX2TR4KZE4VMUNELK4L5JPJQJEJZCMZHJ3L4ELPZGF6QGRLMD",
           "current": {
             "state": "dark",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -940,7 +940,7 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         }
       ]
@@ -963,9 +963,9 @@
           "account": "GDVKY2GU2DRXWTBEYJJWSFXIGBZV6AZNBVVSUHEPZI54LIS6BA7DVVSP",
           "current": {
             "state": "slow",
-            "observations": 68,
+            "observations": 69,
             "since": "2026-08-28T01:16:35.116Z",
-            "days": 12.9,
+            "days": 13,
             "everChanged": true
           },
           "transitions": [
@@ -994,16 +994,16 @@
             "earlierGrowth": 52,
             "recentGrowth": 5,
             "direction": "slowing",
-            "basis": "357 observations"
+            "basis": "358 observations"
           }
         },
         {
           "account": "GDKL5TOWWAVLJ2WRAUQS2QJEAGHEDJFXFEPQFB6LKW2WRB257BVLLMT6",
           "current": {
             "state": "no_activity",
-            "observations": 360,
+            "observations": 361,
             "since": "2026-08-12T13:23:00.436Z",
-            "days": 28.4,
+            "days": 28.5,
             "everChanged": false
           },
           "transitions": [],
@@ -1011,16 +1011,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "360 observations"
+            "basis": "361 observations"
           }
         },
         {
           "account": "GCVVC4SL7G6SCK6AZAHE72RFHZWUFIMAWGAFSKR5VG46GQK6MAFIKX6P",
           "current": {
             "state": "dark",
-            "observations": 360,
+            "observations": 361,
             "since": "2026-08-12T13:23:00.436Z",
-            "days": 28.4,
+            "days": 28.5,
             "everChanged": false
           },
           "transitions": [],
@@ -1028,7 +1028,7 @@
             "earlierGrowth": 1,
             "recentGrowth": 0,
             "direction": "stopped",
-            "basis": "360 observations"
+            "basis": "361 observations"
           }
         }
       ]
@@ -1051,9 +1051,9 @@
           "account": "GDF6VOEGRWLOZ64PQQGKD2IYWA22RLT37GJKS2EJXZHT2VLAGWLC5TOB",
           "current": {
             "state": "live",
-            "observations": 10,
+            "observations": 11,
             "since": "2026-09-08T16:54:54.852Z",
-            "days": 1.3,
+            "days": 1.4,
             "everChanged": true
           },
           "transitions": [
@@ -1072,7 +1072,7 @@
             "earlierGrowth": 0,
             "recentGrowth": 1,
             "direction": "accelerating",
-            "basis": "24 observations"
+            "basis": "25 observations"
           }
         }
       ]
@@ -1107,9 +1107,9 @@
           "account": "GADFXROGGR74V3MSWU2SUKCEUPQFZEIIF3IUHLRN3NKZ4JN2IPBMCODA",
           "current": {
             "state": "live",
-            "observations": 14,
+            "observations": 15,
             "since": "2026-09-07T21:50:47.897Z",
-            "days": 2.1,
+            "days": 2.2,
             "everChanged": true
           },
           "transitions": [
@@ -1123,16 +1123,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GDGTVWSM4MGS4T7Z6W4RPWOCHE2I6RDFCIFZGS3DOA63LWQTRNZNTTFF",
           "current": {
             "state": "slow",
-            "observations": 23,
+            "observations": 24,
             "since": "2026-09-05T15:48:32.076Z",
-            "days": 4.3,
+            "days": 4.4,
             "everChanged": true
           },
           "transitions": [
@@ -1146,16 +1146,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GBUVRNH4RW4VLHP4C5MOF46RRIRZLAVHYGX45MVSTKA2F6TMR7E7L6NW",
           "current": {
             "state": "dark",
-            "observations": 15,
+            "observations": 16,
             "since": "2026-09-07T18:29:21.003Z",
-            "days": 2.2,
+            "days": 2.3,
             "everChanged": true
           },
           "transitions": [
@@ -1169,16 +1169,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GDPJALI4AZKUU2W426U5WKMAT6CN3AJRPIIRYR2YM54TL2GDWO5O2MZM",
           "current": {
             "state": "slow",
-            "observations": 24,
+            "observations": 25,
             "since": "2026-09-05T12:24:44.641Z",
-            "days": 4.5,
+            "days": 4.6,
             "everChanged": true
           },
           "transitions": [
@@ -1192,16 +1192,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GAVBS6SXMRD7C3IRN5K2SY5C2CAUFHBVOGWTQXADSBUHAFDDUKVTQWWY",
           "current": {
             "state": "slow",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -1209,16 +1209,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GCBPMB2VK3POXU3QL2IPOUYKEDNZYRCYPFQGLLYVX6D2OLLRO7SWTTBO",
           "current": {
             "state": "slow",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -1226,16 +1226,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GD7G6G56JHGQ3LY37ZYHALJRSAJYXWMYMKAF5G2GBXD5ETRPY4U5XS33",
           "current": {
             "state": "dark",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -1243,16 +1243,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GA3UK3JHOYYD3TAUH5C7NDOUDWBRF5FC4MECXFA2VRPEHIDQUOJIVOAJ",
           "current": {
             "state": "dark",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -1260,16 +1260,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GDYQNEF2UWTK4L6HITMT53MZ6F5QWO3Q4UVE6SCGC4OMEQIZQQDERQFD",
           "current": {
             "state": "dark",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -1277,16 +1277,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GARDNV3Q7YGT4AKSDF25LT32YSCCW4EV22Y2TV3I2PU2MMXJTEDL5T55",
           "current": {
             "state": "slow",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -1294,16 +1294,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GDVKAVKZDKMLPEXXFXPVKARRO4BNFJXRRPKENEDERK5PBYIWCJ2GQOOF",
           "current": {
             "state": "slow",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -1311,16 +1311,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GANESLOXBZWPLB5ZM2KFUTBGSBGISB7JTWFXO67G4TGQINWRMI6766GV",
           "current": {
             "state": "live",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -1328,16 +1328,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GBFXOHVAS43OIWNIO7XLRJAHT3BICFEIKOJLZVXNT572MISM4CMGSOCC",
           "current": {
             "state": "slow",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -1345,7 +1345,7 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         }
       ]
@@ -1380,9 +1380,9 @@
           "account": "GA5ZXXHHXX766BEEB33WN7Y4SHKUX2ZIGNRVJTAJM3K7PZMBM7DEJCFL",
           "current": {
             "state": "slow",
-            "observations": 14,
+            "observations": 15,
             "since": "2026-09-07T18:29:21.003Z",
-            "days": 2.2,
+            "days": 2.3,
             "everChanged": true
           },
           "transitions": [
@@ -1396,16 +1396,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "25 observations"
+            "basis": "26 observations"
           }
         },
         {
           "account": "GAROH4EV3WVVTRQKEY43GZK3XSRBEYETRVZ7SVG5LHWOAANSMCTJBB3U",
           "current": {
             "state": "slow",
-            "observations": 14,
+            "observations": 15,
             "since": "2026-09-07T18:29:21.003Z",
-            "days": 2.2,
+            "days": 2.3,
             "everChanged": true
           },
           "transitions": [
@@ -1419,16 +1419,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "25 observations"
+            "basis": "26 observations"
           }
         },
         {
           "account": "GCTG4YT2ZTYRODK5JCXFJ6V7P6HMQ62L27PPG5UGK57VUFDJ7DFDGBPZ",
           "current": {
             "state": "slow",
-            "observations": 20,
+            "observations": 21,
             "since": "2026-09-06T14:36:20.129Z",
-            "days": 3.4,
+            "days": 3.5,
             "everChanged": true
           },
           "transitions": [
@@ -1442,16 +1442,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "25 observations"
+            "basis": "26 observations"
           }
         },
         {
           "account": "GAKTLPC4ZV37SSCITQ5IS5AQ4WPF4CF4VZJQPPAROSGXMYOATF5U6XPR",
           "current": {
             "state": "dark",
-            "observations": 25,
+            "observations": 26,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -1459,16 +1459,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "25 observations"
+            "basis": "26 observations"
           }
         },
         {
           "account": "GCZLKDDJ5FMVUTKDKBCQ4QJ7PBM3LQKRNYHU5VDYYG3XOXFAMJWBF2DC",
           "current": {
             "state": "dark",
-            "observations": 25,
+            "observations": 26,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -1476,16 +1476,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "25 observations"
+            "basis": "26 observations"
           }
         },
         {
           "account": "GD3MMNHD5U5H732GTLYO7DZVUNGPVP462KVNFO4HALNPP6C7ESQAGOLD",
           "current": {
             "state": "dark",
-            "observations": 25,
+            "observations": 26,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -1493,16 +1493,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "25 observations"
+            "basis": "26 observations"
           }
         },
         {
           "account": "GAIVVKIZV2WOTOI4FB6MS2CSOH2HST7MVRKO23L3JXLCKZ7GR4BCKPZX",
           "current": {
             "state": "dark",
-            "observations": 25,
+            "observations": 26,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -1510,16 +1510,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "25 observations"
+            "basis": "26 observations"
           }
         },
         {
           "account": "GCXZTK7XDPG72MDEI655N2W4Q5MEW4MSSOFXTVR7XVBT3KZTMCRVCP42",
           "current": {
             "state": "dark",
-            "observations": 25,
+            "observations": 26,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -1527,16 +1527,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "25 observations"
+            "basis": "26 observations"
           }
         },
         {
           "account": "GDZL62FHKSJCFLX4H5ANAJCQEKOTNSSCLQHHKSSDQSIP23JTUWQVHW7X",
           "current": {
             "state": "dark",
-            "observations": 25,
+            "observations": 26,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -1544,16 +1544,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "25 observations"
+            "basis": "26 observations"
           }
         },
         {
           "account": "GCGJOW22JXLVK3DC6YOSENXFEEMMFDNKWNWQYEKKUXSDG7VDIVKAPXPQ",
           "current": {
             "state": "dark",
-            "observations": 25,
+            "observations": 26,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -1561,16 +1561,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "25 observations"
+            "basis": "26 observations"
           }
         },
         {
           "account": "GA37M2LDWCDWPCHIST3NHF7GTYX55MN7IKXI56LPQ2QRJGSZQV6HCVLI",
           "current": {
             "state": "dark",
-            "observations": 25,
+            "observations": 26,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -1578,16 +1578,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "25 observations"
+            "basis": "26 observations"
           }
         },
         {
           "account": "GAT63G6FINKAES4473ZZZT3SYJVUIXKYBVFBQYQHEZF6EE3VY5AGBTCZ",
           "current": {
             "state": "dark",
-            "observations": 25,
+            "observations": 26,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -1595,16 +1595,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "25 observations"
+            "basis": "26 observations"
           }
         },
         {
           "account": "GAM5BKSKTHYS6IE4OUHCISGI6YVH75XIMOCG4RB5TR74KZDJRSNKEURZ",
           "current": {
             "state": "dark",
-            "observations": 25,
+            "observations": 26,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -1612,16 +1612,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "25 observations"
+            "basis": "26 observations"
           }
         },
         {
           "account": "GDZBAWPUGAJI4CQTO53O6Y33WEZ4IRVDBLDYUY6EKGICP7OK53OYZARZ",
           "current": {
             "state": "dark",
-            "observations": 25,
+            "observations": 26,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -1629,16 +1629,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "25 observations"
+            "basis": "26 observations"
           }
         },
         {
           "account": "GAP5YLVKIS5UCT4IPEZASWOHKFSGWCJMWZ3SSIMARADIANT4XBRKGON5",
           "current": {
             "state": "dark",
-            "observations": 25,
+            "observations": 26,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -1646,7 +1646,7 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "25 observations"
+            "basis": "26 observations"
           }
         }
       ]
@@ -1662,9 +1662,9 @@
           "account": "GCYE7C77EB5AWAA25R5XMWNI2EDOKTTFTTPZKM2SR5DI4B4WFD52DARS",
           "current": {
             "state": "slow",
-            "observations": 347,
+            "observations": 348,
             "since": "2026-08-14T10:57:12.630Z",
-            "days": 26.5,
+            "days": 26.6,
             "everChanged": true
           },
           "transitions": [
@@ -1678,16 +1678,16 @@
             "earlierGrowth": 6,
             "recentGrowth": 0,
             "direction": "stopped",
-            "basis": "358 observations"
+            "basis": "359 observations"
           }
         },
         {
           "account": "GA4TDPNUCZPTOHB3TKUYMDCRVATXKEADH7ZEYEBWJKQKE2UBFCYNBPEN",
           "current": {
             "state": "dark",
-            "observations": 358,
+            "observations": 359,
             "since": "2026-08-12T13:23:00.436Z",
-            "days": 28.4,
+            "days": 28.5,
             "everChanged": false
           },
           "transitions": [],
@@ -1695,16 +1695,16 @@
             "earlierGrowth": 2,
             "recentGrowth": 0,
             "direction": "stopped",
-            "basis": "358 observations"
+            "basis": "359 observations"
           }
         },
         {
           "account": "GARDJZ33FTTLVKGABXDS22SYNTP4VCLYARIEWKMZKYHX3RRLPMNR3HOT",
           "current": {
             "state": "live",
-            "observations": 358,
+            "observations": 359,
             "since": "2026-08-12T13:23:00.436Z",
-            "days": 28.4,
+            "days": 28.5,
             "everChanged": false
           },
           "transitions": [],
@@ -1712,7 +1712,7 @@
             "earlierGrowth": -137,
             "recentGrowth": 11,
             "direction": "accelerating",
-            "basis": "358 observations"
+            "basis": "359 observations"
           }
         }
       ]
@@ -1728,9 +1728,9 @@
           "account": "GB7OUO5NY5WQKXJJ7PFFZEJOKN4BA7IOEN3Z6SWAY26LGTREJJYZH2ZT",
           "current": {
             "state": "live",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -1738,24 +1738,24 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GBN32NH6TMWE4ZD4G245CF3UVOQRXD4FK3FDCLZ4DE5642HWFKSLLRMB",
           "current": {
             "state": "live",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
           "volume": {
             "earlierGrowth": 2094,
-            "recentGrowth": 1592,
+            "recentGrowth": 1738,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         }
       ]
@@ -1771,9 +1771,9 @@
           "account": "GBNZILSTVQZ4R7IKQDGHYGY2QXL5QOFJYQMXPKWRRM5PAV7Y4M67AQUA",
           "current": {
             "state": "live",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -1781,16 +1781,16 @@
             "earlierGrowth": 4,
             "recentGrowth": 0,
             "direction": "stopped",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GAXSGZ2JM3LNWOO4WRGADISNMWO4HQLG4QBGUZRKH5ZHL3EQBGX73ICE",
           "current": {
             "state": "live",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -1798,7 +1798,7 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         }
       ]
@@ -1814,9 +1814,9 @@
           "account": "GDC7X2MXTYSAKUUGAIQ7J7RPEIM7GXSAIWFYWWH4GLNFECQVJJLB2EEU",
           "current": {
             "state": "live",
-            "observations": 24,
+            "observations": 25,
             "since": "2026-09-05T12:24:44.641Z",
-            "days": 4.5,
+            "days": 4.6,
             "everChanged": false
           },
           "transitions": [],
@@ -1824,16 +1824,16 @@
             "earlierGrowth": 2,
             "recentGrowth": 0,
             "direction": "stopped",
-            "basis": "24 observations"
+            "basis": "25 observations"
           }
         },
         {
           "account": "GCUIIJ6J6KIOOYOICVFOEVH6XRY3WX4NUZDYGPUCJQZM6R3OFJE2QGY2",
           "current": {
             "state": "dark",
-            "observations": 24,
+            "observations": 25,
             "since": "2026-09-05T12:24:44.641Z",
-            "days": 4.5,
+            "days": 4.6,
             "everChanged": false
           },
           "transitions": [],
@@ -1841,7 +1841,7 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "24 observations"
+            "basis": "25 observations"
           }
         }
       ]
@@ -1857,9 +1857,9 @@
           "account": "GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN",
           "current": {
             "state": "live",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -1867,16 +1867,16 @@
             "earlierGrowth": 25,
             "recentGrowth": 51,
             "direction": "accelerating",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GDEWOLMOPAVRTGNJVWOE6U6LHZVAWIJZVWM6PDLCFTUTJJEKSU32TO5W",
           "current": {
             "state": "live",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -1884,7 +1884,7 @@
             "earlierGrowth": 0,
             "recentGrowth": 2,
             "direction": "accelerating",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         }
       ]
@@ -1900,9 +1900,9 @@
           "account": "GDYSPBVZHPQTYMGSYNOHRZQNLB3ZWFVQ2F7EP7YBOLRGD42XIC3QUX5G",
           "current": {
             "state": "dark",
-            "observations": 34,
+            "observations": 35,
             "since": "2026-09-03T19:38:03.126Z",
-            "days": 6.2,
+            "days": 6.3,
             "everChanged": false
           },
           "transitions": [],
@@ -1910,7 +1910,7 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "34 observations"
+            "basis": "35 observations"
           }
         }
       ]
@@ -1926,9 +1926,9 @@
           "account": "GCJI3CP2NL6NWSCHM36XBQYCBHOTVVZWEXZALWON34KAYUGF6GEVNRTS",
           "current": {
             "state": "dark",
-            "observations": 24,
+            "observations": 25,
             "since": "2026-09-05T12:24:44.641Z",
-            "days": 4.5,
+            "days": 4.6,
             "everChanged": false
           },
           "transitions": [],
@@ -1936,7 +1936,7 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "24 observations"
+            "basis": "25 observations"
           }
         }
       ]
@@ -1952,9 +1952,9 @@
           "account": "GBUYUAI75XXWDZEKLY66CFYKQPET5JR4EENXZBUZ3YXZ7DS56Z4OKOFU",
           "current": {
             "state": "dark",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -1962,16 +1962,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GDW3CNKSP5AOTDQ2YCKNGC6L65CE4JDX3JS5BV427OB54HCF2J4PUEVG",
           "current": {
             "state": "slow",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -1979,7 +1979,7 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         }
       ]
@@ -1995,9 +1995,9 @@
           "account": "GAJ7V3EMD3FRWAPBEJAP7EC4223XI5EACDZ46RFMY5DYOMCIMWEFR5II",
           "current": {
             "state": "live",
-            "observations": 5,
+            "observations": 6,
             "since": "2026-09-09T10:22:26.169Z",
-            "days": 0.6,
+            "days": 0.7,
             "everChanged": true
           },
           "transitions": [
@@ -2011,16 +2011,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GAXQJANVLNXSLGXJZUHRXY2VD62E2JXK2ZFWUQZZNO7I2HESYIWLGRAT",
           "current": {
             "state": "dark",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -2028,16 +2028,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GBVWQZITQY4PPGHJEOHDTKUPV56WQXQBTV2YMMUPYW7KEQI63LETZONE",
           "current": {
             "state": "dark",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -2045,16 +2045,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GAU7MPFCR2VUXNEN474G5OY63EFVBU77F35OJDQ4WGG25XHT3VYWLIQD",
           "current": {
             "state": "dark",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -2062,16 +2062,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GB6WD37NWIIY34A6HNIUVGSA7XXAHG6G6QEWNL54H62Y6SU7ESNGBRDG",
           "current": {
             "state": "dark",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -2079,16 +2079,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GBEKGNPT3DC6HPSWUXSAQRU6GRIGXFQOY2DPK47MQA6MEGAZ755DTEAM",
           "current": {
             "state": "dark",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -2096,16 +2096,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GAB4NHMAVPDCD7MRU7MRD6DV47KLGO24K7WR3VKITLKAPTFIBRRGGRNT",
           "current": {
             "state": "dark",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -2113,16 +2113,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GDMXLK6HCJ6TWR7TSBCAR2QDQ5GOMPKRRHLN5SES3CMHEKSHNIRAONBD",
           "current": {
             "state": "dark",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -2130,16 +2130,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GDLTEDSHH7EQQYSFLD5RRJVTTGEGGXDHMLWH6A5ATTMCE2AUDSK3FUND",
           "current": {
             "state": "slow",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -2147,16 +2147,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GBSREZLYHRAKQXQM4OESVO7FFT2RGG3EQQRTXEPTRPS56UI3VAXBXMAP",
           "current": {
             "state": "dark",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -2164,7 +2164,7 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         }
       ]
@@ -2180,9 +2180,9 @@
           "account": "GCQLUTKZ373IUGE7Z33JKH5VLRRRLH2LKTU3WEBAGH2MD6AWNYPHUU2Q",
           "current": {
             "state": "dark",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -2190,16 +2190,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GDYC7FS3JIBLYIJGDARQXJKM5VQBVM4ZCBB7IMAJJ7BJ3ARQRTHCTIA3",
           "current": {
             "state": "dark",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -2207,16 +2207,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GC4SAAHODFMZPNGLGAYC7RQ6GDD65DTSONZ6TCSYRCZQJDEN7HOIHVNS",
           "current": {
             "state": "dark",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -2224,16 +2224,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GAIUGZZZSL47BKH27SUDZESZELFJDPE2UM52RACOSFJ7BIVBGKUEJSUZ",
           "current": {
             "state": "dark",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -2241,7 +2241,7 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         }
       ]
@@ -2257,9 +2257,9 @@
           "account": "GAQRF3UGHBT6JYQZ7YSUYCIYWAF4T2SAA5237Q5LIQYJOHHFAWDXZ7NM",
           "current": {
             "state": "slow",
-            "observations": 345,
+            "observations": 346,
             "since": "2026-08-14T05:49:15.155Z",
-            "days": 26.7,
+            "days": 26.8,
             "everChanged": true
           },
           "transitions": [
@@ -2273,16 +2273,16 @@
             "earlierGrowth": 1,
             "recentGrowth": 0,
             "direction": "stopped",
-            "basis": "348 observations"
+            "basis": "349 observations"
           }
         },
         {
           "account": "GCY37QZUH2P24CMCTGT2XNMRFSHVQF2DKL4N5VCY22TQ52DFUNEUTKBD",
           "current": {
             "state": "slow",
-            "observations": 344,
+            "observations": 345,
             "since": "2026-08-14T06:07:43.856Z",
-            "days": 26.7,
+            "days": 26.8,
             "everChanged": true
           },
           "transitions": [
@@ -2296,7 +2296,7 @@
             "earlierGrowth": 235,
             "recentGrowth": 0,
             "direction": "stopped",
-            "basis": "347 observations"
+            "basis": "348 observations"
           }
         }
       ]
@@ -2312,9 +2312,9 @@
           "account": "GBHA4FGPHX7KURMP7CZU7SQ2UOAGTAQ22SCHPK5P5XCQHZXCSVXQJFYB",
           "current": {
             "state": "dark",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -2322,16 +2322,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GCY7VH763TOMBGSCWAVBG3LRLYYY6Z6ZJFPHFQKKUWBXAKC376KDUUSY",
           "current": {
             "state": "dark",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -2339,7 +2339,7 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         }
       ]
@@ -2355,9 +2355,9 @@
           "account": "GASBV6W7GGED66MXEVC7YZHTWWYMSVYEY35USF2HJZBLABLYIFQGXZY6",
           "current": {
             "state": "slow",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -2365,16 +2365,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GCQLPBWOQ5PAJYEEQBE7GDSY7X3LCYKFEBKOCNF3OUA6F74ORK74HVSQ",
           "current": {
             "state": "live",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -2382,7 +2382,7 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         }
       ]
@@ -2398,9 +2398,9 @@
           "account": "GAZPKDTEZ5UM3BF4E7FL7EMXRMLH76F2TNVXRLOF6SCVXOFWSPCEWFI5",
           "current": {
             "state": "slow",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -2408,16 +2408,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GBFZPR7KNYNZEJXWBENA5TSDG4V7SHZV4S6Z4AWURAQ6PRNUYPYZZLLP",
           "current": {
             "state": "dark",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -2425,16 +2425,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GAHQAIM35LLAJWBPGP5M2ZHQPZG3FKJS35N3WZ44EQ4NMQWCH25INJ4V",
           "current": {
             "state": "dark",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -2442,16 +2442,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GCUVU7CV2KR4IGQBKOPBABJW5KFZJETRHMJFORGSOYLP66UAXGLRMMDD",
           "current": {
             "state": "dark",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -2459,16 +2459,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GB6OFQHDM5PT75DU5PTRZBCJOUKR62IQKBZ7KAA5JWJKIE45V5KXBRSL",
           "current": {
             "state": "dark",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -2476,7 +2476,7 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         }
       ]
@@ -2492,9 +2492,9 @@
           "account": "GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5",
           "current": {
             "state": "live",
-            "observations": 16,
+            "observations": 17,
             "since": "2026-09-07T06:47:20.730Z",
-            "days": 2.7,
+            "days": 2.8,
             "everChanged": true
           },
           "transitions": [
@@ -2508,16 +2508,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GC3M7GD3HNLCXSWDSJO2YTJ4LMNGNUOFWX5SVRHY7PCYGV5GLLYQMALT",
           "current": {
             "state": "dark",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -2525,16 +2525,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GC45JH537XZD4DY4WTV5PCUJL4KPOIE4WMGX5OP5KSPS2OLGRUOVVIGD",
           "current": {
             "state": "dark",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -2542,16 +2542,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GDD7ABRF7BCK76W33RXDQG5Q3WXVSQYVLGEMXSOWRGZ6Z3G3M2EM2TCP",
           "current": {
             "state": "dark",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -2559,7 +2559,7 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         }
       ]
@@ -2575,9 +2575,9 @@
           "account": "GDXLSLCOPPHTWOQXLLKSVN4VN3G67WD2ENU7UMVAROEYVJLSPSEWXIZN",
           "current": {
             "state": "dark",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -2585,16 +2585,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GAYTNWDWDIKMN7JXSSO4MXDLQTVJ4A7UZVW7XWECAPBUNXRMEA2SGX74",
           "current": {
             "state": "dark",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -2602,16 +2602,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GDYKVJVWRTERUUOU6Z4ZN3LFMNOI7YGJNATNLPGF6R5YFYGMCRKXSEVA",
           "current": {
             "state": "dark",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -2619,16 +2619,16 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         },
         {
           "account": "GA5TCQVISVBFKLEVHEXPOTDUHZMDOF4TJM7NEJC3RE45OB2QZBK36442",
           "current": {
             "state": "dark",
-            "observations": 26,
+            "observations": 27,
             "since": "2026-09-05T03:09:33.499Z",
-            "days": 4.9,
+            "days": 5,
             "everChanged": false
           },
           "transitions": [],
@@ -2636,7 +2636,7 @@
             "earlierGrowth": 0,
             "recentGrowth": 0,
             "direction": "steady",
-            "basis": "26 observations"
+            "basis": "27 observations"
           }
         }
       ]

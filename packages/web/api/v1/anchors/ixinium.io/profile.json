@@ -1,10 +1,10 @@
 {
   "anchorId": "ixinium.io",
   "name": "Baltic Representative Office",
-  "asOf": "2026-09-09T23:40:21.752Z",
+  "asOf": "2026-09-10T02:03:30.890Z",
   "verification": {
     "resolved": true,
-    "checkedAt": "2026-09-09T23:40:21.752Z",
+    "checkedAt": "2026-09-10T02:03:30.890Z",
     "source": "SEP-1 stellar.toml, resolved live; issuer attribution confirmed against each issuer account's own on-chain home_domain",
     "accounts": [
       {
@@ -60,7 +60,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 83.5,
+      "hoursSinceActivity": 85.88,
       "topCounterpartyShare": 0.5192
     },
     {
@@ -72,7 +72,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 2444.26,
+      "hoursSinceActivity": 2446.65,
       "topCounterpartyShare": null
     },
     {
@@ -84,7 +84,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1525.39,
+      "hoursSinceActivity": 1527.78,
       "topCounterpartyShare": null
     },
     {
@@ -96,7 +96,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1505.44,
+      "hoursSinceActivity": 1507.83,
       "topCounterpartyShare": null
     },
     {
@@ -108,7 +108,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1524.9,
+      "hoursSinceActivity": 1527.28,
       "topCounterpartyShare": null
     },
     {
@@ -120,7 +120,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 12.61,
+      "hoursSinceActivity": 15,
       "topCounterpartyShare": null
     },
     {
@@ -132,7 +132,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1526.26,
+      "hoursSinceActivity": 1528.65,
       "topCounterpartyShare": null
     },
     {
@@ -144,7 +144,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1507.02,
+      "hoursSinceActivity": 1509.41,
       "topCounterpartyShare": null
     }
   ],
@@ -331,6 +331,13 @@
         "in": 73,
         "out": 0,
         "hours": 83.5
+      },
+      {
+        "t": "2026-09-10T02:03:30.890Z",
+        "state": "slow",
+        "in": 73,
+        "out": 0,
+        "hours": 85.88
       }
     ],
     "GBQU526F73OALRTDRUI4F2DXKJOHLW2PCS6G53SPRQVKAALM7TFCLAAO": [
@@ -515,6 +522,13 @@
         "in": 0,
         "out": 0,
         "hours": 2444.26
+      },
+      {
+        "t": "2026-09-10T02:03:30.890Z",
+        "state": "dark",
+        "in": 0,
+        "out": 0,
+        "hours": 2446.65
       }
     ],
     "GC4O3BHXHQWSBFYSJP2HMAAHWDDHRJDM6X5CX7LK3C5O4ZX4E4MA54RQ": [
@@ -699,6 +713,13 @@
         "in": 0,
         "out": 0,
         "hours": 1525.39
+      },
+      {
+        "t": "2026-09-10T02:03:30.890Z",
+        "state": "dark",
+        "in": 0,
+        "out": 0,
+        "hours": 1527.78
       }
     ],
     "GDRNVZRLMWGK6YITXIPEYNRTRYWRWVJN5SFXXQK4RPF5CXIDZGTBLFM7": [
@@ -883,6 +904,13 @@
         "in": 0,
         "out": 0,
         "hours": 1505.44
+      },
+      {
+        "t": "2026-09-10T02:03:30.890Z",
+        "state": "dark",
+        "in": 0,
+        "out": 0,
+        "hours": 1507.83
       }
     ],
     "GCRX6MPZ4YUGEPRS7Z427T3LMTQXVZ5T24C5IXT6JBKG77PR72S5P5TI": [
@@ -1067,6 +1095,13 @@
         "in": 0,
         "out": 0,
         "hours": 1524.9
+      },
+      {
+        "t": "2026-09-10T02:03:30.890Z",
+        "state": "dark",
+        "in": 0,
+        "out": 0,
+        "hours": 1527.28
       }
     ],
     "GBMBDOEUIOBTABN5SLP623NPEEBR4TKLXOTQ7JWOVZMKJZU74IXODER4": [
@@ -1251,6 +1286,13 @@
         "in": 0,
         "out": 0,
         "hours": 12.61
+      },
+      {
+        "t": "2026-09-10T02:03:30.890Z",
+        "state": "live",
+        "in": 0,
+        "out": 0,
+        "hours": 15
       }
     ],
     "GDFHYYZNM5RQRTHL6DX3RTFFL6LZJOCI6MYMHHOIXB766RXG3NSVNWGF": [
@@ -1435,6 +1477,13 @@
         "in": 0,
         "out": 0,
         "hours": 1526.26
+      },
+      {
+        "t": "2026-09-10T02:03:30.890Z",
+        "state": "dark",
+        "in": 0,
+        "out": 0,
+        "hours": 1528.65
       }
     ],
     "GCSECMDTZDHAUCTZJO4Z3BGAGDKKV77TBGPBWPOAJUE6Z5N5JEU4CY4R": [
@@ -1619,6 +1668,13 @@
         "in": 0,
         "out": 0,
         "hours": 1507.02
+      },
+      {
+        "t": "2026-09-10T02:03:30.890Z",
+        "state": "dark",
+        "in": 0,
+        "out": 0,
+        "hours": 1509.41
       }
     ]
   },
