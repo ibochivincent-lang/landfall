@@ -1,10 +1,10 @@
 {
   "anchorId": "mykobo.co",
   "name": "MYKOBO",
-  "asOf": "2026-09-10T02:03:30.890Z",
+  "asOf": "2026-09-10T07:37:15.804Z",
   "verification": {
     "resolved": true,
-    "checkedAt": "2026-09-10T02:03:30.890Z",
+    "checkedAt": "2026-09-10T07:37:15.804Z",
     "source": "SEP-1 stellar.toml, resolved live; issuer attribution confirmed against each issuer account's own on-chain home_domain",
     "accounts": [
       {
@@ -20,8 +20,8 @@
   "summary": {
     "accounts": 2,
     "live": 0,
-    "slow": 2,
-    "dark": 0,
+    "slow": 0,
+    "dark": 2,
     "noActivity": 0,
     "inbound": 865,
     "outbound": 963
@@ -31,24 +31,24 @@
       "account": "GAQRF3UGHBT6JYQZ7YSUYCIYWAF4T2SAA5237Q5LIQYJOHHFAWDXZ7NM",
       "domain": "mykobo.co",
       "name": "MYKOBO",
-      "state": "slow",
+      "state": "dark",
       "inbound": 4,
       "outbound": 31,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 716.44,
+      "hoursSinceActivity": 722,
       "topCounterpartyShare": 0.9991
     },
     {
       "account": "GCY37QZUH2P24CMCTGT2XNMRFSHVQF2DKL4N5VCY22TQ52DFUNEUTKBD",
       "domain": "mykobo.co",
       "name": "MYKOBO",
-      "state": "slow",
+      "state": "dark",
       "inbound": 861,
       "outbound": 932,
       "returns": 10,
       "returnRate": 0.0116,
-      "hoursSinceActivity": 716.12,
+      "hoursSinceActivity": 721.68,
       "topCounterpartyShare": 0.529
     }
   ],
@@ -2503,6 +2503,13 @@
         "in": 4,
         "out": 31,
         "hours": 716.44
+      },
+      {
+        "t": "2026-09-10T07:37:15.804Z",
+        "state": "dark",
+        "in": 4,
+        "out": 31,
+        "hours": 722
       }
     ],
     "GCY37QZUH2P24CMCTGT2XNMRFSHVQF2DKL4N5VCY22TQ52DFUNEUTKBD": [
@@ -4948,6 +4955,13 @@
         "in": 861,
         "out": 932,
         "hours": 716.12
+      },
+      {
+        "t": "2026-09-10T07:37:15.804Z",
+        "state": "dark",
+        "in": 861,
+        "out": 932,
+        "hours": 721.68
       }
     ]
   },

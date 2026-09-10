@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>MYKOBO — settlement record | Landfall</title>
-<meta name="description" content="Independent, ledger-derived settlement record for mykobo.co: 2 declared Stellar account(s), 0 settling, 0 dark. Every figure traces to a transaction hash.">
+<meta name="description" content="Independent, ledger-derived settlement record for mykobo.co: 2 declared Stellar account(s), 0 settling, 2 dark. Every figure traces to a transaction hash.">
 <link rel="canonical" href="https://landfall-chi.vercel.app/anchor/mykobo.co">
 <meta property="og:title" content="MYKOBO — settlement record">
 <meta property="og:description" content="0 of 2 accounts settling. Read from the public Stellar ledger, not self-reported.">
@@ -35,7 +35,7 @@
   <div class="anchor-summary">
     <div class="sum"><b>2</b><span>declared accounts</span></div>
     <div class="sum"><b>0</b><span>settling now</span></div>
-    <div class="sum"><b class="">0</b><span>dark &gt; 30 days</span></div>
+    <div class="sum"><b class="is-dark">2</b><span>dark &gt; 30 days</span></div>
     <div class="sum"><b>865</b><span>inbound indexed</span></div>
     <div class="sum"><b>963</b><span>outbound indexed</span></div>
   </div>
@@ -51,7 +51,7 @@
       domain's own is how a shared stablecoin issuer once got credited to a single business here.
     </p>
     <ul class="verify-list"><li class="mono">GAQRF3UGHB…DXZ7NM — <strong>declared</strong></li><li class="mono">GCY37QZUH2…EUTKBD — <strong>declared</strong></li></ul>
-    <p class="muted small">SEP-1 resolved successfully at 2026-09-10T02:03:30.890Z.</p>
+    <p class="muted small">SEP-1 resolved successfully at 2026-09-10T07:37:15.804Z.</p>
   </section>
 
   <section class="anchor-block">
@@ -61,25 +61,25 @@
       <tbody>
       <tr>
         <td class="mono"><a href="https://stellar.expert/explorer/public/account/GAQRF3UGHBT6JYQZ7YSUYCIYWAF4T2SAA5237Q5LIQYJOHHFAWDXZ7NM" target="_blank" rel="noopener">GAQRF3UG…DXZ7NM</a></td>
-        <td><span class="state state--slow">slow</span></td>
+        <td><span class="state state--dark">dark</span></td>
         <td class="num">4</td>
         <td class="num">31</td>
-        <td class="num">29.9d</td>
-        <td class="num">350 obs</td>
+        <td class="num">30.1d</td>
+        <td class="num">351 obs</td>
       </tr>
       <tr>
         <td class="mono"><a href="https://stellar.expert/explorer/public/account/GCY37QZUH2P24CMCTGT2XNMRFSHVQF2DKL4N5VCY22TQ52DFUNEUTKBD" target="_blank" rel="noopener">GCY37QZU…EUTKBD</a></td>
-        <td><span class="state state--slow">slow</span></td>
+        <td><span class="state state--dark">dark</span></td>
         <td class="num">861</td>
         <td class="num">932</td>
-        <td class="num">29.8d</td>
-        <td class="num">349 obs</td>
+        <td class="num">30.1d</td>
+        <td class="num">350 obs</td>
       </tr></tbody>
     </table>
     <p class="muted small">
       Liveness is read directly from the ledger and cannot be self-reported: an anchor can keep a
       status page green indefinitely, but it cannot fake on-chain silence.
-      
+      Dark means no settlement in over 30 days — a fact about the ledger, not a claim about why.
     </p>
   </section>
 
@@ -87,10 +87,18 @@
   <section class="anchor-block">
     <h2>Trend</h2>
     <p class="muted small">
-      2 state change(s) observed across this anchor's accounts,
-      2 of them to a weaker state.
+      4 state change(s) observed across this anchor's accounts,
+      4 of them to a weaker state.
     </p>
     <ul class="trend-list"><li>
+        <span class="mono">GAQRF3UG…DXZ7NM</span>
+        went <strong class="trend-down">slow → dark</strong>
+        on 2026-09-10
+      </li><li>
+        <span class="mono">GCY37QZU…EUTKBD</span>
+        went <strong class="trend-down">slow → dark</strong>
+        on 2026-09-10
+      </li><li>
         <span class="mono">GCY37QZU…EUTKBD</span>
         went <strong class="trend-down">live → slow</strong>
         on 2026-08-14
@@ -113,7 +121,7 @@
     <p>
       A <code>stellar.toml</code> entry is a claim that an endpoint exists. Directories publish that claim
       and nothing checks it. These are the results of asking each declared endpoint directly, at
-      2026-09-09T23:45:50.107Z.
+      2026-09-10T02:09:59.226Z.
       <strong>4 declared capability(ies) did not answer.</strong>
     </p>
     <table class="anchor-table">
@@ -123,21 +131,21 @@
         <td><strong>SEP-6</strong><div class="muted small">Programmatic deposit &amp; withdrawal</div></td>
         <td><span class="cap cap--yes">declared</span></td>
         <td><span class="cap cap--no">not answering</span></td>
-        <td class="num">34ms</td>
+        <td class="num">40ms</td>
         <td class="muted small">fetch failed</td>
       </tr>
       <tr>
         <td><strong>SEP-24</strong><div class="muted small">Hosted deposit &amp; withdrawal</div></td>
         <td><span class="cap cap--yes">declared</span></td>
         <td><span class="cap cap--no">not answering</span></td>
-        <td class="num">88ms</td>
+        <td class="num">36ms</td>
         <td class="muted small">fetch failed</td>
       </tr>
       <tr>
         <td><strong>SEP-31</strong><div class="muted small">Cross-border payments</div></td>
         <td><span class="cap cap--yes">declared</span></td>
         <td><span class="cap cap--no">not answering</span></td>
-        <td class="num">99ms</td>
+        <td class="num">92ms</td>
         <td class="muted small">fetch failed</td>
       </tr>
       <tr>
@@ -151,7 +159,7 @@
         <td><strong>SEP-10</strong><div class="muted small">Web authentication</div></td>
         <td><span class="cap cap--yes">declared</span></td>
         <td><span class="cap cap--no">not answering</span></td>
-        <td class="num">25ms</td>
+        <td class="num">128ms</td>
         <td class="muted small">fetch failed</td>
       </tr></tbody>
     </table>
@@ -169,7 +177,7 @@
   </section>
 
   <p class="muted small asof">
-    Scan of 2026-09-10T02:03:30.890Z · verified against stellar.expert · <a href="../docs.html">methodology</a> ·
+    Scan of 2026-09-10T07:37:15.804Z · verified against stellar.expert · <a href="../docs.html">methodology</a> ·
     <a href="https://github.com/ibochivincent-lang/landfall/blob/main/DISPUTES.md">dispute a figure on this page</a>
   </p>
 </main>
