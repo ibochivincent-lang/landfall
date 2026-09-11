@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-10T22:11:06.946Z",
+  "generatedAt": "2026-09-11T00:44:11.673Z",
   "note": "Which on-chain accounts each tracked anchor declares as its own, and how that was established. Attribution comes from the anchor's own SEP-1 stellar.toml — the permissionless standard the operator controls — and any account cited there only as a currency issuer is included solely when the issuer account's own home_domain confirms the claim. Every published scan is checked for an account claimed by two anchors before it can go out; see packages/indexer/src/invariants.ts.",
   "anchors": [
     {
@@ -92,6 +92,13 @@
       "accounts": 10,
       "profile": "/api/v1/anchors/gratz.io/profile.json",
       "page": "/anchor/gratz.io"
+    },
+    {
+      "anchorId": "ixinium.io",
+      "resolved": true,
+      "accounts": 8,
+      "profile": "/api/v1/anchors/ixinium.io/profile.json",
+      "page": "/anchor/ixinium.io"
     },
     {
       "anchorId": "luxpayband.io",

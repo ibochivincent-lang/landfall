@@ -1,10 +1,10 @@
 {
   "anchorId": "anclap.com",
   "name": "Grupo Anchor S.A.",
-  "asOf": "2026-09-10T22:04:36.672Z",
+  "asOf": "2026-09-11T00:40:30.273Z",
   "verification": {
     "resolved": true,
-    "checkedAt": "2026-09-10T22:04:36.672Z",
+    "checkedAt": "2026-09-11T00:40:30.273Z",
     "source": "SEP-1 stellar.toml, resolved live; issuer attribution confirmed against each issuer account's own on-chain home_domain",
     "accounts": [
       {
@@ -27,7 +27,7 @@
     "slow": 0,
     "dark": 1,
     "noActivity": 0,
-    "inbound": 1291,
+    "inbound": 1292,
     "outbound": 696
   },
   "accounts": [
@@ -36,12 +36,12 @@
       "domain": "anclap.com",
       "name": "Grupo Anchor S.A.",
       "state": "live",
-      "inbound": 9,
+      "inbound": 10,
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 2.19,
-      "topCounterpartyShare": 0.9401
+      "hoursSinceActivity": 0.54,
+      "topCounterpartyShare": 0.904
     },
     {
       "account": "GA4TDPNUCZPTOHB3TKUYMDCRVATXKEADH7ZEYEBWJKQKE2UBFCYNBPEN",
@@ -52,7 +52,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 2100.02,
+      "hoursSinceActivity": 2102.62,
       "topCounterpartyShare": 0.9999
     },
     {
@@ -64,7 +64,7 @@
       "outbound": 696,
       "returns": 1,
       "returnRate": 0.0008,
-      "hoursSinceActivity": 18.4,
+      "hoursSinceActivity": 21,
       "topCounterpartyShare": 0.1007
     }
   ],
@@ -2624,6 +2624,13 @@
         "in": 9,
         "out": 0,
         "hours": 2.19
+      },
+      {
+        "t": "2026-09-11T00:40:30.273Z",
+        "state": "live",
+        "in": 10,
+        "out": 0,
+        "hours": 0.54
       }
     ],
     "GA4TDPNUCZPTOHB3TKUYMDCRVATXKEADH7ZEYEBWJKQKE2UBFCYNBPEN": [
@@ -5181,6 +5188,13 @@
         "in": 5,
         "out": 0,
         "hours": 2100.02
+      },
+      {
+        "t": "2026-09-11T00:40:30.273Z",
+        "state": "dark",
+        "in": 5,
+        "out": 0,
+        "hours": 2102.62
       }
     ],
     "GARDJZ33FTTLVKGABXDS22SYNTP4VCLYARIEWKMZKYHX3RRLPMNR3HOT": [
@@ -7738,6 +7752,13 @@
         "in": 1277,
         "out": 696,
         "hours": 18.4
+      },
+      {
+        "t": "2026-09-11T00:40:30.273Z",
+        "state": "live",
+        "in": 1277,
+        "out": 696,
+        "hours": 21
       }
     ]
   },
