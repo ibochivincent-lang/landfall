@@ -1,10 +1,10 @@
 {
   "anchorId": "audd.digital",
   "name": "AUDC PTY LTD",
-  "asOf": "2026-09-11T14:42:10.231Z",
+  "asOf": "2026-09-11T17:59:58.670Z",
   "verification": {
     "resolved": true,
-    "checkedAt": "2026-09-11T14:42:10.231Z",
+    "checkedAt": "2026-09-11T17:59:58.670Z",
     "source": "SEP-1 stellar.toml, resolved live; issuer attribution confirmed against each issuer account's own on-chain home_domain",
     "accounts": [
       {
@@ -36,7 +36,7 @@
       "outbound": 3,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 13.82,
+      "hoursSinceActivity": 17.11,
       "topCounterpartyShare": 0.9541
     },
     {
@@ -48,7 +48,7 @@
       "outbound": 2,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 2260.09,
+      "hoursSinceActivity": 2263.39,
       "topCounterpartyShare": 0.6667
     }
   ],
@@ -291,6 +291,13 @@
         "in": 235,
         "out": 3,
         "hours": 13.82
+      },
+      {
+        "t": "2026-09-11T17:59:58.670Z",
+        "state": "live",
+        "in": 235,
+        "out": 3,
+        "hours": 17.11
       }
     ],
     "GCUIIJ6J6KIOOYOICVFOEVH6XRY3WX4NUZDYGPUCJQZM6R3OFJE2QGY2": [
@@ -531,6 +538,13 @@
         "in": 2,
         "out": 2,
         "hours": 2260.09
+      },
+      {
+        "t": "2026-09-11T17:59:58.670Z",
+        "state": "dark",
+        "in": 2,
+        "out": 2,
+        "hours": 2263.39
       }
     ]
   },

@@ -1,10 +1,10 @@
 {
   "anchorId": "app.phoenix-hub.io",
   "name": "Phoenix Protocol Group",
-  "asOf": "2026-09-11T14:42:10.231Z",
+  "asOf": "2026-09-11T17:59:58.670Z",
   "verification": {
     "resolved": true,
-    "checkedAt": "2026-09-11T14:42:10.231Z",
+    "checkedAt": "2026-09-11T17:59:58.670Z",
     "source": "SEP-1 stellar.toml, resolved live; issuer attribution confirmed against each issuer account's own on-chain home_domain",
     "accounts": [
       {
@@ -32,7 +32,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 178.11,
+      "hoursSinceActivity": 181.41,
       "topCounterpartyShare": 1
     }
   ],
@@ -289,6 +289,13 @@
         "in": 1,
         "out": 0,
         "hours": 178.11
+      },
+      {
+        "t": "2026-09-11T17:59:58.670Z",
+        "state": "slow",
+        "in": 1,
+        "out": 0,
+        "hours": 181.41
       }
     ]
   },

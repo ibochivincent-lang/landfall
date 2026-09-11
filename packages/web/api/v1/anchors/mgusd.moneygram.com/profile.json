@@ -1,10 +1,10 @@
 {
   "anchorId": "mgusd.moneygram.com",
   "name": "MoneyGram Payment Systems, Inc.",
-  "asOf": "2026-09-11T14:42:10.231Z",
+  "asOf": "2026-09-11T17:59:58.670Z",
   "verification": {
     "resolved": true,
-    "checkedAt": "2026-09-11T14:42:10.231Z",
+    "checkedAt": "2026-09-11T17:59:58.670Z",
     "source": "SEP-1 stellar.toml, resolved live; issuer attribution confirmed against each issuer account's own on-chain home_domain",
     "accounts": [
       {
@@ -44,7 +44,7 @@
       "outbound": 1,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 2488.98,
+      "hoursSinceActivity": 2492.28,
       "topCounterpartyShare": 0.6301
     },
     {
@@ -56,7 +56,7 @@
       "outbound": 2,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 2537.33,
+      "hoursSinceActivity": 2540.62,
       "topCounterpartyShare": 0.9174
     },
     {
@@ -68,7 +68,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 7638.66,
+      "hoursSinceActivity": 7641.95,
       "topCounterpartyShare": 0.8333
     },
     {
@@ -80,7 +80,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 1547.3,
+      "hoursSinceActivity": 1550.59,
       "topCounterpartyShare": 1
     }
   ],
@@ -337,6 +337,13 @@
         "in": 6,
         "out": 1,
         "hours": 2488.98
+      },
+      {
+        "t": "2026-09-11T17:59:58.670Z",
+        "state": "dark",
+        "in": 6,
+        "out": 1,
+        "hours": 2492.28
       }
     ],
     "GDYC7FS3JIBLYIJGDARQXJKM5VQBVM4ZCBB7IMAJJ7BJ3ARQRTHCTIA3": [
@@ -591,6 +598,13 @@
         "in": 5,
         "out": 2,
         "hours": 2537.33
+      },
+      {
+        "t": "2026-09-11T17:59:58.670Z",
+        "state": "dark",
+        "in": 5,
+        "out": 2,
+        "hours": 2540.62
       }
     ],
     "GC4SAAHODFMZPNGLGAYC7RQ6GDD65DTSONZ6TCSYRCZQJDEN7HOIHVNS": [
@@ -845,6 +859,13 @@
         "in": 2,
         "out": 0,
         "hours": 7638.66
+      },
+      {
+        "t": "2026-09-11T17:59:58.670Z",
+        "state": "dark",
+        "in": 2,
+        "out": 0,
+        "hours": 7641.95
       }
     ],
     "GAIUGZZZSL47BKH27SUDZESZELFJDPE2UM52RACOSFJ7BIVBGKUEJSUZ": [
@@ -1099,6 +1120,13 @@
         "in": 1,
         "out": 0,
         "hours": 1547.3
+      },
+      {
+        "t": "2026-09-11T17:59:58.670Z",
+        "state": "dark",
+        "in": 1,
+        "out": 0,
+        "hours": 1550.59
       }
     ]
   },
