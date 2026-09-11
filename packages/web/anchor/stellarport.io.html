@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Stellarport — settlement record | Landfall</title>
-<meta name="description" content="Independent, ledger-derived settlement record for stellarport.io: 4 declared Stellar account(s), 0 settling, 3 dark. Every figure traces to a transaction hash.">
+<meta name="description" content="Independent, ledger-derived settlement record for stellarport.io: 4 declared Stellar account(s), 1 settling, 3 dark. Every figure traces to a transaction hash.">
 <link rel="canonical" href="https://landfall-chi.vercel.app/anchor/stellarport.io">
 <meta property="og:title" content="Stellarport — settlement record">
-<meta property="og:description" content="0 of 4 accounts settling. Read from the public Stellar ledger, not self-reported.">
+<meta property="og:description" content="1 of 4 accounts settling. Read from the public Stellar ledger, not self-reported.">
 <meta property="og:type" content="website">
 <link rel="stylesheet" href="../dashboard.css">
 <link rel="stylesheet" href="../anchor.css">
@@ -34,7 +34,7 @@
 
   <div class="anchor-summary">
     <div class="sum"><b>4</b><span>declared accounts</span></div>
-    <div class="sum"><b>0</b><span>settling now</span></div>
+    <div class="sum"><b>1</b><span>settling now</span></div>
     <div class="sum"><b class="is-dark">3</b><span>dark &gt; 30 days</span></div>
     <div class="sum"><b>30</b><span>inbound indexed</span></div>
     <div class="sum"><b>0</b><span>outbound indexed</span></div>
@@ -51,7 +51,7 @@
       domain's own is how a shared stablecoin issuer once got credited to a single business here.
     </p>
     <ul class="verify-list"><li class="mono">GBVOL67TMU…225PL5 — <strong>declared</strong></li><li class="mono">GC3M7GD3HN…YQMALT — <strong>declared</strong></li><li class="mono">GC45JH537X…OVVIGD — <strong>declared</strong></li><li class="mono">GDD7ABRF7B…EM2TCP — <strong>declared</strong></li></ul>
-    <p class="muted small">SEP-1 resolved successfully at 2026-09-11T10:12:19.721Z.</p>
+    <p class="muted small">SEP-1 resolved successfully at 2026-09-11T14:42:10.231Z.</p>
   </section>
 
   <section class="anchor-block">
@@ -61,35 +61,35 @@
       <tbody>
       <tr>
         <td class="mono"><a href="https://stellar.expert/explorer/public/account/GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5" target="_blank" rel="noopener">GBVOL67T…225PL5</a></td>
-        <td><span class="state state--slow">slow</span></td>
+        <td><span class="state state--live">live</span></td>
         <td class="num">30</td>
         <td class="num">0</td>
-        <td class="num">4.2d</td>
-        <td class="num">35 obs</td>
+        <td class="num">3.6h</td>
+        <td class="num">36 obs</td>
       </tr>
       <tr>
         <td class="mono"><a href="https://stellar.expert/explorer/public/account/GC3M7GD3HNLCXSWDSJO2YTJ4LMNGNUOFWX5SVRHY7PCYGV5GLLYQMALT" target="_blank" rel="noopener">GC3M7GD3…YQMALT</a></td>
         <td><span class="state state--dark">dark</span></td>
         <td class="num">0</td>
         <td class="num">0</td>
-        <td class="num">64.3d</td>
-        <td class="num">35 obs</td>
+        <td class="num">64.4d</td>
+        <td class="num">36 obs</td>
       </tr>
       <tr>
         <td class="mono"><a href="https://stellar.expert/explorer/public/account/GC45JH537XZD4DY4WTV5PCUJL4KPOIE4WMGX5OP5KSPS2OLGRUOVVIGD" target="_blank" rel="noopener">GC45JH53…OVVIGD</a></td>
         <td><span class="state state--dark">dark</span></td>
         <td class="num">0</td>
         <td class="num">0</td>
-        <td class="num">64.1d</td>
-        <td class="num">35 obs</td>
+        <td class="num">64.3d</td>
+        <td class="num">36 obs</td>
       </tr>
       <tr>
         <td class="mono"><a href="https://stellar.expert/explorer/public/account/GDD7ABRF7BCK76W33RXDQG5Q3WXVSQYVLGEMXSOWRGZ6Z3G3M2EM2TCP" target="_blank" rel="noopener">GDD7ABRF…EM2TCP</a></td>
         <td><span class="state state--dark">dark</span></td>
         <td class="num">0</td>
         <td class="num">0</td>
-        <td class="num">65.1d</td>
-        <td class="num">35 obs</td>
+        <td class="num">65.3d</td>
+        <td class="num">36 obs</td>
       </tr></tbody>
     </table>
     <p class="muted small">
@@ -103,10 +103,14 @@
   <section class="anchor-block">
     <h2>Trend</h2>
     <p class="muted small">
-      2 state change(s) observed across this anchor's accounts,
+      3 state change(s) observed across this anchor's accounts,
       1 of them to a weaker state.
     </p>
     <ul class="trend-list"><li>
+        <span class="mono">GBVOL67T…225PL5</span>
+        went <strong class="trend-up">slow → live</strong>
+        on 2026-09-11
+      </li><li>
         <span class="mono">GBVOL67T…225PL5</span>
         went <strong class="trend-down">live → slow</strong>
         on 2026-09-10
@@ -129,7 +133,7 @@
     <p>
       A <code>stellar.toml</code> entry is a claim that an endpoint exists. Directories publish that claim
       and nothing checks it. These are the results of asking each declared endpoint directly, at
-      2026-09-11T05:31:08.993Z.
+      2026-09-11T10:16:16.033Z.
       <strong>1 declared capability(ies) did not answer.</strong>
     </p>
     <table class="anchor-table">
@@ -139,14 +143,14 @@
         <td><strong>SEP-6</strong><div class="muted small">Programmatic deposit &amp; withdrawal</div></td>
         <td><span class="cap cap--yes">declared</span></td>
         <td><span class="cap cap--no">not answering</span></td>
-        <td class="num">89ms</td>
+        <td class="num">151ms</td>
         <td class="muted small">fetch failed</td>
       </tr>
       <tr>
         <td><strong>SEP-10</strong><div class="muted small">Web authentication</div></td>
         <td><span class="cap cap--yes">declared</span></td>
         <td><span class="cap cap--yes">answering</span></td>
-        <td class="num">442ms</td>
+        <td class="num">239ms</td>
         <td class="muted small">Answered a bare challenge request, which is the expected behaviour.</td>
       </tr></tbody>
     </table>
@@ -164,7 +168,7 @@
   </section>
 
   <p class="muted small asof">
-    Scan of 2026-09-11T10:12:19.721Z · verified against stellar.expert · <a href="../docs.html">methodology</a> ·
+    Scan of 2026-09-11T14:42:10.231Z · verified against stellar.expert · <a href="../docs.html">methodology</a> ·
     <a href="https://github.com/ibochivincent-lang/landfall/blob/main/DISPUTES.md">dispute a figure on this page</a>
   </p>
 </main>
