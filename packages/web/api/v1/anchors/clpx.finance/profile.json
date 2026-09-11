@@ -1,10 +1,10 @@
 {
   "anchorId": "clpx.finance",
   "name": "CLPX S.A.",
-  "asOf": "2026-09-11T05:25:15.702Z",
+  "asOf": "2026-09-11T10:12:19.721Z",
   "verification": {
     "resolved": true,
-    "checkedAt": "2026-09-11T05:25:15.702Z",
+    "checkedAt": "2026-09-11T10:12:19.721Z",
     "source": "SEP-1 stellar.toml, resolved live; issuer attribution confirmed against each issuer account's own on-chain home_domain",
     "accounts": [
       {
@@ -32,7 +32,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 1364.53,
+      "hoursSinceActivity": 1369.32,
       "topCounterpartyShare": 0.9254
     }
   ],
@@ -331,6 +331,13 @@
         "in": 7,
         "out": 0,
         "hours": 1364.53
+      },
+      {
+        "t": "2026-09-11T10:12:19.721Z",
+        "state": "dark",
+        "in": 7,
+        "out": 0,
+        "hours": 1369.32
       }
     ]
   },
