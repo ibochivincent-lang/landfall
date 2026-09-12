@@ -1,10 +1,10 @@
 {
   "anchorId": "aqua.network",
   "name": "Aquarius",
-  "asOf": "2026-09-12T05:15:25.242Z",
+  "asOf": "2026-09-12T09:46:37.224Z",
   "verification": {
     "resolved": true,
-    "checkedAt": "2026-09-12T05:15:25.242Z",
+    "checkedAt": "2026-09-12T09:46:37.224Z",
     "source": "SEP-1 stellar.toml, resolved live; issuer attribution confirmed against each issuer account's own on-chain home_domain",
     "accounts": [
       {
@@ -23,8 +23,8 @@
     "slow": 0,
     "dark": 0,
     "noActivity": 0,
-    "inbound": 264,
-    "outbound": 1542
+    "inbound": 265,
+    "outbound": 1561
   },
   "accounts": [
     {
@@ -32,11 +32,11 @@
       "domain": "aqua.network",
       "name": "Aquarius",
       "state": "live",
-      "inbound": 264,
+      "inbound": 265,
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 1.62,
+      "hoursSinceActivity": 4.08,
       "topCounterpartyShare": 0.238
     },
     {
@@ -45,10 +45,10 @@
       "name": "Aquarius",
       "state": "live",
       "inbound": 0,
-      "outbound": 1542,
+      "outbound": 1561,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 0.83,
+      "hoursSinceActivity": 0.01,
       "topCounterpartyShare": null
     }
   ],
@@ -340,6 +340,13 @@
         "in": 264,
         "out": 0,
         "hours": 1.62
+      },
+      {
+        "t": "2026-09-12T09:46:37.224Z",
+        "state": "live",
+        "in": 265,
+        "out": 0,
+        "hours": 4.08
       }
     ],
     "GAXSGZ2JM3LNWOO4WRGADISNMWO4HQLG4QBGUZRKH5ZHL3EQBGX73ICE": [
@@ -629,6 +636,13 @@
         "in": 0,
         "out": 1542,
         "hours": 0.83
+      },
+      {
+        "t": "2026-09-12T09:46:37.224Z",
+        "state": "live",
+        "in": 0,
+        "out": 1561,
+        "hours": 0.01
       }
     ]
   },
