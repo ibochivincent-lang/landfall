@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-12T18:57:48.430Z",
+  "generatedAt": "2026-09-12T21:14:35.835Z",
   "note": "Which anchors can move value into a given local currency, and which of them are demonstrably working. Joins three things that previously had to be joined by the caller: the currencies an anchor declares, whether its SEP endpoints answered when probed, and whether it has settled anything on the ledger lately.",
   "ranking": "Ordered by evidence, not by a score. Endpoints answering and a recent settlement ranks above endpoints answering and a long silence, which ranks above a declared corridor with a dead API. Every route carries the evidence inline so a consumer that disagrees can impose its own order.",
   "vocabulary": {
@@ -30,11 +30,11 @@
               "SEP-10"
             ],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:39.495Z"
+            "checkedAt": "2026-09-12T21:14:28.142Z"
           },
           "ledger": {
             "state": "settling",
-            "hoursSinceActivity": 2.8,
+            "hoursSinceActivity": 5,
             "accounts": 13
           },
           "fees": {
@@ -55,11 +55,11 @@
               "SEP-10"
             ],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:37.354Z"
+            "checkedAt": "2026-09-12T21:14:25.033Z"
           },
           "ledger": {
             "state": "slow",
-            "hoursSinceActivity": 468.6,
+            "hoursSinceActivity": 470.8,
             "accounts": 4
           },
           "fees": {
@@ -81,11 +81,11 @@
               "SEP-10"
             ],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:39.248Z"
+            "checkedAt": "2026-09-12T21:14:27.107Z"
           },
           "ledger": {
             "state": "slow",
-            "hoursSinceActivity": 200.4,
+            "hoursSinceActivity": 202.7,
             "accounts": 15
           },
           "fees": {
@@ -109,7 +109,7 @@
               "SEP-10"
             ],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:36.926Z"
+            "checkedAt": "2026-09-12T21:14:24.383Z"
           },
           "ledger": {
             "state": "untracked",
@@ -136,7 +136,7 @@
             "failingSeps": [
               "SEP-10"
             ],
-            "checkedAt": "2026-09-12T18:57:36.510Z"
+            "checkedAt": "2026-09-12T21:14:23.738Z"
           },
           "ledger": {
             "state": "untracked",
@@ -159,11 +159,11 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:37.001Z"
+            "checkedAt": "2026-09-12T21:14:24.574Z"
           },
           "ledger": {
             "state": "settling",
-            "hoursSinceActivity": 52.2,
+            "hoursSinceActivity": 54.5,
             "accounts": 6
           },
           "fees": {
@@ -180,7 +180,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:37.380Z"
+            "checkedAt": "2026-09-12T21:14:24.749Z"
           },
           "ledger": {
             "state": "settling",
@@ -201,11 +201,11 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:37.472Z"
+            "checkedAt": "2026-09-12T21:14:25.142Z"
           },
           "ledger": {
             "state": "settling",
-            "hoursSinceActivity": 2.2,
+            "hoursSinceActivity": 1.5,
             "accounts": 2
           },
           "fees": {
@@ -222,11 +222,11 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:37.905Z"
+            "checkedAt": "2026-09-12T21:14:25.605Z"
           },
           "ledger": {
             "state": "settling",
-            "hoursSinceActivity": 0.8,
+            "hoursSinceActivity": 0.1,
             "accounts": 5
           },
           "fees": {
@@ -243,11 +243,11 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:38.838Z"
+            "checkedAt": "2026-09-12T21:14:26.210Z"
           },
           "ledger": {
             "state": "slow",
-            "hoursSinceActivity": 101.1,
+            "hoursSinceActivity": 103.3,
             "accounts": 1
           },
           "fees": {
@@ -264,11 +264,11 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:38.144Z"
+            "checkedAt": "2026-09-12T21:14:25.567Z"
           },
           "ledger": {
             "state": "dark",
-            "hoursSinceActivity": 776.7,
+            "hoursSinceActivity": 779,
             "accounts": 2
           },
           "fees": {
@@ -285,11 +285,11 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:37.979Z"
+            "checkedAt": "2026-09-12T21:14:25.755Z"
           },
           "ledger": {
             "state": "dark",
-            "hoursSinceActivity": 1575.5,
+            "hoursSinceActivity": 1577.7,
             "accounts": 4
           },
           "fees": {
@@ -325,11 +325,11 @@
               "SEP-10"
             ],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:37.354Z"
+            "checkedAt": "2026-09-12T21:14:25.033Z"
           },
           "ledger": {
             "state": "slow",
-            "hoursSinceActivity": 468.6,
+            "hoursSinceActivity": 470.8,
             "accounts": 4
           },
           "fees": {
@@ -346,11 +346,11 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:37.001Z"
+            "checkedAt": "2026-09-12T21:14:24.574Z"
           },
           "ledger": {
             "state": "settling",
-            "hoursSinceActivity": 52.2,
+            "hoursSinceActivity": 54.5,
             "accounts": 6
           },
           "fees": {
@@ -370,11 +370,11 @@
               "SEP-24",
               "SEP-10"
             ],
-            "checkedAt": "2026-09-12T18:57:38.290Z"
+            "checkedAt": "2026-09-12T21:14:25.840Z"
           },
           "ledger": {
             "state": "slow",
-            "hoursSinceActivity": 109.6,
+            "hoursSinceActivity": 111.8,
             "accounts": 2
           },
           "fees": {
@@ -411,11 +411,11 @@
               "SEP-10"
             ],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:37.751Z"
+            "checkedAt": "2026-09-12T21:14:25.560Z"
           },
           "ledger": {
             "state": "slow",
-            "hoursSinceActivity": 456.5,
+            "hoursSinceActivity": 458.7,
             "accounts": 3
           },
           "fees": {
@@ -434,11 +434,11 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:37.001Z"
+            "checkedAt": "2026-09-12T21:14:24.574Z"
           },
           "ledger": {
             "state": "settling",
-            "hoursSinceActivity": 52.2,
+            "hoursSinceActivity": 54.5,
             "accounts": 6
           },
           "fees": {
@@ -455,7 +455,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:37.380Z"
+            "checkedAt": "2026-09-12T21:14:24.749Z"
           },
           "ledger": {
             "state": "settling",
@@ -496,11 +496,11 @@
               "SEP-10"
             ],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:38.521Z"
+            "checkedAt": "2026-09-12T21:14:26.180Z"
           },
           "ledger": {
             "state": "dark",
-            "hoursSinceActivity": 1402,
+            "hoursSinceActivity": 1404.2,
             "accounts": 1
           },
           "fees": {
@@ -517,11 +517,11 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:37.001Z"
+            "checkedAt": "2026-09-12T21:14:24.574Z"
           },
           "ledger": {
             "state": "settling",
-            "hoursSinceActivity": 52.2,
+            "hoursSinceActivity": 54.5,
             "accounts": 6
           },
           "fees": {
@@ -538,7 +538,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:37.380Z"
+            "checkedAt": "2026-09-12T21:14:24.749Z"
           },
           "ledger": {
             "state": "settling",
@@ -578,11 +578,11 @@
               "SEP-10"
             ],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:36.361Z"
+            "checkedAt": "2026-09-12T21:14:24.274Z"
           },
           "ledger": {
             "state": "settling",
-            "hoursSinceActivity": 23.8,
+            "hoursSinceActivity": 26.1,
             "accounts": 3
           },
           "fees": {
@@ -601,11 +601,11 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:37.001Z"
+            "checkedAt": "2026-09-12T21:14:24.574Z"
           },
           "ledger": {
             "state": "settling",
-            "hoursSinceActivity": 52.2,
+            "hoursSinceActivity": 54.5,
             "accounts": 6
           },
           "fees": {
@@ -622,7 +622,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:37.380Z"
+            "checkedAt": "2026-09-12T21:14:24.749Z"
           },
           "ledger": {
             "state": "settling",
@@ -658,11 +658,11 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:37.001Z"
+            "checkedAt": "2026-09-12T21:14:24.574Z"
           },
           "ledger": {
             "state": "settling",
-            "hoursSinceActivity": 52.2,
+            "hoursSinceActivity": 54.5,
             "accounts": 6
           },
           "fees": {
@@ -679,7 +679,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:37.380Z"
+            "checkedAt": "2026-09-12T21:14:24.749Z"
           },
           "ledger": {
             "state": "settling",
@@ -700,11 +700,11 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:38.144Z"
+            "checkedAt": "2026-09-12T21:14:25.567Z"
           },
           "ledger": {
             "state": "dark",
-            "hoursSinceActivity": 776.7,
+            "hoursSinceActivity": 779,
             "accounts": 2
           },
           "fees": {
@@ -736,11 +736,11 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:37.001Z"
+            "checkedAt": "2026-09-12T21:14:24.574Z"
           },
           "ledger": {
             "state": "settling",
-            "hoursSinceActivity": 52.2,
+            "hoursSinceActivity": 54.5,
             "accounts": 6
           },
           "fees": {
@@ -757,11 +757,11 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:39.555Z"
+            "checkedAt": "2026-09-12T21:14:26.771Z"
           },
           "ledger": {
             "state": "settling",
-            "hoursSinceActivity": 42,
+            "hoursSinceActivity": 44.2,
             "accounts": 2
           },
           "fees": {
@@ -778,11 +778,11 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:38.492Z"
+            "checkedAt": "2026-09-12T21:14:26.117Z"
           },
           "ledger": {
             "state": "dark",
-            "hoursSinceActivity": 776.7,
+            "hoursSinceActivity": 779,
             "accounts": 5
           },
           "fees": {
@@ -814,11 +814,11 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:37.001Z"
+            "checkedAt": "2026-09-12T21:14:24.574Z"
           },
           "ledger": {
             "state": "settling",
-            "hoursSinceActivity": 52.2,
+            "hoursSinceActivity": 54.5,
             "accounts": 6
           },
           "fees": {
@@ -835,7 +835,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:37.380Z"
+            "checkedAt": "2026-09-12T21:14:24.749Z"
           },
           "ledger": {
             "state": "settling",
@@ -856,11 +856,11 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:39.404Z"
+            "checkedAt": "2026-09-12T21:14:26.949Z"
           },
           "ledger": {
             "state": "dark",
-            "hoursSinceActivity": 1372.3,
+            "hoursSinceActivity": 1374.5,
             "accounts": 1
           },
           "fees": {
@@ -892,11 +892,11 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:37.001Z"
+            "checkedAt": "2026-09-12T21:14:24.574Z"
           },
           "ledger": {
             "state": "settling",
-            "hoursSinceActivity": 52.2,
+            "hoursSinceActivity": 54.5,
             "accounts": 6
           },
           "fees": {
@@ -916,11 +916,11 @@
               "SEP-24",
               "SEP-10"
             ],
-            "checkedAt": "2026-09-12T18:57:38.290Z"
+            "checkedAt": "2026-09-12T21:14:25.840Z"
           },
           "ledger": {
             "state": "slow",
-            "hoursSinceActivity": 109.6,
+            "hoursSinceActivity": 111.8,
             "accounts": 2
           },
           "fees": {
@@ -952,11 +952,11 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:37.001Z"
+            "checkedAt": "2026-09-12T21:14:24.574Z"
           },
           "ledger": {
             "state": "settling",
-            "hoursSinceActivity": 52.2,
+            "hoursSinceActivity": 54.5,
             "accounts": 6
           },
           "fees": {
@@ -976,11 +976,11 @@
               "SEP-24",
               "SEP-10"
             ],
-            "checkedAt": "2026-09-12T18:57:38.290Z"
+            "checkedAt": "2026-09-12T21:14:25.840Z"
           },
           "ledger": {
             "state": "slow",
-            "hoursSinceActivity": 109.6,
+            "hoursSinceActivity": 111.8,
             "accounts": 2
           },
           "fees": {
@@ -1017,11 +1017,11 @@
               "SEP-10"
             ],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:39.248Z"
+            "checkedAt": "2026-09-12T21:14:27.107Z"
           },
           "ledger": {
             "state": "slow",
-            "hoursSinceActivity": 200.4,
+            "hoursSinceActivity": 202.7,
             "accounts": 15
           },
           "fees": {
@@ -1038,11 +1038,11 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:37.001Z"
+            "checkedAt": "2026-09-12T21:14:24.574Z"
           },
           "ledger": {
             "state": "settling",
-            "hoursSinceActivity": 52.2,
+            "hoursSinceActivity": 54.5,
             "accounts": 6
           },
           "fees": {
@@ -1078,11 +1078,11 @@
               "SEP-10"
             ],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:36.361Z"
+            "checkedAt": "2026-09-12T21:14:24.274Z"
           },
           "ledger": {
             "state": "settling",
-            "hoursSinceActivity": 23.8,
+            "hoursSinceActivity": 26.1,
             "accounts": 3
           },
           "fees": {
@@ -1101,11 +1101,11 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:37.001Z"
+            "checkedAt": "2026-09-12T21:14:24.574Z"
           },
           "ledger": {
             "state": "settling",
-            "hoursSinceActivity": 52.2,
+            "hoursSinceActivity": 54.5,
             "accounts": 6
           },
           "fees": {
@@ -1137,11 +1137,11 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:37.001Z"
+            "checkedAt": "2026-09-12T21:14:24.574Z"
           },
           "ledger": {
             "state": "settling",
-            "hoursSinceActivity": 52.2,
+            "hoursSinceActivity": 54.5,
             "accounts": 6
           },
           "fees": {
@@ -1158,7 +1158,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:37.380Z"
+            "checkedAt": "2026-09-12T21:14:24.749Z"
           },
           "ledger": {
             "state": "settling",
@@ -1194,11 +1194,11 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:37.001Z"
+            "checkedAt": "2026-09-12T21:14:24.574Z"
           },
           "ledger": {
             "state": "settling",
-            "hoursSinceActivity": 52.2,
+            "hoursSinceActivity": 54.5,
             "accounts": 6
           },
           "fees": {
@@ -1215,7 +1215,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:37.380Z"
+            "checkedAt": "2026-09-12T21:14:24.749Z"
           },
           "ledger": {
             "state": "settling",
@@ -1251,11 +1251,11 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:37.001Z"
+            "checkedAt": "2026-09-12T21:14:24.574Z"
           },
           "ledger": {
             "state": "settling",
-            "hoursSinceActivity": 52.2,
+            "hoursSinceActivity": 54.5,
             "accounts": 6
           },
           "fees": {
@@ -1272,7 +1272,7 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:37.380Z"
+            "checkedAt": "2026-09-12T21:14:24.749Z"
           },
           "ledger": {
             "state": "settling",
@@ -1308,11 +1308,11 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:37.001Z"
+            "checkedAt": "2026-09-12T21:14:24.574Z"
           },
           "ledger": {
             "state": "settling",
-            "hoursSinceActivity": 52.2,
+            "hoursSinceActivity": 54.5,
             "accounts": 6
           },
           "fees": {
@@ -1329,11 +1329,11 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:39.555Z"
+            "checkedAt": "2026-09-12T21:14:26.771Z"
           },
           "ledger": {
             "state": "settling",
-            "hoursSinceActivity": 42,
+            "hoursSinceActivity": 44.2,
             "accounts": 2
           },
           "fees": {
@@ -1370,11 +1370,11 @@
               "SEP-10"
             ],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:39.248Z"
+            "checkedAt": "2026-09-12T21:14:27.107Z"
           },
           "ledger": {
             "state": "slow",
-            "hoursSinceActivity": 200.4,
+            "hoursSinceActivity": 202.7,
             "accounts": 15
           },
           "fees": {
@@ -1391,11 +1391,11 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:37.001Z"
+            "checkedAt": "2026-09-12T21:14:24.574Z"
           },
           "ledger": {
             "state": "settling",
-            "hoursSinceActivity": 52.2,
+            "hoursSinceActivity": 54.5,
             "accounts": 6
           },
           "fees": {
@@ -1427,11 +1427,11 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:37.001Z"
+            "checkedAt": "2026-09-12T21:14:24.574Z"
           },
           "ledger": {
             "state": "settling",
-            "hoursSinceActivity": 52.2,
+            "hoursSinceActivity": 54.5,
             "accounts": 6
           },
           "fees": {
@@ -1463,11 +1463,11 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:37.001Z"
+            "checkedAt": "2026-09-12T21:14:24.574Z"
           },
           "ledger": {
             "state": "settling",
-            "hoursSinceActivity": 52.2,
+            "hoursSinceActivity": 54.5,
             "accounts": 6
           },
           "fees": {
@@ -1499,11 +1499,11 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:37.001Z"
+            "checkedAt": "2026-09-12T21:14:24.574Z"
           },
           "ledger": {
             "state": "settling",
-            "hoursSinceActivity": 52.2,
+            "hoursSinceActivity": 54.5,
             "accounts": 6
           },
           "fees": {
@@ -1535,11 +1535,11 @@
             "working": 0,
             "workingSeps": [],
             "failingSeps": [],
-            "checkedAt": "2026-09-12T18:57:37.001Z"
+            "checkedAt": "2026-09-12T21:14:24.574Z"
           },
           "ledger": {
             "state": "settling",
-            "hoursSinceActivity": 52.2,
+            "hoursSinceActivity": 54.5,
             "accounts": 6
           },
           "fees": {
