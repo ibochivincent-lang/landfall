@@ -1,10 +1,10 @@
 {
   "anchorId": "stellarport.io",
   "name": "Stellarport",
-  "asOf": "2026-09-12T13:14:42.775Z",
+  "asOf": "2026-09-12T16:37:59.812Z",
   "verification": {
     "resolved": true,
-    "checkedAt": "2026-09-12T13:14:42.775Z",
+    "checkedAt": "2026-09-12T16:37:59.812Z",
     "source": "SEP-1 stellar.toml, resolved live; issuer attribution confirmed against each issuer account's own on-chain home_domain",
     "accounts": [
       {
@@ -44,7 +44,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": 0,
-      "hoursSinceActivity": 26.19,
+      "hoursSinceActivity": 29.58,
       "topCounterpartyShare": 0.9982
     },
     {
@@ -56,7 +56,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1569.2,
+      "hoursSinceActivity": 1572.59,
       "topCounterpartyShare": null
     },
     {
@@ -68,7 +68,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1565.58,
+      "hoursSinceActivity": 1568.97,
       "topCounterpartyShare": null
     },
     {
@@ -80,7 +80,7 @@
       "outbound": 0,
       "returns": 0,
       "returnRate": null,
-      "hoursSinceActivity": 1588.6,
+      "hoursSinceActivity": 1591.99,
       "topCounterpartyShare": null
     }
   ],
@@ -386,6 +386,13 @@
         "in": 30,
         "out": 0,
         "hours": 26.19
+      },
+      {
+        "t": "2026-09-12T16:37:59.812Z",
+        "state": "live",
+        "in": 30,
+        "out": 0,
+        "hours": 29.58
       }
     ],
     "GC3M7GD3HNLCXSWDSJO2YTJ4LMNGNUOFWX5SVRHY7PCYGV5GLLYQMALT": [
@@ -689,6 +696,13 @@
         "in": 0,
         "out": 0,
         "hours": 1569.2
+      },
+      {
+        "t": "2026-09-12T16:37:59.812Z",
+        "state": "dark",
+        "in": 0,
+        "out": 0,
+        "hours": 1572.59
       }
     ],
     "GC45JH537XZD4DY4WTV5PCUJL4KPOIE4WMGX5OP5KSPS2OLGRUOVVIGD": [
@@ -992,6 +1006,13 @@
         "in": 0,
         "out": 0,
         "hours": 1565.58
+      },
+      {
+        "t": "2026-09-12T16:37:59.812Z",
+        "state": "dark",
+        "in": 0,
+        "out": 0,
+        "hours": 1568.97
       }
     ],
     "GDD7ABRF7BCK76W33RXDQG5Q3WXVSQYVLGEMXSOWRGZ6Z3G3M2EM2TCP": [
@@ -1295,6 +1316,13 @@
         "in": 0,
         "out": 0,
         "hours": 1588.6
+      },
+      {
+        "t": "2026-09-12T16:37:59.812Z",
+        "state": "dark",
+        "in": 0,
+        "out": 0,
+        "hours": 1591.99
       }
     ]
   },
