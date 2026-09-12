@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-11T23:01:18.750Z",
+  "generatedAt": "2026-09-12T00:56:27.927Z",
   "stpVersion": "1",
   "window": {
-    "since": "2026-08-12T23:00:16.804Z",
+    "since": "2026-08-13T00:55:26.293Z",
     "days": 30,
     "maxRecordsPerAccount": 200
   },
@@ -55,7 +55,7 @@
     }
   ],
   "totals": {
-    "PROVEN": 1567,
+    "PROVEN": 1558,
     "ATTESTED": 0,
     "DERIVED": 0
   },
@@ -83,12 +83,12 @@
     {
       "anchorId": "ultracapital.xyz",
       "evidence": {
-        "PROVEN": 239,
+        "PROVEN": 232,
         "ATTESTED": 0,
         "DERIVED": 0
       },
-      "tierMix": "PROVEN 239 · ATTESTED 0 · DERIVED 0",
-      "rationale": "Ranked on 239 ledger-proven settlement(s)."
+      "tierMix": "PROVEN 232 · ATTESTED 0 · DERIVED 0",
+      "rationale": "Ranked on 232 ledger-proven settlement(s)."
     },
     {
       "anchorId": "luxpayband.io",
@@ -113,12 +113,12 @@
     {
       "anchorId": "anclap.com",
       "evidence": {
-        "PROVEN": 58,
+        "PROVEN": 56,
         "ATTESTED": 0,
         "DERIVED": 0
       },
-      "tierMix": "PROVEN 58 · ATTESTED 0 · DERIVED 0",
-      "rationale": "Ranked on 58 ledger-proven settlement(s)."
+      "tierMix": "PROVEN 56 · ATTESTED 0 · DERIVED 0",
+      "rationale": "Ranked on 56 ledger-proven settlement(s)."
     },
     {
       "anchorId": "aqua.network",
@@ -563,12 +563,12 @@
         "tiers": [
           {
             "tier": "PROVEN",
-            "events": 58,
+            "events": 56,
             "byAsset": [
               {
                 "asset": "ARS",
-                "count": 57,
-                "volume": "13099163.6491074"
+                "count": 55,
+                "volume": "13098326.6791074"
               },
               {
                 "asset": "XLM",
@@ -593,7 +593,7 @@
             "chain": "stellar",
             "maxTier": "PROVEN",
             "state": "observed",
-            "events": 58,
+            "events": 56,
             "sourcesScanned": 3,
             "sourcesFailed": 0
           },
@@ -661,8 +661,8 @@
             "note": "no solana address curated for this anchor in registry/anchors.registry.json"
           }
         ],
-        "totalEvents": 58,
-        "tierMix": "PROVEN 58 · ATTESTED 0 · DERIVED 0"
+        "totalEvents": 56,
+        "tierMix": "PROVEN 56 · ATTESTED 0 · DERIVED 0"
       },
       "failures": [],
       "sampleAttestations": [
@@ -890,38 +890,38 @@
             "byAsset": [
               {
                 "asset": "APSEURM",
-                "count": 124,
-                "volume": "1512075.35"
+                "count": 127,
+                "volume": "1512786.62"
               },
               {
                 "asset": "APSUSDM",
-                "count": 59,
-                "volume": "348469.43"
-              },
-              {
-                "asset": "APSBPIUSD",
-                "count": 33,
-                "volume": "1450.83"
+                "count": 58,
+                "volume": "362076.59"
               },
               {
                 "asset": "APSBPOUSD",
-                "count": 20,
-                "volume": "1702.38"
+                "count": 27,
+                "volume": "17997.95"
+              },
+              {
+                "asset": "APSBPIUSD",
+                "count": 26,
+                "volume": "655.02"
               },
               {
                 "asset": "APSBPIEUR",
                 "count": 11,
-                "volume": "322.14"
+                "volume": "658.45"
               },
               {
                 "asset": "APSSARM",
-                "count": 9,
-                "volume": "8571096.82"
+                "count": 8,
+                "volume": "8569023.73"
               },
               {
                 "asset": "APSBPIGBP",
-                "count": 3,
-                "volume": "175.13"
+                "count": 2,
+                "volume": "206.03"
               }
             ]
           },
@@ -2576,7 +2576,7 @@
               {
                 "asset": "XTAR",
                 "count": 190,
-                "volume": "0.022749"
+                "volume": "0.0227492"
               },
               {
                 "asset": "AQUA",
@@ -2730,15 +2730,15 @@
             "asset": "XTAR",
             "direction": "deposit",
             "amount": "0.0001642",
-            "onchain_ref": "fd68425e657358f77cc876aff179660dcac8085cb9e682c91ba033bcd3052929",
+            "onchain_ref": "c320cfa1d3cde368e53cda1f1a6bd570eaec5a937398d195fc9745330d37991b",
             "fiat_leg_ref": null,
             "evidence_tier": "PROVEN",
             "evidence_detail": "stellar_ledger",
             "keystone_ref": null,
-            "observed_at": "2026-09-11T22:01:50Z",
+            "observed_at": "2026-09-12T00:01:36Z",
             "signer": "landfall-attester-dev"
           },
-          "digest": "0f16af65e5fa3893d229bb2ee6cde2805b5dade72073b37e203424088bbe4bc3",
+          "digest": "39d9dbbcf7856e3c73a5194a25cc8243308ae5f513519da24f36ad6f020ec74e",
           "signed": false
         }
       ]
@@ -4118,7 +4118,7 @@
         "tiers": [
           {
             "tier": "PROVEN",
-            "events": 239,
+            "events": 232,
             "byAsset": [
               {
                 "asset": "yETH",
@@ -4127,8 +4127,8 @@
               },
               {
                 "asset": "yUSDC",
-                "count": 102,
-                "volume": "70585.2102567"
+                "count": 95,
+                "volume": "20000.2102567"
               },
               {
                 "asset": "yXLM",
@@ -4173,7 +4173,7 @@
             "chain": "stellar",
             "maxTier": "PROVEN",
             "state": "observed",
-            "events": 239,
+            "events": 232,
             "sourcesScanned": 13,
             "sourcesFailed": 0
           },
@@ -4241,8 +4241,8 @@
             "note": "no solana address curated for this anchor in registry/anchors.registry.json"
           }
         ],
-        "totalEvents": 239,
-        "tierMix": "PROVEN 239 · ATTESTED 0 · DERIVED 0"
+        "totalEvents": 232,
+        "tierMix": "PROVEN 232 · ATTESTED 0 · DERIVED 0"
       },
       "failures": [],
       "sampleAttestations": [
