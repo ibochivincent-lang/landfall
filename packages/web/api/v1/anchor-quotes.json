@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-12T09:52:02.431Z",
+  "generatedAt": "2026-09-12T13:19:02.429Z",
   "note": "Live indicative FX rates from each anchor's own SEP-38 quote server, sampled at $100 once an hour. Replaces the hardcoded rateSpread catalogue in packages/web/compare.js wherever an anchor runs SEP-38 and declares the asset pair — see docs.html and README for which anchors that is today.",
   "caveat": "GET /price is indicative, not firm — an anchor can quote differently at execution time, and its price can vary with amount (fee tiers), so this is a $100 sample, not a guarantee. Anchors with no ANCHOR_QUOTE_SERVER, or whose /info does not list a corridor Route Scout shows, still fall back to the catalogue rateSpread — status distinguishes exactly why per anchor.",
   "counts": {
